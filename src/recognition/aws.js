@@ -5,6 +5,7 @@ const { writeOutput } = require("../logger");
 
 class AWSProvider {
   constructor(environmentVars) {
+    writeOutput("Using AWS");
     AWS.config.update({
       region: environmentVars.AWS_BUCKET_REGION,
       credentials: new AWS.CognitoIdentityCredentials({

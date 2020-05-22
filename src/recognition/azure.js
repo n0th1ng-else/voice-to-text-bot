@@ -1,5 +1,7 @@
 class AzureProvider {
   constructor(environmentVars) {
+    writeOutput("Using Azure");
+
     this.token = environmentVars.AZURE_API;
   }
 
