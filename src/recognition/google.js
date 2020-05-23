@@ -21,7 +21,8 @@ class GoogleProvider {
     };
   }
 
-  transformToText(fileLink) {
+  transformToText(fileLink, data) {
+    const name = `${data.file_unique_id}.wav`;
     writeOutput("Starting process for", fileLink);
     return this.getFileBase64(fileLink)
       .then((base64data) => {
@@ -32,9 +33,14 @@ class GoogleProvider {
           config: this.config,
         };
 
+        writeOutput("Start converting", name, fileLink);
         return this.service.recognize(params);
       })
-      .then((translationData) => this.unpackTranscription(translationData));
+      .then((translationData) => this.unpackTranscription(translationData))
+      .then((text) => {
+        writeOutput(`Job ${name} completed`);
+        return text;
+      });
   }
 
   unpackTranscription(translationData) {

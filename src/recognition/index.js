@@ -1,18 +1,14 @@
 const { AWSProvider } = require("./aws");
-const { AzureProvider } = require("./azure");
 const { GoogleProvider } = require("./google");
 
 class VoiceConverter {
   constructor(provider, environmentVars) {
     switch (provider) {
-      case VoiceConverterProvider.google:
+      case VoiceConverterProvider.Google:
         this.provider = new GoogleProvider(environmentVars);
         return;
-      case VoiceConverterProvider.aws:
+      case VoiceConverterProvider.Aws:
         this.provider = new AWSProvider(environmentVars);
-        return;
-      case VoiceConverterProvider.azure:
-        this.provider = new AzureProvider(environmentVars);
         return;
       default:
         throw new Error("Voice recognition provider is not specified");
@@ -24,13 +20,22 @@ class VoiceConverter {
   }
 }
 
+function getVoiceConverterProvider(environmentVars) {
+  switch (environmentVars.PROVIDER) {
+    case VoiceConverterProvider.Aws:
+      return VoiceConverterProvider.Aws;
+    case VoiceConverterProvider.Google:
+    default:
+      return VoiceConverterProvider.Google;
+  }
+}
+
 const VoiceConverterProvider = {
-  google: "GOOGLE",
-  azure: "AZURE",
-  aws: "AWS",
+  Google: "GOOGLE",
+  Aws: "AWS",
 };
 
 module.exports = {
-  VoiceConverterProvider,
+  getVoiceConverterProvider,
   VoiceConverter,
 };

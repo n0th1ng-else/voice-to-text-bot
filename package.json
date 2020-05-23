@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "node src/server/index.js",
+    "dev": "node src/scripts/start.js",
     "format": "prettier --write ."
   },
   "dependencies": {
