@@ -1,0 +1,26 @@
+name: Project Workflow
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    name: Push docker image
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up node using nvm
+        uses: dcodeIO/setup-node-nvm@v4.0.0
+
+      - name: Docker Build & Push to GitHub Package
+        uses: opspresso/action-docker@master
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.GITHUB_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          IMAGE_NAME: voice-to-speech-app
