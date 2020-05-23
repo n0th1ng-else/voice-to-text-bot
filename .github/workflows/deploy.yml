@@ -24,3 +24,5 @@ jobs:
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
           IMAGE_NAME: voice-to-speech-app
+          TAG_NAME: latest
+          LATEST: "true"
