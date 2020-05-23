@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: voice-to-speech-https
+spec:
+  type: ClusterIP
+  ports:
+    - name: app-port-web
+      protocol: TCP
+      port: 8080
+      targetPort: app-port
+  selector:
+    app: voice-to-speech

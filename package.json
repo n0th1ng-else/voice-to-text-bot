@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "node src/scripts/start.js",
+    "start": "node src/scripts/start.js",
+    "dev": "node src/scripts/dev.js",
     "format": "prettier --write ."
   },
   "dependencies": {
