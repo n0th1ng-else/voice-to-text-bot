@@ -1,4 +1,5 @@
 const https = require("https");
+const mm = require("music-metadata");
 const { PubSub } = require("@google-cloud/pubsub");
 
 const pubsub = new PubSub();
@@ -33,16 +34,23 @@ exports.getVoiceFileBuffer = (pubSubEvent) => {
       const oggBuffer = [];
       response.on("data", (chunk) => oggBuffer.push(chunk));
       response.on("error", (err) => reject(err));
-      response.on("end", () =>
-        resolve(Buffer.concat(oggBuffer).toString("base64"))
-      );
+      response.on("end", () => resolve(Buffer.concat(oggBuffer)));
     });
   })
-    .then((fileBuffer) => {
+    .then((binaryBuffer) => {
+      return mm.parseBuffer(binaryBuffer).then((info) => ({
+        sampleRate: info.format.sampleRate,
+        numberOfChannels: info.format.numberOfChannels,
+        bufferString: binaryBuffer.toString("base64"),
+      }));
+    })
+    .then((bufferData) => {
       console.log(`${data.chatId} Created a buffer. Encoding...`);
       const messageObject = {
         ...data,
-        fileBuffer,
+        fileBuffer: bufferData.bufferString,
+        sampleRateHertz: bufferData.sampleRate,
+        audioChannelCount: bufferData.numberOfChannels,
       };
 
       return triggerEvent(TOPIC.GET_TEXT, messageObject);

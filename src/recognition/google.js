@@ -1,5 +1,6 @@
 const https = require("https");
 const speech = require("@google-cloud/speech");
+const mm = require("music-metadata");
 const { writeOutput } = require("../logger");
 
 class GoogleProvider {
@@ -13,24 +14,27 @@ class GoogleProvider {
         client_email: environmentVars.GOOGLE_CLIENT_EMAIL,
       },
     });
-
-    this.config = {
-      encoding: "OGG_OPUS",
-      sampleRateHertz: 16000,
-      languageCode: "ru-RU",
-    };
   }
 
   transformToText(fileLink, data) {
     const name = `${data.file_unique_id}.wav`;
     writeOutput("Starting process for", fileLink);
     return this.getFileBase64(fileLink)
-      .then((base64data) => {
+      .then((bufferData) => {
         const params = {
           audio: {
-            content: base64data,
+            content: bufferData.bufferString,
           },
-          config: this.config,
+          config: {
+            encoding: "OGG_OPUS",
+            sampleRateHertz: bufferData.sampleRate,
+            audioChannelCount: bufferData.numberOfChannels,
+            model: "phone_call",
+            useEnhanced: true,
+            // TODO detect lang
+            languageCode: "ru-RU",
+            // alternativeLanguageCodes: ["en-GB", "en-US""],
+          },
         };
 
         writeOutput("Start converting", name, fileLink);
@@ -57,10 +61,14 @@ class GoogleProvider {
         const oggBuffer = [];
         response.on("data", (chunk) => oggBuffer.push(chunk));
         response.on("error", (err) => reject(err));
-        response.on("end", () =>
-          resolve(Buffer.concat(oggBuffer).toString("base64"))
-        );
+        response.on("end", () => resolve(Buffer.concat(oggBuffer)));
       });
+    }).then((buffer) => {
+      return mm.parseBuffer(buffer).then((info) => ({
+        sampleRate: info.format.sampleRate,
+        numberOfChannels: info.format.numberOfChannels,
+        bufferString: buffer.toString("base64"),
+      }));
     });
   }
 }

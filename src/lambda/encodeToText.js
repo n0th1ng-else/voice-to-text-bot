@@ -14,6 +14,8 @@ const TOPIC = {
  *
  * @param pubSubEvent.data.chatId
  * @param pubSubEvent.data.fileBuffer
+ * @param pubSubEvent.data.sampleRateHertz
+ * @param pubSubEvent.data.audioChannelCount
  *
  */
 exports.encodeBufferToText = (pubSubEvent) => {
@@ -21,7 +23,8 @@ exports.encodeBufferToText = (pubSubEvent) => {
   console.log(`${data.chatId} Received a Buffer`);
 
   console.log("chatId", data.chatId);
-  console.log("fileBuffer", data.fileBuffer);
+  console.log("sampleRateHertz", data.sampleRateHertz);
+  console.log("audioChannelCount", data.audioChannelCount);
 
   const triggerEvent = (topic, data) => {
     const buf = Buffer.from(JSON.stringify(data), "utf8");
@@ -29,13 +32,7 @@ exports.encodeBufferToText = (pubSubEvent) => {
     return topicHandler.publish(buf);
   };
 
-  const client = new speech.SpeechClient({
-    projectId: process.env.GOOGLE_PROJECT_ID,
-    credentials: {
-      private_key: process.env.GOOGLE_PRIVATE_KEY,
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    },
-  });
+  const client = new speech.SpeechClient();
 
   const params = {
     audio: {
@@ -43,8 +40,13 @@ exports.encodeBufferToText = (pubSubEvent) => {
     },
     config: {
       encoding: "OGG_OPUS",
-      sampleRateHertz: 16000,
+      sampleRateHertz: data.sampleRateHertz,
+      audioChannelCount: data.numberOfChannels,
+      model: "phone_call",
+      useEnhanced: true,
+      // TODO detect lang
       languageCode: "ru-RU",
+      // alternativeLanguageCodes: ["en-GB", "en-US""],
     },
   };
 
