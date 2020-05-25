@@ -1,4 +1,4 @@
-const speech = require("@google-cloud/speech");
+const { SpeechClient } = require("@google-cloud/speech");
 const { PubSub } = require("@google-cloud/pubsub");
 
 const pubsub = new PubSub();
@@ -32,7 +32,7 @@ exports.encodeBufferToText = (pubSubEvent) => {
     return topicHandler.publish(buf);
   };
 
-  const client = new speech.SpeechClient();
+  const client = new SpeechClient();
 
   const params = {
     audio: {
