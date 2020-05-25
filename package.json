@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@google-cloud/speech": "3.6.0",
+    "@google-cloud/secret-manager": "3.0.0",
     "@google-cloud/pubsub": "2.0.0",
     "aws-sdk": "2.680.0",
     "chalk": "4.0.0",

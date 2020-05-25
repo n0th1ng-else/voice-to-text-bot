@@ -1,4 +1,5 @@
 const TelegramBot = require("node-telegram-bot-api");
+const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
 const { PubSub } = require("@google-cloud/pubsub");
 
 const pubsub = new PubSub();
@@ -20,8 +21,6 @@ const TOPIC = {
 exports.handleIncomingHTTPMessage = (req, res) => {
   res.sendStatus(200);
   const msg = req.body.message;
-  const token = process.env.TELEGRAM_API_TOKEN;
-  const bot = new TelegramBot(token);
   const chatId = msg.chat.id;
   console.log(`${chatId} Received new Telegram message`);
 
@@ -29,6 +28,14 @@ exports.handleIncomingHTTPMessage = (req, res) => {
     const buf = Buffer.from(JSON.stringify(data), "utf8");
     const topicHandler = pubsub.topic(topic);
     return topicHandler.publish(buf);
+  };
+
+  const getTelegramToken = () => {
+    return new SecretManagerServiceClient()
+      .accessSecretVersion({
+        name: process.env.TELEGRAM_TOKEN_SECRET_FIELD,
+      })
+      .then(([data]) => data.payload.data.toString("utf8"));
   };
 
   if (!msg.voice) {
@@ -51,7 +58,8 @@ exports.handleIncomingHTTPMessage = (req, res) => {
   };
 
   return triggerEvent(TOPIC.SEND_MESSAGE, messageObject)
-    .then(() => bot.getFileLink(fileId))
+    .then(() => getTelegramToken())
+    .then((token) => new TelegramBot(token).getFileLink(fileId))
     .then((fileUrl) => {
       const messageObject = {
         chatId,

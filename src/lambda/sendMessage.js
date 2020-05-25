@@ -1,4 +1,5 @@
 const TelegramBot = require("node-telegram-bot-api");
+const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
 
 /**
  * TRIGGERS BY "projects/voice-to-message-1590158829666/topics/SEND_MESSAGE"
@@ -11,7 +12,15 @@ exports.sendTelegramMessage = (pubSubEvent) => {
   const data = JSON.parse(Buffer.from(pubSubEvent.data, "base64").toString());
   console.log(`${data.chatId} New message to send ${data.message}`);
 
-  const token = process.env.TELEGRAM_API_TOKEN;
-  const bot = new TelegramBot(token);
-  return bot.sendMessage(data.chatId, data.message);
+  const getTelegramToken = () => {
+    return new SecretManagerServiceClient()
+      .accessSecretVersion({
+        name: process.env.TELEGRAM_TOKEN_SECRET_FIELD,
+      })
+      .then(([data]) => data.payload.data.toString("utf8"));
+  };
+
+  return getTelegramToken().then((token) =>
+    new TelegramBot(token).sendMessage(data.chatId, data.message)
+  );
 };
