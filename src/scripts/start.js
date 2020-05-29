@@ -1,8 +1,28 @@
+const { getVoiceConverterProvider, VoiceConverter } = require("../recognition");
 const { ExpressServer } = require("../server/express");
-const envy = require("../../env.json");
+const { TelegramBotModel } = require("../telegram/bot");
+const {
+  appPort,
+  enableSSL,
+  provider,
+  replicaCount,
+  replicaIndex,
+  selfUrl,
+  telegramBotApi,
+} = require("../env");
 
 (async function start() {
-  const server = new ExpressServer();
+  const server = new ExpressServer(appPort, enableSSL, selfUrl);
+  const converterOptions = {};
+  const converter = new VoiceConverter(
+    getVoiceConverterProvider(provider),
+    converterOptions
+  );
 
-  server.start(envy.PORT, envy.USE_SSL === "true");
+  const bot = new TelegramBotModel(telegramBotApi, converter);
+
+  server.setBots([bot]);
+  server.start().then((stopHandler) => {
+    server.triggerDaemon(replicaCount, replicaIndex);
+  });
 })();

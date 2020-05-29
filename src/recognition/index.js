@@ -20,8 +20,8 @@ class VoiceConverter {
   }
 }
 
-function getVoiceConverterProvider(environmentVars) {
-  switch (environmentVars.PROVIDER) {
+function getVoiceConverterProvider(provider) {
+  switch (provider) {
     case VoiceConverterProvider.Aws:
       return VoiceConverterProvider.Aws;
     case VoiceConverterProvider.Google:
@@ -38,4 +38,5 @@ const VoiceConverterProvider = {
 module.exports = {
   getVoiceConverterProvider,
   VoiceConverter,
+  VoiceConverterProvider,
 };
