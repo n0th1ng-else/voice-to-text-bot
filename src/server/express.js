@@ -130,7 +130,7 @@ class ExpressServer {
       )
     )
       .then(() => logger.info("Bots are set up to use this replica"))
-      .catch((err) => logger.err("Unable to set up bots routing", err));
+      .catch((err) => logger.error("Unable to set up bots routing", err));
   }
 
   _clearPing() {
