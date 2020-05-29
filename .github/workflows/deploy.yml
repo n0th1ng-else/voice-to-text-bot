@@ -15,10 +15,6 @@ jobs:
       - name: Set up node using nvm
         uses: dcodeIO/setup-node-nvm@v4.0.0
 
-      - name: Get release version
-        id: get_version
-        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_SHA:10})
-
       - name: Publish to Registry
         uses: docker/build-push-action@v1
         with:
@@ -27,3 +23,41 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: "${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app"
           tag_with_sha: true
+
+  heroku-master:
+    runs-on: ubuntu-latest
+    name: Deploy to Heroku Master account
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up node using nvm
+        uses: dcodeIO/setup-node-nvm@v4.0.0
+
+      - name: Build, Push and Deploy to Heroku
+        id: heroku
+        uses: jctaveras/heroku-deploy@v1.0.0
+        with:
+          email: ${{ secrets.HEROKU_EMAIL }}
+          api_key: ${{ secrets.HEROKU_API_KEY }}
+          app_name: ${{ secrets.HEROKU_APP_MASTER }}
+          dockerfile: "./Dockerfile"
+
+  heroku-slave:
+    runs-on: ubuntu-latest
+    name: Deploy to Heroku Slave account
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up node using nvm
+        uses: dcodeIO/setup-node-nvm@v4.0.0
+
+      - name: Build, Push and Deploy to Heroku
+        id: heroku
+        uses: jctaveras/heroku-deploy@v1.0.0
+        with:
+          email: ${{ secrets.HEROKU_EMAIL }}
+          api_key: ${{ secrets.HEROKU_API_KEY }}
+          app_name: ${{ secrets.HEROKU_APP_SLAVE }}
+          dockerfile: "./Dockerfile"

@@ -4,12 +4,13 @@ const { writeOutput, writeError } = require("../logger");
 const { TelegramBotModel } = require("../telegram/bot");
 const { ExpressServer } = require("../server/express");
 const envy = require("../../env.json");
+const { appPort, enableSSL, selfUrl } = require("../env");
 
 (async function start() {
   const converter = new VoiceConverter(getVoiceConverterProvider(envy), envy);
 
   const bot = new TelegramBotModel(envy.TELEGRAM_BOT_API, converter);
-  const server = new ExpressServer();
+  const server = new ExpressServer(appPort, enableSSL, selfUrl);
 
   getHostName(envy)
     .then((host) => {
@@ -18,7 +19,7 @@ const envy = require("../../env.json");
     })
     .then(() => {
       server.setBots([bot]);
-      server.start(envy.PORT, envy.USE_SSL === "true");
+      server.start();
     })
     .catch((err) => {
       writeError(err);
