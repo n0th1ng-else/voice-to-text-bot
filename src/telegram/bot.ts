@@ -152,7 +152,7 @@ export class TelegramBotModel {
 
   private showLanguageSelection(chatId: number): void {
     this.bot
-      .sendMessage(chatId, "Select the language", {
+      .sendMessage(chatId, this.text.t(LabelId.ChangeLangTitle), {
         reply_markup: {
           inline_keyboard: [
             [
