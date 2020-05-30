@@ -9,6 +9,7 @@ import {
   selfUrl,
   telegramBotApi,
   googleApi,
+  dbStat,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -16,6 +17,7 @@ import {
 } from "../recognition";
 import { VoiceConverterOptions } from "../recognition/types";
 import { Logger } from "../logger";
+import { StatisticApi } from "../statistic";
 
 const logger = new Logger("run handler");
 
@@ -31,7 +33,13 @@ export function run() {
     converterOptions
   );
 
-  const bot = new TelegramBotModel(telegramBotApi, converter);
+  const stat = new StatisticApi(
+    dbStat.statUrl,
+    dbStat.appId,
+    dbStat.appKey,
+    dbStat.masterKey
+  );
+  const bot = new TelegramBotModel(telegramBotApi, converter, stat);
 
   server
     .setBots([bot])

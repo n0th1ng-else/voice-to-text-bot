@@ -22,3 +22,10 @@ export const googleApi = {
   clientEmail: process.env.GOOGLE_CLIENT_EMAIL || "",
   privateKey: process.env.GOOGLE_PRIVATE_KEY || "",
 };
+
+export const dbStat = {
+  statUrl: process.env.DB_STAT_URL || "",
+  appId: process.env.DB_STAT_APP_ID || "",
+  appKey: process.env.DB_STAT_APP_KEY || "",
+  masterKey: process.env.DB_STAT_MASTER_KEY || "",
+};

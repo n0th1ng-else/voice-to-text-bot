@@ -1,17 +1,20 @@
 import { Logger } from "../logger";
-import * as TelegramBot from "node-telegram-bot-api";
+import TelegramBot from "node-telegram-bot-api";
 import { VoiceConverter } from "../recognition/types";
+import { StatisticApi } from "../statistic";
 
 const logger = new Logger("telegram-bot");
 
 export class TelegramBotModel {
+  #stat: StatisticApi;
   #bot: TelegramBot;
   #converter: VoiceConverter;
   #token = "";
   #host = "";
   #path = "";
 
-  constructor(apiToken: string, converter: VoiceConverter) {
+  constructor(apiToken: string, converter: VoiceConverter, stat: StatisticApi) {
+    this.#stat = stat;
     this.#converter = converter;
     this.#token = apiToken;
     this.#bot = new TelegramBot(this.#token);
@@ -47,6 +50,10 @@ export class TelegramBotModel {
     }
 
     const fileName = (msg.voice && (msg.voice as any).file_unique_id) || "";
+
+    this.#stat
+      .updateUsageCount(chatId)
+      .catch((err) => logger.error("Unable to update stat count", err));
 
     this.getFileLInk(msg)
       .then((fileLink) => {

@@ -1,6 +1,11 @@
 import { get as runGet } from "https";
 import { v1 } from "@google-cloud/speech";
-import { AudioFileData, VoiceConverter, VoiceConverterOptions } from "./types";
+import {
+  AudioFileData,
+  LanguageCode,
+  VoiceConverter,
+  VoiceConverterOptions,
+} from "./types";
 import { Logger } from "../logger";
 import { parseBuffer } from "music-metadata";
 
@@ -39,7 +44,7 @@ export class GoogleProvider extends VoiceConverter {
             model: "phone_call",
             useEnhanced: true,
             // TODO detect lang
-            languageCode: "ru-RU",
+            languageCode: LanguageCode.Ru,
             // alternativeLanguageCodes: ["en-GB", "en-US""],
           },
         });

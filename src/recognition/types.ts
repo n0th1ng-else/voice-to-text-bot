@@ -36,3 +36,8 @@ export class AudioFileData {
     return this.meta.format.numberOfChannels;
   }
 }
+
+export enum LanguageCode {
+  Ru = "ru-RU",
+  En = "en-US",
+}
