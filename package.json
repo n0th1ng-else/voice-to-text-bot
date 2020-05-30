@@ -20,6 +20,7 @@
     "express": "4.17.1",
     "google-gax": "1.6.2",
     "music-metadata": "6.4.0",
+    "ngrok": "3.2.7",
     "node-fetch": "2.6.0",
     "node-telegram-bot-api": "0.50.0",
     "parse": "2.13.0",
@@ -29,7 +30,6 @@
     "waveheader": "0.0.2"
   },
   "devDependencies": {
-    "ngrok": "3.2.7",
     "prettier": "2.0.5"
   }
 }
