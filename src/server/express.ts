@@ -46,8 +46,14 @@ export class ExpressServer {
     logger.info(`${bots.length} bots to set up`);
 
     bots.forEach((bot) => {
+      logger.warn("Setting up a handler for", bot.getPath());
       this.app.post(bot.getPath(), (req, res) => {
         bot.handleApiMessage(req.body);
+        res.sendStatus(200);
+      });
+
+      this.app.get(bot.getPath(), (req, res) => {
+        logger.info("Route is enabled");
         res.sendStatus(200);
       });
     });

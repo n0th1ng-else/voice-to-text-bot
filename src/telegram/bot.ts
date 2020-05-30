@@ -28,7 +28,8 @@ export class TelegramBotModel {
   }
 
   public getPath(): string {
-    return `${this.path}/${this.token}`;
+    // TODO add uniq id
+    return `${this.path}`;
   }
 
   public handleApiMessage(message: TelegramBot.Update): void {
