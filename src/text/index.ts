@@ -13,6 +13,10 @@ export class TextModel {
     this.language = lang;
   }
 
+  public getLanguage(): LanguageCode {
+    return this.language;
+  }
+
   public t(id: LabelId): string {
     // @ts-ignore
     return labels[this.language][id] || labels[this.cbLang][id] || "";

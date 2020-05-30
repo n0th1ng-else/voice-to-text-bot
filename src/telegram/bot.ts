@@ -90,7 +90,11 @@ export class TelegramBotModel {
             logger.info("New link", fileLink);
             this.sendMessage(chatId, LabelId.InProgress);
 
-            return this.converter.transformToText(fileLink, fileName);
+            return this.converter.transformToText(
+              fileLink,
+              fileName,
+              this.text.getLanguage()
+            );
           })
           .then((text: string) => this.bot.sendMessage(chatId, `🗣 ${text}`))
           .catch((err: Error) => {
