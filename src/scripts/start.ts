@@ -39,7 +39,11 @@ export function run() {
     dbStat.appKey,
     dbStat.masterKey
   );
-  const bot = new TelegramBotModel(telegramBotApi, converter, stat);
+  const bot = new TelegramBotModel(
+    telegramBotApi,
+    converter,
+    stat
+  ).setHostLocation(selfUrl);
 
   server
     .setBots([bot])

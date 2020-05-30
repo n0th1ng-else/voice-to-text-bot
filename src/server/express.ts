@@ -52,9 +52,9 @@ export class ExpressServer {
         res.sendStatus(200);
       });
 
-      this.app.get(bot.getPath(), (req, res) => {
+      this.app.get(bot.getPath(), (req, res, next) => {
         logger.info("Route is enabled");
-        res.sendStatus(200);
+        next();
       });
     });
 
@@ -139,9 +139,7 @@ export class ExpressServer {
       this.schedulerPingInterval
     );
 
-    Promise.all(
-      this.bots.map((bot) => bot.setHostLocation(this.selfUrl, "/bot/message"))
-    )
+    Promise.all(this.bots.map((bot) => bot.applyHostLocation()))
       .then(() => logger.info("Bots are set up to use this replica"))
       .catch((err) => logger.error("Unable to set up bots routing", err));
   }

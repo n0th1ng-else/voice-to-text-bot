@@ -43,7 +43,7 @@ export function run() {
   getHostName()
     .then((host) => {
       logger.info(`Telling telegram our location is ${host}`);
-      return bot.setHostLocation(host, "/bot/message");
+      return bot.setHostLocation(host).applyHostLocation();
     })
     .then(() => server.setBots([bot]).start())
     .catch((err: Error) => logger.error(err));

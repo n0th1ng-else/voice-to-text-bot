@@ -1,5 +1,6 @@
-import { Logger } from "../logger";
+import { createHash } from "crypto";
 import TelegramBot from "node-telegram-bot-api";
+import { Logger } from "../logger";
 import { VoiceConverter } from "../recognition/types";
 import { StatisticApi } from "../statistic";
 
@@ -7,6 +8,7 @@ const logger = new Logger("telegram-bot");
 
 export class TelegramBotModel {
   private readonly bot: TelegramBot;
+  private id = "";
   private host = "";
   private path = "";
 
@@ -19,17 +21,24 @@ export class TelegramBotModel {
     this.bot.on("message", (msg) => this.handleMessage(msg));
   }
 
-  public setHostLocation(host: string, path: string): Promise<void> {
+  public setHostLocation(host: string, path = "/bot/message"): this {
     this.host = host;
     this.path = path;
+    this.id = createHash("md5")
+      .update(`${this.host}${this.path}:${this.token}`)
+      .digest("hex");
+
+    return this;
+  }
+
+  public applyHostLocation(): Promise<void> {
     const hookUrl = `${this.host}${this.getPath()}`;
     logger.warn(`webHook url is ${hookUrl}`);
     return this.bot.setWebHook(hookUrl);
   }
 
   public getPath(): string {
-    // TODO add uniq id
-    return `${this.path}`;
+    return `${this.path}/${this.id}`;
   }
 
   public handleApiMessage(message: TelegramBot.Update): void {
