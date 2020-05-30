@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import { createServer as createHttp } from "http";
 import { createServer as createHttps, get as runGet } from "https";
 import { Logger } from "../logger";
