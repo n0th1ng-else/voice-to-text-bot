@@ -117,12 +117,26 @@ export class TelegramBotModel {
   }
 
   private sendHelloMessage(chatId: number): void {
-    this.sendMessage(chatId, LabelId.WelcomeMessage);
+    this.sendMessage(chatId, [
+      LabelId.WelcomeMessage,
+      LabelId.WelcomeMessageMore,
+    ]);
   }
 
-  private sendMessage(chatId: number, id: LabelId): void {
-    this.bot
-      .sendMessage(chatId, this.text.t(id))
+  private sendMessage(chatId: number, ids: LabelId | LabelId[]): Promise<void> {
+    const msgs = Array.isArray(ids) ? ids : [ids];
+    if (!msgs.length) {
+      return Promise.resolve();
+    }
+
+    const part = msgs.shift();
+    if (!part) {
+      return Promise.resolve();
+    }
+
+    return this.bot
+      .sendMessage(chatId, this.text.t(part))
+      .then(() => this.sendMessage(chatId, msgs))
       .catch((err) => logger.error("Unable to send a message", err));
   }
 
