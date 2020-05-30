@@ -3,6 +3,7 @@
     "start": "node src/scripts/runTs.js start",
     "start:js": "node dist/src/scripts/runJs.js start",
     "dev": "node src/scripts/runTs.js dev",
+    "dev:js": "node dist/src/scripts/runJs.js dev",
     "format": "prettier --write .",
     "build": "tsc"
   },
