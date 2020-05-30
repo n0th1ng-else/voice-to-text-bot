@@ -1,8 +1,10 @@
 {
   "scripts": {
-    "start": "node src/scripts/index.js start",
-    "dev": "node src/scripts/index.js dev",
-    "format": "prettier --write ."
+    "start": "node src/scripts/runTs.js start",
+    "start:js": "node dist/src/scripts/runJs.js start",
+    "dev": "node src/scripts/runTs.js dev",
+    "format": "prettier --write .",
+    "build": "tsc"
   },
   "dependencies": {
     "@discordjs/opus": "0.3.2",

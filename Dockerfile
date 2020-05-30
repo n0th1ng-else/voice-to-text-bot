@@ -17,4 +17,6 @@ RUN npm ci && npm cache clean --force
 
 COPY . $APP_DIR
 
-CMD ["npm", "start"]
+RUN npm run build
+
+CMD ["npm", "run", "start:js"]

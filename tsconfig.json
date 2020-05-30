@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
     "target": "esnext",
     "module": "commonjs",
     "allowJs": true,
     "strict": true,
-    "noEmit": true,
     "esModuleInterop": true
   }
 }
