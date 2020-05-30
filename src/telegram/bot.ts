@@ -6,34 +6,33 @@ import { StatisticApi } from "../statistic";
 const logger = new Logger("telegram-bot");
 
 export class TelegramBotModel {
-  #stat: StatisticApi;
-  #bot: TelegramBot;
-  #converter: VoiceConverter;
-  #token = "";
-  #host = "";
-  #path = "";
+  private readonly bot: TelegramBot;
+  private host = "";
+  private path = "";
 
-  constructor(apiToken: string, converter: VoiceConverter, stat: StatisticApi) {
-    this.#stat = stat;
-    this.#converter = converter;
-    this.#token = apiToken;
-    this.#bot = new TelegramBot(this.#token);
-    this.#bot.on("message", (msg) => this.handleMessage(msg));
+  constructor(
+    private readonly token: string,
+    private readonly converter: VoiceConverter,
+    private readonly stat: StatisticApi
+  ) {
+    this.bot = new TelegramBot(this.token);
+    this.bot.on("message", (msg) => this.handleMessage(msg));
   }
 
   public setHostLocation(host: string, path: string): Promise<void> {
-    this.#host = host;
-    this.#path = path;
-
-    return this.#bot.setWebHook(`${this.#host}${this.getPath()}`);
+    this.host = host;
+    this.path = path;
+    const hookUrl = `${this.host}${this.getPath()}`;
+    logger.warn(`webHook url is ${hookUrl}`);
+    return this.bot.setWebHook(hookUrl);
   }
 
   public getPath(): string {
-    return `${this.#path}/${this.#token}`;
+    return `${this.path}/${this.token}`;
   }
 
   public handleApiMessage(message: TelegramBot.Update): void {
-    this.#bot.processUpdate(message);
+    this.bot.processUpdate(message);
   }
 
   private handleMessage(msg: TelegramBot.Message): void {
@@ -51,7 +50,7 @@ export class TelegramBotModel {
 
     const fileName = (msg.voice && (msg.voice as any).file_unique_id) || "";
 
-    this.#stat
+    this.stat
       .updateUsageCount(chatId)
       .catch((err) => logger.error("Unable to update stat count", err));
 
@@ -60,9 +59,9 @@ export class TelegramBotModel {
         logger.info("New link", fileLink);
         this.sendMessage(chatId, "🎙 Processing voice message");
 
-        return this.#converter.transformToText(fileLink, fileName);
+        return this.converter.transformToText(fileLink, fileName);
       })
-      .then((text: string) => this.#bot.sendMessage(chatId, `🗣 ${text}`))
+      .then((text: string) => this.bot.sendMessage(chatId, `🗣 ${text}`))
       .catch((err: Error) => {
         this.sendMessage(chatId, "Unable to convert 😔");
         logger.error(err);
@@ -85,7 +84,7 @@ export class TelegramBotModel {
   }
 
   private sendMessage(chatId: number, message: string): void {
-    this.#bot
+    this.bot
       .sendMessage(chatId, message)
       .catch((err) => logger.error("Unable to send a message", err));
   }
@@ -99,6 +98,6 @@ export class TelegramBotModel {
       );
     }
 
-    return this.#bot.getFileLink(fileId);
+    return this.bot.getFileLink(fileId);
   }
 }
