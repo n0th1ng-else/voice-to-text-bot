@@ -1,67 +1,71 @@
-const http = require("http");
-const https = require("https");
-const express = require("express");
-const httpsData = require("../../certs");
-const { writeOutput, Logger } = require("../logger");
-const { enableSSL } = require("../env");
+import * as express from "express";
+import { createServer as createHttp } from "http";
+import { createServer as createHttps, get as runGet } from "https";
+import { Logger } from "../logger";
+import Timeout = NodeJS.Timeout;
+import { TelegramBotModel } from "../telegram/bot";
+import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 
 const logger = new Logger("server");
 
-class ExpressServer {
-  #scheduler = null;
+export class ExpressServer {
+  #scheduler: Timeout | null = null;
   #schedulerPingInterval = 60_000;
-  #daemon = null;
+  #daemon: Timeout | null = null;
   #daemonInterval = 60_000;
   #dayStart = 0;
   #dayEnd = 0;
   #selfUrl = "";
   #port = 0;
   #isHttps = false;
-  #app = null;
-  #httpsOptions = {};
+  #app = express();
+  #httpsOptions: HttpsOptions;
   #active = false;
-  #bots = [];
+  #bots: TelegramBotModel[] = [];
 
-  constructor(port, isHttps, selfUrl) {
-    writeOutput("Initializing express server");
+  constructor(port: number, isHttps: boolean, selfUrl: string) {
+    logger.info("Initializing express server");
     this.#port = port;
     this.#isHttps = isHttps;
     this.#selfUrl = selfUrl;
 
     this.#httpsOptions = {
-      cert: httpsData.cert,
-      key: httpsData.key,
+      cert: httpsCert,
+      key: httpsKey,
     };
 
-    this.#app = express();
     this.#app.use(express.json());
     this.#app.get("/health", (req, res) =>
-      res.status(200).send({ status: "ONLINE", ssl: enableSSL ? "on" : "off" })
+      res
+        .status(200)
+        .send({ status: "ONLINE", ssl: this.#isHttps ? "on" : "off" })
     );
   }
 
-  setBots(bots = []) {
+  setBots(bots: TelegramBotModel[] = []): this {
     this.#bots = bots;
-    writeOutput(`${bots.length} bots to set up`);
+    logger.info(`${bots.length} bots to set up`);
 
-    bots.map((bot) => {
+    bots.forEach((bot) => {
       this.#app.post(bot.getPath(), (req, res) => {
-        bot.handleApiMessage(req);
+        bot.handleApiMessage(req.body);
         res.sendStatus(200);
       });
     });
+
+    return this;
   }
 
-  start() {
-    writeOutput(`Starting http${this.#isHttps ? "s" : ""} server`);
+  start(): Promise<() => Promise<void>> {
+    logger.info(`Starting http${this.#isHttps ? "s" : ""} server`);
 
     const server = this.#isHttps
-      ? https.createServer(this.#httpsOptions, this.#app)
-      : http.createServer(this.#app);
+      ? createHttps(this.#httpsOptions, this.#app)
+      : createHttp(this.#app);
 
     return new Promise((resolve) => {
       server.listen(this.#port, () => {
-        writeOutput(`Express server is listening on ${this.#port}`);
+        logger.info(`Express server is listening on ${this.#port}`);
         resolve(
           () =>
             new Promise((resolve, reject) => {
@@ -75,7 +79,7 @@ class ExpressServer {
     });
   }
 
-  triggerDaemon(replicaCount, replicaIndex) {
+  triggerDaemon(replicaCount: number, replicaIndex: number): void {
     const replicaNextIndex = replicaIndex + 1;
     logger.info(
       `This replica index is ${replicaNextIndex} out of ${replicaCount} in the pool`
@@ -90,12 +94,12 @@ class ExpressServer {
     this._scheduleDaemon();
   }
 
-  _scheduleDaemon() {
+  _scheduleDaemon(): void {
     this._runDaemon();
     this.#daemon = setInterval(() => this._runDaemon(), this.#daemonInterval);
   }
 
-  _runDaemon() {
+  _runDaemon(): void {
     const currentDay = new Date().getDate();
     logger.info(
       `This replica covers days from ${this.#dayStart} to ${
@@ -113,7 +117,7 @@ class ExpressServer {
     }
   }
 
-  _schedulePing() {
+  _schedulePing(): void {
     if (this.#active) {
       return;
     }
@@ -133,7 +137,7 @@ class ExpressServer {
       .catch((err) => logger.error("Unable to set up bots routing", err));
   }
 
-  _clearPing() {
+  _clearPing(): void {
     if (!this.#active) {
       return;
     }
@@ -144,23 +148,17 @@ class ExpressServer {
     }
   }
 
-  _runPing() {
+  _runPing(): void {
     const url = `${this.#selfUrl}/health`;
     logger.info("Triggering ping event for url", url);
 
-    https
-      .get(url, (response) => {
-        let body = "";
-        response.on("data", (chunk) => (body += chunk));
-        response.on("end", () => {
-          const obj = JSON.parse(body);
-          logger.info("Ping completed with result: ", obj.status);
-        });
-      })
-      .on("error", (err) => logger.error("Got an error: ", err));
+    runGet(url, (response) => {
+      let body = "";
+      response.on("data", (chunk) => (body += chunk));
+      response.on("end", () => {
+        const obj = JSON.parse(body);
+        logger.info("Ping completed with result: ", obj.status);
+      });
+    }).on("error", (err) => logger.error("Got an error: ", err));
   }
 }
-
-module.exports = {
-  ExpressServer,
-};
