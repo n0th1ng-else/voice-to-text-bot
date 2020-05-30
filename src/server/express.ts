@@ -9,45 +9,44 @@ import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 const logger = new Logger("server");
 
 export class ExpressServer {
-  #scheduler: Timeout | null = null;
-  #schedulerPingInterval = 60_000;
-  #daemon: Timeout | null = null;
-  #daemonInterval = 60_000;
-  #dayStart = 0;
-  #dayEnd = 0;
-  #selfUrl = "";
-  #port = 0;
-  #isHttps = false;
-  #app = express();
-  #httpsOptions: HttpsOptions;
-  #active = false;
-  #bots: TelegramBotModel[] = [];
+  private readonly schedulerPingInterval = 60_000;
+  private readonly daemonInterval = 60_000;
+  private readonly app = express();
+  private readonly httpsOptions: HttpsOptions;
 
-  constructor(port: number, isHttps: boolean, selfUrl: string) {
+  private scheduler: Timeout | null = null;
+  private daemon: Timeout | null = null;
+  private dayStart = 0;
+  private dayEnd = 0;
+  private active = false;
+  private bots: TelegramBotModel[] = [];
+
+  constructor(
+    private readonly port: number,
+    private readonly isHttps: boolean,
+    private readonly selfUrl: string
+  ) {
     logger.info("Initializing express server");
-    this.#port = port;
-    this.#isHttps = isHttps;
-    this.#selfUrl = selfUrl;
 
-    this.#httpsOptions = {
+    this.httpsOptions = {
       cert: httpsCert,
       key: httpsKey,
     };
 
-    this.#app.use(express.json());
-    this.#app.get("/health", (req, res) =>
+    this.app.use(express.json());
+    this.app.get("/health", (req, res) =>
       res
         .status(200)
-        .send({ status: "ONLINE", ssl: this.#isHttps ? "on" : "off" })
+        .send({ status: "ONLINE", ssl: this.isHttps ? "ON" : "OFF" })
     );
   }
 
   setBots(bots: TelegramBotModel[] = []): this {
-    this.#bots = bots;
+    this.bots = bots;
     logger.info(`${bots.length} bots to set up`);
 
     bots.forEach((bot) => {
-      this.#app.post(bot.getPath(), (req, res) => {
+      this.app.post(bot.getPath(), (req, res) => {
         bot.handleApiMessage(req.body);
         res.sendStatus(200);
       });
@@ -57,20 +56,20 @@ export class ExpressServer {
   }
 
   start(): Promise<() => Promise<void>> {
-    logger.info(`Starting http${this.#isHttps ? "s" : ""} server`);
+    logger.info(`Starting http${this.isHttps ? "s" : ""} server`);
 
-    const server = this.#isHttps
-      ? createHttps(this.#httpsOptions, this.#app)
-      : createHttp(this.#app);
+    const server = this.isHttps
+      ? createHttps(this.httpsOptions, this.app)
+      : createHttp(this.app);
 
     return new Promise((resolve) => {
-      server.listen(this.#port, () => {
-        logger.info(`Express server is listening on ${this.#port}`);
+      server.listen(this.port, () => {
+        logger.info(`Express server is listening on ${this.port}`);
         resolve(
           () =>
             new Promise((resolve, reject) => {
-              if (this.#scheduler) {
-                clearInterval(this.#scheduler);
+              if (this.scheduler) {
+                clearInterval(this.scheduler);
               }
               server.close((err) => (err ? reject(err) : resolve()));
             })
@@ -89,27 +88,25 @@ export class ExpressServer {
     const pingStart = Math.ceil(daysInMonth / replicaCount);
     const dayStart = replicaIndex * pingStart - daysOverlap;
     const dayEnd = replicaNextIndex * pingStart + daysOverlap;
-    this.#dayStart = dayStart < 0 ? 0 : dayStart;
-    this.#dayEnd = dayEnd > daysInMonth ? daysInMonth : dayEnd;
+    this.dayStart = dayStart < 0 ? 0 : dayStart;
+    this.dayEnd = dayEnd > daysInMonth ? daysInMonth : dayEnd;
     this._scheduleDaemon();
   }
 
   _scheduleDaemon(): void {
     this._runDaemon();
-    this.#daemon = setInterval(() => this._runDaemon(), this.#daemonInterval);
+    this.daemon = setInterval(() => this._runDaemon(), this.daemonInterval);
   }
 
   _runDaemon(): void {
     const currentDay = new Date().getDate();
     logger.info(
-      `This replica covers days from ${this.#dayStart} to ${
-        this.#dayEnd
-      }. Today is ${currentDay}`
+      `This replica covers days from ${this.dayStart} to ${this.dayEnd}. Today is ${currentDay}`
     );
     if (
-      currentDay >= this.#dayStart &&
-      currentDay <= this.#dayEnd &&
-      !this.#active
+      currentDay >= this.dayStart &&
+      currentDay <= this.dayEnd &&
+      !this.active
     ) {
       this._schedulePing();
     } else {
@@ -118,38 +115,36 @@ export class ExpressServer {
   }
 
   _schedulePing(): void {
-    if (this.#active) {
+    if (this.active) {
       return;
     }
-    this.#active = true;
+    this.active = true;
     this._runPing();
-    this.#scheduler = setInterval(
+    this.scheduler = setInterval(
       () => this._runPing(),
-      this.#schedulerPingInterval
+      this.schedulerPingInterval
     );
 
     Promise.all(
-      this.#bots.map((bot) =>
-        bot.setHostLocation(this.#selfUrl, "/bot/message")
-      )
+      this.bots.map((bot) => bot.setHostLocation(this.selfUrl, "/bot/message"))
     )
       .then(() => logger.info("Bots are set up to use this replica"))
       .catch((err) => logger.error("Unable to set up bots routing", err));
   }
 
   _clearPing(): void {
-    if (!this.#active) {
+    if (!this.active) {
       return;
     }
-    this.#active = false;
-    if (this.#scheduler) {
-      clearInterval(this.#scheduler);
-      this.#scheduler = null;
+    this.active = false;
+    if (this.scheduler) {
+      clearInterval(this.scheduler);
+      this.scheduler = null;
     }
   }
 
   _runPing(): void {
-    const url = `${this.#selfUrl}/health`;
+    const url = `${this.selfUrl}/health`;
     logger.info("Triggering ping event for url", url);
 
     runGet(url, (response) => {
