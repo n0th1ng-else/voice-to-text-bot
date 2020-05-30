@@ -52,6 +52,14 @@ export class ExpressServer {
       });
     });
 
+    this.app.use((req, res) => {
+      logger.error("Unknown route", req.originalUrl);
+
+      res
+        .status(404)
+        .send({ status: 404, message: "Route not found", error: "Not found" });
+    });
+
     return this;
   }
 
