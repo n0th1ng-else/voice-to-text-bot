@@ -37,6 +37,13 @@ export class StatisticApi {
       .then((stat) => this.updateStatLanguage(stat, lang));
   }
 
+  public getLanguage(chatId: number): Promise<LanguageCode> {
+    return this.getStatId(chatId)
+      .catch(() => this.createStat(chatId))
+      .then((statId) => this.getStat(statId))
+      .then((stat) => stat.get(StatKey.LangId));
+  }
+
   private updateStatCount(stat: Parse.Object): Promise<void> {
     logger.info("Updating usage count for statId", stat.id);
 
