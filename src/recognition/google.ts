@@ -27,7 +27,11 @@ export class GoogleProvider extends VoiceConverter {
     });
   }
 
-  transformToText(fileLink: string, fileId: number): Promise<string> {
+  transformToText(
+    fileLink: string,
+    fileId: number,
+    lang: LanguageCode
+  ): Promise<string> {
     const name = `${fileId}.wav`;
     logger.info("Starting process for", fileLink);
     return this.getFileBase64(fileLink)
@@ -43,9 +47,7 @@ export class GoogleProvider extends VoiceConverter {
             audioChannelCount: bufferData.numberOfChannels,
             model: "phone_call",
             useEnhanced: true,
-            // TODO detect lang
-            languageCode: LanguageCode.Ru,
-            // alternativeLanguageCodes: ["en-GB", "en-US""],
+            languageCode: lang,
           },
         });
       })
