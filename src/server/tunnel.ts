@@ -1,10 +1,9 @@
 import { connect } from "ngrok";
-import { selfUrl, appPort, ngRokToken } from "../env";
 import { Logger } from "../logger";
 
 const logger = new Logger("tunnel");
 
-function createTunnel(port: number, token: string): Promise<string> {
+function createTunnel(port: number, token?: string): Promise<string> {
   logger.info("Creating tunnel");
   const localHost = `https://localhost:${port}`;
   return connect({ authtoken: token, addr: localHost }).then((host) => {
@@ -14,11 +13,15 @@ function createTunnel(port: number, token: string): Promise<string> {
   });
 }
 
-export function getHostName(): Promise<string> {
+export function getHostName(
+  port: number,
+  selfUrl?: string,
+  ngRokToken?: string
+): Promise<string> {
   if (selfUrl) {
     logger.info(`Using the host ${selfUrl}`);
     return Promise.resolve(selfUrl);
   }
 
-  return createTunnel(appPort, ngRokToken);
+  return createTunnel(port, ngRokToken);
 }

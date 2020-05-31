@@ -8,6 +8,7 @@ import {
   selfUrl,
   telegramBotApi,
   dbStat,
+  ngRokToken,
 } from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
@@ -40,7 +41,7 @@ export function run() {
   );
   const bot = new TelegramBotModel(telegramBotApi, converter, stat);
 
-  getHostName()
+  getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
       logger.info(`Telling telegram our location is ${host}`);
       return bot.setHostLocation(host).applyHostLocation();

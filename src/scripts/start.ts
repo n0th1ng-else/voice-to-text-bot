@@ -4,12 +4,12 @@ import {
   appPort,
   enableSSL,
   provider,
-  replicaCount,
-  replicaIndex,
   selfUrl,
   telegramBotApi,
   googleApi,
   dbStat,
+  nextReplicaUrl,
+  replicaLifecycleInterval,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -48,6 +48,6 @@ export function run() {
   server
     .setBots([bot])
     .start()
-    .then(() => server.triggerDaemon(replicaCount, replicaIndex))
+    .then(() => server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval))
     .catch((err: Error) => logger.error(err));
 }
