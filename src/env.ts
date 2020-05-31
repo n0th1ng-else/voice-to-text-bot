@@ -9,9 +9,10 @@ export const provider: string =
 
 export const selfUrl: string = process.env.SELF_URL || "";
 
-export const replicaCount: number = Number(process.env.REPLICA_COUNT) || 1;
+export const nextReplicaUrl: string = process.env.NEXT_REPLICA_URL || "";
 
-export const replicaIndex: number = Number(process.env.REPLICA_INDEX) || 0;
+export const replicaLifecycleInterval: number =
+  Number(process.env.REPLICA_LIFECYCLE_INTERVAL_DAYS) || 1;
 
 export const telegramBotApi: string = process.env.TELEGRAM_BOT_API || "";
 

@@ -1,25 +1,26 @@
 import express from "express";
 import { createServer as createHttp } from "http";
-import { createServer as createHttps, get as runGet } from "https";
+import { createServer as createHttps } from "https";
 import { Logger } from "../logger";
-import Timeout = NodeJS.Timeout;
 import { TelegramBotModel } from "../telegram/bot";
 import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
+import { HealthDto, HealthSsl, HealthStatus } from "./types";
+import { sleepForRandom } from "./timer";
+import { runGet } from "./request";
 
 const logger = new Logger("server");
 
 export class ExpressServer {
-  private readonly schedulerPingInterval = 60_000;
   private readonly daemonInterval = 60_000;
   private readonly app = express();
   private readonly httpsOptions: HttpsOptions;
 
-  private scheduler: Timeout | null = null;
-  private daemon: Timeout | null = null;
-  private dayStart = 0;
-  private dayEnd = 0;
-  private active = false;
   private bots: TelegramBotModel[] = [];
+  private isIdle = false;
+  private lifecycleInterval = 1;
+  private nextReplicaUrl = "";
+  private daemon: NodeJS.Timeout | null = null;
+  private daysRunning: number[] = [];
 
   constructor(
     private readonly port: number,
@@ -34,15 +35,44 @@ export class ExpressServer {
     };
 
     this.app.use(express.json());
-    this.app.get("/health", (req, res) =>
-      res
-        .status(200)
-        .send({ status: "ONLINE", ssl: this.isHttps ? "ON" : "OFF" })
-    );
+    this.app.get("/health", (req, res) => {
+      if (!this.isIdle) {
+        const status: HealthDto = {
+          status: HealthStatus.InProgress,
+          ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
+          message: "Waiting for bots to set up",
+          urls: [],
+        };
+        res.status(400).send(status);
+        return;
+      }
+
+      Promise.all(this.bots.map((bot) => bot.getHostLocation()))
+        .then((urls) => {
+          const status: HealthDto = {
+            status: HealthStatus.Online,
+            ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
+            message: "All is good",
+            urls,
+          };
+          res.status(200).send(status);
+        })
+        .catch((err) => {
+          logger.error("Unable to get bot urls", err);
+          const status: HealthDto = {
+            status: HealthStatus.Error,
+            ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
+            message: "Unable to get bot urls",
+            urls: [],
+          };
+          res.status(400).send(status);
+        });
+    });
   }
 
-  setBots(bots: TelegramBotModel[] = []): this {
+  public setBots(bots: TelegramBotModel[] = []): this {
     this.bots = bots;
+    this.isIdle = true;
     logger.info(`${bots.length} bots to set up`);
 
     bots.forEach((bot) => {
@@ -69,7 +99,7 @@ export class ExpressServer {
     return this;
   }
 
-  start(): Promise<() => Promise<void>> {
+  public start(): Promise<() => Promise<void>> {
     logger.info(`Starting http${this.isHttps ? "s" : ""} server`);
 
     const server = this.isHttps
@@ -82,8 +112,8 @@ export class ExpressServer {
         resolve(
           () =>
             new Promise((resolve, reject) => {
-              if (this.scheduler) {
-                clearInterval(this.scheduler);
+              if (this.daemon) {
+                clearInterval(this.daemon);
               }
               server.close((err) => (err ? reject(err) : resolve()));
             })
@@ -92,80 +122,91 @@ export class ExpressServer {
     });
   }
 
-  triggerDaemon(replicaCount: number, replicaIndex: number): void {
-    const replicaNextIndex = replicaIndex + 1;
+  public triggerDaemon(
+    nextReplicaUrl: string,
+    lifecycleInterval: number
+  ): void {
+    if (!nextReplicaUrl) {
+      logger.warn(
+        "Next replica url is not set for this node. Unable to set up the daemon"
+      );
+      return;
+    }
+
+    this.lifecycleInterval = lifecycleInterval;
+    this.nextReplicaUrl = nextReplicaUrl;
+    this.daysRunning = [];
     logger.info(
-      `This replica index is ${replicaNextIndex} out of ${replicaCount} in the pool`
+      `Lifecycle interval is set to ${this.lifecycleInterval} day${
+        this.lifecycleInterval === 1 ? "" : "s"
+      }`
     );
-    const daysInMonth = 31;
-    const daysOverlap = 2;
-    const pingStart = Math.ceil(daysInMonth / replicaCount);
-    const dayStart = replicaIndex * pingStart - daysOverlap;
-    const dayEnd = replicaNextIndex * pingStart + daysOverlap;
-    this.dayStart = dayStart < 0 ? 0 : dayStart;
-    this.dayEnd = dayEnd > daysInMonth ? daysInMonth : dayEnd;
-    this._scheduleDaemon();
+
+    sleepForRandom()
+      .then(() => Promise.all(this.bots.map((bot) => bot.applyHostLocation())))
+      .then(() => this.scheduleDaemon())
+      .catch((err) => logger.error("Unable to schedule replica", err));
   }
 
-  _scheduleDaemon(): void {
-    this._runDaemon();
-    this.daemon = setInterval(() => this._runDaemon(), this.daemonInterval);
+  private scheduleDaemon(): void {
+    this.runDaemon();
+    this.daemon = setInterval(() => this.runDaemon(), this.daemonInterval);
   }
 
-  _runDaemon(): void {
+  private runDaemon(): void {
     const currentDay = new Date().getDate();
+    if (!this.daysRunning.includes(currentDay)) {
+      this.daysRunning.push(currentDay);
+    }
     logger.info(
-      `This replica covers days from ${this.dayStart} to ${this.dayEnd}. Today is ${currentDay}`
+      `Daemon tick. Today is ${currentDay} and I have been running for ${this.daysRunning.join(
+        ","
+      )} already`
     );
-    if (
-      currentDay >= this.dayStart &&
-      currentDay <= this.dayEnd &&
-      !this.active
-    ) {
-      this._schedulePing();
-    } else {
-      this._clearPing();
-    }
-  }
+    const currentInterval = this.daysRunning.length;
+    if (currentInterval >= this.lifecycleInterval) {
+      runGet<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
+        .then((health) => {
+          if (health.status !== HealthStatus.Online) {
+            logger.error("Buddy replica status is not ok", health);
+            return;
+          }
 
-  _schedulePing(): void {
-    if (this.active) {
+          if (this.daemon) {
+            clearInterval(this.daemon);
+            this.daysRunning = [];
+            logger.warn(
+              "Delegated callback for the buddy node. Daemon stopped and I am going to hibernate"
+            );
+          }
+        })
+        .catch((err) => logger.error("Unable to delegate logic", err));
       return;
     }
-    this.active = true;
-    this._runPing();
-    this.scheduler = setInterval(
-      () => this._runPing(),
-      this.schedulerPingInterval
-    );
 
-    Promise.all(this.bots.map((bot) => bot.applyHostLocation()))
-      .then(() => logger.info("Bots are set up to use this replica"))
-      .catch((err) => logger.error("Unable to set up bots routing", err));
+    runGet<HealthDto>(this.getHealthUrl())
+      .then((health) => {
+        if (health.status !== HealthStatus.Online) {
+          logger.error("Replica status is not ok", health);
+          return;
+        }
+        logger.info("Ping completed with result: ", health.status);
+
+        const isCallbackOwner = health.urls.every((url) =>
+          url.includes(this.selfUrl)
+        );
+        if (!isCallbackOwner && this.daemon) {
+          clearInterval(this.daemon);
+          this.daysRunning = [];
+          logger.warn(
+            "Callback is not owner by this node. Daemon stopped and I am going to hibernate"
+          );
+        }
+      })
+      .catch((err) => logger.error("Unable to ping myself!", err));
   }
 
-  _clearPing(): void {
-    if (!this.active) {
-      return;
-    }
-    this.active = false;
-    if (this.scheduler) {
-      clearInterval(this.scheduler);
-      this.scheduler = null;
-    }
-  }
-
-  _runPing(): void {
-    const url = `${this.selfUrl}/health`;
-    logger.info("Triggering ping event for url", url);
-
-    runGet(url, (response) => {
-      let body = "";
-      response.on("data", (chunk) => (body += chunk));
-      response.on("end", () => {
-        const obj = JSON.parse(body);
-        logger.info("Ping completed with result: ", obj.status);
-      });
-    }).on("error", (err) => logger.error("Got an error: ", err));
+  private getHealthUrl(url = this.selfUrl): string {
+    return `${url}/health`;
   }
 }

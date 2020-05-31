@@ -46,6 +46,10 @@ export class TelegramBotModel {
     return this.bot.setWebHook(hookUrl);
   }
 
+  public getHostLocation(): Promise<string> {
+    return this.bot.getWebHookInfo().then((info) => info.url);
+  }
+
   public getPath(): string {
     return `${this.path}/${this.id}`;
   }
