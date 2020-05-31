@@ -67,9 +67,10 @@ export class TelegramBotModel {
   }
 
   private handleMessage(msg: TelegramBot.Message): void {
+    const username = msg.from ? msg.from.username : msg.chat.username;
     const chatId = msg.chat.id;
     this.stat
-      .getLanguage(chatId)
+      .getLanguage(chatId, username)
       .then((lang) => this.text.setLanguage(lang))
       .catch((err) => {
         logger.error("Unable to get lang", err);
