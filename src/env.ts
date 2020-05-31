@@ -12,7 +12,7 @@ export const selfUrl: string = process.env.SELF_URL || "";
 export const nextReplicaUrl: string = process.env.NEXT_REPLICA_URL || "";
 
 export const replicaLifecycleInterval: number =
-  Number(process.env.REPLICA_LIFECYCLE_INTERVAL_DAYS) || 1;
+  Number(process.env.REPLICA_LIFECYCLE_INTERVAL_DAYS) || 2; // Not less than 2
 
 export const telegramBotApi: string = process.env.TELEGRAM_BOT_API || "";
 
