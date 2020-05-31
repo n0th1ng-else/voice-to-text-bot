@@ -8,6 +8,7 @@ enum StatKey {
   UsageCount = "usageCount",
   LangId = "langId",
   ChatId = "chatId",
+  UserName = "user",
 }
 
 export class StatisticApi {
@@ -25,7 +26,7 @@ export class StatisticApi {
 
   public updateUsageCount(chatId: number) {
     return this.getStatId(chatId)
-      .catch(() => this.createStat(chatId))
+      .catch(() => this.createStat(chatId, LanguageCode.Ru))
       .then((statId) => this.getStat(statId))
       .then((stat) => this.updateStatCount(stat));
   }
@@ -37,9 +38,9 @@ export class StatisticApi {
       .then((stat) => this.updateStatLanguage(stat, lang));
   }
 
-  public getLanguage(chatId: number): Promise<LanguageCode> {
+  public getLanguage(chatId: number, username = ""): Promise<LanguageCode> {
     return this.getStatId(chatId)
-      .catch(() => this.createStat(chatId))
+      .catch(() => this.createStat(chatId, LanguageCode.Ru, username))
       .then((statId) => this.getStat(statId))
       .then((stat) => stat.get(StatKey.LangId));
   }
@@ -66,7 +67,11 @@ export class StatisticApi {
     });
   }
 
-  public createStat(chatId: number, lang = LanguageCode.Ru): Promise<string> {
+  public createStat(
+    chatId: number,
+    lang: LanguageCode,
+    username = ""
+  ): Promise<string> {
     logger.info("Creating stat record for chatId", chatId);
 
     const BotStatClass = Parse.Object.extend(this.dbClass);
@@ -74,6 +79,7 @@ export class StatisticApi {
     instance.set(StatKey.ChatId, chatId);
     instance.set(StatKey.UsageCount, 0);
     instance.set(StatKey.LangId, lang);
+    instance.set(StatKey.UserName, username);
     return instance.save().then((stat: Parse.Object) => stat.id);
   }
 
