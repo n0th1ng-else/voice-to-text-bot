@@ -5,12 +5,14 @@ import { LanguageCode, VoiceConverter } from "../recognition/types";
 import { StatisticApi } from "../statistic";
 import { TextModel } from "../text";
 import { LabelId } from "../text/labels";
+import { githubUrl } from "../const";
 
 const logger = new Logger("telegram-bot");
 
 enum BotCommand {
   Start = "/start",
   Language = "/lang",
+  Support = "/support",
 }
 
 export class TelegramBotModel {
@@ -19,6 +21,7 @@ export class TelegramBotModel {
   private id = "";
   private host = "";
   private path = "";
+  private authorUrl = "";
 
   constructor(
     private readonly token: string,
@@ -37,6 +40,11 @@ export class TelegramBotModel {
       .update(`${this.host}${this.path}:${this.token}`)
       .digest("hex");
 
+    return this;
+  }
+
+  public setAuthor(url: string): this {
+    this.authorUrl = url;
     return this;
   }
 
@@ -78,6 +86,11 @@ export class TelegramBotModel {
           return;
         }
 
+        if (this.isSupportMessage(msg)) {
+          this.sendSupportMessage(chatId);
+          return;
+        }
+
         if (!this.isVoiceMessage(msg)) {
           this.sendMessage(chatId, LabelId.NoContent);
           return;
@@ -116,6 +129,10 @@ export class TelegramBotModel {
     return msg && msg.text === BotCommand.Start;
   }
 
+  private isSupportMessage(msg: TelegramBot.Message): boolean {
+    return msg && msg.text === BotCommand.Support;
+  }
+
   private isVoiceMessage(msg: TelegramBot.Message): boolean {
     return msg && !!msg.voice;
   }
@@ -125,6 +142,28 @@ export class TelegramBotModel {
       LabelId.WelcomeMessage,
       LabelId.WelcomeMessageMore,
     ]);
+  }
+
+  private sendSupportMessage(chatId: number): void {
+    const buttons = [];
+    buttons.push({
+      text: this.text.t(LabelId.GithubIssues),
+      url: githubUrl,
+    });
+
+    if (this.authorUrl) {
+      buttons.push({
+        text: this.text.t(LabelId.ContactAuthor),
+        url: this.authorUrl,
+      });
+    }
+    this.bot
+      .sendMessage(chatId, this.text.t(LabelId.SupportCommand), {
+        reply_markup: {
+          inline_keyboard: [buttons],
+        },
+      })
+      .catch((err) => logger.error("Unable to send support message", err));
   }
 
   private sendMessage(chatId: number, ids: LabelId | LabelId[]): Promise<void> {
