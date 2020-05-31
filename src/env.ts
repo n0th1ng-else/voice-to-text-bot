@@ -18,6 +18,9 @@ export const telegramBotApi: string = process.env.TELEGRAM_BOT_API || "";
 
 export const ngRokToken: string = process.env.NGROK_TOKEN || "";
 
+export const authorTelegramAccount: string =
+  process.env.AUTHOR_TELEGRAM_ACCOUNT || "";
+
 export const googleApi = {
   projectId: process.env.GOOGLE_PROJECT_ID || "",
   clientEmail: process.env.GOOGLE_CLIENT_EMAIL || "",

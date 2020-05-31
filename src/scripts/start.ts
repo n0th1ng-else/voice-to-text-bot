@@ -10,6 +10,7 @@ import {
   dbStat,
   nextReplicaUrl,
   replicaLifecycleInterval,
+  authorTelegramAccount,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -39,11 +40,9 @@ export function run() {
     dbStat.appKey,
     dbStat.masterKey
   );
-  const bot = new TelegramBotModel(
-    telegramBotApi,
-    converter,
-    stat
-  ).setHostLocation(selfUrl);
+  const bot = new TelegramBotModel(telegramBotApi, converter, stat)
+    .setHostLocation(selfUrl)
+    .setAuthor(authorTelegramAccount);
 
   server
     .setBots([bot])

@@ -10,6 +10,9 @@ export enum LabelId {
   WelcomeMessageMore,
   ChangeLang,
   ChangeLangTitle,
+  GithubIssues,
+  ContactAuthor,
+  SupportCommand,
 }
 
 export const labels = {
@@ -23,6 +26,9 @@ export const labels = {
       "👋🏽 Привет! отправь мне голосовое сообщение и я распознаю его в текст",
     [LabelId.ChangeLang]: "🆗 Язык изменен",
     [LabelId.ChangeLangTitle]: "Какой язык использовать? 🔮",
+    [LabelId.GithubIssues]: "Отправить issue на GitHub",
+    [LabelId.ContactAuthor]: "Связаться с автором",
+    [LabelId.SupportCommand]: "Поддержка",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -36,5 +42,8 @@ export const labels = {
     [LabelId.ChangeLangTitle]: "Select the language 🔮",
     [LabelId.WelcomeMessageMore]:
       "Don't forget to select the language you are going to recognise by typing the /lang command.\nНе забудь выбрать язык голосовых сообщений с помощью команды /lang",
+    [LabelId.GithubIssues]: "Send me an issue (GitHub)",
+    [LabelId.ContactAuthor]: "Talk to author",
+    [LabelId.SupportCommand]: "Support menu",
   },
 };

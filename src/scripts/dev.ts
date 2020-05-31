@@ -9,6 +9,7 @@ import {
   telegramBotApi,
   dbStat,
   ngRokToken,
+  authorTelegramAccount,
 } from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
@@ -39,7 +40,9 @@ export function run() {
     dbStat.appKey,
     dbStat.masterKey
   );
-  const bot = new TelegramBotModel(telegramBotApi, converter, stat);
+  const bot = new TelegramBotModel(telegramBotApi, converter, stat).setAuthor(
+    authorTelegramAccount
+  );
 
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
