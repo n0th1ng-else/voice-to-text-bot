@@ -8,6 +8,8 @@ import {
 } from "./types";
 import { Logger } from "../logger";
 import { parseBuffer } from "music-metadata";
+import { google } from "@google-cloud/speech/build/protos/protos";
+import IRecognizeResponse = google.cloud.speech.v1.IRecognizeResponse;
 
 const logger = new Logger("Google recognition");
 
@@ -29,7 +31,7 @@ export class GoogleProvider extends VoiceConverter {
 
   transformToText(
     fileLink: string,
-    fileId: number,
+    fileId: string,
     lang: LanguageCode
   ): Promise<string> {
     const name = `${fileId}.wav`;
@@ -45,22 +47,28 @@ export class GoogleProvider extends VoiceConverter {
             encoding: "OGG_OPUS",
             sampleRateHertz: bufferData.sampleRate,
             audioChannelCount: bufferData.numberOfChannels,
+            enableAutomaticPunctuation: true,
             model: "phone_call",
             useEnhanced: true,
             languageCode: lang,
           },
         });
       })
-      .then((translationData: any) => this.unpackTranscription(translationData))
+      .then(([translationData]) => this.unpackTranscription(translationData))
       .then((text) => {
         logger.info(`Job ${logger.y(name)} completed`);
         return text;
       });
   }
 
-  unpackTranscription(translationData: any): Promise<string> {
-    const transcription = translationData[0].results
-      .map((result: any) => result.alternatives[0].transcript)
+  unpackTranscription(translationData: IRecognizeResponse): Promise<string> {
+    const res = translationData.results || [];
+    const transcription = res
+      .map((result) => {
+        const options = result.alternatives || [{ transcript: "" }];
+        return options[0].transcript;
+      })
+      .filter((text) => text)
       .join("\n");
     return Promise.resolve(transcription);
   }

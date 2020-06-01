@@ -21,7 +21,7 @@ export class NodeStatisticApi {
     Parse.initialize(appId, appKey, masterKey);
   }
 
-  public toggleActive(selfUrl: string, active: boolean) {
+  public toggleActive(selfUrl: string, active: boolean): Promise<void> {
     return this.getStatId(selfUrl)
       .catch(() => this.createStat(selfUrl, active))
       .then((statId) => this.getStat(statId))

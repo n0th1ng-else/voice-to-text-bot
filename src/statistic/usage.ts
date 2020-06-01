@@ -24,14 +24,14 @@ export class UsageStatisticApi {
     Parse.initialize(appId, appKey, masterKey);
   }
 
-  public updateUsageCount(chatId: number) {
+  public updateUsageCount(chatId: number): Promise<void> {
     return this.getStatId(chatId)
       .catch(() => this.createStat(chatId, LanguageCode.Ru))
       .then((statId) => this.getStat(statId))
       .then((stat) => this.updateStatCount(stat));
   }
 
-  public updateLanguage(chatId: number, lang: LanguageCode) {
+  public updateLanguage(chatId: number, lang: LanguageCode): Promise<void> {
     return this.getStatId(chatId)
       .catch(() => this.createStat(chatId, lang))
       .then((statId) => this.getStat(statId))

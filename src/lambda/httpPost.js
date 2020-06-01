@@ -22,6 +22,7 @@ exports.handleIncomingHTTPMessage = (req, res) => {
   res.sendStatus(200);
   const msg = req.body.message;
   const chatId = msg.chat.id;
+  // eslint-disable-next-line no-console
   console.log(`${chatId} Received new Telegram message`);
 
   const triggerEvent = (topic, data) => {
@@ -39,6 +40,7 @@ exports.handleIncomingHTTPMessage = (req, res) => {
   };
 
   if (!msg.voice) {
+    // eslint-disable-next-line no-console
     console.log(`${chatId} Message is not a voice`);
 
     const messageObject = {
@@ -49,6 +51,7 @@ exports.handleIncomingHTTPMessage = (req, res) => {
     return triggerEvent(TOPIC.SEND_MESSAGE, messageObject);
   }
 
+  // eslint-disable-next-line no-console
   console.log(`${chatId} Message includes voice. Processing`);
   const fileId = msg.voice.file_id;
 

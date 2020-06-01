@@ -13,9 +13,12 @@ const TOPIC = {
  */
 exports.extractTextLiteral = (pubSubEvent) => {
   const data = JSON.parse(Buffer.from(pubSubEvent.data, "base64").toString());
+  // eslint-disable-next-line no-console
   console.log(`${data.chatId} Received a text data`);
 
+  // eslint-disable-next-line no-console
   console.log("chatId", data.chatId);
+  // eslint-disable-next-line no-console
   console.log("textData", data.textData);
 
   const triggerEvent = (topic, data) => {
@@ -28,6 +31,7 @@ exports.extractTextLiteral = (pubSubEvent) => {
     .map((result) => result.alternatives[0].transcript)
     .join("\n");
 
+  // eslint-disable-next-line no-console
   console.log(`${data.chatId} Complete`);
 
   const messageObject = {

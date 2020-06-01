@@ -6,6 +6,7 @@ import { StatisticApi } from "../statistic";
 import { TextModel } from "../text";
 import { LabelId } from "../text/labels";
 import { githubUrl } from "../const";
+import { TelegramApiVoice } from "./types";
 
 const logger = new Logger("telegram-bot");
 
@@ -97,7 +98,8 @@ export class TelegramBotModel {
           return;
         }
 
-        const fileName = (msg.voice && (msg.voice as any).file_unique_id) || "";
+        const fileName =
+          (msg.voice && (msg.voice as TelegramApiVoice).file_unique_id) || "";
 
         this.stat.usage
           .updateUsageCount(chatId)

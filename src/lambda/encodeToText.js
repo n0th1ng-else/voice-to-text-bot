@@ -20,10 +20,14 @@ const TOPIC = {
  */
 exports.encodeBufferToText = (pubSubEvent) => {
   const data = JSON.parse(Buffer.from(pubSubEvent.data, "base64").toString());
+  // eslint-disable-next-line no-console
   console.log(`${data.chatId} Received a Buffer`);
 
+  // eslint-disable-next-line no-console
   console.log("chatId", data.chatId);
+  // eslint-disable-next-line no-console
   console.log("sampleRateHertz", data.sampleRateHertz);
+  // eslint-disable-next-line no-console
   console.log("audioChannelCount", data.audioChannelCount);
 
   const triggerEvent = (topic, data) => {
@@ -53,6 +57,7 @@ exports.encodeBufferToText = (pubSubEvent) => {
   return client
     .recognize(params)
     .then((textData) => {
+      // eslint-disable-next-line no-console
       console.log(`${data.chatId} Created a text. Extracting literal...`);
       const messageObject = {
         ...data,
@@ -62,6 +67,7 @@ exports.encodeBufferToText = (pubSubEvent) => {
       return triggerEvent(TOPIC.GET_TEXT_RESULT, messageObject);
     })
     .catch((err) => {
+      // eslint-disable-next-line no-console
       console.log(`${data.chatId} Unable to convert into text`, err);
 
       const messageObject = {
