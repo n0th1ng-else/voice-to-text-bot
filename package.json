@@ -4,7 +4,8 @@
     "start:js": "node dist/src/scripts/runJs.js start",
     "dev": "node src/scripts/runTs.js dev",
     "dev:js": "node dist/src/scripts/runJs.js dev",
-    "format": "prettier --write .",
+    "format": "prettier --write",
+    "lint": "eslint",
     "build": "tsc"
   },
   "dependencies": {
@@ -31,6 +32,34 @@
     "waveheader": "0.0.2"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "3.0.2",
+    "@typescript-eslint/eslint-plugin": "3.0.2",
+    "eslint": "7.1.0",
+    "eslint-config-prettier": "6.11.0",
+    "husky": "4.2.5",
+    "lint-staged": "10.2.7",
     "prettier": "2.0.5"
-  }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{md}": [
+      "npm run format"
+    ],
+    "*.{js,ts, json}": [
+      "npm run format",
+      "npm run lint"
+    ]
+  },
+  "author": "n0th1ng-else",
+  "repository": {
+    "url": "https://github.com/n0th1ng-else/voice-to-text-bot"
+  },
+  "bugs": {
+    "url": "https://github.com/n0th1ng-else/voice-to-text-bot/issues"
+  },
+  "license": "MIT"
 }
