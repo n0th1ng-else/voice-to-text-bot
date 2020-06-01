@@ -46,6 +46,7 @@ export function run() {
 
   server
     .setBots([bot])
+    .setStat(stat)
     .start()
     .then(() => server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval))
     .catch((err: Error) => logger.error(err));
