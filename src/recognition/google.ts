@@ -33,10 +33,10 @@ export class GoogleProvider extends VoiceConverter {
     lang: LanguageCode
   ): Promise<string> {
     const name = `${fileId}.wav`;
-    logger.info("Starting process for", fileLink);
+    logger.info(`Starting process for ${logger.y(name)}`);
     return this.getFileBase64(fileLink)
       .then((bufferData) => {
-        logger.info("Start converting", name, fileLink);
+        logger.info(`Start converting ${logger.y(name)}`);
         return this.service.recognize({
           audio: {
             content: bufferData.plainBuffer,
@@ -53,7 +53,7 @@ export class GoogleProvider extends VoiceConverter {
       })
       .then((translationData: any) => this.unpackTranscription(translationData))
       .then((text) => {
-        logger.info(`Job ${name} completed`);
+        logger.info(`Job ${logger.y(name)} completed`);
         return text;
       });
   }
@@ -66,7 +66,7 @@ export class GoogleProvider extends VoiceConverter {
   }
 
   private getFileBase64(fileLink: string): Promise<AudioFileData> {
-    logger.info("Converting into base64 💿");
+    logger.info("Converting file url into base64 💿");
     return new Promise<Buffer>((resolve, reject) => {
       runGet(fileLink, (response) => {
         const oggBuffer: Buffer[] = [];

@@ -1,5 +1,3 @@
-import { TelegramBotModel } from "../telegram/bot";
-import { ExpressServer } from "../server/express";
 import {
   appPort,
   enableSSL,
@@ -19,6 +17,8 @@ import {
 } from "../recognition";
 import { getHostName } from "../server/tunnel";
 import { StatisticApi } from "../statistic";
+import { TelegramBotModel } from "../telegram/bot";
+import { ExpressServer } from "../server/express";
 
 const logger = new Logger("run handler");
 
@@ -50,5 +50,5 @@ export function run(): void {
       return bot.setHostLocation(host).applyHostLocation();
     })
     .then(() => server.setBots([bot]).start())
-    .catch((err: Error) => logger.error(err));
+    .catch((err: Error) => logger.error("Failed to run dev instance", err));
 }

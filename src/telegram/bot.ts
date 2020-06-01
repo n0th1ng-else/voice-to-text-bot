@@ -73,26 +73,26 @@ export class TelegramBotModel {
       .getLanguage(chatId, username)
       .then((lang) => this.text.setLanguage(lang))
       .catch((err) => {
-        logger.error("Unable to get lang", err);
+        logger.error("Unable to get the lang", err);
         this.text.resetLanguage();
       })
       .then(() => {
-        if (this.isHelloMessage(msg)) {
+        if (TelegramBotModel.isHelloMessage(msg)) {
           this.sendHelloMessage(chatId);
           return;
         }
 
-        if (this.isLangMessage(msg)) {
+        if (TelegramBotModel.isLangMessage(msg)) {
           this.showLanguageSelection(chatId);
           return;
         }
 
-        if (this.isSupportMessage(msg)) {
+        if (TelegramBotModel.isSupportMessage(msg)) {
           this.sendSupportMessage(chatId);
           return;
         }
 
-        if (!this.isVoiceMessage(msg)) {
+        if (!TelegramBotModel.isVoiceMessage(msg)) {
           this.sendMessage(chatId, LabelId.NoContent);
           return;
         }
@@ -105,7 +105,7 @@ export class TelegramBotModel {
 
         this.getFileLInk(msg)
           .then((fileLink) => {
-            logger.info("New link", fileLink);
+            logger.warn("New link", logger.y(fileLink));
             this.sendMessage(chatId, LabelId.InProgress);
 
             return this.converter.transformToText(
@@ -117,24 +117,27 @@ export class TelegramBotModel {
           .then((text: string) => this.bot.sendMessage(chatId, `🗣 ${text}`))
           .catch((err: Error) => {
             this.sendMessage(chatId, LabelId.RecognitionFailed);
-            logger.error(err);
+            logger.error(
+              `Unable to recognize the file ${logger.y(fileName)}`,
+              err
+            );
           });
       });
   }
 
-  private isLangMessage(msg: TelegramBot.Message): boolean {
+  private static isLangMessage(msg: TelegramBot.Message): boolean {
     return msg && msg.text === BotCommand.Language;
   }
 
-  private isHelloMessage(msg: TelegramBot.Message): boolean {
+  private static isHelloMessage(msg: TelegramBot.Message): boolean {
     return msg && msg.text === BotCommand.Start;
   }
 
-  private isSupportMessage(msg: TelegramBot.Message): boolean {
+  private static isSupportMessage(msg: TelegramBot.Message): boolean {
     return msg && msg.text === BotCommand.Support;
   }
 
-  private isVoiceMessage(msg: TelegramBot.Message): boolean {
+  private static isVoiceMessage(msg: TelegramBot.Message): boolean {
     return msg && !!msg.voice;
   }
 
@@ -238,7 +241,10 @@ export class TelegramBotModel {
   private handleCallbackQuery(msg: TelegramBot.CallbackQuery): void {
     const message = msg.message;
     if (!message) {
-      logger.error("No message passed in callback query");
+      logger.error(
+        "No message passed in callback query",
+        new Error("No message passed in callback query")
+      );
       return;
     }
     const chatId = message.chat.id;
@@ -253,7 +259,9 @@ export class TelegramBotModel {
       })
       .catch((err) =>
         logger.error(
-          `Unable to set the language for chatId=${chatId} lang=${lang}`,
+          `Unable to set the language for chatId=${logger.y(
+            chatId
+          )} lang=${logger.y(lang)}`,
           err
         )
       );

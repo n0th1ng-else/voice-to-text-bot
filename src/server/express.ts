@@ -80,10 +80,14 @@ export class ExpressServer {
   public setBots(bots: TelegramBotModel[] = []): this {
     this.bots = bots;
     this.isIdle = true;
-    logger.info(`${bots.length} bots to set up`);
+    logger.info(
+      `Requested ${logger.y(bots.length)} bot${
+        bots.length === 1 ? "" : "s"
+      } to set up`
+    );
 
     bots.forEach((bot) => {
-      logger.warn("Setting up a handler for", bot.getPath());
+      logger.warn(`Setting up a handler for ${logger.y(bot.getPath())}`);
       this.app.post(bot.getPath(), (req, res) => {
         bot.handleApiMessage(req.body);
         res.sendStatus(200);
@@ -96,7 +100,7 @@ export class ExpressServer {
     });
 
     this.app.use((req, res) => {
-      logger.error("Unknown route", req.originalUrl);
+      logger.error(`Unknown route ${logger.y(req.originalUrl)}`);
 
       res
         .status(404)
@@ -115,7 +119,7 @@ export class ExpressServer {
 
     return new Promise((resolve) => {
       server.listen(this.port, () => {
-        logger.info(`Express server is listening on ${this.port}`);
+        logger.info(`Express server is listening on ${logger.y(this.port)}`);
         resolve(
           () =>
             new Promise((resolve, reject) => {
@@ -144,7 +148,7 @@ export class ExpressServer {
     this.nextReplicaUrl = nextReplicaUrl;
     this.daysRunning = [];
     logger.info(
-      `Lifecycle interval is set to ${this.lifecycleInterval} day${
+      `Lifecycle interval is set to ${logger.y(this.lifecycleInterval)} day${
         this.lifecycleInterval === 1 ? "" : "s"
       }`
     );
@@ -166,13 +170,18 @@ export class ExpressServer {
     if (!this.daysRunning.includes(currentDay)) {
       this.daysRunning.push(currentDay);
     }
+
+    const daysRunning = this.daysRunning.join(",");
     logger.info(
-      `Daemon tick. Today is ${currentDay} and I have been running for ${this.daysRunning.join(
-        ","
-      )} already`
+      `Daemon tick. Today is ${logger.y(
+        currentDay
+      )} and I have been running for (${logger.y(daysRunning)}) already`
     );
     const currentInterval = this.daysRunning.length;
     if (currentInterval >= this.lifecycleInterval) {
+      logger.warn(
+        "Lifecycle limit reached. Delegating execution to the next node"
+      );
       runGet<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
         .then((health) => {
           if (health.status !== HealthStatus.Online) {
@@ -186,7 +195,9 @@ export class ExpressServer {
           clearInterval(this.daemon);
           this.daysRunning = [];
           logger.warn(
-            "Delegated callback for the buddy node. Daemon stopped and I am going to hibernate"
+            `Delegated callback for the buddy node. Daemon stopped and ${logger.y(
+              "I am going to hibernate"
+            )}`
           );
 
           return this.stat && this.stat.node.toggleActive(this.selfUrl, false);
@@ -201,7 +212,7 @@ export class ExpressServer {
           logger.error("Replica status is not ok", health);
           return;
         }
-        logger.info("Ping completed with result: ", health.status);
+        logger.info(`Ping completed with result: ${logger.y(health.status)}`);
 
         const isCallbackOwner = health.urls.every((url) =>
           url.includes(this.selfUrl)
@@ -211,7 +222,9 @@ export class ExpressServer {
           clearInterval(this.daemon);
           this.daysRunning = [];
           logger.warn(
-            "Callback is not owner by this node. Daemon stopped and I am going to hibernate"
+            `Callback is not owner by this node. Daemon stopped and ${logger.y(
+              "I am going to hibernate"
+            )}`
           );
           return this.stat && this.stat.node.toggleActive(this.selfUrl, false);
         }

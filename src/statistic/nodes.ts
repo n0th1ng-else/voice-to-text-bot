@@ -29,7 +29,7 @@ export class NodeStatisticApi {
   }
 
   private toggleNodeActive(stat: Parse.Object, active: boolean): Promise<void> {
-    logger.info("Updating active state for", stat.id);
+    logger.info(`Updating active state for ${logger.y(stat.id)}`);
 
     stat.set(StatKey.Active, active);
     return stat.save().then(() => {
@@ -38,7 +38,7 @@ export class NodeStatisticApi {
   }
 
   public createStat(selfUrl: string, active: boolean): Promise<string> {
-    logger.info("Creating stat record for url", selfUrl);
+    logger.info(`Creating stat record for url ${logger.y(selfUrl)}`);
 
     const NodeStatClass = Parse.Object.extend(this.dbClass);
     const instance = new NodeStatClass();
@@ -48,7 +48,7 @@ export class NodeStatisticApi {
   }
 
   private getStat(statId: string) {
-    logger.info("Fetching node stat object with statId", statId);
+    logger.info(`Fetching node stat object with statId ${logger.y(statId)}`);
 
     const NodeStatClass = Parse.Object.extend(this.dbClass);
     const query = new Parse.Query(NodeStatClass);
@@ -56,7 +56,7 @@ export class NodeStatisticApi {
   }
 
   private getStatId(selfUrl: string): Promise<string> {
-    logger.info("Looking for statId for url", selfUrl);
+    logger.info(`Looking for statId for url ${logger.y(selfUrl)}`);
 
     const NodeStatClass = Parse.Object.extend(this.dbClass);
     const query = new Parse.Query(NodeStatClass);
