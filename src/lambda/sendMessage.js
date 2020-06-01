@@ -10,6 +10,7 @@ const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
  */
 exports.sendTelegramMessage = (pubSubEvent) => {
   const data = JSON.parse(Buffer.from(pubSubEvent.data, "base64").toString());
+  // eslint-disable-next-line no-console
   console.log(`${data.chatId} New message to send ${data.message}`);
 
   const getTelegramToken = () => {

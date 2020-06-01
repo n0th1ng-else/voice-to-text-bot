@@ -1,5 +1,3 @@
-import { TelegramBotModel } from "../telegram/bot";
-import { ExpressServer } from "../server/express";
 import {
   appPort,
   enableSSL,
@@ -19,6 +17,8 @@ import {
 import { VoiceConverterOptions } from "../recognition/types";
 import { Logger } from "../logger";
 import { StatisticApi } from "../statistic";
+import { TelegramBotModel } from "../telegram/bot";
+import { ExpressServer } from "../server/express";
 
 const logger = new Logger("run handler");
 
@@ -49,5 +49,5 @@ export function run(): void {
     .setStat(stat)
     .start()
     .then(() => server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval))
-    .catch((err: Error) => logger.error(err));
+    .catch((err: Error) => logger.error("Failed to run the server", err));
 }

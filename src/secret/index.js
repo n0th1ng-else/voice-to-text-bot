@@ -46,9 +46,13 @@ function handleTelegramToken(environmentVars, secretName, token) {
       // setTelegramToken(environmentVars, secretName, token)
       // .then(() => getTelegramToken(environmentVars, secretName))
       .then((data) => {
+        // eslint-disable-next-line no-console
         console.log(data);
       })
-      .catch((err) => console.error("!!!", err))
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error("!!!", err);
+      })
   );
 }
 

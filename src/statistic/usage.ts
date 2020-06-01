@@ -24,14 +24,14 @@ export class UsageStatisticApi {
     Parse.initialize(appId, appKey, masterKey);
   }
 
-  public updateUsageCount(chatId: number) {
+  public updateUsageCount(chatId: number): Promise<void> {
     return this.getStatId(chatId)
       .catch(() => this.createStat(chatId, LanguageCode.Ru))
       .then((statId) => this.getStat(statId))
       .then((stat) => this.updateStatCount(stat));
   }
 
-  public updateLanguage(chatId: number, lang: LanguageCode) {
+  public updateLanguage(chatId: number, lang: LanguageCode): Promise<void> {
     return this.getStatId(chatId)
       .catch(() => this.createStat(chatId, lang))
       .then((statId) => this.getStat(statId))
@@ -46,7 +46,7 @@ export class UsageStatisticApi {
   }
 
   private updateStatCount(stat: Parse.Object): Promise<void> {
-    logger.info("Updating usage count for statId", stat.id);
+    logger.info(`Updating usage count for statId ${logger.y(stat.id)}`);
 
     const count = stat.get(StatKey.UsageCount);
     stat.set(StatKey.UsageCount, count + 1);
@@ -59,7 +59,7 @@ export class UsageStatisticApi {
     stat: Parse.Object,
     lang: LanguageCode
   ): Promise<void> {
-    logger.info("Updating language for statId", stat.id);
+    logger.info(`Updating language for statId ${logger.y(stat.id)}`);
 
     stat.set(StatKey.LangId, lang);
     return stat.save().then(() => {
@@ -72,7 +72,7 @@ export class UsageStatisticApi {
     lang: LanguageCode,
     username = ""
   ): Promise<string> {
-    logger.info("Creating stat record for chatId", chatId);
+    logger.info(`Creating stat record for chatId ${logger.y(chatId)}`);
 
     const BotStatClass = Parse.Object.extend(this.dbClass);
     const instance = new BotStatClass();
@@ -84,7 +84,7 @@ export class UsageStatisticApi {
   }
 
   private getStat(statId: string) {
-    logger.info("Fetching stat object with statId", statId);
+    logger.info(`Fetching stat object with statId ${logger.y(statId)}`);
 
     const BotStatClass = Parse.Object.extend(this.dbClass);
     const query = new Parse.Query(BotStatClass);
@@ -92,7 +92,7 @@ export class UsageStatisticApi {
   }
 
   private getStatId(chatId: number): Promise<string> {
-    logger.info("Looking for statId for chatId", chatId);
+    logger.info(`Looking for statId for chatId ${logger.y(chatId)}`);
 
     const BotStatClass = Parse.Object.extend(this.dbClass);
     const query = new Parse.Query(BotStatClass);

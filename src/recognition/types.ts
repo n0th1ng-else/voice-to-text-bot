@@ -8,7 +8,7 @@ export enum VoiceConverterProvider {
 export abstract class VoiceConverter {
   public abstract transformToText(
     fileLink: string,
-    fileId: number,
+    fileId: string,
     lang: LanguageCode
   ): Promise<string>;
 }

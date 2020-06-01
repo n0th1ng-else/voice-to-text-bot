@@ -1,5 +1,7 @@
 import { VoiceConverterProvider } from "./recognition/types";
 
+process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegram-bot-api" package
+
 export const appPort: number = Number(process.env.PORT) || 3000;
 
 export const enableSSL = process.env.ENABLE_SSL === "true";
@@ -32,4 +34,9 @@ export const dbStat = {
   appId: process.env.DB_STAT_APP_ID || "",
   appKey: process.env.DB_STAT_APP_KEY || "",
   masterKey: process.env.DB_STAT_MASTER_KEY || "",
+};
+
+export const logApi = {
+  apiToken: process.env.LOG_API_TOKEN || "",
+  projectId: process.env.LOG_PROJECT_ID || "",
 };

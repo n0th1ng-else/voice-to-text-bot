@@ -18,9 +18,12 @@ const TOPIC = {
  */
 exports.getVoiceFileBuffer = (pubSubEvent) => {
   const data = JSON.parse(Buffer.from(pubSubEvent.data, "base64").toString());
+  // eslint-disable-next-line no-console
   console.log(`${data.chatId} Received a file`);
 
+  // eslint-disable-next-line no-console
   console.log("chatId", data.chatId);
+  // eslint-disable-next-line no-console
   console.log("fileUrl", data.fileUrl);
 
   const triggerEvent = (topic, data) => {
@@ -45,6 +48,7 @@ exports.getVoiceFileBuffer = (pubSubEvent) => {
       }));
     })
     .then((bufferData) => {
+      // eslint-disable-next-line no-console
       console.log(`${data.chatId} Created a buffer. Encoding...`);
       const messageObject = {
         ...data,
@@ -56,6 +60,7 @@ exports.getVoiceFileBuffer = (pubSubEvent) => {
       return triggerEvent(TOPIC.GET_TEXT, messageObject);
     })
     .catch((err) => {
+      // eslint-disable-next-line no-console
       console.log(`${data.chatId} Unable to get buffer`, err);
 
       const messageObject = {

@@ -7,7 +7,7 @@ function createTunnel(port: number, token?: string): Promise<string> {
   logger.info("Creating tunnel");
   const localHost = `https://localhost:${port}`;
   return connect({ authtoken: token, addr: localHost }).then((host) => {
-    logger.info(logger.g(`Started tunnel from ${host} to ${localHost}`));
+    logger.info(`Started tunnel from ${host} to ${localHost}`);
     logger.info(`Using the host ${host}`);
     return host;
   });

@@ -1,24 +1,32 @@
+import stripAnsi from "strip-ansi";
 import { green, red, yellow } from "chalk";
+import { LogType, sendLogs } from "./integration";
 
 export class Logger {
   constructor(private readonly id: string = "") {}
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public info(...message: any[]): void {
+  public info(msg: string, ...message: any[]): void {
+    const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.log(this.g(`[${this.id}]`), ...message);
+    console.log(this.g(prefix), msg, ...message);
+    sendLogs(LogType.Info, this.id, stripAnsi(msg));
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public warn(...message: any[]): void {
+  public warn(msg: string, ...data: any[]): void {
+    const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.warn(this.y(`[${this.id}]`), ...message);
+    console.warn(this.y(prefix), msg, ...data);
+    sendLogs(LogType.Warn, this.id, stripAnsi(msg), data);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public error(...message: any[]): void {
+  public error(msg: string, ...data: any[]): void {
+    const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.error(this.r(`[${this.id}]`), ...message);
+    console.error(this.r(prefix), this.r(msg), ...data);
+    sendLogs(LogType.Error, this.id, stripAnsi(msg), data);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
