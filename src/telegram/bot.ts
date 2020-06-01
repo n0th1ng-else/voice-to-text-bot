@@ -69,7 +69,7 @@ export class TelegramBotModel {
   private handleMessage(msg: TelegramBot.Message): void {
     const username = msg.from ? msg.from.username : msg.chat.username;
     const chatId = msg.chat.id;
-    this.stat
+    this.stat.usage
       .getLanguage(chatId, username)
       .then((lang) => this.text.setLanguage(lang))
       .catch((err) => {
@@ -99,7 +99,7 @@ export class TelegramBotModel {
 
         const fileName = (msg.voice && (msg.voice as any).file_unique_id) || "";
 
-        this.stat
+        this.stat.usage
           .updateUsageCount(chatId)
           .catch((err) => logger.error("Unable to update stat count", err));
 
@@ -245,7 +245,7 @@ export class TelegramBotModel {
     const lang =
       msg.data === LanguageCode.En ? LanguageCode.En : LanguageCode.Ru;
 
-    this.stat
+    this.stat.usage
       .updateLanguage(chatId, lang)
       .then(() => {
         this.text.setLanguage(lang);
@@ -253,7 +253,7 @@ export class TelegramBotModel {
       })
       .catch((err) =>
         logger.error(
-          `Unable to set thw language for chatId=${chatId} lang=${lang}`,
+          `Unable to set the language for chatId=${chatId} lang=${lang}`,
           err
         )
       );

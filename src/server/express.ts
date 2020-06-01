@@ -7,6 +7,7 @@ import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 import { HealthDto, HealthSsl, HealthStatus } from "./types";
 import { sleepForRandom } from "./timer";
 import { runGet } from "./request";
+import { StatisticApi } from "../statistic";
 
 const logger = new Logger("server");
 
@@ -15,6 +16,7 @@ export class ExpressServer {
   private readonly app = express();
   private readonly httpsOptions: HttpsOptions;
 
+  private stat: StatisticApi | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = false;
   private lifecycleInterval = 1;
@@ -68,6 +70,11 @@ export class ExpressServer {
           res.status(400).send(status);
         });
     });
+  }
+
+  public setStat(stat: StatisticApi): this {
+    this.stat = stat;
+    return this;
   }
 
   public setBots(bots: TelegramBotModel[] = []): this {
@@ -145,6 +152,7 @@ export class ExpressServer {
     sleepForRandom()
       .then(() => Promise.all(this.bots.map((bot) => bot.applyHostLocation())))
       .then(() => this.scheduleDaemon())
+      .then(() => this.stat && this.stat.node.toggleActive(this.selfUrl, true))
       .catch((err) => logger.error("Unable to schedule replica", err));
   }
 
@@ -172,13 +180,16 @@ export class ExpressServer {
             return;
           }
 
-          if (this.daemon) {
-            clearInterval(this.daemon);
-            this.daysRunning = [];
-            logger.warn(
-              "Delegated callback for the buddy node. Daemon stopped and I am going to hibernate"
-            );
+          if (!this.daemon) {
+            return;
           }
+          clearInterval(this.daemon);
+          this.daysRunning = [];
+          logger.warn(
+            "Delegated callback for the buddy node. Daemon stopped and I am going to hibernate"
+          );
+
+          return this.stat && this.stat.node.toggleActive(this.selfUrl, false);
         })
         .catch((err) => logger.error("Unable to delegate logic", err));
       return;
@@ -195,12 +206,14 @@ export class ExpressServer {
         const isCallbackOwner = health.urls.every((url) =>
           url.includes(this.selfUrl)
         );
+
         if (!isCallbackOwner && this.daemon) {
           clearInterval(this.daemon);
           this.daysRunning = [];
           logger.warn(
             "Callback is not owner by this node. Daemon stopped and I am going to hibernate"
           );
+          return this.stat && this.stat.node.toggleActive(this.selfUrl, false);
         }
       })
       .catch((err) => logger.error("Unable to ping myself!", err));
