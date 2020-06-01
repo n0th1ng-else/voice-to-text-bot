@@ -32,7 +32,7 @@
     "ts-node": "8.10.2",
     "typescript": "3.9.3",
     "waveheader": "0.0.2",
-    "winston": "^3.2.1",
+    "winston": "3.2.1",
     "winston-loggly-bulk": "3.1.0"
   },
   "devDependencies": {
@@ -65,5 +65,12 @@
   "bugs": {
     "url": "https://github.com/n0th1ng-else/voice-to-text-bot/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "telegram",
+    "bot",
+    "speech-to-text",
+    "recognition",
+    "express"
+  ]
 }
