@@ -52,13 +52,13 @@ export class GoogleProvider extends VoiceConverter {
         });
       })
       .then((translationData: any) => this.unpackTranscription(translationData))
-      .then((text: string) => {
+      .then((text) => {
         logger.info(`Job ${name} completed`);
         return text;
       });
   }
 
-  unpackTranscription(translationData: any) {
+  unpackTranscription(translationData: any): Promise<string> {
     const transcription = translationData[0].results
       .map((result: any) => result.alternatives[0].transcript)
       .join("\n");

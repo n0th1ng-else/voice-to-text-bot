@@ -22,7 +22,7 @@ import { StatisticApi } from "../statistic";
 
 const logger = new Logger("run handler");
 
-export function run() {
+export function run(): void {
   const server = new ExpressServer(appPort, enableSSL, selfUrl);
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: googleApi.privateKey,

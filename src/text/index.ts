@@ -5,11 +5,11 @@ export class TextModel {
   private readonly cbLang = LanguageCode.En;
   private language = LanguageCode.Ru;
 
-  public resetLanguage() {
+  public resetLanguage(): void {
     this.setLanguage(this.cbLang);
   }
 
-  public setLanguage(lang: LanguageCode) {
+  public setLanguage(lang: LanguageCode): void {
     this.language = lang;
   }
 
@@ -18,6 +18,7 @@ export class TextModel {
   }
 
   public t(id: LabelId): string {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return labels[this.language][id] || labels[this.cbLang][id] || "";
   }
