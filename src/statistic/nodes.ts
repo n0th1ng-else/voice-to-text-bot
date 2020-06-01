@@ -29,7 +29,7 @@ export class NodeStatisticApi {
   }
 
   private toggleNodeActive(stat: Parse.Object, active: boolean): Promise<void> {
-    logger.info("Updating language for statId", stat.id);
+    logger.info("Updating active state for", stat.id);
 
     stat.set(StatKey.Active, active);
     return stat.save().then(() => {

@@ -53,6 +53,9 @@ jobs:
       - name: Set up node using nvm
         uses: dcodeIO/setup-node-nvm@v4.0.0
 
+      - name: Sleep 5 sec for slave to avoid race condition
+        run: sleep 5
+
       - name: Build, Push and Deploy to Heroku
         id: heroku
         uses: jctaveras/heroku-deploy@v1.0.0
