@@ -6,9 +6,6 @@ ENV NODE_ENV production
 
 ARG APP_DIR=/usr/src/app/
 
-ARG APP_VERSION=local
-ENV APP_VERSION ${APP_VERSION}
-
 RUN mkdir -p $APP_DIR
 WORKDIR $APP_DIR
 
@@ -16,6 +13,11 @@ COPY package.json package-lock.json $APP_DIR
 RUN npm ci && npm cache clean --force
 
 COPY . $APP_DIR
+
+ARG APP_VERSION=local
+ENV APP_VERSION ${APP_VERSION}
+
+RUN echo ${APP_VERSION}
 
 RUN npm run build
 
