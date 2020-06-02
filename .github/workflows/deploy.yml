@@ -10,7 +10,7 @@ jobs:
     name: Push docker image
     steps:
       - name: App version
-        uses: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the bot version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -33,7 +33,7 @@ jobs:
     name: Deploy to Heroku Master account
     steps:
       - name: App version
-        uses: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the bot version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -56,7 +56,7 @@ jobs:
     name: Deploy to Heroku Slave account
     steps:
       - name: App version
-        uses: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the bot version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
