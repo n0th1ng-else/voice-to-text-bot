@@ -20,7 +20,11 @@ if (isLoggingEnabled()) {
     new Loggly({
       token: logApi.apiToken,
       subdomain: logApi.projectId,
-      tags: ["bot", "server", selfUrl],
+      tags: [
+        "bot",
+        "server",
+        selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-"),
+      ],
       json: true,
     })
   );

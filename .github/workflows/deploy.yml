@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Push docker image
     steps:
+      - name: App version
+        uses: echo "Picked the bot version ${GITHUB_SHA}"
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -23,11 +26,15 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: "${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app"
           tag_with_sha: true
+          build_args: APP_VERSION=${GITHUB_SHA}
 
   heroku-master:
     runs-on: ubuntu-latest
     name: Deploy to Heroku Master account
     steps:
+      - name: App version
+        uses: echo "Picked the bot version ${GITHUB_SHA}"
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -42,11 +49,15 @@ jobs:
           api_key: ${{ secrets.HEROKU_API_KEY }}
           app_name: ${{ secrets.HEROKU_APP_MASTER }}
           dockerfile: "./Dockerfile"
+          options: "--build-arg APP_VERSION=${GITHUB_SHA}"
 
   heroku-slave:
     runs-on: ubuntu-latest
     name: Deploy to Heroku Slave account
     steps:
+      - name: App version
+        uses: echo "Picked the bot version ${GITHUB_SHA}"
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -64,3 +75,4 @@ jobs:
           api_key: ${{ secrets.HEROKU_API_KEY }}
           app_name: ${{ secrets.HEROKU_APP_SLAVE }}
           dockerfile: "./Dockerfile"
+          options: "--build-arg APP_VERSION=${GITHUB_SHA}"

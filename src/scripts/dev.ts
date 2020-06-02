@@ -8,6 +8,7 @@ import {
   dbStat,
   ngRokToken,
   authorTelegramAccount,
+  appVersion,
 } from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
@@ -23,7 +24,7 @@ import { ExpressServer } from "../server/express";
 const logger = new Logger("run handler");
 
 export function run(): void {
-  const server = new ExpressServer(appPort, enableSSL, selfUrl);
+  const server = new ExpressServer(appPort, enableSSL, selfUrl, appVersion);
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: googleApi.privateKey,
     googleProjectId: googleApi.projectId,

@@ -27,7 +27,8 @@ export class ExpressServer {
   constructor(
     private readonly port: number,
     private readonly isHttps: boolean,
-    private readonly selfUrl: string
+    private readonly selfUrl: string,
+    private readonly version: string
   ) {
     logger.info("Initializing express server");
 
@@ -44,6 +45,7 @@ export class ExpressServer {
           ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
           message: "Waiting for bots to set up",
           urls: [],
+          version: this.version,
         };
         res.status(400).send(status);
         return;
@@ -56,6 +58,7 @@ export class ExpressServer {
             ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
             message: "All is good",
             urls,
+            version: this.version,
           };
           res.status(200).send(status);
         })
@@ -66,6 +69,7 @@ export class ExpressServer {
             ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
             message: "Unable to get bot urls",
             urls: [],
+            version: this.version,
           };
           res.status(400).send(status);
         });

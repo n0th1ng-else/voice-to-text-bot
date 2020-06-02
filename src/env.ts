@@ -4,6 +4,8 @@ process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegr
 
 export const appPort: number = Number(process.env.PORT) || 3000;
 
+export const appVersion: string = process.env.APP_VERSION || "dev";
+
 export const enableSSL = process.env.ENABLE_SSL === "true";
 
 export const provider: string =
