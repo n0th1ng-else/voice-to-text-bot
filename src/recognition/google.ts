@@ -34,7 +34,7 @@ export class GoogleProvider extends VoiceConverter {
     fileId: string,
     lang: LanguageCode
   ): Promise<string> {
-    const name = `${fileId}.wav`;
+    const name = `${fileId}.ogg`;
     logger.info(`Starting process for ${logger.y(name)}`);
     return this.getFileBase64(fileLink)
       .then((bufferData) => {
