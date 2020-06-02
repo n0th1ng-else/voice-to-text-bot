@@ -3,6 +3,7 @@ export interface HealthDto {
   ssl: HealthSsl;
   message: string;
   urls: string[];
+  version: string;
 }
 
 export enum HealthStatus {
