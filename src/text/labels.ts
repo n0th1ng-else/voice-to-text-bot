@@ -13,6 +13,7 @@ export enum LabelId {
   GithubIssues,
   ContactAuthor,
   SupportCommand,
+  LongVoiceMessage,
 }
 
 export const labels = {
@@ -29,6 +30,8 @@ export const labels = {
     [LabelId.GithubIssues]: "Отправить issue на GitHub",
     [LabelId.ContactAuthor]: "Связаться с автором",
     [LabelId.SupportCommand]: "Поддержка",
+    [LabelId.LongVoiceMessage]:
+      "Сообщения длиной больше 1 минуты не поддерживаются 🌚",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -45,5 +48,7 @@ export const labels = {
     [LabelId.GithubIssues]: "Send me an issue (GitHub)",
     [LabelId.ContactAuthor]: "Talk to author",
     [LabelId.SupportCommand]: "Support menu",
+    [LabelId.LongVoiceMessage]:
+      "Messages with duration more than 1 minute are not supported 🌚",
   },
 };

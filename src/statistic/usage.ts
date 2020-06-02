@@ -38,7 +38,7 @@ export class UsageStatisticApi {
       .then((stat) => this.updateStatLanguage(stat, lang));
   }
 
-  public getLanguage(chatId: number, username = ""): Promise<LanguageCode> {
+  public getLanguage(chatId: number, username: string): Promise<LanguageCode> {
     return this.getStatId(chatId)
       .catch(() => this.createStat(chatId, LanguageCode.Ru, username))
       .then((statId) => this.getStat(statId))

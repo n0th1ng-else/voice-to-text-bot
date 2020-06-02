@@ -6,15 +6,16 @@ import { StatisticApi } from "../statistic";
 import { TextModel } from "../text";
 import { LabelId } from "../text/labels";
 import { githubUrl } from "../const";
-import { TelegramApiVoice } from "./types";
+import { BotMessageModel } from "./types";
+import {
+  isHelloMessage,
+  isLangMessage,
+  isSupportMessage,
+  isVoiceMessage,
+  isVoiceMessageLong,
+} from "./helpers";
 
 const logger = new Logger("telegram-bot");
-
-enum BotCommand {
-  Start = "/start",
-  Language = "/lang",
-  Support = "/support",
-}
 
 export class TelegramBotModel {
   private readonly bot: TelegramBot;
@@ -68,79 +69,78 @@ export class TelegramBotModel {
   }
 
   private handleMessage(msg: TelegramBot.Message): void {
-    const username = msg.from ? msg.from.username : msg.chat.username;
-    const chatId = msg.chat.id;
+    const model = new BotMessageModel(msg);
+
+    if (!model.isMessageSupported) {
+      logger.warn("Message is not supported");
+      return;
+    }
+
     this.stat.usage
-      .getLanguage(chatId, username)
+      .getLanguage(model.chatId, model.username)
       .then((lang) => this.text.setLanguage(lang))
       .catch((err) => {
         logger.error("Unable to get the lang", err);
         this.text.resetLanguage();
       })
       .then(() => {
-        if (TelegramBotModel.isHelloMessage(msg)) {
-          this.sendHelloMessage(chatId);
+        if (isHelloMessage(msg)) {
+          this.sendHelloMessage(model.chatId);
           return;
         }
 
-        if (TelegramBotModel.isLangMessage(msg)) {
-          this.showLanguageSelection(chatId);
+        if (isLangMessage(msg)) {
+          this.showLanguageSelection(model.chatId);
           return;
         }
 
-        if (TelegramBotModel.isSupportMessage(msg)) {
-          this.sendSupportMessage(chatId);
+        if (isSupportMessage(msg)) {
+          this.sendSupportMessage(model.chatId);
           return;
         }
 
-        if (!TelegramBotModel.isVoiceMessage(msg)) {
-          this.sendMessage(chatId, LabelId.NoContent);
+        if (!isVoiceMessage(msg)) {
+          if (!model.isGroup) {
+            this.sendMessage(model.chatId, LabelId.NoContent);
+          }
           return;
         }
 
-        const fileName =
-          (msg.voice && (msg.voice as TelegramApiVoice).file_unique_id) || "";
+        if (isVoiceMessageLong(model)) {
+          this.sendMessage(model.chatId, LabelId.LongVoiceMessage);
+          return;
+        }
 
         this.stat.usage
-          .updateUsageCount(chatId)
+          .updateUsageCount(model.chatId)
           .catch((err) => logger.error("Unable to update stat count", err));
 
-        this.getFileLInk(msg)
+        this.getFileLInk(model)
           .then((fileLink) => {
             logger.warn("New link", logger.y(fileLink));
-            this.sendMessage(chatId, LabelId.InProgress);
+            if (!model.isGroup) {
+              this.sendMessage(model.chatId, LabelId.InProgress);
+            }
 
             return this.converter.transformToText(
               fileLink,
-              fileName,
+              model.voiceFileId,
               this.text.getLanguage()
             );
           })
-          .then((text: string) => this.bot.sendMessage(chatId, `🗣 ${text}`))
+          .then((text: string) =>
+            this.bot.sendMessage(model.chatId, `🗣 ${text}`)
+          )
           .catch((err: Error) => {
-            this.sendMessage(chatId, LabelId.RecognitionFailed);
+            if (!model.isGroup) {
+              this.sendMessage(model.chatId, LabelId.RecognitionFailed);
+            }
             logger.error(
-              `Unable to recognize the file ${logger.y(fileName)}`,
+              `Unable to recognize the file ${logger.y(model.voiceFileId)}`,
               err
             );
           });
       });
-  }
-
-  private static isLangMessage(msg: TelegramBot.Message): boolean {
-    return msg && msg.text === BotCommand.Language;
-  }
-
-  private static isHelloMessage(msg: TelegramBot.Message): boolean {
-    return msg && msg.text === BotCommand.Start;
-  }
-
-  private static isSupportMessage(msg: TelegramBot.Message): boolean {
-    return msg && msg.text === BotCommand.Support;
-  }
-
-  private static isVoiceMessage(msg: TelegramBot.Message): boolean {
-    return msg && !!msg.voice;
   }
 
   private sendHelloMessage(chatId: number): void {
@@ -205,16 +205,14 @@ export class TelegramBotModel {
       .catch((err) => logger.error("Unable to edit the message", err));
   }
 
-  private getFileLInk(msg: TelegramBot.Message) {
-    const fileId = msg.voice && msg.voice.file_id;
-
-    if (!fileId) {
+  private getFileLInk(model: BotMessageModel) {
+    if (!model.voiceFileId) {
       return Promise.reject(
         new Error("Unable to find a voice file in the message")
       );
     }
 
-    return this.bot.getFileLink(fileId);
+    return this.bot.getFileLink(model.voiceFileId);
   }
 
   private showLanguageSelection(chatId: number): void {
