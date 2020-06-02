@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: "${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app"
           tag_with_sha: true
-          build_args: APP_VERSION=${GITHUB_SHA}
+          build_args: APP_VERSION=${{ github.sha }}
 
   heroku-master:
     runs-on: ubuntu-latest
@@ -41,19 +41,40 @@ jobs:
       - name: Set up node using nvm
         uses: dcodeIO/setup-node-nvm@v4.0.0
 
-      - name: Build, Push and Deploy to Heroku
-        id: heroku
-        uses: jctaveras/heroku-deploy@v1.0.0
-        with:
-          email: ${{ secrets.HEROKU_EMAIL }}
-          api_key: ${{ secrets.HEROKU_API_KEY }}
-          app_name: ${{ secrets.HEROKU_APP_MASTER }}
-          dockerfile: "./Dockerfile"
-          options: "--build-arg APP_VERSION=${GITHUB_SHA}"
+      - name: Docker login
+        run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
+        env:
+          D_LOGIN: ${{ secrets.HEROKU_EMAIL }}
+          D_PWD: ${{ secrets.HEROKU_API_KEY }}
+          D_REGISTRY: registry.heroku.com
+
+      - name: Docker build
+        run: docker build . --file Dockerfile --build-arg APP_VERSION=${{ env.D_VERSION }} --tag ${{ env.D_REGISTRY }}/${{ env.D_NAME }}/web
+        env:
+          D_REGISTRY: registry.heroku.com
+          D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
+          D_VERSION: ${{ github.sha }}
+
+      - name: Push docker image
+        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          D_ACTION: push
+          D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
+          D_VERSION: ${{ github.sha }}
+
+      - name: Release docker image
+        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          D_ACTION: release
+          D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
+
 
   heroku-slave:
     runs-on: ubuntu-latest
     name: Deploy to Heroku Slave account
+    needs: heroku-master
     steps:
       - name: App version
         run: echo "Picked the bot version ${GITHUB_SHA}"
@@ -64,15 +85,32 @@ jobs:
       - name: Set up node using nvm
         uses: dcodeIO/setup-node-nvm@v4.0.0
 
-      - name: Sleep 5 sec for slave to avoid race condition
-        run: sleep 5
+      - name: Docker login
+        run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
+        env:
+          D_LOGIN: ${{ secrets.HEROKU_EMAIL }}
+          D_PWD: ${{ secrets.HEROKU_API_KEY }}
+          D_REGISTRY: registry.heroku.com
 
-      - name: Build, Push and Deploy to Heroku
-        id: heroku
-        uses: jctaveras/heroku-deploy@v1.0.0
-        with:
-          email: ${{ secrets.HEROKU_EMAIL }}
-          api_key: ${{ secrets.HEROKU_API_KEY }}
-          app_name: ${{ secrets.HEROKU_APP_SLAVE }}
-          dockerfile: "./Dockerfile"
-          options: "--build-arg APP_VERSION=${GITHUB_SHA}"
+      - name: Docker build
+        run: docker build . --file Dockerfile --build-arg APP_VERSION=${{ env.D_VERSION }} --tag ${{ env.D_REGISTRY }}/${{ env.D_NAME }}/web
+        env:
+          D_REGISTRY: registry.heroku.com
+          D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
+          D_VERSION: ${{ github.sha }}
+
+      - name: Push docker image
+        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          D_ACTION: push
+          D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
+          D_VERSION: ${{ github.sha }}
+
+      - name: Release docker image
+        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          D_ACTION: release
+          D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
+
