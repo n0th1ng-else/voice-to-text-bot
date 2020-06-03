@@ -87,17 +87,17 @@ export class TelegramBotModel {
         this.text.resetLanguage();
       })
       .then(() => {
-        if (isHelloMessage(msg)) {
+        if (isHelloMessage(model, msg)) {
           this.sendHelloMessage(model.chatId);
           return;
         }
 
-        if (isLangMessage(msg)) {
+        if (isLangMessage(model, msg)) {
           this.showLanguageSelection(model.chatId);
           return;
         }
 
-        if (isSupportMessage(msg)) {
+        if (isSupportMessage(model, msg)) {
           this.sendSupportMessage(model.chatId);
           return;
         }

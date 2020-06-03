@@ -1,16 +1,49 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotCommand, BotMessageModel } from "./types";
+import { telegramBotName } from "../env";
 
-export function isLangMessage(msg: TelegramBot.Message): boolean {
-  return msg && msg.text === BotCommand.Language;
+export function isLangMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message
+): boolean {
+  return isCommandMessage(model, msg, BotCommand.Language);
 }
 
-export function isHelloMessage(msg: TelegramBot.Message): boolean {
-  return msg && msg.text === BotCommand.Start;
+export function isHelloMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message
+): boolean {
+  return isCommandMessage(model, msg, BotCommand.Start);
 }
 
-export function isSupportMessage(msg: TelegramBot.Message): boolean {
-  return msg && msg.text === BotCommand.Support;
+export function isSupportMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message
+): boolean {
+  return isCommandMessage(model, msg, BotCommand.Support);
+}
+
+function isCommandMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message,
+  command: BotCommand
+): boolean {
+  if (!msg || !msg.text) {
+    return false;
+  }
+
+  if (msg.text === command) {
+    return true;
+  }
+
+  if (!telegramBotName) {
+    return false;
+  }
+
+  return (
+    model.isGroup &&
+    msg.text.toLowerCase() === `${command}@${telegramBotName.toLowerCase()}`
+  );
 }
 
 export function isVoiceMessageLong(model: BotMessageModel): boolean {
