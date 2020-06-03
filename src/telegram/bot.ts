@@ -159,7 +159,7 @@ export class TelegramBotModel {
   }
 
   private sendSupportMessage(chatId: number): void {
-    const buttons = [];
+    const buttons: TelegramBot.InlineKeyboardButton[] = [];
     buttons.push({
       text: this.text.t(LabelId.GithubIssues),
       url: githubUrl,

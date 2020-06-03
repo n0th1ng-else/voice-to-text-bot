@@ -65,8 +65,7 @@ export function getChatId(msg: TelegramBot.Message): number {
 }
 
 export function isChatGroup(msg: TelegramBot.Message): boolean {
-  const groupTypes: TelegramBot.ChatType[] = ["group", "supergroup", "channel"];
-  return groupTypes.includes(msg.chat.type);
+  return msg.chat.type !== "private";
 }
 
 export function getUserName(msg: TelegramBot.Message): string {
