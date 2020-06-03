@@ -24,7 +24,9 @@ import { ExpressServer } from "../server/express";
 const logger = new Logger("run handler");
 
 export function run(): void {
-  const server = new ExpressServer(appPort, enableSSL, selfUrl, appVersion);
+  const server = new ExpressServer(appPort, enableSSL, appVersion).setSelfUrl(
+    selfUrl
+  );
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: googleApi.privateKey,
     googleProjectId: googleApi.projectId,

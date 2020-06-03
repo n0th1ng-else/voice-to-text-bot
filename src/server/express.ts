@@ -5,9 +5,9 @@ import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
 import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 import { HealthDto, HealthSsl, HealthStatus } from "./types";
-import { sleepForRandom } from "./timer";
-import { runGet } from "./request";
+import { runGetDto } from "./request";
 import { StatisticApi } from "../statistic";
+import { sleepForRandom } from "../common/timer";
 
 const logger = new Logger("server");
 
@@ -23,11 +23,11 @@ export class ExpressServer {
   private nextReplicaUrl = "";
   private daemon: NodeJS.Timeout | null = null;
   private daysRunning: number[] = [];
+  private selfUrl = "";
 
   constructor(
     private readonly port: number,
     private readonly isHttps: boolean,
-    private readonly selfUrl: string,
     private readonly version: string
   ) {
     logger.info("Initializing express server");
@@ -114,8 +114,15 @@ export class ExpressServer {
     return this;
   }
 
+  public setSelfUrl(url: string): this {
+    this.selfUrl = url;
+    return this;
+  }
+
   public start(): Promise<() => Promise<void>> {
-    logger.info(`Starting http${this.isHttps ? "s" : ""} server`);
+    logger.info(
+      `Starting ${logger.y(`http${this.isHttps ? "s" : ""}`)} server`
+    );
 
     const server = this.isHttps
       ? createHttps(this.httpsOptions, this.app)
@@ -186,7 +193,7 @@ export class ExpressServer {
       logger.warn(
         "Lifecycle limit reached. Delegating execution to the next node"
       );
-      runGet<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
+      runGetDto<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
         .then((health) => {
           if (health.status !== HealthStatus.Online) {
             logger.error("Buddy replica status is not ok", health);
@@ -210,7 +217,7 @@ export class ExpressServer {
       return;
     }
 
-    runGet<HealthDto>(this.getHealthUrl())
+    runGetDto<HealthDto>(this.getHealthUrl())
       .then((health) => {
         if (health.status !== HealthStatus.Online) {
           logger.error("Replica status is not ok", health);
