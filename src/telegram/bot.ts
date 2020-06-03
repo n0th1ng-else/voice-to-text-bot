@@ -80,24 +80,24 @@ export class TelegramBotModel {
     }
 
     this.stat.usage
-      .getLanguage(model.chatId, model.username)
+      .getLanguage(model.chatId, model.name)
       .then((lang) => this.text.setLanguage(lang))
       .catch((err) => {
         logger.error("Unable to get the lang", err);
         this.text.resetLanguage();
       })
       .then(() => {
-        if (isHelloMessage(msg)) {
+        if (isHelloMessage(model, msg)) {
           this.sendHelloMessage(model.chatId);
           return;
         }
 
-        if (isLangMessage(msg)) {
+        if (isLangMessage(model, msg)) {
           this.showLanguageSelection(model.chatId);
           return;
         }
 
-        if (isSupportMessage(msg)) {
+        if (isSupportMessage(model, msg)) {
           this.sendSupportMessage(model.chatId);
           return;
         }
@@ -118,7 +118,7 @@ export class TelegramBotModel {
         }
 
         this.stat.usage
-          .updateUsageCount(model.chatId, model.username)
+          .updateUsageCount(model.chatId, model.name)
           .catch((err) => logger.error("Unable to update stat count", err));
 
         this.getFileLInk(model)
@@ -134,9 +134,11 @@ export class TelegramBotModel {
               this.text.getLanguage()
             );
           })
-          .then((text: string) =>
-            this.bot.sendMessage(model.chatId, `🗣 ${text}`)
-          )
+          .then((text: string) => {
+            const name = model.fullUserName || model.userName;
+            const prefix = model.isGroup && name ? `${name} ` : "";
+            return this.bot.sendMessage(model.chatId, `${prefix}🗣 ${text}`);
+          })
           .catch((err: Error) => {
             if (!model.isGroup) {
               this.sendMessage(model.chatId, LabelId.RecognitionFailed);

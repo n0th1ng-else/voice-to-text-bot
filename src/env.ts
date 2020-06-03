@@ -20,6 +20,8 @@ export const replicaLifecycleInterval: number =
 
 export const telegramBotApi: string = process.env.TELEGRAM_BOT_API || "";
 
+export const telegramBotName: string = process.env.TELEGRAM_BOT_NAME || "";
+
 export const ngRokToken: string = process.env.NGROK_TOKEN || "";
 
 export const authorTelegramAccount: string =

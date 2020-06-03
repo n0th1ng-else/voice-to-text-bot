@@ -1,17 +1,49 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotCommand, BotMessageModel } from "./types";
-import { watchFile } from "fs";
+import { telegramBotName } from "../env";
 
-export function isLangMessage(msg: TelegramBot.Message): boolean {
-  return msg && msg.text === BotCommand.Language;
+export function isLangMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message
+): boolean {
+  return isCommandMessage(model, msg, BotCommand.Language);
 }
 
-export function isHelloMessage(msg: TelegramBot.Message): boolean {
-  return msg && msg.text === BotCommand.Start;
+export function isHelloMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message
+): boolean {
+  return isCommandMessage(model, msg, BotCommand.Start);
 }
 
-export function isSupportMessage(msg: TelegramBot.Message): boolean {
-  return msg && msg.text === BotCommand.Support;
+export function isSupportMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message
+): boolean {
+  return isCommandMessage(model, msg, BotCommand.Support);
+}
+
+function isCommandMessage(
+  model: BotMessageModel,
+  msg: TelegramBot.Message,
+  command: BotCommand
+): boolean {
+  if (!msg || !msg.text) {
+    return false;
+  }
+
+  if (msg.text === command) {
+    return true;
+  }
+
+  if (!telegramBotName) {
+    return false;
+  }
+
+  return (
+    model.isGroup &&
+    msg.text.toLowerCase() === `${command}@${telegramBotName.toLowerCase()}`
+  );
 }
 
 export function isVoiceMessageLong(model: BotMessageModel): boolean {
@@ -38,16 +70,25 @@ export function isChatGroup(msg: TelegramBot.Message): boolean {
   return msg.chat.type === "group";
 }
 
-export function getUserId(msg: TelegramBot.Message): string {
+export function getUserName(msg: TelegramBot.Message): string {
   const fromUserName = msg.from && msg.from.username;
+  return fromUserName || getFullUserName(msg) || getGroupName(msg) || "";
+}
+
+export function getFullUserName(msg: TelegramBot.Message): string {
   const fromUserFullName =
     msg.from &&
     [msg.from.first_name, msg.from.last_name].filter((k) => k).join(" ");
-  const chatName = msg.chat.username;
+
+  return fromUserFullName || "";
+}
+
+export function getGroupName(msg: TelegramBot.Message): string {
+  const chatName = msg.chat.title;
   const chatFullName = [msg.chat.first_name, msg.chat.last_name]
     .filter((k) => k)
     .join(" ");
-  return fromUserName || fromUserFullName || chatName || chatFullName || "";
+  return chatName || chatFullName || "";
 }
 
 export function getVoiceFile(msg: TelegramBot.Message) {

@@ -167,7 +167,11 @@ export class ExpressServer {
     sleepForRandom()
       .then(() => Promise.all(this.bots.map((bot) => bot.applyHostLocation())))
       .then(() => this.scheduleDaemon())
-      .then(() => this.stat && this.stat.node.toggleActive(this.selfUrl, true))
+      .then(
+        () =>
+          this.stat &&
+          this.stat.node.toggleActive(this.selfUrl, true, this.version)
+      )
       .catch((err) => logger.error("Unable to schedule replica", err));
   }
 
@@ -211,7 +215,10 @@ export class ExpressServer {
             )}`
           );
 
-          return this.stat && this.stat.node.toggleActive(this.selfUrl, false);
+          return (
+            this.stat &&
+            this.stat.node.toggleActive(this.selfUrl, false, this.version)
+          );
         })
         .catch((err) => logger.error("Unable to delegate logic", err));
       return;
@@ -237,7 +244,10 @@ export class ExpressServer {
               "I am going to hibernate"
             )}`
           );
-          return this.stat && this.stat.node.toggleActive(this.selfUrl, false);
+          return (
+            this.stat &&
+            this.stat.node.toggleActive(this.selfUrl, false, this.version)
+          );
         }
       })
       .catch((err) => logger.error("Unable to ping myself!", err));

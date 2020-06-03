@@ -10,6 +10,7 @@ import {
   replicaLifecycleInterval,
   authorTelegramAccount,
   appVersion,
+  ngRokToken,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -20,13 +21,13 @@ import { Logger } from "../logger";
 import { StatisticApi } from "../statistic";
 import { TelegramBotModel } from "../telegram/bot";
 import { ExpressServer } from "../server/express";
+import { getHostName } from "../server/tunnel";
 
 const logger = new Logger("run handler");
 
 export function run(): void {
-  const server = new ExpressServer(appPort, enableSSL, appVersion).setSelfUrl(
-    selfUrl
-  );
+  const server = new ExpressServer(appPort, enableSSL, appVersion);
+
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: googleApi.privateKey,
     googleProjectId: googleApi.projectId,
@@ -43,14 +44,16 @@ export function run(): void {
     dbStat.appKey,
     dbStat.masterKey
   );
-  const bot = new TelegramBotModel(telegramBotApi, converter, stat)
-    .setHostLocation(selfUrl)
-    .setAuthor(authorTelegramAccount);
+  const bot = new TelegramBotModel(telegramBotApi, converter, stat).setAuthor(
+    authorTelegramAccount
+  );
 
-  server
-    .setBots([bot])
-    .setStat(stat)
-    .start()
+  getHostName(appPort, selfUrl, ngRokToken)
+    .then((host) => {
+      logger.info(`Telling telegram our location is ${host}`);
+      bot.setHostLocation(host);
+      return server.setSelfUrl(host).setBots([bot]).setStat(stat).start();
+    })
     .then(() => server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval))
     .catch((err: Error) => logger.error("Failed to run the server", err));
 }
