@@ -5,9 +5,9 @@ import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
 import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 import { HealthDto, HealthSsl, HealthStatus } from "./types";
-import { sleepForRandom } from "./timer";
 import { runGet } from "./request";
 import { StatisticApi } from "../statistic";
+import { sleepForRandom } from "../common/timer";
 
 const logger = new Logger("server");
 

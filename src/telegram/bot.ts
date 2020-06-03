@@ -14,6 +14,7 @@ import {
   isVoiceMessage,
   isVoiceMessageLong,
 } from "./helpers";
+import { runPromiseWithRetry } from "../common/helpers";
 
 const logger = new Logger("telegram-bot");
 
@@ -52,8 +53,10 @@ export class TelegramBotModel {
 
   public applyHostLocation(): Promise<void> {
     const hookUrl = `${this.host}${this.getPath()}`;
-    logger.warn(`webHook url is ${hookUrl}`);
-    return this.bot.setWebHook(hookUrl);
+    logger.warn(`WebHook url is ${hookUrl}`);
+    return runPromiseWithRetry("bot.applyHostLocation", () =>
+      this.bot.setWebHook(hookUrl)
+    );
   }
 
   public getHostLocation(): Promise<string> {
