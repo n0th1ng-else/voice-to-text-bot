@@ -23,7 +23,7 @@ if (isLoggingEnabled()) {
       tags: [
         "bot",
         "server",
-        selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-"),
+        selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-") || "local",
       ],
       json: true,
     })
