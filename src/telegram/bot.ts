@@ -118,7 +118,7 @@ export class TelegramBotModel {
         }
 
         this.stat.usage
-          .updateUsageCount(model.chatId)
+          .updateUsageCount(model.chatId, model.username)
           .catch((err) => logger.error("Unable to update stat count", err));
 
         this.getFileLInk(model)

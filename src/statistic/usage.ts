@@ -24,11 +24,11 @@ export class UsageStatisticApi {
     Parse.initialize(appId, appKey, masterKey);
   }
 
-  public updateUsageCount(chatId: number): Promise<void> {
+  public updateUsageCount(chatId: number, username: string): Promise<void> {
     return this.getStatId(chatId)
-      .catch(() => this.createStat(chatId, LanguageCode.Ru))
+      .catch(() => this.createStat(chatId, LanguageCode.Ru, username))
       .then((statId) => this.getStat(statId))
-      .then((stat) => this.updateStatCount(stat));
+      .then((stat) => this.updateStatCount(stat, username));
   }
 
   public updateLanguage(chatId: number, lang: LanguageCode): Promise<void> {
@@ -45,12 +45,16 @@ export class UsageStatisticApi {
       .then((stat) => stat.get(StatKey.LangId));
   }
 
-  private updateStatCount(stat: Parse.Object): Promise<void> {
-    logger.info(`Updating usage count for statId ${logger.y(stat.id)}`);
+  private updateStatCount(
+    instance: Parse.Object,
+    username: string
+  ): Promise<void> {
+    logger.info(`Updating usage count for statId ${logger.y(instance.id)}`);
 
-    const count = stat.get(StatKey.UsageCount);
-    stat.set(StatKey.UsageCount, count + 1);
-    return stat.save().then(() => {
+    const count = instance.get(StatKey.UsageCount);
+    instance.set(StatKey.UsageCount, count + 1);
+    instance.set(StatKey.UserName, username);
+    return instance.save().then(() => {
       // Empty promise result
     });
   }
