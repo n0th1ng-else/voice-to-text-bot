@@ -1,6 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
 import { BotCommand, BotMessageModel } from "./types";
-import { watchFile } from "fs";
 
 export function isLangMessage(msg: TelegramBot.Message): boolean {
   return msg && msg.text === BotCommand.Language;
@@ -38,16 +37,25 @@ export function isChatGroup(msg: TelegramBot.Message): boolean {
   return msg.chat.type === "group";
 }
 
-export function getUserId(msg: TelegramBot.Message): string {
+export function getUserName(msg: TelegramBot.Message): string {
   const fromUserName = msg.from && msg.from.username;
+  return fromUserName || getFullUserName(msg) || getGroupName(msg) || "";
+}
+
+export function getFullUserName(msg: TelegramBot.Message): string {
   const fromUserFullName =
     msg.from &&
     [msg.from.first_name, msg.from.last_name].filter((k) => k).join(" ");
-  const chatName = msg.chat.username;
+
+  return fromUserFullName || "";
+}
+
+export function getGroupName(msg: TelegramBot.Message): string {
+  const chatName = msg.chat.title;
   const chatFullName = [msg.chat.first_name, msg.chat.last_name]
     .filter((k) => k)
     .join(" ");
-  return fromUserName || fromUserFullName || chatName || chatFullName || "";
+  return chatName || chatFullName || "";
 }
 
 export function getVoiceFile(msg: TelegramBot.Message) {

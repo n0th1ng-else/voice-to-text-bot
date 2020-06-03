@@ -80,7 +80,7 @@ export class TelegramBotModel {
     }
 
     this.stat.usage
-      .getLanguage(model.chatId, model.username)
+      .getLanguage(model.chatId, model.name)
       .then((lang) => this.text.setLanguage(lang))
       .catch((err) => {
         logger.error("Unable to get the lang", err);
@@ -118,7 +118,7 @@ export class TelegramBotModel {
         }
 
         this.stat.usage
-          .updateUsageCount(model.chatId, model.username)
+          .updateUsageCount(model.chatId, model.name)
           .catch((err) => logger.error("Unable to update stat count", err));
 
         this.getFileLInk(model)
@@ -134,9 +134,11 @@ export class TelegramBotModel {
               this.text.getLanguage()
             );
           })
-          .then((text: string) =>
-            this.bot.sendMessage(model.chatId, `🗣 ${text}`)
-          )
+          .then((text: string) => {
+            const name = model.fullUserName || model.userName;
+            const prefix = model.isGroup && name ? `${name} ` : "";
+            return this.bot.sendMessage(model.chatId, `${prefix}🗣 ${text}`);
+          })
           .catch((err: Error) => {
             if (!model.isGroup) {
               this.sendMessage(model.chatId, LabelId.RecognitionFailed);
