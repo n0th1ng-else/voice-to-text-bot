@@ -23,11 +23,11 @@ export class ExpressServer {
   private nextReplicaUrl = "";
   private daemon: NodeJS.Timeout | null = null;
   private daysRunning: number[] = [];
+  private selfUrl = "";
 
   constructor(
     private readonly port: number,
     private readonly isHttps: boolean,
-    private readonly selfUrl: string,
     private readonly version: string
   ) {
     logger.info("Initializing express server");
@@ -114,8 +114,15 @@ export class ExpressServer {
     return this;
   }
 
+  public setSelfUrl(url: string): this {
+    this.selfUrl = url;
+    return this;
+  }
+
   public start(): Promise<() => Promise<void>> {
-    logger.info(`Starting http${this.isHttps ? "s" : ""} server`);
+    logger.info(
+      `Starting ${logger.y(`http${this.isHttps ? "s" : ""}`)} server`
+    );
 
     const server = this.isHttps
       ? createHttps(this.httpsOptions, this.app)

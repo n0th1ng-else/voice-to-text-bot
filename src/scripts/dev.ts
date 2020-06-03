@@ -24,7 +24,7 @@ import { ExpressServer } from "../server/express";
 const logger = new Logger("run handler");
 
 export function run(): void {
-  const server = new ExpressServer(appPort, enableSSL, selfUrl, appVersion);
+  const server = new ExpressServer(appPort, enableSSL, appVersion);
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: googleApi.privateKey,
     googleProjectId: googleApi.projectId,
@@ -48,6 +48,7 @@ export function run(): void {
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
       logger.info(`Telling telegram our location is ${host}`);
+      server.setSelfUrl(host);
       return bot.setHostLocation(host).applyHostLocation();
     })
     .then(() => server.setBots([bot]).start())
