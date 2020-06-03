@@ -5,7 +5,7 @@ import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
 import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 import { HealthDto, HealthSsl, HealthStatus } from "./types";
-import { runGet } from "./request";
+import { runGetDto } from "./request";
 import { StatisticApi } from "../statistic";
 import { sleepForRandom } from "../common/timer";
 
@@ -186,7 +186,7 @@ export class ExpressServer {
       logger.warn(
         "Lifecycle limit reached. Delegating execution to the next node"
       );
-      runGet<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
+      runGetDto<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
         .then((health) => {
           if (health.status !== HealthStatus.Online) {
             logger.error("Buddy replica status is not ok", health);
@@ -210,7 +210,7 @@ export class ExpressServer {
       return;
     }
 
-    runGet<HealthDto>(this.getHealthUrl())
+    runGetDto<HealthDto>(this.getHealthUrl())
       .then((health) => {
         if (health.status !== HealthStatus.Online) {
           logger.error("Replica status is not ok", health);

@@ -1,4 +1,3 @@
-import { get as runGet } from "https";
 import { v1 } from "@google-cloud/speech";
 import {
   AudioFileData,
@@ -10,6 +9,7 @@ import { Logger } from "../logger";
 import { parseBuffer } from "music-metadata";
 import { google } from "@google-cloud/speech/build/protos/protos";
 import IRecognizeResponse = google.cloud.speech.v1.IRecognizeResponse;
+import { runGetBuffer } from "../server/request";
 
 const logger = new Logger("google-recognition");
 
@@ -79,14 +79,7 @@ export class GoogleProvider extends VoiceConverter {
 
   private getFileBase64(fileLink: string): Promise<AudioFileData> {
     logger.info("Converting file url into base64 💿");
-    return new Promise<Buffer>((resolve, reject) => {
-      runGet(fileLink, (response) => {
-        const oggBuffer: Buffer[] = [];
-        response.on("data", (chunk) => oggBuffer.push(chunk));
-        response.on("error", (err) => reject(err));
-        response.on("end", () => resolve(Buffer.concat(oggBuffer)));
-      });
-    }).then((buffer) =>
+    return runGetBuffer(fileLink).then((buffer) =>
       parseBuffer(buffer).then((info) => new AudioFileData(buffer, info))
     );
   }
