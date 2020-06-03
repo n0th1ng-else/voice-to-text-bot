@@ -6,6 +6,7 @@ const logger = new Logger("db");
 enum StatKey {
   Active = "active",
   SelfUrl = "selfUrl",
+  Version = "version",
 }
 
 export class NodeStatisticApi {
@@ -21,29 +22,43 @@ export class NodeStatisticApi {
     Parse.initialize(appId, appKey, masterKey);
   }
 
-  public toggleActive(selfUrl: string, active: boolean): Promise<void> {
+  public toggleActive(
+    selfUrl: string,
+    active: boolean,
+    version: string
+  ): Promise<void> {
     return this.getStatId(selfUrl)
-      .catch(() => this.createStat(selfUrl, active))
+      .catch(() => this.createStat(selfUrl, active, version))
       .then((statId) => this.getStat(statId))
-      .then((stat) => this.toggleNodeActive(stat, active));
+      .then((stat) => this.toggleNodeActive(stat, active, version));
   }
 
-  private toggleNodeActive(stat: Parse.Object, active: boolean): Promise<void> {
-    logger.info(`Updating active state for ${logger.y(stat.id)}`);
+  private toggleNodeActive(
+    instance: Parse.Object,
+    active: boolean,
+    version: string
+  ): Promise<void> {
+    logger.info(`Updating active state for ${logger.y(instance.id)}`);
 
-    stat.set(StatKey.Active, active);
-    return stat.save().then(() => {
+    instance.set(StatKey.Active, active);
+    instance.set(StatKey.Version, version);
+    return instance.save().then(() => {
       // Empty promise result
     });
   }
 
-  public createStat(selfUrl: string, active: boolean): Promise<string> {
+  public createStat(
+    selfUrl: string,
+    active: boolean,
+    version: string
+  ): Promise<string> {
     logger.info(`Creating stat record for url ${logger.y(selfUrl)}`);
 
     const NodeStatClass = Parse.Object.extend(this.dbClass);
     const instance = new NodeStatClass();
     instance.set(StatKey.SelfUrl, selfUrl);
     instance.set(StatKey.Active, active);
+    instance.set(StatKey.Version, version);
     return instance.save().then((stat: Parse.Object) => stat.id);
   }
 
