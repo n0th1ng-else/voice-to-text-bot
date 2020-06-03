@@ -107,7 +107,10 @@ export class TelegramBotModel {
         }
 
         if (isVoiceMessageLong(model)) {
-          this.sendMessage(model.chatId, LabelId.LongVoiceMessage);
+          logger.warn(`Message is too long ${model.voiceDuration} sec`);
+          if (!model.isGroup) {
+            this.sendMessage(model.chatId, LabelId.LongVoiceMessage);
+          }
           return;
         }
 
