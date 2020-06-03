@@ -24,8 +24,10 @@ export function isVoiceMessage(msg: TelegramBot.Message): boolean {
 }
 
 export function isMessageSupported(msg: TelegramBot.Message): boolean {
+  const isBot = !!(msg.from && msg.from.is_bot);
   const types: TelegramBot.ChatType[] = ["private", "group"];
-  return types.includes(msg.chat.type);
+  const isSupportedDialogType = types.includes(msg.chat.type);
+  return isSupportedDialogType && !isBot;
 }
 
 export function getChatId(msg: TelegramBot.Message): number {
