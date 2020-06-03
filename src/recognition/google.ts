@@ -11,7 +11,9 @@ import { parseBuffer } from "music-metadata";
 import { google } from "@google-cloud/speech/build/protos/protos";
 import IRecognizeResponse = google.cloud.speech.v1.IRecognizeResponse;
 
-const logger = new Logger("Google recognition");
+const logger = new Logger("google-recognition");
+
+const supportedSampleRates = [8000, 12000, 16000, 24000, 48000];
 
 export class GoogleProvider extends VoiceConverter {
   private readonly service: v1.SpeechClient;
@@ -29,7 +31,7 @@ export class GoogleProvider extends VoiceConverter {
     });
   }
 
-  transformToText(
+  public transformToText(
     fileLink: string,
     fileId: string,
     lang: LanguageCode
@@ -45,7 +47,7 @@ export class GoogleProvider extends VoiceConverter {
           },
           config: {
             encoding: "OGG_OPUS",
-            sampleRateHertz: bufferData.sampleRate,
+            sampleRateHertz: this.getSampleRate(bufferData.sampleRate),
             audioChannelCount: bufferData.numberOfChannels,
             enableAutomaticPunctuation: true,
             model: "phone_call",
@@ -61,7 +63,9 @@ export class GoogleProvider extends VoiceConverter {
       });
   }
 
-  unpackTranscription(translationData: IRecognizeResponse): Promise<string> {
+  private unpackTranscription(
+    translationData: IRecognizeResponse
+  ): Promise<string> {
     const res = translationData.results || [];
     const transcription = res
       .map((result) => {
@@ -85,5 +89,31 @@ export class GoogleProvider extends VoiceConverter {
     }).then((buffer) =>
       parseBuffer(buffer).then((info) => new AudioFileData(buffer, info))
     );
+  }
+
+  private getSampleRate(fileSampleRate?: number): number {
+    if (!fileSampleRate) {
+      logger.warn(
+        `No sample rate detected. falling back to ${supportedSampleRates[2]}`
+      );
+      return supportedSampleRates[2];
+    }
+
+    if (supportedSampleRates.includes(fileSampleRate)) {
+      return fileSampleRate;
+    }
+
+    const closest = supportedSampleRates.reduce(
+      (prev, curr) =>
+        Math.abs(curr - fileSampleRate) < Math.abs(prev - fileSampleRate)
+          ? curr
+          : prev,
+      supportedSampleRates[2]
+    );
+
+    logger.warn(
+      `Sample rate ${fileSampleRate} is not supported. Trying the closest one ${closest}`
+    );
+    return closest;
   }
 }
