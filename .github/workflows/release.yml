@@ -13,7 +13,7 @@ jobs:
         run: echo "Picked the bot version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Set up node using nvm
         uses: dcodeIO/setup-node-nvm@v4.0.0
@@ -22,3 +22,16 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tag-validate:
+    runs-on: ubuntu-latest
+    needs: tag-release
+    steps:
+      - uses: actions/checkout@v2
+      - name: Put release version into env
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+
+      - name: Test release version
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
