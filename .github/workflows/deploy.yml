@@ -2,7 +2,7 @@ name: Project Workflow
 
 on:
   push:
-    branches: [master]
+    branches: [master-off]
 
 jobs:
   docker:
