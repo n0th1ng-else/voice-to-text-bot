@@ -2,7 +2,7 @@ name: Project Workflow
 
 on:
   push:
-    branches: [master-off]
+    branches: [master]
 
 jobs:
   docker:
@@ -10,7 +10,7 @@ jobs:
     name: Push docker image
     steps:
       - name: App version
-        run: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -33,7 +33,7 @@ jobs:
     name: Deploy to Heroku Master account
     steps:
       - name: App version
-        run: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -77,7 +77,7 @@ jobs:
     needs: heroku-master
     steps:
       - name: App version
-        run: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
