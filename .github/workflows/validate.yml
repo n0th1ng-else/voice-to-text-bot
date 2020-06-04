@@ -2,12 +2,12 @@ name: Project Workflow
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    needs: tag-release
     steps:
       - uses: actions/checkout@v1
       - name: Put release version into env
