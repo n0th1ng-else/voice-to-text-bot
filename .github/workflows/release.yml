@@ -10,7 +10,7 @@ jobs:
     name: Tag released changes
     steps:
       - name: App version
-        run: echo "Picked the bot version ${GITHUB_SHA}"
+        run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,13 +22,3 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  tag-validate:
-    runs-on: ubuntu-latest
-    needs: tag-release
-    steps:
-      - uses: olegtarasov/get-tag@v2
-        id: tagName
-
-      - name: Test release version
-        run: echo $GIT_TAG_NAME
