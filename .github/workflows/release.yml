@@ -27,11 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: tag-release
     steps:
-      - uses: actions/checkout@v2
-      - name: Put release version into env
-        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+      - uses: olegtarasov/get-tag@v2
+        id: tagName
 
       - name: Test release version
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ env.RELEASE_VERSION }}
+        run: echo $GIT_TAG_NAME
