@@ -18,7 +18,7 @@ export class ExpressServer {
 
   private stat: StatisticApi | null = null;
   private bots: TelegramBotModel[] = [];
-  private isIdle = false;
+  private isIdle = true;
   private lifecycleInterval = 1;
   private nextReplicaUrl = "";
   private daemon: NodeJS.Timeout | null = null;
@@ -39,7 +39,7 @@ export class ExpressServer {
 
     this.app.use(express.json());
     this.app.get("/health", (req, res) => {
-      if (!this.isIdle) {
+      if (this.isIdle) {
         const status: HealthDto = {
           status: HealthStatus.InProgress,
           ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
@@ -83,7 +83,6 @@ export class ExpressServer {
 
   public setBots(bots: TelegramBotModel[] = []): this {
     this.bots = bots;
-    this.isIdle = true;
     logger.info(
       `Requested ${logger.y(bots.length)} bot${
         bots.length === 1 ? "" : "s"
@@ -144,6 +143,14 @@ export class ExpressServer {
     });
   }
 
+  public applyHostLocation(): Promise<void> {
+    return Promise.all(this.bots.map((bot) => bot.applyHostLocation())).then(
+      () => {
+        this.isIdle = false;
+      }
+    );
+  }
+
   public triggerDaemon(
     nextReplicaUrl: string,
     lifecycleInterval: number
@@ -165,7 +172,7 @@ export class ExpressServer {
     );
 
     sleepForRandom()
-      .then(() => Promise.all(this.bots.map((bot) => bot.applyHostLocation())))
+      .then(() => this.applyHostLocation())
       .then(() => this.scheduleDaemon())
       .then(
         () =>
@@ -186,14 +193,14 @@ export class ExpressServer {
       this.daysRunning.push(currentDay);
     }
 
-    const daysRunning = this.daysRunning.join(",");
+    const daysRunning = this.daysRunning.join(", ");
     logger.info(
       `Daemon tick. Today is ${logger.y(
         currentDay
       )} and I have been running for (${logger.y(daysRunning)}) already`
     );
     const currentInterval = this.daysRunning.length;
-    if (currentInterval >= this.lifecycleInterval) {
+    if (currentInterval > this.lifecycleInterval) {
       logger.warn(
         "Lifecycle limit reached. Delegating execution to the next node"
       );
@@ -209,8 +216,10 @@ export class ExpressServer {
           }
           clearInterval(this.daemon);
           this.daysRunning = [];
+          this.isIdle = true;
+
           logger.warn(
-            `Delegated callback for the buddy node. Daemon stopped and ${logger.y(
+            `Delegated callback to the buddy node. Daemon stopped and ${logger.y(
               "I am going to hibernate"
             )}`
           );
@@ -220,7 +229,9 @@ export class ExpressServer {
             this.stat.node.toggleActive(this.selfUrl, false, this.version)
           );
         })
-        .catch((err) => logger.error("Unable to delegate logic", err));
+        .catch((err) =>
+          logger.error("Unable to delegate logic. Keep working", err)
+        );
       return;
     }
 
@@ -239,6 +250,8 @@ export class ExpressServer {
         if (!isCallbackOwner && this.daemon) {
           clearInterval(this.daemon);
           this.daysRunning = [];
+          this.isIdle = true;
+
           logger.warn(
             `Callback is not owner by this node. Daemon stopped and ${logger.y(
               "I am going to hibernate"
