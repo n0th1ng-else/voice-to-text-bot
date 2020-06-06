@@ -7,6 +7,7 @@ export enum LabelId {
   InProgress,
   RecognitionFailed,
   WelcomeMessage,
+  WelcomeMessageGroup,
   WelcomeMessageMore,
   ChangeLang,
   ChangeLangTitle,
@@ -25,8 +26,12 @@ export const labels = {
     [LabelId.RecognitionFailed]: "Не получилось распознать голос 😔",
     [LabelId.WelcomeMessage]:
       "👋🏽 Привет! отправь мне голосовое сообщение и я распознаю его в текст",
+    [LabelId.WelcomeMessageGroup]:
+      "Если хочешь, можешь добавить меня в группу, и я буду распознавать сообщения там",
     [LabelId.ChangeLang]: "🆗 Язык изменен",
     [LabelId.ChangeLangTitle]: "Какой язык использовать? 🔮",
+    [LabelId.WelcomeMessageMore]:
+      "Не забудь выбрать язык голосовых сообщений с помощью команды /lang",
     [LabelId.GithubIssues]: "Написать об ошибке",
     [LabelId.ContactAuthor]: "Связаться с автором",
     [LabelId.SupportCommand]: "Поддержка",
@@ -41,10 +46,12 @@ export const labels = {
     [LabelId.RecognitionFailed]: "Unable to convert voice 😔",
     [LabelId.WelcomeMessage]:
       "👋🏽 Hey here! Send me a voice message and I will show what they are talking about in plain text",
+    [LabelId.WelcomeMessageGroup]:
+      "You can add me to a group so I will convert voice messages in there",
     [LabelId.ChangeLang]: "🆗 Language has changed",
     [LabelId.ChangeLangTitle]: "Select the language 🔮",
     [LabelId.WelcomeMessageMore]:
-      "Don't forget to select the language you are going to recognise by typing the /lang command.\nНе забудь выбрать язык голосовых сообщений с помощью команды /lang",
+      "Don't forget to select the language you are going to recognise by typing the /lang command",
     [LabelId.GithubIssues]: "Send an issue",
     [LabelId.ContactAuthor]: "Talk to author",
     [LabelId.SupportCommand]: "Support menu",

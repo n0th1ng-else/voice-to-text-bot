@@ -162,7 +162,13 @@ export class ExpressServer {
       return;
     }
 
-    this.lifecycleInterval = lifecycleInterval;
+    if (lifecycleInterval < 1) {
+      logger.warn(
+        `Lifecycle interval can not be less than 1 day. Falling back to 1 (Received ${lifecycleInterval})`
+      );
+    }
+
+    this.lifecycleInterval = lifecycleInterval < 1 ? 1 : lifecycleInterval;
     this.nextReplicaUrl = nextReplicaUrl;
     this.daysRunning = [];
     logger.info(
