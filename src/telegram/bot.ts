@@ -154,6 +154,7 @@ export class TelegramBotModel {
   private sendHelloMessage(chatId: number): void {
     this.sendMessage(chatId, [
       LabelId.WelcomeMessage,
+      LabelId.WelcomeMessageGroup,
       LabelId.WelcomeMessageMore,
     ]);
   }
