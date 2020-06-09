@@ -26,21 +26,21 @@ export class UsageStatisticApi {
 
   public updateUsageCount(chatId: number, username: string): Promise<void> {
     return this.getStatId(chatId)
-      .catch(() => this.createStat(chatId, LanguageCode.Ru, username))
+      .catch(() => this.createStat(chatId, LanguageCode.En, username))
       .then((statId) => this.getStat(statId))
       .then((stat) => this.updateStatCount(stat, username));
   }
 
   public updateLanguage(chatId: number, lang: LanguageCode): Promise<void> {
     return this.getStatId(chatId)
-      .catch(() => this.createStat(chatId, lang))
+      .catch(() => this.createStat(chatId, LanguageCode.En))
       .then((statId) => this.getStat(statId))
       .then((stat) => this.updateStatLanguage(stat, lang));
   }
 
   public getLanguage(chatId: number, username: string): Promise<LanguageCode> {
     return this.getStatId(chatId)
-      .catch(() => this.createStat(chatId, LanguageCode.Ru, username))
+      .catch(() => this.createStat(chatId, LanguageCode.En, username))
       .then((statId) => this.getStat(statId))
       .then((stat) => stat.get(StatKey.LangId));
   }
@@ -71,7 +71,7 @@ export class UsageStatisticApi {
     });
   }
 
-  public createStat(
+  private createStat(
     chatId: number,
     lang: LanguageCode,
     username = ""
