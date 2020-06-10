@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+    <title>Chart generator</title>
+  </head>
+
+  <body>
+    <div>
+      <div style="display: flex; justify-content: space-between;">
+        <div>
+          <label for="fileEl">Choose a file:</label>
+          <input type="file" onchange="onFileSelect()" id="fileEl" />
+        </div>
+
+        <div>
+          <label for="chartTypeEl">Choose a type:</label>
+          <select id="chartTypeEl" onchange="onTypeSelect()">
+            <option value="language">Language</option>
+            <option value="language-total">Language Total</option>
+            <option value="installs">Installs</option>
+            <option value="installs-usages">Installs vs Usages</option>
+          </select>
+        </div>
+
+        <div>
+          <button onclick="onReset()">Reset</button>
+        </div>
+      </div>
+      <div style="width: 900px; height: 550px; margin: 40px auto;">
+        <canvas id="chartEl"></canvas>
+      </div>
+    </div>
+
+    <script>
+      let chartType = "language";
+      let chardData = [];
+      let chart = null;
+
+      class DataModel {
+        constructor(item) {
+          this.langId = item.langId;
+          this.createdAt = new Date(item.createdAt);
+          this.updatedAt = new Date(item.updatedAt);
+          this.usageCount = item.usageCount;
+        }
+
+        getDateString(date) {
+          const day = date.getDate();
+          const month = date.getMonth() + 1;
+          const dayStr = day < 10 ? `0${day}` : day.toString();
+          const monthStr = month < 10 ? `0${month}` : month.toString();
+          return `${dayStr}.${monthStr}`;
+        }
+      }
+
+      const renderLanguageChart = (arr, ctx) => {
+        let currentDay = 100;
+        let currentDayIndex = 0;
+
+        const data = arr.reduce((res, item) => {
+          const day = item.createdAt.getDate();
+          const date = item.getDateString(item.createdAt);
+
+          const isEn = item.langId === "en-US";
+          const forRu = isEn ? 0 : 1;
+          const forEn = isEn ? 1 : 0;
+
+          if (day === currentDay) {
+            res[currentDayIndex].en += forEn;
+            res[currentDayIndex].ru += forRu;
+          } else {
+            currentDayIndex++;
+            currentDay = day;
+
+            res[currentDayIndex] = { en: forEn, ru: forRu, date };
+          }
+
+          return res;
+        }, {});
+        delete data[currentDayIndex]; // last day is not relevant
+
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: Object.keys(data).reduce((res, key) => {
+              res.push(data[key].date);
+              return res;
+            }, []),
+            datasets: [
+              {
+                label: "English chats",
+                fill: false,
+                data: Object.keys(data).reduce((res, key) => {
+                  res.push(data[key].en);
+                  return res;
+                }, []),
+                borderColor: "rgb(255,98,132)",
+                backgroundColor: "rgb(255,98,132)",
+              },
+              {
+                label: "Russian chats",
+                fill: false,
+                data: Object.keys(data).reduce((res, key) => {
+                  res.push(data[key].ru);
+                  return res;
+                }, []),
+                borderColor: "rgb(54,162,236)",
+                backgroundColor: "rgb(54,162,236)",
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              labels: {
+                fontSize: 24,
+                fontColor: "#fff",
+                render: () => "",
+              },
+            },
+            scales: {
+              yAxes: [
+                {
+                  scaleLabel: {
+                    display: true,
+                    labelString: "# of chats",
+                  },
+                },
+              ],
+              xAxes: [
+                {
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Date",
+                  },
+                },
+              ],
+            },
+          },
+        });
+      };
+
+      const renderTotalLanguagePie = (arr, ctx) => {
+        const data = arr.reduce(
+          (res, item) => {
+            const isEn = item.langId === "en-US";
+            const forRu = isEn ? 0 : 1;
+            const forEn = isEn ? 1 : 0;
+            res.en += forEn;
+            res.ru += forRu;
+
+            return res;
+          },
+          { en: 0, ru: 0 }
+        );
+
+        chart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["English chats", "Russian chats"],
+            datasets: [
+              {
+                data: [data.en, data.ru],
+                backgroundColor: ["rgb(255,98,132)", "rgb(54,162,236)"],
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              labels: {
+                fontSize: 24,
+                fontColor: "#fff",
+              },
+            },
+          },
+        });
+      };
+
+      const renderInstallsChart = (arr, ctx) => {
+        let currentDay = 100;
+        let currentDayIndex = 0;
+
+        const data = arr.reduce((res, item) => {
+          const day = item.createdAt.getDate();
+          const date = item.getDateString(item.createdAt);
+
+          if (day === currentDay) {
+            res[currentDayIndex].count++;
+          } else {
+            currentDayIndex++;
+            currentDay = day;
+
+            res[currentDayIndex] = { count: 1, date };
+          }
+
+          return res;
+        }, {});
+        delete data[currentDayIndex]; // last day is not relevant
+
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: Object.keys(data).reduce((res, key) => {
+              res.push(data[key].date);
+              return res;
+            }, []),
+            datasets: [
+              {
+                label: "# of installs",
+                data: Object.keys(data).reduce((res, key) => {
+                  res.push(data[key].count);
+                  return res;
+                }, []),
+                borderColor: "rgb(54,162,236)",
+                backgroundColor: "rgba(54,162,236, .15)",
+              },
+            ],
+          },
+          options: {
+            scales: {
+              yAxes: [
+                {
+                  scaleLabel: {
+                    display: true,
+                    labelString: "# of chats",
+                  },
+                },
+              ],
+              xAxes: [
+                {
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Date",
+                  },
+                },
+              ],
+            },
+          },
+        });
+      };
+
+      const renderInstallsUsagesPie = (arr, ctx) => {
+        const data = arr.reduce(
+          (res, item) => {
+            const usedOnce = item.usageCount ? 1 : 0;
+            res.installs += 1;
+            res.usages += usedOnce;
+
+            return res;
+          },
+          { installs: 0, usages: 0 }
+        );
+
+        chart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["Installed", "Used at least once"],
+            datasets: [
+              {
+                data: [data.installs, data.usages],
+                backgroundColor: ["rgb(255,98,132)", "rgb(54,162,236)"],
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              labels: {
+                fontSize: 24,
+                fontColor: "#fff",
+                render: "value",
+              },
+            },
+          },
+        });
+      };
+
+      const renderChart = () => {
+        const ctx = document.getElementById("chartEl").getContext("2d");
+
+        if (chart) {
+          chart.destroy();
+        }
+
+        if (!chardData || !chardData.length) {
+          return;
+        }
+
+        switch (chartType) {
+          case "language":
+            return renderLanguageChart(chardData, ctx);
+          case "language-total":
+            return renderTotalLanguagePie(chardData, ctx);
+          case "installs":
+            return renderInstallsChart(chardData, ctx);
+          case "installs-usages":
+            return renderInstallsUsagesPie(chardData, ctx);
+          default:
+            console.error("Unknown chart type");
+        }
+      };
+
+      const onReaderLoad = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          if (!data.results) {
+            throw new Error("No results in data.results");
+          }
+          chardData = data.results.map((res) => new DataModel(res));
+          renderChart();
+        } catch (err) {
+          console.error("Unable to parse stat file", err);
+        }
+      };
+
+      const onFileSelect = () => {
+        const el = document.getElementById("fileEl");
+        const reader = new FileReader();
+        reader.onload = onReaderLoad;
+        reader.readAsText(el.files[0]);
+      };
+
+      const onTypeSelect = () => {
+        const el = document.getElementById("chartTypeEl");
+        chartType = el.value;
+        renderChart();
+      };
+
+      const onReset = () => {
+        const el1 = document.getElementById("fileEl");
+        el1.value = "";
+
+        const el2 = document.getElementById("chartTypeEl");
+        el2.value = "language";
+
+        chartType = "language";
+        chardData = [];
+        renderChart();
+      };
+    </script>
+  </body>
+</html>

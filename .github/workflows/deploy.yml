@@ -70,7 +70,6 @@ jobs:
           D_ACTION: release
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
 
-
   heroku-slave:
     runs-on: ubuntu-latest
     name: Deploy to Heroku Slave account
@@ -113,4 +112,3 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_ACTION: release
           D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
-

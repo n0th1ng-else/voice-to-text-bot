@@ -5,6 +5,7 @@
     "dev": "node src/scripts/runTs.js dev",
     "dev:js": "node dist/src/scripts/runJs.js dev",
     "format": "prettier --write",
+    "chart": "node src/scripts/runTs.js chart",
     "lint": "eslint",
     "build": "tsc"
   },
@@ -49,10 +50,10 @@
     }
   },
   "lint-staged": {
-    "*.{md}": [
+    "*.{md,html,yml}": [
       "npm run format"
     ],
-    "*.{js,ts, json}": [
+    "*.{js,ts,json}": [
       "npm run format",
       "npm run lint"
     ]
