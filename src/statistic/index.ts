@@ -9,9 +9,16 @@ export class StatisticApi {
     statUrl: string,
     appId: string,
     appKey: string,
-    masterKey: string
+    masterKey: string,
+    cacheSize: number
   ) {
     this.node = new NodeStatisticApi(statUrl, appId, appKey, masterKey);
-    this.usage = new UsageStatisticApi(statUrl, appId, appKey, masterKey);
+    this.usage = new UsageStatisticApi(
+      statUrl,
+      appId,
+      appKey,
+      masterKey,
+      cacheSize
+    );
   }
 }

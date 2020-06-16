@@ -1,3 +1,5 @@
+import { LanguageCode } from "../recognition/types";
+
 export enum NodeStatKey {
   Active = "active",
   SelfUrl = "selfUrl",
@@ -10,4 +12,9 @@ export enum UsageStatKey {
   ChatId = "chatId",
   UserName = "user",
   CreatedAt = "createdAt",
+}
+
+export interface UsageStatCache {
+  [UsageStatKey.ChatId]: number;
+  [UsageStatKey.LangId]: LanguageCode;
 }

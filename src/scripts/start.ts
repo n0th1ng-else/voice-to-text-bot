@@ -11,6 +11,7 @@ import {
   authorTelegramAccount,
   appVersion,
   ngRokToken,
+  cacheSize,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -42,7 +43,8 @@ export function run(): void {
     dbStat.statUrl,
     dbStat.appId,
     dbStat.appKey,
-    dbStat.masterKey
+    dbStat.masterKey,
+    cacheSize
   );
   const bot = new TelegramBotModel(telegramBotApi, converter, stat).setAuthor(
     authorTelegramAccount
