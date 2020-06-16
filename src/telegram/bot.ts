@@ -6,7 +6,7 @@ import { StatisticApi } from "../statistic";
 import { TextModel } from "../text";
 import { LabelId } from "../text/labels";
 import { githubUrl } from "../const";
-import { BotMessageModel } from "./types";
+import { BotMessageModel, MessageOptions } from "./types";
 import {
   isHelloMessage,
   isLangMessage,
@@ -71,117 +71,123 @@ export class TelegramBotModel {
     this.bot.processUpdate(message);
   }
 
-  private handleMessage(msg: TelegramBot.Message): void {
+  private handleMessage(msg: TelegramBot.Message): Promise<void> {
     const model = new BotMessageModel(msg);
 
     if (!model.isMessageSupported) {
-      logger.warn("Message is not supported");
-      return;
+      logger.warn(`Message is not supported for chatId=${model.chatId}`);
+      return Promise.resolve();
     }
 
-    this.stat.usage
-      .getLanguage(model.chatId, model.name)
-      .then((lang) => this.text.setLanguage(lang))
-      .catch((err) => {
-        logger.error("Unable to get the lang", err);
-        this.text.resetLanguage();
-      })
-      .then(() => {
-        if (isHelloMessage(model, msg)) {
-          this.sendHelloMessage(model.chatId);
-          return;
-        }
+    if (isHelloMessage(model, msg)) {
+      return this.sendHelloMessage(model);
+    }
 
-        if (isLangMessage(model, msg)) {
-          this.showLanguageSelection(model.chatId);
-          return;
-        }
+    if (isLangMessage(model, msg)) {
+      return this.showLanguageSelection(model);
+    }
 
-        if (isSupportMessage(model, msg)) {
-          this.sendSupportMessage(model.chatId);
-          return;
-        }
+    if (isSupportMessage(model, msg)) {
+      return this.sendSupportMessage(model);
+    }
 
-        if (!isVoiceMessage(msg)) {
-          if (!model.isGroup) {
-            this.sendMessage(model.chatId, LabelId.NoContent);
-          }
-          return;
-        }
+    if (!isVoiceMessage(msg)) {
+      if (!model.isGroup) {
+        return this.sendNoVoiceMessage(model);
+      }
 
-        if (isVoiceMessageLong(model)) {
-          logger.warn(`Message is too long ${model.voiceDuration} sec`);
-          if (!model.isGroup) {
-            this.sendMessage(model.chatId, LabelId.LongVoiceMessage);
-          }
-          return;
-        }
+      return Promise.resolve();
+    }
 
-        this.stat.usage
-          .updateUsageCount(model.chatId, model.name)
-          .catch((err) => logger.error("Unable to update stat count", err));
+    if (isVoiceMessageLong(model)) {
+      logger.warn(
+        `Message is too long duration=${model.voiceDuration} sec for chatId=${model.chatId}`
+      );
+      if (!model.isGroup) {
+        return this.sendVoiceMessageTooLong(model);
+      }
+      return Promise.resolve();
+    }
 
-        this.getFileLInk(model)
-          .then((fileLink) => {
-            logger.warn("New link", logger.y(fileLink));
-            if (!model.isGroup) {
-              this.sendMessage(model.chatId, LabelId.InProgress);
-            }
+    return this.getChatLanguage(model).then((lang) =>
+      this.recogniseVoiceMessage(model, lang)
+    );
+  }
 
-            return this.converter.transformToText(
-              fileLink,
-              model.voiceFileId,
-              this.text.getLanguage()
-            );
-          })
-          .then((text: string) => {
-            const name = model.fullUserName || model.userName;
-            const prefix = model.isGroup && name ? `${name} ` : "";
-            return this.bot.sendMessage(model.chatId, `${prefix}🗣 ${text}`);
-          })
-          .catch((err: Error) => {
-            if (!model.isGroup) {
-              this.sendMessage(model.chatId, LabelId.RecognitionFailed);
-            }
-            logger.error(
-              `Unable to recognize the file ${logger.y(model.voiceFileId)}`,
-              err
-            );
+  private sendVoiceMessageTooLong(model: BotMessageModel): Promise<void> {
+    return this.getChatLanguage(model).then((lang) =>
+      this.sendMessage(model, LabelId.LongVoiceMessage, { lang })
+    );
+  }
+
+  private sendNoVoiceMessage(model: BotMessageModel): Promise<void> {
+    return this.getChatLanguage(model).then((lang) =>
+      this.sendMessage(model, LabelId.NoContent, { lang })
+    );
+  }
+
+  private sendHelloMessage(model: BotMessageModel): Promise<void> {
+    return this.getChatLanguage(model).then((lang) =>
+      this.sendMessage(
+        model,
+        [
+          LabelId.WelcomeMessage,
+          LabelId.WelcomeMessageGroup,
+          LabelId.WelcomeMessageMore,
+        ],
+        { lang }
+      )
+    );
+  }
+
+  private sendSupportMessage(model: BotMessageModel): Promise<void> {
+    return this.getChatLanguage(model)
+      .then((lang) => {
+        const buttons: TelegramBot.InlineKeyboardButton[] = [];
+        buttons.push({
+          text: this.text.t(LabelId.GithubIssues, lang),
+          url: githubUrl,
+        });
+
+        if (this.authorUrl) {
+          buttons.push({
+            text: this.text.t(LabelId.ContactAuthor, lang),
+            url: this.authorUrl,
           });
-      });
-  }
+        }
 
-  private sendHelloMessage(chatId: number): void {
-    this.sendMessage(chatId, [
-      LabelId.WelcomeMessage,
-      LabelId.WelcomeMessageGroup,
-      LabelId.WelcomeMessageMore,
-    ]);
-  }
-
-  private sendSupportMessage(chatId: number): void {
-    const buttons: TelegramBot.InlineKeyboardButton[] = [];
-    buttons.push({
-      text: this.text.t(LabelId.GithubIssues),
-      url: githubUrl,
-    });
-
-    if (this.authorUrl) {
-      buttons.push({
-        text: this.text.t(LabelId.ContactAuthor),
-        url: this.authorUrl,
-      });
-    }
-    this.bot
-      .sendMessage(chatId, this.text.t(LabelId.SupportCommand), {
-        reply_markup: {
-          inline_keyboard: [buttons],
-        },
+        return this.sendMessage(model, LabelId.SupportCommand, {
+          lang,
+          options: {
+            reply_markup: {
+              inline_keyboard: [buttons],
+            },
+          },
+        });
       })
-      .catch((err) => logger.error("Unable to send support message", err));
+      .catch((err) =>
+        logger.error(
+          `Unable to send support message for chatId=${model.chatId}`,
+          err
+        )
+      );
   }
 
-  private sendMessage(chatId: number, ids: LabelId | LabelId[]): Promise<void> {
+  private sendRawMessage(
+    chatId: number,
+    message: string,
+    options?: TelegramBot.SendMessageOptions
+  ): Promise<void> {
+    return this.bot.sendMessage(chatId, message, options).then(() => {
+      // Empty promise result
+    });
+  }
+
+  private sendMessage(
+    model: BotMessageModel,
+    ids: LabelId | LabelId[],
+    meta: MessageOptions
+  ): Promise<void> {
     const msgs = Array.isArray(ids) ? ids : [ids];
     if (!msgs.length) {
       return Promise.resolve();
@@ -192,26 +198,37 @@ export class TelegramBotModel {
       return Promise.resolve();
     }
 
-    return this.bot
-      .sendMessage(chatId, this.text.t(part))
-      .then(() => this.sendMessage(chatId, msgs))
-      .catch((err) => logger.error("Unable to send a message", err));
+    return this.sendRawMessage(
+      model.chatId,
+      this.text.t(part, meta.lang),
+      meta.options
+    )
+      .then(() => this.sendMessage(model, msgs, meta))
+      .catch((err) =>
+        logger.error(
+          `Unable to send the message for chatId=${model.chatId}`,
+          err
+        )
+      );
   }
 
   private editMessage(
     chatId: number,
+    lang: LanguageCode,
     messageId: number,
     id: LabelId
   ): Promise<void> {
     return this.bot
-      .editMessageText(this.text.t(id), {
+      .editMessageText(this.text.t(id, lang), {
         chat_id: chatId,
         message_id: messageId,
       })
       .then(() => {
         // Empty promise result
       })
-      .catch((err) => logger.error("Unable to edit the message", err));
+      .catch((err) =>
+        logger.error(`Unable to edit the message for chatId=${chatId}`, err)
+      );
   }
 
   private getFileLInk(model: BotMessageModel) {
@@ -224,27 +241,37 @@ export class TelegramBotModel {
     return this.bot.getFileLink(model.voiceFileId);
   }
 
-  private showLanguageSelection(chatId: number): void {
-    this.bot
-      .sendMessage(chatId, this.text.t(LabelId.ChangeLangTitle), {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: this.text.t(LabelId.BtnRussian),
-                callback_data: LanguageCode.Ru,
-              },
-            ],
-            [
-              {
-                text: this.text.t(LabelId.BtnEnglish),
-                callback_data: LanguageCode.En,
-              },
-            ],
-          ],
-        },
-      })
-      .catch((err) => logger.error("Unable to send language selector", err));
+  private showLanguageSelection(model: BotMessageModel): Promise<void> {
+    return this.getChatLanguage(model)
+      .then((lang) =>
+        this.sendMessage(model, LabelId.ChangeLangTitle, {
+          lang,
+          options: {
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: this.text.t(LabelId.BtnRussian, lang),
+                    callback_data: LanguageCode.Ru,
+                  },
+                ],
+                [
+                  {
+                    text: this.text.t(LabelId.BtnEnglish, lang),
+                    callback_data: LanguageCode.En,
+                  },
+                ],
+              ],
+            },
+          },
+        })
+      )
+      .catch((err) =>
+        logger.error(
+          `Unable to send language selector for chatId=${model.chatId}`,
+          err
+        )
+      );
   }
 
   private handleCallbackQuery(msg: TelegramBot.CallbackQuery): void {
@@ -262,10 +289,9 @@ export class TelegramBotModel {
 
     this.stat.usage
       .updateLanguage(chatId, lang)
-      .then(() => {
-        this.text.setLanguage(lang);
-        return this.editMessage(chatId, message.message_id, LabelId.ChangeLang);
-      })
+      .then(() =>
+        this.editMessage(chatId, lang, message.message_id, LabelId.ChangeLang)
+      )
       .catch((err) =>
         logger.error(
           `Unable to set the language for chatId=${logger.y(
@@ -274,5 +300,73 @@ export class TelegramBotModel {
           err
         )
       );
+  }
+
+  private recogniseVoiceMessage(
+    model: BotMessageModel,
+    lang: LanguageCode
+  ): Promise<void> {
+    return this.getFileLInk(model)
+      .then((fileLink) => {
+        logger.warn(`New link for chatId=${model.chatId}`, logger.y(fileLink));
+        if (!model.isGroup) {
+          this.sendMessage(model, LabelId.InProgress, { lang });
+        }
+
+        return this.converter.transformToText(
+          fileLink,
+          model.voiceFileId,
+          lang
+        );
+      })
+      .then((text: string) => {
+        const name = model.fullUserName || model.userName;
+        const prefix = model.isGroup && name ? `${name} ` : "";
+        return Promise.all([
+          this.sendRawMessage(model.chatId, `${prefix}🗣 ${text}`),
+          this.updateUsageCount(model),
+        ]);
+      })
+      .then(() => {
+        // Empty promise result
+      })
+      .catch((err: Error) => {
+        if (!model.isGroup) {
+          this.sendMessage(model, LabelId.RecognitionFailed, { lang });
+        }
+        logger.error(
+          `Unable to recognize the file ${logger.y(
+            model.voiceFileId
+          )} for chatId=${model.chatId}`,
+          err
+        );
+      });
+  }
+
+  private updateUsageCount(model: BotMessageModel): Promise<void> {
+    return this.stat.usage
+      .updateUsageCount(model.chatId, model.name)
+      .catch((err) =>
+        logger.error(
+          `Unable to update stat count for chatId=${model.chatId}`,
+          err
+        )
+      );
+  }
+
+  private getChatLanguage(
+    model: BotMessageModel,
+    lang?: LanguageCode
+  ): Promise<LanguageCode> {
+    if (lang) {
+      return Promise.resolve(lang);
+    }
+
+    return this.stat.usage
+      .getLanguage(model.chatId, model.name)
+      .catch((err) => {
+        logger.error(`Unable to get the lang for chatId=${model.chatId}`, err);
+        return this.text.fallbackLanguage;
+      });
   }
 }

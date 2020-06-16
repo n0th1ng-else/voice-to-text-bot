@@ -9,6 +9,7 @@ import {
   isChatGroup,
   isMessageSupported,
 } from "./helpers";
+import { LanguageCode } from "../recognition/types";
 
 export enum BotCommand {
   Start = "/start",
@@ -40,4 +41,9 @@ export class BotMessageModel {
   public get name(): string {
     return this.isGroup ? this.groupName : this.userName;
   }
+}
+
+export interface MessageOptions {
+  lang: LanguageCode;
+  options?: TelegramBot.SendMessageOptions;
 }
