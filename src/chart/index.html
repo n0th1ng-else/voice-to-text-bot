@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@0.1.3/src/chartjs-plugin-trendline.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@0.5.7/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel@2.0.3/dist/chartjs-plugin-doughnutlabel.min.js"></script>
     <title>Chart generator</title>
   </head>
 
@@ -23,7 +26,12 @@
             <option value="language">Language</option>
             <option value="language-total">Language Total</option>
             <option value="installs">Installs</option>
+            <option value="installs-cumulative">Installs Cumulative</option>
             <option value="installs-usages">Installs vs Usages</option>
+            <option value="direct-group-install"
+              >Direct vs Groups installs</option
+            >
+            <option value="direct-group-usages">Direct vs Groups usages</option>
           </select>
         </div>
 
@@ -37,12 +45,28 @@
     </div>
 
     <script>
+      const colors = {
+        regular: {
+          blue: "rgb(54,162,236)",
+          red: "rgb(255,98,132)",
+          white: "rgb(256,256,256)",
+        },
+        light: {
+          blue: "rgba(54,162,236, .8)",
+          red: "rgba(255,98,132, .8)",
+        },
+        lighter: {
+          blue: "rgba(54,162,236, .15)",
+          red: "rgba(255,98,132, .15)",
+        },
+      };
       let chartType = "language";
       let chardData = [];
       let chart = null;
 
       class DataModel {
         constructor(item) {
+          this.chatId = item.chatId;
           this.langId = item.langId;
           this.createdAt = new Date(item.createdAt);
           this.updatedAt = new Date(item.updatedAt);
@@ -84,6 +108,12 @@
         }, {});
         delete data[currentDayIndex]; // last day is not relevant
 
+        const dataSize = Object.keys(data).length;
+        const sum = {
+          en: Object.keys(data).reduce((res, key) => res + data[key].en, 0),
+          ru: Object.keys(data).reduce((res, key) => res + data[key].ru, 0),
+        };
+
         chart = new Chart(ctx, {
           type: "bar",
           data: {
@@ -99,8 +129,8 @@
                   res.push(data[key].en);
                   return res;
                 }, []),
-                borderColor: "rgb(255,98,132)",
-                backgroundColor: "rgb(255,98,132)",
+                borderColor: colors.regular.red,
+                backgroundColor: colors.regular.red,
               },
               {
                 label: "Russian chats",
@@ -109,8 +139,8 @@
                   res.push(data[key].ru);
                   return res;
                 }, []),
-                borderColor: "rgb(54,162,236)",
-                backgroundColor: "rgb(54,162,236)",
+                borderColor: colors.regular.blue,
+                backgroundColor: colors.regular.blue,
               },
             ],
           },
@@ -118,9 +148,33 @@
             plugins: {
               labels: {
                 fontSize: 24,
-                fontColor: "#fff",
+                fontColor: colors.regular.white,
                 render: () => "",
               },
+            },
+            annotation: {
+              annotations: [
+                {
+                  id: "ru-line",
+                  type: "line",
+                  mode: "horizontal",
+                  scaleID: "y-axis-0",
+                  value: dataSize ? sum.ru / dataSize : 0,
+                  borderColor: colors.light.blue,
+                  borderWidth: 2,
+                  borderDash: [2, 2],
+                },
+                {
+                  id: "en-line",
+                  type: "line",
+                  mode: "horizontal",
+                  scaleID: "y-axis-0",
+                  value: dataSize ? sum.en / dataSize : 0,
+                  borderColor: colors.light.red,
+                  borderWidth: 2,
+                  borderDash: [2, 2],
+                },
+              ],
             },
             scales: {
               yAxes: [
@@ -165,7 +219,7 @@
             datasets: [
               {
                 data: [data.en, data.ru],
-                backgroundColor: ["rgb(255,98,132)", "rgb(54,162,236)"],
+                backgroundColor: [colors.regular.red, colors.regular.blue],
               },
             ],
           },
@@ -173,7 +227,7 @@
             plugins: {
               labels: {
                 fontSize: 24,
-                fontColor: "#fff",
+                fontColor: colors.regular.white,
               },
             },
           },
@@ -215,8 +269,83 @@
                   res.push(data[key].count);
                   return res;
                 }, []),
-                borderColor: "rgb(54,162,236)",
-                backgroundColor: "rgba(54,162,236, .15)",
+                borderColor: colors.regular.blue,
+                backgroundColor: colors.lighter.blue,
+                trendlineLinear: {
+                  style: colors.light.red,
+                  lineStyle: "dotted|solid",
+                  width: 2,
+                },
+              },
+            ],
+          },
+          options: {
+            scales: {
+              yAxes: [
+                {
+                  scaleLabel: {
+                    display: true,
+                    labelString: "# of chats",
+                  },
+                },
+              ],
+              xAxes: [
+                {
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Date",
+                  },
+                },
+              ],
+            },
+          },
+        });
+      };
+
+      const renderInstallsCumulativeChart = (arr, ctx) => {
+        let currentDay = 100;
+        let currentDayIndex = 0;
+
+        const data = arr.reduce((res, item) => {
+          const day = item.createdAt.getDate();
+          const date = item.getDateString(item.createdAt);
+
+          if (day === currentDay) {
+            res[currentDayIndex].count++;
+          } else {
+            const lastDayCount =
+              (res[currentDayIndex] && res[currentDayIndex].count) || 1;
+            currentDayIndex++;
+            currentDay = day;
+
+            res[currentDayIndex] = { count: lastDayCount, date };
+          }
+
+          return res;
+        }, {});
+        delete data[currentDayIndex]; // last day is not relevant
+
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: Object.keys(data).reduce((res, key) => {
+              res.push(data[key].date);
+              return res;
+            }, []),
+            datasets: [
+              {
+                label: "# of installs",
+                data: Object.keys(data).reduce((res, key) => {
+                  res.push(data[key].count);
+                  return res;
+                }, []),
+                borderColor: colors.regular.blue,
+                backgroundColor: colors.lighter.blue,
+                trendlineLinear: {
+                  style: colors.light.red,
+                  lineStyle: "dotted|solid",
+                  width: 2,
+                },
               },
             ],
           },
@@ -254,15 +383,16 @@
           },
           { installs: 0, usages: 0 }
         );
+        const percentage = Math.floor((data.usages * 100) / data.installs);
 
         chart = new Chart(ctx, {
-          type: "pie",
+          type: "doughnut",
           data: {
             labels: ["Installed", "Used at least once"],
             datasets: [
               {
                 data: [data.installs, data.usages],
-                backgroundColor: ["rgb(255,98,132)", "rgb(54,162,236)"],
+                backgroundColor: [colors.regular.red, colors.regular.blue],
               },
             ],
           },
@@ -270,8 +400,90 @@
             plugins: {
               labels: {
                 fontSize: 24,
-                fontColor: "#fff",
+                fontColor: colors.regular.white,
                 render: "value",
+              },
+              doughnutlabel: {
+                labels: [
+                  {
+                    text: `${percentage}%`,
+                    font: {
+                      size: "60",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        });
+      };
+
+      const renderDirectVsGroupsPie = (arr, ctx) => {
+        const data = arr.reduce(
+          (res, item) => {
+            const isDirect = item.chatId > 0;
+            const forGroup = isDirect ? 0 : 1;
+            const forDirect = isDirect ? 1 : 0;
+            res.group += forGroup;
+            res.direct += forDirect;
+
+            return res;
+          },
+          { direct: 0, group: 0 }
+        );
+
+        chart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["Direct messages", "Groups and channels"],
+            datasets: [
+              {
+                data: [data.direct, data.group],
+                backgroundColor: [colors.regular.red, colors.regular.blue],
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              labels: {
+                fontSize: 24,
+                fontColor: colors.regular.white,
+              },
+            },
+          },
+        });
+      };
+
+      const renderDirectVsGroupsUsagePie = (arr, ctx) => {
+        const data = arr.reduce(
+          (res, item) => {
+            const isDirect = item.chatId > 0;
+            const forGroup = isDirect ? 0 : item.usageCount;
+            const forDirect = isDirect ? item.usageCount : 0;
+            res.group += forGroup;
+            res.direct += forDirect;
+
+            return res;
+          },
+          { direct: 0, group: 0 }
+        );
+
+        chart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["Direct messages", "Groups and channels"],
+            datasets: [
+              {
+                data: [data.direct, data.group],
+                backgroundColor: [colors.regular.red, colors.regular.blue],
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              labels: {
+                fontSize: 24,
+                fontColor: colors.regular.white,
               },
             },
           },
@@ -296,8 +508,14 @@
             return renderTotalLanguagePie(chardData, ctx);
           case "installs":
             return renderInstallsChart(chardData, ctx);
+          case "installs-cumulative":
+            return renderInstallsCumulativeChart(chardData, ctx);
           case "installs-usages":
             return renderInstallsUsagesPie(chardData, ctx);
+          case "direct-group-install":
+            return renderDirectVsGroupsPie(chardData, ctx);
+          case "direct-group-usages":
+            return renderDirectVsGroupsUsagePie(chardData, ctx);
           default:
             console.error("Unknown chart type");
         }
