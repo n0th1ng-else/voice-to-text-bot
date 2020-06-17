@@ -1,4 +1,3 @@
-import stripAnsi from "strip-ansi";
 import { green, red, yellow } from "chalk";
 import { LogType, sendLogs } from "./integration";
 
@@ -10,7 +9,7 @@ export class Logger {
     const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
     console.log(this.g(prefix), msg, ...message);
-    sendLogs(LogType.Info, this.id, stripAnsi(msg));
+    sendLogs(LogType.Info, this.id, msg);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -18,7 +17,7 @@ export class Logger {
     const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
     console.warn(this.y(prefix), msg, ...data);
-    sendLogs(LogType.Warn, this.id, stripAnsi(msg), data);
+    sendLogs(LogType.Warn, this.id, msg, data);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -26,7 +25,7 @@ export class Logger {
     const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
     console.error(this.r(prefix), this.r(msg), ...data);
-    sendLogs(LogType.Error, this.id, stripAnsi(msg), data);
+    sendLogs(LogType.Error, this.id, msg, data);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any

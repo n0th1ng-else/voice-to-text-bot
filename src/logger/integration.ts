@@ -1,4 +1,5 @@
 import winston from "winston";
+import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
 import { selfUrl, logApi } from "../env";
 
@@ -41,15 +42,16 @@ export function sendLogs(
   }
 
   const logData = Array.isArray(data)
-    ? data.reduce<LogDataType>((res, prop, index) => {
-        res[index] = prop;
+    ? data.reduce((res, prop, index) => {
+        const val = typeof prop === "string" ? stripAnsi(prop) : prop;
+        res[`metadata-${index}`] = val;
         return res;
       }, {})
     : data;
 
   winston[type]({
     level: type,
-    message,
+    message: stripAnsi(message),
     id,
     ...logData,
   });
