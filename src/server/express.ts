@@ -8,6 +8,7 @@ import { HealthDto, HealthSsl, HealthStatus } from "./types";
 import { runGetDto } from "./request";
 import { StatisticApi } from "../statistic";
 import { sleepForRandom } from "../common/timer";
+import { sSuffix } from "../text";
 
 const logger = new Logger("server");
 
@@ -83,11 +84,7 @@ export class ExpressServer {
 
   public setBots(bots: TelegramBotModel[] = []): this {
     this.bots = bots;
-    logger.info(
-      `Requested ${logger.y(bots.length)} bot${
-        bots.length === 1 ? "" : "s"
-      } to set up`
-    );
+    logger.info(`Requested ${logger.y(sSuffix("bot", bots.length))} to set up`);
 
     bots.forEach((bot) => {
       logger.warn(`Setting up a handler for ${logger.y(bot.getPath())}`);
@@ -119,9 +116,7 @@ export class ExpressServer {
   }
 
   public start(): Promise<() => Promise<void>> {
-    logger.info(
-      `Starting ${logger.y(`http${this.isHttps ? "s" : ""}`)} server`
-    );
+    logger.info(`Starting ${logger.y(sSuffix("http", this.isHttps))} server`);
 
     const server = this.isHttps
       ? createHttps(this.httpsOptions, this.app)
@@ -172,9 +167,9 @@ export class ExpressServer {
     this.nextReplicaUrl = nextReplicaUrl;
     this.daysRunning = [];
     logger.info(
-      `Lifecycle interval is set to ${logger.y(this.lifecycleInterval)} day${
-        this.lifecycleInterval === 1 ? "" : "s"
-      }`
+      `Lifecycle interval is set to ${logger.y(
+        sSuffix("day", this.lifecycleInterval)
+      )}`
     );
 
     sleepForRandom()

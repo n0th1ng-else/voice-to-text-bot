@@ -21,7 +21,7 @@ import { StatisticApi } from "../statistic";
 import { TelegramBotModel } from "../telegram/bot";
 import { ExpressServer } from "../server/express";
 
-const logger = new Logger("run handler");
+const logger = new Logger("dev-script");
 
 export function run(): void {
   const server = new ExpressServer(appPort, enableSSL, appVersion);

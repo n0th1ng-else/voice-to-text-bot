@@ -1,15 +1,9 @@
 import Parse from "parse/node";
 import { LanguageCode } from "../recognition/types";
 import { Logger } from "../logger";
+import { UsageStatKey } from "./types";
 
 const logger = new Logger("db");
-
-enum StatKey {
-  UsageCount = "usageCount",
-  LangId = "langId",
-  ChatId = "chatId",
-  UserName = "user",
-}
 
 export class UsageStatisticApi {
   private readonly dbClass = "BotStat";
@@ -42,7 +36,7 @@ export class UsageStatisticApi {
     return this.getStatId(chatId)
       .catch(() => this.createStat(chatId, LanguageCode.En, username))
       .then((statId) => this.getStat(statId))
-      .then((stat) => stat.get(StatKey.LangId));
+      .then((stat) => stat.get(UsageStatKey.LangId));
   }
 
   private updateStatCount(
@@ -51,9 +45,9 @@ export class UsageStatisticApi {
   ): Promise<void> {
     logger.info(`Updating usage count for statId ${logger.y(instance.id)}`);
 
-    const count = instance.get(StatKey.UsageCount);
-    instance.set(StatKey.UsageCount, count + 1);
-    instance.set(StatKey.UserName, username);
+    const count = instance.get(UsageStatKey.UsageCount);
+    instance.set(UsageStatKey.UsageCount, count + 1);
+    instance.set(UsageStatKey.UserName, username);
     return instance.save().then(() => {
       // Empty promise result
     });
@@ -65,7 +59,7 @@ export class UsageStatisticApi {
   ): Promise<void> {
     logger.info(`Updating language for statId ${logger.y(stat.id)}`);
 
-    stat.set(StatKey.LangId, lang);
+    stat.set(UsageStatKey.LangId, lang);
     return stat.save().then(() => {
       // Empty promise result
     });
@@ -80,10 +74,10 @@ export class UsageStatisticApi {
 
     const BotStatClass = Parse.Object.extend(this.dbClass);
     const instance = new BotStatClass();
-    instance.set(StatKey.ChatId, chatId);
-    instance.set(StatKey.UsageCount, 0);
-    instance.set(StatKey.LangId, lang);
-    instance.set(StatKey.UserName, username);
+    instance.set(UsageStatKey.ChatId, chatId);
+    instance.set(UsageStatKey.UsageCount, 0);
+    instance.set(UsageStatKey.LangId, lang);
+    instance.set(UsageStatKey.UserName, username);
     return instance.save().then((stat: Parse.Object) => stat.id);
   }
 
@@ -100,7 +94,7 @@ export class UsageStatisticApi {
 
     const BotStatClass = Parse.Object.extend(this.dbClass);
     const query = new Parse.Query(BotStatClass);
-    query.equalTo(StatKey.ChatId, chatId);
+    query.equalTo(UsageStatKey.ChatId, chatId);
     return query.find().then((results) => {
       if (!results.length) {
         return Promise.reject(new Error(`Record ${chatId} not found`));

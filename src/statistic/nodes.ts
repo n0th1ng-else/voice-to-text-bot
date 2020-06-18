@@ -1,13 +1,8 @@
 import Parse from "parse/node";
 import { Logger } from "../logger";
+import { NodeStatKey } from "./types";
 
 const logger = new Logger("db");
-
-enum StatKey {
-  Active = "active",
-  SelfUrl = "selfUrl",
-  Version = "version",
-}
 
 export class NodeStatisticApi {
   private readonly dbClass = "NodeStat";
@@ -40,8 +35,8 @@ export class NodeStatisticApi {
   ): Promise<void> {
     logger.info(`Updating active state for ${logger.y(instance.id)}`);
 
-    instance.set(StatKey.Active, active);
-    instance.set(StatKey.Version, version);
+    instance.set(NodeStatKey.Active, active);
+    instance.set(NodeStatKey.Version, version);
     return instance.save().then(() => {
       // Empty promise result
     });
@@ -56,9 +51,9 @@ export class NodeStatisticApi {
 
     const NodeStatClass = Parse.Object.extend(this.dbClass);
     const instance = new NodeStatClass();
-    instance.set(StatKey.SelfUrl, selfUrl);
-    instance.set(StatKey.Active, active);
-    instance.set(StatKey.Version, version);
+    instance.set(NodeStatKey.SelfUrl, selfUrl);
+    instance.set(NodeStatKey.Active, active);
+    instance.set(NodeStatKey.Version, version);
     return instance.save().then((stat: Parse.Object) => stat.id);
   }
 
@@ -75,7 +70,8 @@ export class NodeStatisticApi {
 
     const NodeStatClass = Parse.Object.extend(this.dbClass);
     const query = new Parse.Query(NodeStatClass);
-    query.equalTo(StatKey.SelfUrl, selfUrl);
+    query.equalTo(NodeStatKey.SelfUrl, selfUrl);
+
     return query.find().then((results) => {
       if (!results.length) {
         return Promise.reject(new Error(`Record ${selfUrl} not found`));

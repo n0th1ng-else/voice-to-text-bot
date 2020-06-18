@@ -109,6 +109,7 @@ export class TelegramBotModel {
       return Promise.resolve();
     }
 
+    logger.info(`New voice message for chatId=${model.chatId}`);
     return this.getChatLanguage(model).then((lang) =>
       this.recogniseVoiceMessage(model, lang)
     );
