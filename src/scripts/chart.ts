@@ -5,10 +5,11 @@ import { resolve as resolvePath } from "path";
 import { Logger } from "../logger";
 import { appPort, enableSSL } from "../env";
 import { httpsCert, httpsKey } from "../../certs";
+import { sSuffix } from "../text";
+
+const logger = new Logger("chart-script");
 
 export function run(): void {
-  const logger = new Logger("chart");
-
   const chartHtml = resolvePath(__dirname, "../chart/index.html");
 
   const app = express();
@@ -18,7 +19,7 @@ export function run(): void {
     res.status(200).sendFile(chartHtml);
   });
 
-  logger.info(`Starting ${logger.y(`http${enableSSL ? "s" : ""}`)} server`);
+  logger.info(`Starting ${logger.y(sSuffix("http", enableSSL))} server`);
 
   const httpsOptions = {
     cert: httpsCert,

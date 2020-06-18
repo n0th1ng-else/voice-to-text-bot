@@ -23,7 +23,7 @@ import { TelegramBotModel } from "../telegram/bot";
 import { ExpressServer } from "../server/express";
 import { getHostName } from "../server/tunnel";
 
-const logger = new Logger("run handler");
+const logger = new Logger("start-script");
 
 export function run(): void {
   const server = new ExpressServer(appPort, enableSSL, appVersion);
