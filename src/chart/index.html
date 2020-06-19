@@ -501,6 +501,13 @@
           return;
         }
 
+        chardData.reduce((res, item) => {
+          const duplicate = res.includes(item.chatId) && item.chatId;
+          console.warn("duplicated?", duplicate && `true ${duplicate}`);
+          res.push(item.chatId);
+          return res;
+        }, []);
+
         switch (chartType) {
           case "language":
             return renderLanguageChart(chardData, ctx);
