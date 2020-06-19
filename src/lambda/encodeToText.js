@@ -30,8 +30,8 @@ exports.encodeBufferToText = (pubSubEvent) => {
   // eslint-disable-next-line no-console
   console.log("audioChannelCount", data.audioChannelCount);
 
-  const triggerEvent = (topic, data) => {
-    const buf = Buffer.from(JSON.stringify(data), "utf8");
+  const triggerEvent = (topic, payload) => {
+    const buf = Buffer.from(JSON.stringify(payload), "utf8");
     const topicHandler = pubsub.topic(topic);
     return topicHandler.publish(buf);
   };

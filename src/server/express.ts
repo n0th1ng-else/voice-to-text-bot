@@ -127,11 +127,11 @@ export class ExpressServer {
         logger.info(`Express server is listening on ${logger.y(this.port)}`);
         resolve(
           () =>
-            new Promise((resolve, reject) => {
+            new Promise((resolveFn, rejectFn) => {
               if (this.daemon) {
                 clearInterval(this.daemon);
               }
-              server.close((err) => (err ? reject(err) : resolve()));
+              server.close((err) => (err ? rejectFn(err) : resolveFn()));
             })
         );
       });

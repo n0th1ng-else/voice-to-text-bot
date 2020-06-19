@@ -21,8 +21,8 @@ exports.extractTextLiteral = (pubSubEvent) => {
   // eslint-disable-next-line no-console
   console.log("textData", data.textData);
 
-  const triggerEvent = (topic, data) => {
-    const buf = Buffer.from(JSON.stringify(data), "utf8");
+  const triggerEvent = (topic, payload) => {
+    const buf = Buffer.from(JSON.stringify(payload), "utf8");
     const topicHandler = pubsub.topic(topic);
     return topicHandler.publish(buf);
   };

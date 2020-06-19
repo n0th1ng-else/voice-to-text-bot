@@ -18,9 +18,9 @@ class AWSProvider {
     this.service = new AWS.TranscribeService();
   }
 
-  transformToText(fileLink, data) {
+  transformToText(fileLink, fileData) {
     writeOutput("Starting process for", fileLink);
-    const name = `${data.file_unique_id}.wav`;
+    const name = `${fileData.file_unique_id}.wav`;
     return this.getJob(name)
       .then((data) => {
         if (data.isExists) {
