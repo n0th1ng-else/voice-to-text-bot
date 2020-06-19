@@ -1,4 +1,4 @@
-name: Project Workflow
+name: Service Deploy
 
 on:
   push:

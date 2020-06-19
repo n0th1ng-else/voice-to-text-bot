@@ -1,4 +1,4 @@
-name: Project Workflow
+name: App Release
 
 on:
   push:

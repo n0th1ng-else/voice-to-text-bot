@@ -25,8 +25,8 @@ exports.handleIncomingHTTPMessage = (req, res) => {
   // eslint-disable-next-line no-console
   console.log(`${chatId} Received new Telegram message`);
 
-  const triggerEvent = (topic, data) => {
-    const buf = Buffer.from(JSON.stringify(data), "utf8");
+  const triggerEvent = (topic, payload) => {
+    const buf = Buffer.from(JSON.stringify(payload), "utf8");
     const topicHandler = pubsub.topic(topic);
     return topicHandler.publish(buf);
   };
@@ -43,32 +43,32 @@ exports.handleIncomingHTTPMessage = (req, res) => {
     // eslint-disable-next-line no-console
     console.log(`${chatId} Message is not a voice`);
 
-    const messageObject = {
+    const noContentMessage = {
       chatId,
       message: "Content is not supported 🌚",
     };
 
-    return triggerEvent(TOPIC.SEND_MESSAGE, messageObject);
+    return triggerEvent(TOPIC.SEND_MESSAGE, noContentMessage);
   }
 
   // eslint-disable-next-line no-console
   console.log(`${chatId} Message includes voice. Processing`);
   const fileId = msg.voice.file_id;
 
-  const messageObject = {
+  const inProgressMessage = {
     chatId,
     message: "Processing voice message 🎙",
   };
 
-  return triggerEvent(TOPIC.SEND_MESSAGE, messageObject)
+  return triggerEvent(TOPIC.SEND_MESSAGE, inProgressMessage)
     .then(() => getTelegramToken())
     .then((token) => new TelegramBot(token).getFileLink(fileId))
     .then((fileUrl) => {
-      const messageObject = {
+      const resultMessage = {
         chatId,
         fileUrl,
       };
 
-      return triggerEvent(TOPIC.START_CONVERT, messageObject);
+      return triggerEvent(TOPIC.START_CONVERT, resultMessage);
     });
 };
