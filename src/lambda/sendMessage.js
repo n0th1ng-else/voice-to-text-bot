@@ -18,7 +18,7 @@ exports.sendTelegramMessage = (pubSubEvent) => {
       .accessSecretVersion({
         name: process.env.TELEGRAM_TOKEN_SECRET_FIELD,
       })
-      .then(([data]) => data.payload.data.toString("utf8"));
+      .then(([secret]) => secret.payload.data.toString("utf8"));
   };
 
   return getTelegramToken().then((token) =>
