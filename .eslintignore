@@ -3,3 +3,6 @@ node_modules
 
 # don't lint build output
 dist
+
+# dont't lint assets
+assets
