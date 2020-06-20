@@ -39,8 +39,9 @@ export class TelegramBotModel {
   public setHostLocation(host: string, path = "/bot/message"): this {
     this.host = host;
     this.path = path;
+    const salt = new Date().getTime();
     this.id = createHash("md5")
-      .update(`${this.host}${this.path}:${this.token}`)
+      .update(`${this.host}${this.path}:${this.token}:${salt}`)
       .digest("hex");
 
     return this;
