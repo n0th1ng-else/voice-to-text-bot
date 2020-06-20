@@ -1,4 +1,9 @@
-<img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/n0th1ng_else?style=social">
+<div>
+    <a href="https://twitter.com/intent/follow?screen_name=n0th1ng_else" target="_blank" rel="noopener noreferrer">
+        <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/n0th1ng_else?style=social">
+    </a>
+</div>
+
 <div>
     <span>
         <img alt="Number of installs" src="https://img.shields.io/badge/installs-200%2B-blueviolet"> 
