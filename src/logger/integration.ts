@@ -1,7 +1,7 @@
 import winston from "winston";
 import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
-import { selfUrl, logApi } from "../env";
+import { selfUrl, logApi, appVersion } from "../env";
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type LogDataType = Record<string, any>;
@@ -24,6 +24,7 @@ if (isLoggingEnabled()) {
       tags: [
         "bot",
         "server",
+        appVersion,
         selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-") || "local",
       ],
       json: true,
