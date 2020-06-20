@@ -28,6 +28,8 @@ and the results you can see below in the table.
 
 # Service model
 
+![Service model](/assets/diagram/diagram.png?raw=true "Full service model")
+
 # Services overview
 
 | Service provider | Russian lang | Synchronous API | Duration limitation      | File upload     | Speed                   |
