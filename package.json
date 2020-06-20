@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "start": "node src/scripts/runTs.js start",
-    "start:js": "node dist/src/scripts/runJs.js start",
-    "dev": "node src/scripts/runTs.js dev",
-    "dev:js": "node dist/src/scripts/runJs.js dev",
+    "start": "node src/scripts/runTs.js start ts",
+    "dev": "node src/scripts/runTs.js dev ts",
+    "start:js": "node dist/src/scripts/runJs.js start js",
+    "dev:js": "node dist/src/scripts/runJs.js dev js",
     "format": "prettier --write",
     "chart": "node src/scripts/runTs.js chart",
     "lint": "eslint",
