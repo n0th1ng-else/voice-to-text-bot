@@ -118,20 +118,20 @@ export class TelegramBotModel {
 
   private sendVoiceMessageTooLong(model: BotMessageModel): Promise<void> {
     return this.getChatLanguage(model).then((lang) =>
-      this.sendMessage(model, LabelId.LongVoiceMessage, { lang })
+      this.sendMessage(model.chatId, LabelId.LongVoiceMessage, { lang })
     );
   }
 
   private sendNoVoiceMessage(model: BotMessageModel): Promise<void> {
     return this.getChatLanguage(model).then((lang) =>
-      this.sendMessage(model, LabelId.NoContent, { lang })
+      this.sendMessage(model.chatId, LabelId.NoContent, { lang })
     );
   }
 
   private sendHelloMessage(model: BotMessageModel): Promise<void> {
     return this.getChatLanguage(model).then((lang) =>
       this.sendMessage(
-        model,
+        model.chatId,
         [
           LabelId.WelcomeMessage,
           LabelId.WelcomeMessageGroup,
@@ -158,7 +158,7 @@ export class TelegramBotModel {
           });
         }
 
-        return this.sendMessage(model, LabelId.SupportCommand, {
+        return this.sendMessage(model.chatId, LabelId.SupportCommand, {
           lang,
           options: {
             reply_markup: {
@@ -186,7 +186,7 @@ export class TelegramBotModel {
   }
 
   private sendMessage(
-    model: BotMessageModel,
+    chatId: number,
     ids: LabelId | LabelId[],
     meta: MessageOptions
   ): Promise<void> {
@@ -201,16 +201,13 @@ export class TelegramBotModel {
     }
 
     return this.sendRawMessage(
-      model.chatId,
+      chatId,
       this.text.t(part, meta.lang),
       meta.options
     )
-      .then(() => this.sendMessage(model, msgs, meta))
+      .then(() => this.sendMessage(chatId, msgs, meta))
       .catch((err) =>
-        logger.error(
-          `Unable to send the message for chatId=${model.chatId}`,
-          err
-        )
+        logger.error(`Unable to send the message for chatId=${chatId}`, err)
       );
   }
 
@@ -246,7 +243,7 @@ export class TelegramBotModel {
   private showLanguageSelection(model: BotMessageModel): Promise<void> {
     return this.getChatLanguage(model)
       .then((lang) =>
-        this.sendMessage(model, LabelId.ChangeLangTitle, {
+        this.sendMessage(model.chatId, LabelId.ChangeLangTitle, {
           lang,
           options: {
             reply_markup: {
@@ -279,10 +276,8 @@ export class TelegramBotModel {
   private handleCallbackQuery(msg: TelegramBot.CallbackQuery): void {
     const message = msg.message;
     if (!message) {
-      logger.error(
-        "No message passed in callback query",
-        new Error("No message passed in callback query")
-      );
+      const msgError = new Error("No message passed in callback query");
+      logger.error(msgError.message, msgError);
       return;
     }
     const chatId = message.chat.id;
@@ -294,14 +289,15 @@ export class TelegramBotModel {
       .then(() =>
         this.editMessage(chatId, lang, message.message_id, LabelId.ChangeLang)
       )
-      .catch((err) =>
+      .catch((err) => {
+        this.sendMessage(chatId, LabelId.UpdateLanguageError, { lang });
         logger.error(
           `Unable to set the language for chatId=${logger.y(
             chatId
           )} lang=${logger.y(lang)}`,
           err
-        )
-      );
+        );
+      });
   }
 
   private recogniseVoiceMessage(
@@ -312,7 +308,7 @@ export class TelegramBotModel {
       .then((fileLink) => {
         logger.warn(`New link for chatId=${model.chatId}`, logger.y(fileLink));
         if (!model.isGroup) {
-          this.sendMessage(model, LabelId.InProgress, { lang });
+          this.sendMessage(model.chatId, LabelId.InProgress, { lang });
         }
 
         return this.converter.transformToText(
@@ -334,7 +330,7 @@ export class TelegramBotModel {
       })
       .catch((err: Error) => {
         if (!model.isGroup) {
-          this.sendMessage(model, LabelId.RecognitionFailed, { lang });
+          this.sendMessage(model.chatId, LabelId.RecognitionFailed, { lang });
         }
         logger.error(
           `Unable to recognize the file ${logger.y(
