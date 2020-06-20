@@ -15,6 +15,7 @@ export enum LabelId {
   ContactAuthor,
   SupportCommand,
   LongVoiceMessage,
+  UpdateLanguageError,
 }
 
 export const labels = {
@@ -37,6 +38,8 @@ export const labels = {
     [LabelId.SupportCommand]: "Поддержка",
     [LabelId.LongVoiceMessage]:
       "Сообщения длиной больше 1 минуты не поддерживаются 🌚",
+    [LabelId.UpdateLanguageError]:
+      "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -57,5 +60,7 @@ export const labels = {
     [LabelId.SupportCommand]: "Support menu",
     [LabelId.LongVoiceMessage]:
       "Messages with duration more than 1 minute are not supported 🌚",
+    [LabelId.UpdateLanguageError]:
+      "Failed to update the language. Please try again later 😔",
   },
 };

@@ -9,4 +9,5 @@ export enum UsageStatKey {
   LangId = "langId",
   ChatId = "chatId",
   UserName = "user",
+  CreatedAt = "createdAt",
 }

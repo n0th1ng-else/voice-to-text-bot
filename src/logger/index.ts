@@ -1,4 +1,4 @@
-import { green, red, yellow } from "chalk";
+import { green, red, yellow } from "kleur";
 import { LogType, sendLogs } from "./integration";
 
 export class Logger {
@@ -28,18 +28,15 @@ export class Logger {
     sendLogs(LogType.Error, this.id, msg, data);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public g(...message: any[]): string {
-    return green(...message);
+  public g(message: string | number): string {
+    return green(message);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public y(...message: any[]): string {
-    return yellow(...message);
+  public y(message: string | number): string {
+    return yellow(message);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public r(...message: any[]): string {
-    return red(...message);
+  public r(message: string | number): string {
+    return red(message);
   }
 }
