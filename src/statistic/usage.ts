@@ -1,21 +1,28 @@
 import Parse from "parse/node";
 import { LanguageCode } from "../recognition/types";
 import { Logger } from "../logger";
-import { UsageStatKey } from "./types";
+import { UsageStatCache, UsageStatKey } from "./types";
+import { CacheProvider } from "./cache";
 
 const logger = new Logger("db");
 
 export class UsageStatisticApi {
   private readonly dbClass = "BotStat";
+  private cache: CacheProvider<UsageStatCache, UsageStatKey.ChatId>;
 
   constructor(
     statUrl: string,
     appId: string,
     appKey: string,
-    masterKey: string
+    masterKey: string,
+    cacheSize: number
   ) {
     Parse.serverURL = statUrl;
     Parse.initialize(appId, appKey, masterKey);
+    this.cache = new CacheProvider<UsageStatCache, UsageStatKey.ChatId>(
+      cacheSize,
+      UsageStatKey.ChatId
+    );
   }
 
   public updateUsageCount(chatId: number, username: string): Promise<void> {
@@ -25,15 +32,34 @@ export class UsageStatisticApi {
   }
 
   public updateLanguage(chatId: number, lang: LanguageCode): Promise<void> {
+    this.cache.removeItem(chatId);
+
     return this.getStatIfNotExists(chatId).then((stat) =>
       this.updateStatLanguage(stat, lang)
     );
   }
 
   public getLanguage(chatId: number, username: string): Promise<LanguageCode> {
-    return this.getStatIfNotExists(chatId, username).then((stat) =>
-      stat.get(UsageStatKey.LangId)
-    );
+    const cachedItem = this.cache.getItem(chatId);
+    if (cachedItem) {
+      return Promise.resolve(cachedItem[UsageStatKey.LangId]);
+    }
+
+    return this.getStatIfNotExists(chatId, username).then((stat) => {
+      this.addCacheItem(stat);
+      return stat.get(UsageStatKey.LangId);
+    });
+  }
+
+  private addCacheItem(instance: Parse.Object): void {
+    const langId = instance.get(UsageStatKey.LangId);
+    const chatId = instance.get(UsageStatKey.ChatId);
+    const cachedItem: UsageStatCache = {
+      [UsageStatKey.LangId]: langId,
+      [UsageStatKey.ChatId]: chatId,
+    };
+
+    this.cache.addItem(cachedItem);
   }
 
   private getStatIfNotExists(
@@ -139,21 +165,31 @@ export class UsageStatisticApi {
     const resultId = this.getFirstResultIdInArray(results);
 
     return Promise.all(
-      listToRemove.map((res) => this.removeStat(chatId, res.id))
+      listToRemove.map((res) => this.removeStat(chatId, res))
     ).then(() => resultId);
   }
 
-  private removeStat(chatId: number, statId: string): Promise<void> {
-    logger.warn(`Removing duplication statId=${statId} for chatId=${chatId}`);
+  private removeStat(chatId: number, stat: Parse.Object): Promise<void> {
+    const duplication = {
+      [UsageStatKey.UsageCount]: stat.get(UsageStatKey.UsageCount),
+      [UsageStatKey.LangId]: stat.get(UsageStatKey.LangId),
+      [UsageStatKey.UserName]: stat.get(UsageStatKey.UserName),
+      [UsageStatKey.CreatedAt]: stat.get(UsageStatKey.CreatedAt),
+    };
 
-    return this.getStat(statId)
+    logger.warn(
+      `Removing duplication statId=${stat.id} for chatId=${chatId}`,
+      duplication
+    );
+
+    return this.getStat(stat.id)
       .then((stat) => stat.destroy())
       .then(() => {
-        logger.warn(`Removed statId=${statId} for chatId=${chatId}`);
+        logger.warn(`Removed statId=${stat.id} for chatId=${chatId}`);
       })
       .catch((err) => {
         logger.error(
-          `Failed to remove statId=${statId} for chatId=${chatId}`,
+          `Failed to remove statId=${stat.id} for chatId=${chatId}`,
           err
         );
       });
