@@ -165,21 +165,31 @@ export class UsageStatisticApi {
     const resultId = this.getFirstResultIdInArray(results);
 
     return Promise.all(
-      listToRemove.map((res) => this.removeStat(chatId, res.id))
+      listToRemove.map((res) => this.removeStat(chatId, res))
     ).then(() => resultId);
   }
 
-  private removeStat(chatId: number, statId: string): Promise<void> {
-    logger.warn(`Removing duplication statId=${statId} for chatId=${chatId}`);
+  private removeStat(chatId: number, stat: Parse.Object): Promise<void> {
+    const duplication = {
+      [UsageStatKey.UsageCount]: stat.get(UsageStatKey.UsageCount),
+      [UsageStatKey.LangId]: stat.get(UsageStatKey.LangId),
+      [UsageStatKey.UserName]: stat.get(UsageStatKey.UserName),
+      [UsageStatKey.CreatedAt]: stat.get(UsageStatKey.CreatedAt),
+    };
 
-    return this.getStat(statId)
+    logger.warn(
+      `Removing duplication statId=${stat.id} for chatId=${chatId}`,
+      duplication
+    );
+
+    return this.getStat(stat.id)
       .then((stat) => stat.destroy())
       .then(() => {
-        logger.warn(`Removed statId=${statId} for chatId=${chatId}`);
+        logger.warn(`Removed statId=${stat.id} for chatId=${chatId}`);
       })
       .catch((err) => {
         logger.error(
-          `Failed to remove statId=${statId} for chatId=${chatId}`,
+          `Failed to remove statId=${stat.id} for chatId=${chatId}`,
           err
         );
       });
