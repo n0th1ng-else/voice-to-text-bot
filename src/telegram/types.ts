@@ -7,7 +7,6 @@ import {
   getVoiceDuration,
   getVoiceFile,
   isChatGroup,
-  isMessageSupported,
 } from "./helpers";
 import { LanguageCode } from "../recognition/types";
 
@@ -18,6 +17,7 @@ export enum BotCommand {
 }
 
 export class BotMessageModel {
+  public readonly id: number;
   public readonly chatId: number;
   public readonly isGroup: boolean;
   public readonly userName: string;
@@ -25,9 +25,9 @@ export class BotMessageModel {
   public readonly groupName: string;
   public readonly voiceFileId: string;
   public readonly voiceDuration: number;
-  public readonly isMessageSupported: boolean;
 
   constructor(msg: TelegramBot.Message) {
+    this.id = msg.message_id;
     this.chatId = getChatId(msg);
     this.isGroup = isChatGroup(msg);
     this.userName = getUserName(msg);
@@ -35,7 +35,6 @@ export class BotMessageModel {
     this.groupName = getGroupName(msg);
     this.voiceFileId = getVoiceFile(msg);
     this.voiceDuration = getVoiceDuration(msg);
-    this.isMessageSupported = isMessageSupported(msg);
   }
 
   public get name(): string {
