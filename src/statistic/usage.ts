@@ -182,11 +182,9 @@ export class UsageStatisticApi {
       duplication
     );
 
-    return this.getStat(stat.id)
-      .then((stat) => stat.destroy())
-      .then(() => {
-        logger.warn(`Removed statId=${stat.id} for chatId=${chatId}`);
-      })
+    return stat
+      .destroy()
+      .then(() => logger.warn(`Removed statId=${stat.id} for chatId=${chatId}`))
       .catch((err) => {
         logger.error(
           `Failed to remove statId=${stat.id} for chatId=${chatId}`,
