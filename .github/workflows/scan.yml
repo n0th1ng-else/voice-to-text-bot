@@ -8,10 +8,34 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run test suite
+    steps:
+      - name: App version
+        run: echo "Picked the app version ${GITHUB_SHA}"
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up node using nvm
+        uses: dcodeIO/setup-node-nvm@v4.0.0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true
+
   sonar-cloud:
     runs-on: ubuntu-latest
     name: Run SonarCloud security audit
     steps:
+      - name: App version
+        run: echo "Picked the app version ${GITHUB_SHA}"
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
