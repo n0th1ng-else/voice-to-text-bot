@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 
-function randomIntFromInterval(min: number, max: number): number {
+export function randomIntFromInterval(min: number, max: number): number {
   const byteLimit = 256;
   const randomNum = parseInt(randomBytes(1).toString("hex"), 16);
   const normalizedNum = randomNum / byteLimit;

@@ -89,7 +89,7 @@ export function getGroupName(msg: TelegramBot.Message): string {
   return chatName || chatFullName || "";
 }
 
-export function getVoiceFile(msg: TelegramBot.Message) {
+export function getVoiceFile(msg: TelegramBot.Message): string {
   return msg.voice ? msg.voice.file_id : "";
 }
 

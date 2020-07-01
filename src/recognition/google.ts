@@ -16,6 +16,7 @@ export class GoogleProvider extends VoiceConverter {
     logger.info("Using Google");
 
     this.service = new v1.SpeechClient({
+      fallback: options.isTestEnv,
       projectId: options.googleProjectId,
       credentials: {
         private_key: options.googlePrivateKey,
