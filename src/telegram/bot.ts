@@ -66,7 +66,11 @@ export class TelegramBotModel {
   }
 
   public handleApiMessage(message: TelegramBot.Update): void {
-    this.bot.processUpdate(message);
+    try {
+      this.bot.processUpdate(message);
+    } catch (e) {
+      logger.error("Failed to handle api request", e);
+    }
   }
 
   private handleMessage(msg: TelegramBot.Message): Promise<void> {

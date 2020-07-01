@@ -7,7 +7,7 @@ import { CacheProvider } from "./cache";
 const logger = new Logger("db");
 
 export class UsageStatisticApi {
-  private readonly dbClass = "BotStat";
+  public static readonly dbClass = "BotStat";
   private cache: CacheProvider<UsageStatCache, UsageStatKey.ChatId>;
 
   constructor(
@@ -104,7 +104,7 @@ export class UsageStatisticApi {
   ): Promise<string> {
     logger.info(`Creating stat record for chatId ${logger.y(chatId)}`);
 
-    const BotStatClass = Parse.Object.extend(this.dbClass);
+    const BotStatClass = Parse.Object.extend(UsageStatisticApi.dbClass);
     const instance = new BotStatClass();
     instance.set(UsageStatKey.ChatId, chatId);
     instance.set(UsageStatKey.UsageCount, 0);
@@ -116,7 +116,7 @@ export class UsageStatisticApi {
   private getStat(statId: string): Promise<Parse.Object> {
     logger.info(`Fetching stat object with statId ${logger.y(statId)}`);
 
-    const BotStatClass = Parse.Object.extend(this.dbClass);
+    const BotStatClass = Parse.Object.extend(UsageStatisticApi.dbClass);
     const query = new Parse.Query(BotStatClass);
     return query.get(statId);
   }
@@ -124,7 +124,7 @@ export class UsageStatisticApi {
   private getStatId(chatId: number, username?: string): Promise<string> {
     logger.info(`Looking for statId for chatId ${logger.y(chatId)}`);
 
-    const BotStatClass = Parse.Object.extend(this.dbClass);
+    const BotStatClass = Parse.Object.extend(UsageStatisticApi.dbClass);
     const query = new Parse.Query(BotStatClass);
     query.equalTo(UsageStatKey.ChatId, chatId);
     // Set the first tobe the oldest one

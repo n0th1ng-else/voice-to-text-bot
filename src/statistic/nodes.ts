@@ -5,7 +5,7 @@ import { NodeStatKey } from "./types";
 const logger = new Logger("db");
 
 export class NodeStatisticApi {
-  private readonly dbClass = "NodeStat";
+  public static readonly dbClass = "NodeStat";
 
   constructor(
     statUrl: string,
@@ -49,7 +49,7 @@ export class NodeStatisticApi {
   ): Promise<string> {
     logger.info(`Creating stat record for url ${logger.y(selfUrl)}`);
 
-    const NodeStatClass = Parse.Object.extend(this.dbClass);
+    const NodeStatClass = Parse.Object.extend(NodeStatisticApi.dbClass);
     const instance = new NodeStatClass();
     instance.set(NodeStatKey.SelfUrl, selfUrl);
     instance.set(NodeStatKey.Active, active);
@@ -60,7 +60,7 @@ export class NodeStatisticApi {
   private getStat(statId: string) {
     logger.info(`Fetching node stat object with statId ${logger.y(statId)}`);
 
-    const NodeStatClass = Parse.Object.extend(this.dbClass);
+    const NodeStatClass = Parse.Object.extend(NodeStatisticApi.dbClass);
     const query = new Parse.Query(NodeStatClass);
     return query.get(statId);
   }
@@ -68,7 +68,7 @@ export class NodeStatisticApi {
   private getStatId(selfUrl: string): Promise<string> {
     logger.info(`Looking for statId for url ${logger.y(selfUrl)}`);
 
-    const NodeStatClass = Parse.Object.extend(this.dbClass);
+    const NodeStatClass = Parse.Object.extend(NodeStatisticApi.dbClass);
     const query = new Parse.Query(NodeStatClass);
     query.equalTo(NodeStatKey.SelfUrl, selfUrl);
 

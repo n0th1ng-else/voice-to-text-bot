@@ -12,6 +12,7 @@ export abstract class VoiceConverter {
 }
 
 export interface VoiceConverterOptions {
+  isTestEnv?: boolean;
   googleProjectId?: string;
   googleClientEmail?: string;
   googlePrivateKey?: string;
