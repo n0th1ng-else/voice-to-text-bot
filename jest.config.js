@@ -19,6 +19,7 @@ module.exports = () => {
       "\\.ts$": ["ts-jest"],
     },
     coveragePathIgnorePatterns: ["/node_modules/"],
+    reporters: ["default", "jest-sonar"],
   };
 
   return Object.assign({}, commonConfig, isE2E ? e2eConfig : unitConfig);

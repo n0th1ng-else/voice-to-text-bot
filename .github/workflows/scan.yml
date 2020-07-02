@@ -29,9 +29,22 @@ jobs:
         env:
           CI: true
 
+      - name: Store Unit-tests coverage
+        uses: actions/upload-artifact@v1
+        with:
+          name: coverage-unit
+          path: coverage-unit
+
+      - name: Store e2e-tests coverage
+        uses: actions/upload-artifact@v1
+        with:
+          name: coverage-e2e
+          path: coverage-e2e
+
   sonar-cloud:
     runs-on: ubuntu-latest
     name: Run SonarCloud security audit
+    needs: test
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -39,6 +52,16 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: Download Unit-tests coverage
+        uses: actions/download-artifact@v1
+        with:
+          name: coverage-unit
+
+      - name: Download e2e-tests coverage
+        uses: actions/download-artifact@v1
+        with:
+          name: coverage-e2e
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
