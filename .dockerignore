@@ -1,0 +1,9 @@
+node_modules
+.git
+.idea
+e2e
+k8s
+assets
+coverage-e2e
+coverage-unit
+/**/*/*.spec.ts
