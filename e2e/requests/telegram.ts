@@ -31,6 +31,22 @@ export function sendTelegramMessage(
     });
 }
 
+export function sendTelegramCallbackMessage(
+  host: request.SuperTest<request.Test>,
+  bot: TelegramBotModel,
+  msg: TelegramMessageModel
+): Promise<void> {
+  return host
+    .post(bot.getPath())
+    .send({
+      callback_query: msg.toCallbackApi(),
+    })
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({});
+    });
+}
+
 export function mockTgSetWebHook(host: nock.Scope, hookUrl: string): void {
   host
     .post(`/bottelegram-api-token/setWebHook?url=${hookUrl}`)
@@ -135,4 +151,25 @@ export function mockTgGetFileUrl(host: nock.Scope, fileId: string): void {
         "Content-Type": "audio/ogg",
       }
     );
+}
+
+export function mockTgReceiveCallbackMessage(
+  host: nock.Scope,
+  chatId: number,
+  messageId: number,
+  langId: LanguageCode,
+  textId: LabelId
+): Promise<void> {
+  return new Promise((resolve) => {
+    host
+      .post("/bottelegram-api-token/editMessageText")
+      .reply(200, (uri, body) => {
+        const answer = typeof body === "string" ? parse(body) : body;
+        expect(answer.chat_id).toBe(String(chatId));
+        expect(answer.text).toBe(text.t(textId, langId));
+        expect(answer.message_id).toBe(String(messageId));
+        resolve();
+        return telegramApiResponseOk;
+      });
+  });
 }

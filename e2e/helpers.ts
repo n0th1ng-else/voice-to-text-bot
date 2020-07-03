@@ -10,6 +10,7 @@ export class TelegramMessageModel {
   public voiceId = "";
   private text = "";
   private voiceDuration = 0;
+  private callbackData = "";
 
   constructor(
     public readonly chatId: number,
@@ -29,6 +30,12 @@ export class TelegramMessageModel {
     return this;
   }
 
+  public setCallbackData(messageId: number, data: string): this {
+    this.messageId = messageId;
+    this.callbackData = data;
+    return this;
+  }
+
   public toApi(): TelegramBot.Message {
     return {
       text: this.text,
@@ -44,6 +51,28 @@ export class TelegramMessageModel {
             file_id: this.voiceId,
           }
         : undefined,
+    };
+  }
+
+  public toCallbackApi(): TelegramBot.CallbackQuery {
+    return {
+      data: this.callbackData,
+      id: "",
+      from: {
+        is_bot: false,
+        first_name: "",
+        id: this.chatId,
+      },
+      message: {
+        text: this.text,
+        date: new Date().getDate(),
+        message_id: this.messageId,
+        chat: {
+          id: this.chatId,
+          type: this.chatType,
+        },
+      },
+      chat_instance: "",
     };
   }
 }

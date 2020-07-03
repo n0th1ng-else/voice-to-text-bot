@@ -31,7 +31,17 @@ export function mockUpdateBotStatUsage(
 ): Promise<void> {
   mockBotStatFind(host, item.chatId, [item]);
   mockBotStatGet(host, item, langId);
-  return mockBotStatUpdate(host, item);
+  return mockBotStatUpdateUsage(host, item);
+}
+
+export function mockUpdateBotStatLang(
+  host: nock.Scope,
+  item: BotStatRecordModel,
+  langId: LanguageCode
+): Promise<void> {
+  mockBotStatFind(host, item.chatId, [item]);
+  mockBotStatGet(host, item, item.langId);
+  return mockBotStatUpdateLang(host, item, langId);
 }
 
 function mockBotStatFind(
@@ -91,7 +101,7 @@ function mockBotStatGet(
   });
 }
 
-function mockBotStatUpdate(
+function mockBotStatUpdateUsage(
   host: nock.Scope,
   item: BotStatRecordModel
 ): Promise<void> {
@@ -101,6 +111,22 @@ function mockBotStatUpdate(
 
       expect(requestBody.usageCount).toBe(item.usageCount + 1);
       expect(requestBody.user).toBe(item.user);
+      resolve();
+      return [200, JSON.stringify({})];
+    });
+  });
+}
+
+function mockBotStatUpdateLang(
+  host: nock.Scope,
+  item: BotStatRecordModel,
+  langId: LanguageCode
+): Promise<void> {
+  return new Promise((resolve) => {
+    host.post(`${path}/${item.objectId}`).reply((uri, body) => {
+      const requestBody = typeof body === "string" ? JSON.parse(body) : body;
+
+      expect(requestBody.langId).toBe(langId);
       resolve();
       return [200, JSON.stringify({})];
     });
