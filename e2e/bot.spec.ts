@@ -25,14 +25,17 @@ import {
 import { LabelId } from "../src/text/labels";
 import {
   mockTgGetFileUrl,
+  mockTgReceiveCallbackMessage,
   mockTgReceiveMessage,
   mockTgReceiveMessages,
   mockTgReceiveRawMessage,
   mockTgSetWebHook,
+  sendTelegramCallbackMessage,
   sendTelegramMessage,
 } from "./requests/telegram";
 import {
   mockGetBotStatItem,
+  mockUpdateBotStatLang,
   mockUpdateBotStatUsage,
 } from "./requests/db/botStat";
 import { randomIntFromInterval } from "../src/common/timer";
@@ -207,6 +210,43 @@ describe("[bot]", () => {
           ])
         ),
       ]);
+    });
+
+    it("changes language using the /lang callback message", () => {
+      tgMessage.setText(testMessageId, BotCommand.Language);
+      const botStat = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        testLangId
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          testLangId,
+          LabelId.ChangeLangTitle,
+          new TelegramMessageMeta(TelegramMessageMetaType.Button, [
+            new TelegramMessageMetaItem(LabelId.BtnRussian, testLangId),
+            new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
+          ])
+        ),
+      ]).then(() => {
+        const cbMessage = new TelegramMessageModel(testChatId, chatType);
+        cbMessage.setCallbackData(tgMessage.messageId + 1, LanguageCode.En);
+        return Promise.all([
+          sendTelegramCallbackMessage(host, bot, cbMessage),
+          mockTgReceiveCallbackMessage(
+            telegramServer,
+            tgMessage.chatId,
+            cbMessage.messageId,
+            LanguageCode.En,
+            LabelId.ChangeLang
+          ),
+          mockUpdateBotStatLang(dbServer, botStat, LanguageCode.En),
+        ]);
+      });
     });
 
     it("converts voice into text (it fits 60s limit)", () => {
