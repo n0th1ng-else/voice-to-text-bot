@@ -4,7 +4,7 @@ import { HealthSsl, HealthStatus } from "../src/server/types";
 import { appVersion } from "../src/env";
 import { localhostUrl } from "../src/const";
 
-const appPort = 3100;
+const appPort = 3300;
 const enableSSL = false;
 const host = request(`${localhostUrl}:${appPort}`);
 const path = "/health";

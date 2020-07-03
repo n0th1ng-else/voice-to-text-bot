@@ -4,6 +4,13 @@ import { resolve as resolvePath } from "path";
 import { LanguageCode } from "../src/recognition/types";
 import { LabelId } from "../src/text/labels";
 import { UsageStatKey } from "../src/statistic/types";
+import { randomIntFromInterval } from "../src/common/timer";
+
+interface UserNameOptions {
+  userName?: string;
+  firstName?: string;
+  lastName?: string;
+}
 
 export class TelegramMessageModel {
   public messageId = 0;
@@ -11,11 +18,30 @@ export class TelegramMessageModel {
   private text = "";
   private voiceDuration = 0;
   private callbackData = "";
+  private isBot = false;
+  private hasFrom = false;
+  private firstName = "";
+  private lastName = "";
+  private userName = "";
 
   constructor(
     public readonly chatId: number,
     public readonly chatType: TelegramChatType
   ) {}
+
+  public setName(
+    messageId: number,
+    options: UserNameOptions,
+    isBot = false
+  ): this {
+    this.messageId = messageId;
+    this.isBot = isBot;
+    this.hasFrom = true;
+    this.firstName = options.firstName || "";
+    this.lastName = options.lastName || "";
+    this.userName = options.userName || "";
+    return this;
+  }
 
   public setText(messageId: number, text: string): this {
     this.messageId = messageId;
@@ -41,6 +67,15 @@ export class TelegramMessageModel {
       text: this.text,
       message_id: this.messageId,
       date: new Date().getDate(),
+      from: this.hasFrom
+        ? {
+            is_bot: this.isBot,
+            id: randomIntFromInterval(1, 100000),
+            first_name: this.firstName,
+            last_name: this.lastName,
+            username: this.userName,
+          }
+        : undefined,
       chat: {
         id: this.chatId,
         type: this.chatType,
@@ -60,8 +95,10 @@ export class TelegramMessageModel {
       id: "",
       from: {
         is_bot: false,
-        first_name: "",
-        id: this.chatId,
+        first_name: this.firstName,
+        last_name: this.lastName,
+        username: this.userName,
+        id: randomIntFromInterval(1, 100000),
       },
       message: {
         text: this.text,

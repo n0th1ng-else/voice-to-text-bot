@@ -9,28 +9,26 @@ const path = `/classes/${UsageStatisticApi.dbClass}`;
 export function mockGetBotStatItem(
   host: nock.Scope,
   chatId: number,
-  langId: LanguageCode,
   item?: BotStatRecordModel
 ): BotStatRecordModel {
   if (!item) {
     mockBotStatFind(host, chatId);
     const stat = mockBotStatCreate(host, chatId, "");
-    mockBotStatGet(host, stat, langId);
+    mockBotStatGet(host, stat);
     return stat;
   }
 
   mockBotStatFind(host, chatId, [item]);
-  mockBotStatGet(host, item, langId);
+  mockBotStatGet(host, item);
   return item;
 }
 
 export function mockUpdateBotStatUsage(
   host: nock.Scope,
-  item: BotStatRecordModel,
-  langId: LanguageCode
+  item: BotStatRecordModel
 ): Promise<void> {
   mockBotStatFind(host, item.chatId, [item]);
-  mockBotStatGet(host, item, langId);
+  mockBotStatGet(host, item);
   return mockBotStatUpdateUsage(host, item);
 }
 
@@ -40,7 +38,7 @@ export function mockUpdateBotStatLang(
   langId: LanguageCode
 ): Promise<void> {
   mockBotStatFind(host, item.chatId, [item]);
-  mockBotStatGet(host, item, item.langId);
+  mockBotStatGet(host, item);
   return mockBotStatUpdateLang(host, item, langId);
 }
 
@@ -83,14 +81,9 @@ function mockBotStatCreate(
   return stat;
 }
 
-function mockBotStatGet(
-  host: nock.Scope,
-  stat: BotStatRecordModel,
-  langId: LanguageCode
-): void {
+function mockBotStatGet(host: nock.Scope, stat: BotStatRecordModel): void {
   host.post(path).reply((uri, body) => {
     const requestBody = typeof body === "string" ? JSON.parse(body) : body;
-    stat.setLang(langId);
     expect(requestBody.where.objectId).toBe(stat.objectId);
     return [
       200,
@@ -127,6 +120,7 @@ function mockBotStatUpdateLang(
       const requestBody = typeof body === "string" ? JSON.parse(body) : body;
 
       expect(requestBody.langId).toBe(langId);
+      item.setLang(langId);
       resolve();
       return [200, JSON.stringify({})];
     });
