@@ -60,7 +60,7 @@ const converter = getVoiceConverterInstance(
   converterOptions
 );
 
-const appPort = 3400;
+const appPort = 3500;
 const dbPort = appPort + 1;
 
 const hostUrl = `${localhostUrl}:${appPort}`;
