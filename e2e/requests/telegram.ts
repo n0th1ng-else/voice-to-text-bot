@@ -53,6 +53,19 @@ export function mockTgSetWebHook(host: nock.Scope, hookUrl: string): void {
     .reply(200, telegramApiResponseOk);
 }
 
+export function mockTgGetWebHook(host: nock.Scope, hookUrl: string): void {
+  host
+    .post("/bottelegram-api-token/getWebhookInfo")
+    .reply(200, JSON.stringify({ ok: true, result: { url: hookUrl } }));
+}
+
+export function mockTgGetWebHookError(host: nock.Scope): void {
+  host.post("/bottelegram-api-token/getWebhookInfo").replyWithError({
+    status: 503,
+    message: "Telegram webhook is off",
+  });
+}
+
 export function mockTgReceiveRawMessage(
   host: nock.Scope,
   chatId: number,
