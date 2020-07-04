@@ -15,6 +15,7 @@ import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
 import { githubUrl, localhostUrl, telegramUrl } from "../src/const";
 import {
+  BotStatRecordModel,
   getMockCertificate,
   TelegramChatType,
   TelegramMessageMeta,
@@ -58,7 +59,7 @@ const converter = getVoiceConverterInstance(
   converterOptions
 );
 
-const appPort = 3100;
+const appPort = 3200;
 const dbPort = appPort + 1;
 
 const hostUrl = `${localhostUrl}:${appPort}`;
@@ -78,16 +79,17 @@ const host = request(hostUrl);
 let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
+const testLangId = LanguageCode.Ru;
 let chatType: TelegramChatType = TelegramChatType.Private;
 let testMessageId = 0;
 let testChatId = 0;
-let testLangId = LanguageCode.Ru;
 let tgMessage: TelegramMessageModel = new TelegramMessageModel(
   testChatId,
   chatType
 );
+let botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
 
-describe("[bot]", () => {
+describe("[russian language]", () => {
   beforeAll(() => {
     mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
 
@@ -108,11 +110,8 @@ describe("[bot]", () => {
   beforeEach(() => {
     bot.setAuthor("");
     chatType = TelegramChatType.Private;
-    testMessageId =
-      randomIntFromInterval(1, 100000) *
-      (chatType === TelegramChatType.Private ? 1 : -1);
+    testMessageId = randomIntFromInterval(1, 100000);
     testChatId = randomIntFromInterval(1, 100000);
-    testLangId = LanguageCode.Ru;
   });
 
   afterEach(() => {
@@ -123,18 +122,20 @@ describe("[bot]", () => {
   describe("private messages", () => {
     beforeEach(() => {
       tgMessage = new TelegramMessageModel(testChatId, chatType);
+      botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
+      botStat.setObjectId(randomIntFromInterval(1, 100000));
     });
 
     it("responds on a message without voice content", () => {
       tgMessage.setText(testMessageId, "some text");
-      mockGetBotStatItem(dbServer, tgMessage.chatId, testLangId);
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           LabelId.NoContent
         ),
       ]);
@@ -142,28 +143,33 @@ describe("[bot]", () => {
 
     it("responds on a /start message", () => {
       tgMessage.setText(testMessageId, BotCommand.Start);
-      mockGetBotStatItem(dbServer, tgMessage.chatId, testLangId);
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
-        mockTgReceiveMessages(telegramServer, tgMessage.chatId, testLangId, [
-          LabelId.WelcomeMessage,
-          LabelId.WelcomeMessageGroup,
-          LabelId.WelcomeMessageMore,
-        ]),
+        mockTgReceiveMessages(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          [
+            LabelId.WelcomeMessage,
+            LabelId.WelcomeMessageGroup,
+            LabelId.WelcomeMessageMore,
+          ]
+        ),
       ]);
     });
 
     it("responds on a /support message", () => {
       tgMessage.setText(testMessageId, BotCommand.Support);
-      mockGetBotStatItem(dbServer, tgMessage.chatId, testLangId);
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
@@ -176,14 +182,14 @@ describe("[bot]", () => {
       const authorUrl = "some-author-url";
       bot.setAuthor(authorUrl);
       tgMessage.setText(testMessageId, BotCommand.Support);
-      mockGetBotStatItem(dbServer, tgMessage.chatId, testLangId);
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
@@ -195,17 +201,17 @@ describe("[bot]", () => {
 
     it("responds on a /lang message", () => {
       tgMessage.setText(testMessageId, BotCommand.Language);
-      mockGetBotStatItem(dbServer, tgMessage.chatId, testLangId);
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           LabelId.ChangeLangTitle,
           new TelegramMessageMeta(TelegramMessageMetaType.Button, [
-            new TelegramMessageMetaItem(LabelId.BtnRussian, testLangId),
+            new TelegramMessageMetaItem(LabelId.BtnRussian, LanguageCode.Ru),
             new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
           ])
         ),
@@ -214,37 +220,34 @@ describe("[bot]", () => {
 
     it("changes language using the /lang callback message", () => {
       tgMessage.setText(testMessageId, BotCommand.Language);
-      const botStat = mockGetBotStatItem(
-        dbServer,
-        tgMessage.chatId,
-        testLangId
-      );
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           LabelId.ChangeLangTitle,
           new TelegramMessageMeta(TelegramMessageMetaType.Button, [
-            new TelegramMessageMetaItem(LabelId.BtnRussian, testLangId),
+            new TelegramMessageMetaItem(LabelId.BtnRussian, LanguageCode.Ru),
             new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
           ])
         ),
       ]).then(() => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
-        cbMessage.setCallbackData(tgMessage.messageId + 1, LanguageCode.En);
+        const newLangId = LanguageCode.En;
+        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
             telegramServer,
             tgMessage.chatId,
             cbMessage.messageId,
-            LanguageCode.En,
+            newLangId,
             LabelId.ChangeLang
           ),
-          mockUpdateBotStatLang(dbServer, botStat, LanguageCode.En),
+          mockUpdateBotStatLang(dbServer, statModel, newLangId),
         ]);
       });
     });
@@ -254,12 +257,9 @@ describe("[bot]", () => {
       const voiceFileDuration = 59;
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
+      botStat.usageCount = 37;
 
-      const botStat = mockGetBotStatItem(
-        dbServer,
-        tgMessage.chatId,
-        testLangId
-      );
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
       mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
@@ -269,16 +269,16 @@ describe("[bot]", () => {
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           LabelId.InProgress
         ),
         mockTgReceiveRawMessage(
           telegramServer,
           tgMessage.chatId,
-          testLangId,
+          statModel.langId,
           `🗣 ${voiceFileContent}`
         ),
-        mockUpdateBotStatUsage(dbServer, botStat, testLangId),
+        mockUpdateBotStatUsage(dbServer, statModel),
       ]).then(() => {
         expect(speechScope.isDone()).toBeTruthy();
       });
@@ -288,13 +288,16 @@ describe("[bot]", () => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 60;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
-      mockGetBotStatItem(dbServer, tgMessage.chatId, testLangId);
+      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
-        mockTgReceiveMessages(telegramServer, tgMessage.chatId, testLangId, [
-          LabelId.LongVoiceMessage,
-        ]),
+        mockTgReceiveMessages(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          [LabelId.LongVoiceMessage]
+        ),
       ]);
     });
   });
