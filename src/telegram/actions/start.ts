@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import { GenericAction } from "./common";
 import { isHelloMessage } from "../helpers";
-import { BotMessageModel } from "../types";
+import { BotMessageModel, TelegramMessagePrefix } from "../types";
 import { LabelId } from "../../text/labels";
 import { Logger } from "../../logger";
 
@@ -11,7 +11,7 @@ export class StartAction extends GenericAction {
   public runAction(
     msg: TelegramBot.Message,
     mdl: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.sendHelloMessage(mdl, prefix);
   }
@@ -22,9 +22,9 @@ export class StartAction extends GenericAction {
 
   private sendHelloMessage(
     model: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
-    logger.info(`${prefix} Sending hello message`);
+    logger.info(`${prefix.getPrefix()} Sending hello message`);
     return this.getChatLanguage(model, prefix)
       .then((lang) =>
         this.sendMessage(
@@ -39,9 +39,9 @@ export class StartAction extends GenericAction {
           prefix
         )
       )
-      .then(() => logger.info(`${prefix} Hello message sent`))
+      .then(() => logger.info(`${prefix.getPrefix()} Hello message sent`))
       .catch((err) =>
-        logger.error(`${prefix} Unable to send hello message`, err)
+        logger.error(`${prefix.getPrefix()} Unable to send hello message`, err)
       );
   }
 }

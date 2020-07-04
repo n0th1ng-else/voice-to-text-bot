@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import { GenericAction } from "./common";
-import { BotMessageModel } from "../types";
+import { BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isSupportMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
 import { githubUrl } from "../../const";
@@ -14,7 +14,7 @@ export class SupportAction extends GenericAction {
   public runAction(
     msg: TelegramBot.Message,
     mdl: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.sendSupportMessage(mdl, prefix);
   }
@@ -29,9 +29,9 @@ export class SupportAction extends GenericAction {
 
   private sendSupportMessage(
     model: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
-    logger.info(`${prefix} Sending support message`);
+    logger.info(`${prefix.getPrefix()} Sending support message`);
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
@@ -63,9 +63,12 @@ export class SupportAction extends GenericAction {
           prefix
         );
       })
-      .then(() => logger.info(`${prefix} Support message sent`))
+      .then(() => logger.info(`${prefix.getPrefix()} Support message sent`))
       .catch((err) =>
-        logger.error(`${prefix} Unable to send support message`, err)
+        logger.error(
+          `${prefix.getPrefix()} Unable to send support message`,
+          err
+        )
       );
   }
 }

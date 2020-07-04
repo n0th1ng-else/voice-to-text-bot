@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import { GenericAction } from "./common";
-import { BotMessageModel } from "../types";
+import { BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isVoiceMessage, isVoiceMessageLong } from "../helpers";
 import { Logger } from "../../logger";
 import { LabelId } from "../../text/labels";
@@ -14,16 +14,18 @@ export class VoiceAction extends GenericAction {
   public runAction(
     msg: TelegramBot.Message,
     mdl: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     if (isVoiceMessageLong(mdl)) {
       logger.warn(
-        `${prefix} Message is too long duration=${mdl.voiceDuration}s`
+        `${prefix.getPrefix()} Message is too long duration=${
+          mdl.voiceDuration
+        }s`
       );
       return this.sendVoiceMessageTooLong(mdl, prefix);
     }
 
-    logger.info(`${prefix} Voice message`);
+    logger.info(`${prefix.getPrefix()} Voice message`);
     return this.getChatLanguage(mdl, prefix).then((lang) =>
       this.recogniseVoiceMessage(mdl, lang, prefix)
     );
@@ -39,14 +41,14 @@ export class VoiceAction extends GenericAction {
 
   private sendVoiceMessageTooLong(
     model: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     if (model.isGroup) {
-      logger.info(`${prefix} Voice is too long`);
+      logger.info(`${prefix.getPrefix()} Voice is too long`);
       return Promise.resolve();
     }
 
-    logger.info(`${prefix} Sending voice is too long`);
+    logger.info(`${prefix.getPrefix()} Sending voice is too long`);
     return this.getChatLanguage(model, prefix)
       .then((lang) =>
         this.sendMessage(
@@ -59,18 +61,23 @@ export class VoiceAction extends GenericAction {
           prefix
         )
       )
-      .then(() => logger.info(`${prefix} Voice is too message sent`))
+      .then(() =>
+        logger.info(`${prefix.getPrefix()} Voice is too message sent`)
+      )
       .catch((err) =>
-        logger.error(`${prefix} Unable to send voice is too long`, err)
+        logger.error(
+          `${prefix.getPrefix()} Unable to send voice is too long`,
+          err
+        )
       );
   }
 
   private recogniseVoiceMessage(
     model: BotMessageModel,
     lang: LanguageCode,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
-    logger.info(`${prefix} Processing voice`);
+    logger.info(`${prefix.getPrefix()} Processing voice`);
 
     return this.getFileLInk(model, prefix)
       .then((fileLink) => {
@@ -94,7 +101,9 @@ export class VoiceAction extends GenericAction {
           this.updateUsageCount(model, prefix),
         ]);
       })
-      .then(() => logger.info(`${prefix} Voice successfully converted`))
+      .then(() =>
+        logger.info(`${prefix.getPrefix()} Voice successfully converted`)
+      )
       .catch((err: Error) => {
         if (!model.isGroup) {
           this.sendMessage(
@@ -109,7 +118,7 @@ export class VoiceAction extends GenericAction {
         }
 
         logger.error(
-          `${prefix} Unable to recognize the file ${logger.y(
+          `${prefix.getPrefix()} Unable to recognize the file ${Logger.y(
             model.voiceFileId
           )}`,
           err
@@ -117,8 +126,11 @@ export class VoiceAction extends GenericAction {
       });
   }
 
-  private getFileLInk(model: BotMessageModel, prefix: string): Promise<string> {
-    logger.info(`${prefix} Fetching file link`);
+  private getFileLInk(
+    model: BotMessageModel,
+    prefix: TelegramMessagePrefix
+  ): Promise<string> {
+    logger.info(`${prefix.getPrefix()} Fetching file link`);
 
     if (!model.voiceFileId) {
       return Promise.reject(
@@ -132,7 +144,7 @@ export class VoiceAction extends GenericAction {
   private sendInProgressMessage(
     model: BotMessageModel,
     lang: LanguageCode,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     if (model.isGroup) {
       return Promise.resolve();
@@ -151,15 +163,15 @@ export class VoiceAction extends GenericAction {
 
   private updateUsageCount(
     model: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
-    logger.info(`${prefix} Updating usage count`);
+    logger.info(`${prefix.getPrefix()} Updating usage count`);
 
     return this.stat.usage
       .updateUsageCount(model.chatId, model.name)
-      .then(() => logger.info(`${prefix} Usage count updated`))
+      .then(() => logger.info(`${prefix.getPrefix()} Usage count updated`))
       .catch((err) =>
-        logger.error(`${prefix} Unable to update usage count`, err)
+        logger.error(`${prefix.getPrefix()} Unable to update usage count`, err)
       );
   }
 }

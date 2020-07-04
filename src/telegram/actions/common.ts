@@ -1,5 +1,9 @@
 import TelegramBot from "node-telegram-bot-api";
-import { BotMessageModel, MessageOptions } from "../types";
+import {
+  BotMessageModel,
+  MessageOptions,
+  TelegramMessagePrefix,
+} from "../types";
 import { LanguageCode } from "../../recognition/types";
 import { Logger } from "../../logger";
 import { StatisticApi } from "../../statistic";
@@ -19,7 +23,7 @@ export abstract class GenericAction {
   public abstract runAction(
     msg: TelegramBot.Message,
     mdl: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void>;
 
   public abstract runCondition(
@@ -29,18 +33,18 @@ export abstract class GenericAction {
 
   public getChatLanguage(
     model: BotMessageModel,
-    prefix: string,
+    prefix: TelegramMessagePrefix,
     lang?: LanguageCode
   ): Promise<LanguageCode> {
     if (lang) {
       return Promise.resolve(lang);
     }
 
-    logger.info(`${prefix} Fetching language`);
+    logger.info(`${prefix.getPrefix()} Fetching language`);
     return this.stat.usage
       .getLanguage(model.chatId, model.name)
       .catch((err) => {
-        logger.error(`${prefix} Unable to get the lang`, err);
+        logger.error(`${prefix.getPrefix()} Unable to get the lang`, err);
         return this.text.fallbackLanguage;
       });
   }
@@ -50,7 +54,7 @@ export abstract class GenericAction {
     chatId: number,
     ids: LabelId | LabelId[],
     meta: MessageOptions,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     const msgs = Array.isArray(ids) ? ids : [ids];
     if (!msgs.length) {
@@ -62,7 +66,7 @@ export abstract class GenericAction {
       return Promise.resolve();
     }
 
-    logger.info(`${prefix} Sending the message`);
+    logger.info(`${prefix.getPrefix()} Sending the message`);
     return this.sendRawMessage(
       chatId,
       this.text.t(part, meta.lang),
@@ -70,7 +74,7 @@ export abstract class GenericAction {
     )
       .then(() => this.sendMessage(messageId, chatId, msgs, meta, prefix))
       .catch((err) =>
-        logger.error(`${prefix} Unable to send the message`, err)
+        logger.error(`${prefix.getPrefix()} Unable to send the message`, err)
       );
   }
 
@@ -79,16 +83,16 @@ export abstract class GenericAction {
     lang: LanguageCode,
     messageId: number,
     id: LabelId,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.bot
       .editMessageText(this.text.t(id, lang), {
         chat_id: chatId,
         message_id: messageId,
       })
-      .then(() => logger.info(`${prefix} Updated message`))
+      .then(() => logger.info(`${prefix.getPrefix()} Updated message`))
       .catch((err) =>
-        logger.error(`${prefix} Unable to edit the message`, err)
+        logger.error(`${prefix.getPrefix()} Unable to edit the message`, err)
       );
   }
 

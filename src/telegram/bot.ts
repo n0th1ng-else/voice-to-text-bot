@@ -1,10 +1,9 @@
 import TelegramBot from "node-telegram-bot-api";
-import { nanoid } from "nanoid";
 import { Logger } from "../logger";
 import { VoiceConverter } from "../recognition/types";
 import { StatisticApi } from "../statistic";
 import { LabelId } from "../text/labels";
-import { BotMessageModel } from "./types";
+import { BotMessageModel, TelegramMessagePrefix } from "./types";
 import { isMessageSupported } from "./helpers";
 import { runPromiseWithRetry } from "../common/helpers";
 import { getMd5Hash } from "../common/hash";
@@ -69,9 +68,9 @@ export class TelegramBotModel {
 
   private handleMessage(msg: TelegramBot.Message): Promise<void> {
     const model = new BotMessageModel(msg);
-    const prefix = `[Id=${nanoid(10)}] [ChatId=${model.chatId}]`;
+    const prefix = new TelegramMessagePrefix(model.chatId);
 
-    logger.info(`${prefix} Incoming message`);
+    logger.info(`${prefix.getPrefix()} Incoming message`);
 
     if (!isMessageSupported(msg)) {
       return TelegramBotModel.logNotSupportedMessage(prefix);
@@ -96,21 +95,23 @@ export class TelegramBotModel {
     return this.sendNoVoiceMessage(model, prefix);
   }
 
-  private static logNotSupportedMessage(prefix: string): Promise<void> {
-    logger.warn(`${prefix} Message is not supported`);
+  private static logNotSupportedMessage(
+    prefix: TelegramMessagePrefix
+  ): Promise<void> {
+    logger.warn(`${prefix.getPrefix()} Message is not supported`);
     return Promise.resolve();
   }
 
   private sendNoVoiceMessage(
     model: BotMessageModel,
-    prefix: string
+    prefix: TelegramMessagePrefix
   ): Promise<void> {
     if (model.isGroup) {
-      logger.info(`${prefix} No content`);
+      logger.info(`${prefix.getPrefix()} No content`);
       return Promise.resolve();
     }
 
-    logger.info(`${prefix} Sending no content`);
+    logger.info(`${prefix.getPrefix()} Sending no content`);
     return this.actions.core
       .getChatLanguage(model, prefix)
       .then((lang) =>
@@ -122,7 +123,9 @@ export class TelegramBotModel {
           prefix
         )
       )
-      .catch((err) => logger.error(`${prefix} Unable to send no content`, err));
+      .catch((err) =>
+        logger.error(`${prefix.getPrefix()} Unable to send no content`, err)
+      );
   }
 
   private handleCallbackQuery(msg: TelegramBot.CallbackQuery): void {

@@ -19,7 +19,7 @@ export function run(): void {
     res.status(200).sendFile(chartHtml);
   });
 
-  logger.info(`Starting ${logger.y(sSuffix("http", enableSSL))} server`);
+  logger.info(`Starting ${Logger.y(sSuffix("http", enableSSL))} server`);
 
   const httpsOptions = {
     cert: httpsCert,
@@ -29,6 +29,6 @@ export function run(): void {
   const server = enableSSL ? createHttps(httpsOptions, app) : createHttp(app);
 
   server.listen(appPort, () => {
-    logger.info(`Express server is listening on ${logger.y(appPort)}`);
+    logger.info(`Express server is listening on ${Logger.y(appPort)}`);
   });
 }
