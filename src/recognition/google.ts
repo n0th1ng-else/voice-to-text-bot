@@ -31,10 +31,10 @@ export class GoogleProvider extends VoiceConverter {
     lang: LanguageCode
   ): Promise<string> {
     const name = `${fileId}.ogg`;
-    logger.info(`Starting process for ${logger.y(name)}`);
+    logger.info(`Starting process for ${Logger.y(name)}`);
     return getWav(fileLink)
       .then((bufferData) => {
-        logger.info(`Start converting ${logger.y(name)}`);
+        logger.info(`Start converting ${Logger.y(name)}`);
         return this.service.recognize({
           audio: {
             content: bufferData.toString("base64"),
@@ -49,7 +49,7 @@ export class GoogleProvider extends VoiceConverter {
       })
       .then(([translationData]) => this.unpackTranscription(translationData))
       .then((text) => {
-        logger.info(`Job ${logger.y(name)} completed`);
+        logger.info(`Job ${Logger.y(name)} completed`);
         return text;
       });
   }

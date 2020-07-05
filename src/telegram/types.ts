@@ -9,6 +9,8 @@ import {
   isChatGroup,
 } from "./helpers";
 import { LanguageCode } from "../recognition/types";
+import { nanoid } from "nanoid";
+import { Logger } from "../logger";
 
 export enum BotCommand {
   Start = "/start",
@@ -45,4 +47,34 @@ export class BotMessageModel {
 export interface MessageOptions {
   lang: LanguageCode;
   options?: TelegramBot.SendMessageOptions;
+}
+
+export interface BotButtonData {
+  l: LanguageCode;
+  i: string;
+}
+
+export class TelegramMessagePrefix {
+  constructor(
+    public readonly chatId: number,
+    public readonly id = nanoid(10)
+  ) {}
+
+  public getPrefix(): string {
+    return `[Id=${Logger.y(this.id)}] [ChatId=${Logger.y(this.chatId)}]`;
+  }
+
+  public getDto(langId: LanguageCode): BotButtonData {
+    return {
+      l: langId,
+      i: this.id,
+    };
+  }
+}
+
+export class BotLangData {
+  constructor(
+    public readonly langId: LanguageCode,
+    public readonly prefix: TelegramMessagePrefix
+  ) {}
 }

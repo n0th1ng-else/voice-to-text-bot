@@ -12,17 +12,17 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
   ) {
     if (!this.hasCacheEnabled()) {
       logger.warn(
-        `Cache size is ${logger.y(
+        `Cache size is ${Logger.y(
           sSuffix("item", cacheSize)
-        )}, so the cache is ${logger.r("turned off")} for ${logger.y(
+        )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(
           String(idKey)
         )} stat`
       );
     } else {
       logger.warn(
-        `Cache size is ${logger.y(
+        `Cache size is ${Logger.y(
           sSuffix("item", cacheSize)
-        )} initialized for ${logger.y(String(idKey))} stat`
+        )} initialized for ${Logger.y(String(idKey))} stat`
       );
     }
   }
@@ -59,9 +59,9 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
 
     if (newCacheData.length > this.cacheSize) {
       logger.warn(
-        `Cache storage exceeds the limit of ${logger.y(
+        `Cache storage exceeds the limit of ${Logger.y(
           sSuffix("item", this.cacheSize)
-        )} and have a size of ${logger.y(
+        )} and have a size of ${Logger.y(
           sSuffix("item", newCacheData.length)
         )}. Old records will be removed to keep storage under the limit`
       );

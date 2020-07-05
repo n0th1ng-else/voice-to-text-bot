@@ -33,7 +33,7 @@ export class NodeStatisticApi {
     active: boolean,
     version: string
   ): Promise<void> {
-    logger.info(`Updating active state for ${logger.y(instance.id)}`);
+    logger.info(`Updating active state for ${Logger.y(instance.id)}`);
 
     instance.set(NodeStatKey.Active, active);
     instance.set(NodeStatKey.Version, version);
@@ -47,7 +47,7 @@ export class NodeStatisticApi {
     active: boolean,
     version: string
   ): Promise<string> {
-    logger.info(`Creating stat record for url ${logger.y(selfUrl)}`);
+    logger.info(`Creating stat record for url ${Logger.y(selfUrl)}`);
 
     const NodeStatClass = Parse.Object.extend(NodeStatisticApi.dbClass);
     const instance = new NodeStatClass();
@@ -58,7 +58,7 @@ export class NodeStatisticApi {
   }
 
   private getStat(statId: string) {
-    logger.info(`Fetching node stat object with statId ${logger.y(statId)}`);
+    logger.info(`Fetching node stat object with statId ${Logger.y(statId)}`);
 
     const NodeStatClass = Parse.Object.extend(NodeStatisticApi.dbClass);
     const query = new Parse.Query(NodeStatClass);
@@ -66,7 +66,7 @@ export class NodeStatisticApi {
   }
 
   private getStatId(selfUrl: string): Promise<string> {
-    logger.info(`Looking for statId for url ${logger.y(selfUrl)}`);
+    logger.info(`Looking for statId for url ${Logger.y(selfUrl)}`);
 
     const NodeStatClass = Parse.Object.extend(NodeStatisticApi.dbClass);
     const query = new Parse.Query(NodeStatClass);

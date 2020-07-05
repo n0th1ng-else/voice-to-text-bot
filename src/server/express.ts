@@ -84,10 +84,10 @@ export class ExpressServer {
 
   public setBots(bots: TelegramBotModel[] = []): this {
     this.bots = bots;
-    logger.info(`Requested ${logger.y(sSuffix("bot", bots.length))} to set up`);
+    logger.info(`Requested ${Logger.y(sSuffix("bot", bots.length))} to set up`);
 
     bots.forEach((bot) => {
-      logger.warn(`Setting up a handler for ${logger.y(bot.getPath())}`);
+      logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
       this.app.post(bot.getPath(), (req, res) => {
         bot.handleApiMessage(req.body);
         res.sendStatus(200);
@@ -100,7 +100,7 @@ export class ExpressServer {
     });
 
     this.app.use((req, res) => {
-      logger.error(`Unknown route ${logger.y(req.originalUrl)}`);
+      logger.error(`Unknown route ${Logger.y(req.originalUrl)}`);
 
       res
         .status(404)
@@ -116,7 +116,7 @@ export class ExpressServer {
   }
 
   public start(): Promise<() => Promise<void>> {
-    logger.info(`Starting ${logger.y(sSuffix("http", this.isHttps))} server`);
+    logger.info(`Starting ${Logger.y(sSuffix("http", this.isHttps))} server`);
 
     const server = this.isHttps
       ? createHttps(this.httpsOptions, this.app)
@@ -124,7 +124,7 @@ export class ExpressServer {
 
     return new Promise((resolve) => {
       server.listen(this.port, () => {
-        logger.info(`Express server is listening on ${logger.y(this.port)}`);
+        logger.info(`Express server is listening on ${Logger.y(this.port)}`);
         resolve(
           () =>
             new Promise((resolveFn, rejectFn) => {
@@ -167,7 +167,7 @@ export class ExpressServer {
     this.nextReplicaUrl = nextReplicaUrl;
     this.daysRunning = [];
     logger.info(
-      `Lifecycle interval is set to ${logger.y(
+      `Lifecycle interval is set to ${Logger.y(
         sSuffix("day", this.lifecycleInterval)
       )}`
     );
@@ -196,9 +196,9 @@ export class ExpressServer {
 
     const daysRunning = this.daysRunning.join(", ");
     logger.info(
-      `Daemon tick. Today is ${logger.y(
+      `Daemon tick. Today is ${Logger.y(
         currentDay
-      )} and I have been running for (${logger.y(daysRunning)}) already`
+      )} and I have been running for (${Logger.y(daysRunning)}) already`
     );
     const currentInterval = this.daysRunning.length;
     if (currentInterval > this.lifecycleInterval) {
@@ -220,7 +220,7 @@ export class ExpressServer {
           this.isIdle = true;
 
           logger.warn(
-            `Delegated callback to the buddy node. Daemon stopped and ${logger.y(
+            `Delegated callback to the buddy node. Daemon stopped and ${Logger.y(
               "I am going to hibernate"
             )}`
           );
@@ -242,7 +242,7 @@ export class ExpressServer {
           logger.error("Replica status is not ok", health);
           return;
         }
-        logger.info(`Ping completed with result: ${logger.y(health.status)}`);
+        logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
 
         const isCallbackOwner = health.urls.every((url) =>
           url.includes(this.selfUrl)
@@ -254,7 +254,7 @@ export class ExpressServer {
           this.isIdle = true;
 
           logger.warn(
-            `Callback is not owner by this node. Daemon stopped and ${logger.y(
+            `Callback is not owner by this node. Daemon stopped and ${Logger.y(
               "I am going to hibernate"
             )}`
           );

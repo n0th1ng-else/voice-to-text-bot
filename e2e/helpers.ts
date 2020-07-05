@@ -5,6 +5,7 @@ import { LanguageCode } from "../src/recognition/types";
 import { LabelId } from "../src/text/labels";
 import { UsageStatKey } from "../src/statistic/types";
 import { randomIntFromInterval } from "../src/common/timer";
+import { BotButtonData } from "../src/telegram/types";
 
 interface UserNameOptions {
   userName?: string;
@@ -56,9 +57,17 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setCallbackData(messageId: number, data: string): this {
+  public setCallbackData(
+    messageId: number,
+    langId: LanguageCode,
+    prefixId: string
+  ): this {
     this.messageId = messageId;
-    this.callbackData = data;
+    const data: BotButtonData = {
+      l: langId,
+      i: prefixId,
+    };
+    this.callbackData = JSON.stringify(data);
     return this;
   }
 

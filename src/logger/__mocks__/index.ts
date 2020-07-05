@@ -1,4 +1,16 @@
 export class Logger {
+  public static g(message: string | number): string {
+    return typeof message === "string" ? message : String(message);
+  }
+
+  public static y(message: string | number): string {
+    return typeof message === "string" ? message : String(message);
+  }
+
+  public static r(message: string | number): string {
+    return typeof message === "string" ? message : String(message);
+  }
+
   constructor(private readonly id: string = "") {}
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -16,22 +28,10 @@ export class Logger {
     this.output(...messages);
   }
 
-  public g(message: string | number): string {
-    return typeof message === "string" ? message : String(message);
-  }
-
-  public y(message: string | number): string {
-    return typeof message === "string" ? message : String(message);
-  }
-
-  public r(message: string | number): string {
-    return typeof message === "string" ? message : String(message);
-  }
-
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public output(...message: any[]): void {
     const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.log(this.g(prefix), ...message);
+    console.log(Logger.g(prefix), ...message);
   }
 }

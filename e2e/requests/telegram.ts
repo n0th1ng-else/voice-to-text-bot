@@ -11,6 +11,7 @@ import {
 import { TextModel } from "../../src/text";
 import { LanguageCode } from "../../src/recognition/types";
 import { LabelId } from "../../src/text/labels";
+import { BotButtonData } from "../../src/telegram/types";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -89,12 +90,13 @@ export function mockTgReceiveMessage(
   lang: LanguageCode,
   textId: LabelId,
   meta?: TelegramMessageMeta
-): Promise<void> {
-  return new Promise((resolve) => {
+): Promise<string> {
+  return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
       const answer = typeof body === "string" ? parse(body) : body;
       expect(answer.chat_id).toBe(String(chatId));
       expect(answer.text).toBe(text.t(textId, lang));
+      let prefixId = "";
       if (meta) {
         expect(answer.reply_markup).toBeDefined();
         let metaItems = JSON.parse(answer.reply_markup).inline_keyboard;
@@ -122,11 +124,16 @@ export function mockTgReceiveMessage(
 
             expect(itemInfo).toBeDefined();
             expect(itemInfo.text).toBe(text.t(metaItemInfo.title, lang));
-            expect(itemInfo.callback_data).toBe(metaItemInfo.data);
+            const callbackData: BotButtonData = JSON.parse(
+              itemInfo.callback_data
+            );
+            expect(callbackData.l).toBe(metaItemInfo.data);
+            expect(callbackData.i).toBeDefined();
+            prefixId = callbackData.i;
           });
         }
       }
-      resolve();
+      resolve(prefixId);
       return telegramApiResponseOk;
     });
   });

@@ -311,10 +311,10 @@ describe("[default language - english]", () => {
             new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
           ])
         ),
-      ]).then(() => {
+      ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId = LanguageCode.Ru;
-        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId);
+        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -348,10 +348,10 @@ describe("[default language - english]", () => {
             new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
           ])
         ),
-      ]).then(() => {
+      ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId = LanguageCode.Ru;
-        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId);
+        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(

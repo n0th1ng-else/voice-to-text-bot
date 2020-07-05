@@ -234,10 +234,10 @@ describe("[russian language]", () => {
             new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
           ])
         ),
-      ]).then(() => {
+      ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId = LanguageCode.En;
-        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId);
+        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
