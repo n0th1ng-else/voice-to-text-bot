@@ -34,6 +34,7 @@
     "node-telegram-bot-api": "0.50.0",
     "parse": "2.13.0",
     "prism-media": "1.2.2",
+    "signal-exit": "3.0.3",
     "strip-ansi": "6.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.3",

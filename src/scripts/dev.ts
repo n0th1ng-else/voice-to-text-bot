@@ -1,3 +1,4 @@
+import onExit from "signal-exit";
 import {
   appPort,
   enableSSL,
@@ -45,6 +46,10 @@ export function run(): void {
   );
   const bot = new TelegramBotModel(telegramBotApi, converter, stat).setAuthor(
     authorTelegramAccount
+  );
+
+  onExit((code, signal) =>
+    logger.error("Exit signal received", { code, signal })
   );
 
   getHostName(appPort, selfUrl, ngRokToken)

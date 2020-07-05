@@ -128,10 +128,22 @@ export class ExpressServer {
         resolve(
           () =>
             new Promise((resolveFn, rejectFn) => {
+              logger.warn("Shutting down the server instance");
               if (this.daemon) {
+                logger.warn("Stopping daemon");
                 clearInterval(this.daemon);
               }
-              server.close((err) => (err ? rejectFn(err) : resolveFn()));
+
+              server.close((err) => {
+                if (err) {
+                  logger.error("Unable to stop express server", err);
+                  rejectFn(err);
+                  return;
+                }
+
+                logger.warn("Express server has stopped");
+                resolveFn();
+              });
             })
         );
       });
