@@ -1,3 +1,4 @@
+import onExit from "signal-exit";
 import {
   appPort,
   enableSSL,
@@ -50,12 +51,18 @@ export function run(): void {
     authorTelegramAccount
   );
 
+  onExit((code, signal) =>
+    logger.error("Exit signal received", { code, signal })
+  );
+
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
       logger.info(`Telling telegram our location is ${host}`);
       bot.setHostLocation(host);
       return server.setSelfUrl(host).setBots([bot]).setStat(stat).start();
     })
-    .then(() => server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval))
-    .catch((err: Error) => logger.error("Failed to run the server", err));
+    .then(() => {
+      return server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval);
+    })
+    .catch((err) => logger.error("Failed to run the server", err));
 }
