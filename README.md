@@ -6,7 +6,9 @@
 
 <div>
     <span>
-        <img alt="Number of installs" src="https://img.shields.io/badge/installs-200%2B-blueviolet"> 
+        <a href="https://t.me/AudioMessBot" target="_blank">
+            <img alt="Number of installs" src="https://img.shields.io/badge/installs-400%2B-blueviolet"> 
+        </a>
     </span>
     <span>
         <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/n0th1ng-else/voice-to-text-bot"> 
@@ -16,6 +18,9 @@
     </span>
     <span>
         <img alt="Sonar Quality Gate" src="https://img.shields.io/sonar/quality_gate/n0th1ng-else_voice-to-text-bot?server=https%3A%2F%2Fsonarcloud.io"> 
+    </span>
+    <span>
+        <img alt="Sonar Coverage" src="https://img.shields.io/sonar/coverage/n0th1ng-else_voice-to-text-bot?server=https%3A%2F%2Fsonarcloud.io">
     </span>
 </div>
 
