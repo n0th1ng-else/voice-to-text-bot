@@ -3,12 +3,12 @@ import { sleepFor } from "./timer";
 
 const logger = new Logger("run-retry");
 
-export function runPromiseWithRetry(
+export function runPromiseWithRetry<D>(
   fnName: string,
-  fn: () => Promise<void>,
+  fn: () => Promise<D>,
   timeoutMs = 0,
   tries = 5
-): Promise<void> {
+): Promise<D> {
   if (!tries) {
     return Promise.reject(
       new Error(

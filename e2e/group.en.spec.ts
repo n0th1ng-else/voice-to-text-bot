@@ -29,6 +29,7 @@ import {
   mockTgReceiveMessage,
   mockTgReceiveMessages,
   mockTgReceiveRawMessage,
+  mockTgSetCommands,
   mockTgSetWebHook,
   sendTelegramCallbackMessage,
   sendTelegramMessage,
@@ -90,6 +91,7 @@ let tgMessage: TelegramMessageModel = new TelegramMessageModel(
 describe("[default language - english]", () => {
   beforeAll(() => {
     mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
+    mockTgSetCommands(telegramServer);
 
     const server = new ExpressServer(appPort, enableSSL, appVersion);
     return server

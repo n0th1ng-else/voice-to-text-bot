@@ -8,6 +8,7 @@ import { isMessageSupported } from "./helpers";
 import { runPromiseWithRetry } from "../common/helpers";
 import { getMd5Hash } from "../common/hash";
 import { BotActions } from "./actions";
+import { botCommands } from "./data";
 
 const logger = new Logger("telegram-bot");
 
@@ -42,11 +43,15 @@ export class TelegramBotModel {
     return this;
   }
 
-  public applyHostLocation(): Promise<void> {
+  public applyHostLocation(): Promise<boolean> {
     const hookUrl = `${this.host}${this.getPath()}`;
     logger.warn(`WebHook url is ${hookUrl}`);
     return runPromiseWithRetry("bot.applyHostLocation", () =>
       this.bot.setWebHook(hookUrl)
+    ).then(() =>
+      runPromiseWithRetry("bot.setMyCommands", () =>
+        this.bot.setMyCommands(botCommands)
+      )
     );
   }
 

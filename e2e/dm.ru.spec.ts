@@ -30,6 +30,7 @@ import {
   mockTgReceiveMessage,
   mockTgReceiveMessages,
   mockTgReceiveRawMessage,
+  mockTgSetCommands,
   mockTgSetWebHook,
   sendTelegramCallbackMessage,
   sendTelegramMessage,
@@ -92,6 +93,7 @@ let botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
 describe("[russian language]", () => {
   beforeAll(() => {
     mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
+    mockTgSetCommands(telegramServer);
 
     const server = new ExpressServer(appPort, enableSSL, appVersion);
     return server
