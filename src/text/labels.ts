@@ -51,7 +51,7 @@ export const labels = {
     [LabelId.InProgress]: "🎙 Processing voice message",
     [LabelId.RecognitionFailed]: "Unable to convert voice 😔",
     [LabelId.WelcomeMessage]:
-      "👋🏽 Hey here! Send me a voice message and I will show what they are talking about in plain text",
+      "👋🏽 Hey there! Send me a voice message and I will show what they are talking about in plain text",
     [LabelId.WelcomeMessageGroup]:
       "You can add me to a group so I will convert voice messages in there",
     [LabelId.ChangeLang]: "🆗 Language has changed",
@@ -59,7 +59,7 @@ export const labels = {
     [LabelId.WelcomeMessageMore]:
       "Don't forget to select the language you are going to recognise by typing the /lang command",
     [LabelId.GithubIssues]: "Send an issue",
-    [LabelId.ContactAuthor]: "Talk to author",
+    [LabelId.ContactAuthor]: "Talk to the author",
     [LabelId.SupportCommand]: "Support menu",
     [LabelId.LongVoiceMessage]:
       "Messages with duration more than 1 minute are not supported 🌚",
