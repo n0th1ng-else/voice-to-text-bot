@@ -18,6 +18,7 @@ import {
 import {
   mockTgGetWebHook,
   mockTgGetWebHookError,
+  mockTgSetCommands,
   mockTgSetWebHook,
 } from "./requests/telegram";
 import nock from "nock";
@@ -98,6 +99,8 @@ describe("[health]", () => {
   describe("starts with bots", () => {
     beforeEach(() => {
       mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
+      mockTgSetCommands(telegramServer);
+
       return server.setBots([bot]).applyHostLocation();
     });
 

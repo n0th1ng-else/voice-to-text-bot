@@ -12,6 +12,7 @@ import { TextModel } from "../../src/text";
 import { LanguageCode } from "../../src/recognition/types";
 import { LabelId } from "../../src/text/labels";
 import { BotButtonData } from "../../src/telegram/types";
+import { botCommands } from "../../src/telegram/data";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -46,6 +47,21 @@ export function sendTelegramCallbackMessage(
       expect(res.status).toBe(200);
       expect(res.body).toEqual({});
     });
+}
+
+export function mockTgSetCommands(host: nock.Scope) {
+  host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
+    const answer = typeof body === "string" ? parse(body) : body;
+    expect(answer.commands).toBeDefined();
+    const commands = JSON.parse(answer.commands);
+    expect(commands.length).toBe(botCommands.length);
+
+    botCommands.forEach((botCommand, ind) => {
+      expect(commands[ind].command).toBe(botCommand.command);
+      expect(commands[ind].description).toBe(botCommand.description);
+    });
+    return [200, telegramApiResponseOk];
+  });
 }
 
 export function mockTgSetWebHook(host: nock.Scope, hookUrl: string): void {

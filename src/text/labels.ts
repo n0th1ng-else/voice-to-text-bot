@@ -16,6 +16,9 @@ export enum LabelId {
   SupportCommand,
   LongVoiceMessage,
   UpdateLanguageError,
+  StartCommandDescription,
+  LanguageCommandDescription,
+  SupportCommandDescription,
 }
 
 export const labels = {
@@ -62,5 +65,8 @@ export const labels = {
       "Messages with duration more than 1 minute are not supported 🌚",
     [LabelId.UpdateLanguageError]:
       "Failed to update the language. Please try again later 😔",
+    [LabelId.LanguageCommandDescription]: "Switch the recognition language",
+    [LabelId.SupportCommandDescription]: "Show support links",
+    [LabelId.StartCommandDescription]: "Say hello and see bot info",
   },
 };

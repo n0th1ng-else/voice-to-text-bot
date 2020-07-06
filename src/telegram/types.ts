@@ -11,6 +11,8 @@ import {
 import { LanguageCode } from "../recognition/types";
 import { nanoid } from "nanoid";
 import { Logger } from "../logger";
+import { LabelId } from "../text/labels";
+import { TextModel } from "../text";
 
 export enum BotCommand {
   Start = "/start",
@@ -77,4 +79,13 @@ export class BotLangData {
     public readonly langId: LanguageCode,
     public readonly prefix: TelegramMessagePrefix
   ) {}
+}
+
+export class BotCommandOption {
+  public readonly description: string;
+
+  constructor(public readonly command: BotCommand, textId: LabelId) {
+    const textLib = new TextModel();
+    this.description = textLib.t(textId, LanguageCode.En);
+  }
 }

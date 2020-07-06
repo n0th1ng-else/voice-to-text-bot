@@ -14,7 +14,7 @@ import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
 import { localhostUrl, telegramUrl } from "../src/const";
 import { getMockCertificate } from "./helpers";
-import { mockTgSetWebHook } from "./requests/telegram";
+import { mockTgSetCommands, mockTgSetWebHook } from "./requests/telegram";
 import { mockGoogleAuth } from "./requests/google";
 
 jest.mock("../src/logger");
@@ -57,6 +57,7 @@ describe("error cases", () => {
   describe("server routes", () => {
     beforeAll(() => {
       mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
+      mockTgSetCommands(telegramServer);
 
       const server = new ExpressServer(appPort, enableSSL, appVersion);
       return server
