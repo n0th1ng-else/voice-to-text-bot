@@ -14,29 +14,46 @@ export class Logger {
     return red(message);
   }
 
+  private get prefix(): string {
+    const idPrefix = `[${this.id}]`;
+    const timePrefix = `[${this.time}]`;
+    return `${timePrefix} ${idPrefix}`;
+  }
+
+  private get time(): string {
+    const now = new Date();
+    const minute = 60_000;
+    const timezoneOffset = now.getTimezoneOffset() * minute;
+    const dateOffset = now.getTime() - timezoneOffset;
+    const localDate = new Date(dateOffset);
+    const timeLineStart = 0;
+    const timeLineSize = 23;
+    return localDate
+      .toISOString()
+      .slice(timeLineStart, timeLineSize)
+      .replace("T", " ");
+  }
+
   constructor(private readonly id: string = "") {}
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public info(msg: string, ...message: any[]): void {
-    const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.log(Logger.g(prefix), msg, ...message);
+    console.log(Logger.g(this.prefix), msg, ...message);
     sendLogs(LogType.Info, this.id, msg);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public warn(msg: string, ...data: any[]): void {
-    const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.warn(Logger.y(prefix), msg, ...data);
+    console.warn(Logger.y(this.prefix), msg, ...data);
     sendLogs(LogType.Warn, this.id, msg, data);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public error(msg: string, ...data: any[]): void {
-    const prefix = `[${this.id}]`;
     // eslint-disable-next-line no-console
-    console.error(Logger.r(prefix), Logger.r(msg), ...data);
+    console.error(Logger.r(this.prefix), Logger.r(msg), ...data);
     sendLogs(LogType.Error, this.id, msg, data);
   }
 }
