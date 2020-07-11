@@ -1,4 +1,3 @@
-import onExit from "signal-exit";
 import {
   appPort,
   enableSSL,
@@ -13,6 +12,7 @@ import {
   appVersion,
   ngRokToken,
   cacheSize,
+  memoryLimit,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -24,6 +24,9 @@ import { StatisticApi } from "../statistic";
 import { TelegramBotModel } from "../telegram/bot";
 import { ExpressServer } from "../server/express";
 import { getHostName } from "../server/tunnel";
+import { ScheduleDaemon } from "../scheduler";
+import { printCurrentMemoryStat } from "../memory";
+import { StopListener } from "../process";
 
 const logger = new Logger("start-script");
 
@@ -51,9 +54,10 @@ export function run(): void {
     authorTelegramAccount
   );
 
-  onExit((code, signal) =>
-    logger.error("Exit signal received", { code, signal })
-  );
+  const daemon = new ScheduleDaemon("memory", () =>
+    printCurrentMemoryStat(memoryLimit)
+  ).start();
+  const stopListener = new StopListener().addTrigger(() => daemon.stop());
 
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
@@ -61,7 +65,8 @@ export function run(): void {
       bot.setHostLocation(host);
       return server.setSelfUrl(host).setBots([bot]).setStat(stat).start();
     })
-    .then(() => {
+    .then((stopFn) => {
+      stopListener.addTrigger(() => stopFn());
       return server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval);
     })
     .catch((err) => logger.error("Failed to run the server", err));

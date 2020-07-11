@@ -1,4 +1,3 @@
-import onExit from "signal-exit";
 import {
   appPort,
   enableSSL,
@@ -22,6 +21,7 @@ import { getHostName } from "../server/tunnel";
 import { StatisticApi } from "../statistic";
 import { TelegramBotModel } from "../telegram/bot";
 import { ExpressServer } from "../server/express";
+import { StopListener } from "../process";
 
 const logger = new Logger("dev-script");
 
@@ -48,9 +48,7 @@ export function run(): void {
     authorTelegramAccount
   );
 
-  onExit((code, signal) =>
-    logger.error("Exit signal received", { code, signal })
-  );
+  const stopListener = new StopListener();
 
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
@@ -63,5 +61,6 @@ export function run(): void {
         .applyHostLocation();
     })
     .then(() => server.start())
+    .then((onStop) => stopListener.addTrigger(() => onStop()))
     .catch((err: Error) => logger.error("Failed to run dev instance", err));
 }
