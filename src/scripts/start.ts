@@ -61,7 +61,7 @@ export function run(): void {
 
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
-      logger.info(`Telling telegram our location is ${host}`);
+      logger.info(`Telling telegram our location is ${Logger.y(host)}`);
       bot.setHostLocation(host);
       return server.setSelfUrl(host).setBots([bot]).setStat(stat).start();
     })
