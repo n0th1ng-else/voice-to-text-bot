@@ -2,7 +2,6 @@ import { v1 } from "@google-cloud/speech";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { Logger } from "../logger";
 import { google } from "@google-cloud/speech/build/protos/protos";
-import IRecognizeResponse = google.cloud.speech.v1.IRecognizeResponse;
 import { getWav } from "../ogg";
 
 const logger = new Logger("google-recognition");
@@ -55,7 +54,7 @@ export class GoogleProvider extends VoiceConverter {
   }
 
   private unpackTranscription(
-    translationData: IRecognizeResponse
+    translationData: google.cloud.speech.v1.IRecognizeResponse
   ): Promise<string> {
     const res = translationData.results || [];
     const transcription = res

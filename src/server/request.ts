@@ -1,8 +1,12 @@
-import { get } from "https";
+import { get as httpsGet } from "https";
+import { get as httpGet } from "http";
 
 export function runGetDto<R>(url: string): Promise<R> {
   return new Promise<R>((resolve, reject) => {
-    get(url, (response) => {
+    const isHttps = /^https:\/\/.+/;
+    const getHandler = isHttps.test(url) ? httpsGet : httpGet;
+
+    getHandler(url, (response) => {
       let body = "";
       response.on("data", (chunk) => (body += chunk));
       response.on("end", () => {
@@ -19,7 +23,10 @@ export function runGetDto<R>(url: string): Promise<R> {
 
 export function runGetBuffer(url: string): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
-    get(url, (response) => {
+    const isHttps = /^https:\/\/.+/;
+    const getHandler = isHttps.test(url) ? httpsGet : httpGet;
+
+    getHandler(url, (response) => {
       const buff: Buffer[] = [];
       response.on("data", (chunk) => buff.push(chunk));
       response.on("error", (err) => reject(err));

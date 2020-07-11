@@ -1,4 +1,12 @@
 import request from "supertest";
+import {
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+  it,
+  describe,
+} from "@jest/globals";
 import { ExpressServer } from "../src/server/express";
 import { HealthSsl, HealthStatus } from "../src/server/types";
 import { appVersion } from "../src/env";
@@ -70,7 +78,11 @@ describe("[health]", () => {
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 
-  afterEach(() => stopHandler());
+  afterEach(() => {
+    return stopHandler().then(() => {
+      expect(telegramServer.isDone()).toBeTruthy();
+    });
+  });
 
   it("initial api access", () => {
     return host.get(path).then((res) => {
@@ -111,6 +123,18 @@ describe("[health]", () => {
         expect(res.body.ssl).toBe(HealthSsl.Off);
         expect(res.body.status).toBe(HealthStatus.Online);
         expect(res.body.urls).toEqual([`${hostUrl}${bot.getPath()}`]);
+        expect(res.body.version).toBe(appVersion);
+      });
+    });
+
+    it("shows okay health check with bot web hooks not owned by this node", () => {
+      const nextUrl = `${localhostUrl}-next`;
+      mockTgGetWebHook(telegramServer, `${nextUrl}${bot.getPath()}`);
+      return host.get(path).then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.body.ssl).toBe(HealthSsl.Off);
+        expect(res.body.status).toBe(HealthStatus.Online);
+        expect(res.body.urls).toEqual([`${nextUrl}${bot.getPath()}`]);
         expect(res.body.version).toBe(appVersion);
       });
     });

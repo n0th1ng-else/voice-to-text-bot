@@ -1,3 +1,4 @@
+import { expect } from "@jest/globals";
 import nock from "nock";
 import { UsageStatisticApi } from "../../../src/statistic/usage";
 import { LanguageCode } from "../../../src/recognition/types";

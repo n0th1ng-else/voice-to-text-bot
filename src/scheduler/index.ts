@@ -4,6 +4,7 @@ const logger = new Logger("daemon");
 
 export class ScheduleDaemon<TickData> {
   private readonly interval = 60_000;
+  private readonly printId: string;
   private handler: NodeJS.Timeout | null = null;
   private shouldStop?: (data: TickData) => boolean;
   private onFinish?: () => Promise<void>;
@@ -15,7 +16,9 @@ export class ScheduleDaemon<TickData> {
   constructor(
     private readonly id: string,
     private readonly onTick: () => Promise<TickData>
-  ) {}
+  ) {
+    this.printId = `[${this.id}]`;
+  }
 
   public setStopHandler(
     shouldStop: (data: TickData) => boolean,
@@ -28,11 +31,11 @@ export class ScheduleDaemon<TickData> {
 
   public start(): this {
     if (this.isRunning) {
-      logger.warn(`[${this.id}] Daemon is already running`);
+      logger.warn(`${Logger.y(this.printId)} Daemon is already running`);
       return this;
     }
 
-    logger.info(`[${this.id}] Launching the daemon`);
+    logger.info(`${Logger.g(this.printId)} Launching the daemon`);
     this.runTick();
     this.handler = setInterval(() => this.runTick(), this.interval);
     return this;
@@ -40,11 +43,11 @@ export class ScheduleDaemon<TickData> {
 
   public stop(): void {
     if (!this.isRunning) {
-      logger.warn(`[${this.id}] Daemon has already stopped`);
+      logger.warn(`${Logger.y(this.printId)} Daemon has already stopped`);
       return;
     }
 
-    logger.info(`[${this.id}] Stopping the daemon`);
+    logger.info(`${Logger.g(this.printId)} Stopping the daemon`);
 
     if (!this.handler) {
       throw new Error("Unable to clear the interval");
@@ -55,15 +58,17 @@ export class ScheduleDaemon<TickData> {
   }
 
   private runTick(): void {
-    logger.info(`[${this.id}] Running daemon tick`);
+    logger.info(`${Logger.g(this.printId)} Running daemon tick`);
     this.onTick()
       .then((data) => {
-        logger.info(`[${this.id}] Daemon tick executed successfully`);
+        logger.info(
+          `${Logger.g(this.printId)} Daemon tick executed successfully`
+        );
         return this.stopIfNeeded(data);
       })
       .catch((err) =>
         logger.error(
-          `[${this.id}] Error occurred during the tick execution`,
+          `${Logger.r(this.printId)} Error occurred during the tick execution`,
           err
         )
       );
@@ -74,13 +79,15 @@ export class ScheduleDaemon<TickData> {
       return Promise.resolve();
     }
 
-    logger.info(`[${this.id}] Evaluating if daemon needs to stop`);
+    logger.info(`${Logger.g(this.printId)} Evaluating if daemon needs to stop`);
     if (!this.shouldStop(data)) {
-      logger.info(`[${this.id}] Daemon up to the next tick`);
+      logger.info(
+        `${Logger.g(this.printId)} Daemon is live and waiting for the next tick`
+      );
       return Promise.resolve();
     }
 
-    logger.info(`[${this.id}] Daemon is about to stop`);
+    logger.info(`${Logger.g(this.printId)} Daemon is about to stop`);
     return this.onFinish().then(() => this.stop());
   }
 }

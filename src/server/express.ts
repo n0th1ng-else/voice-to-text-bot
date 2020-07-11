@@ -5,25 +5,20 @@ import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
 import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
 import { HealthDto, HealthSsl, HealthStatus } from "./types";
-import { runGetDto } from "./request";
 import { StatisticApi } from "../statistic";
-import { sleepForRandom } from "../common/timer";
 import { sSuffix } from "../text";
+import { UptimeDaemon } from "./uptime";
 
 const logger = new Logger("server");
 
 export class ExpressServer {
-  private readonly daemonInterval = 60_000;
   private readonly app = express();
   private readonly httpsOptions: HttpsOptions;
+  private readonly uptimeDaemon: UptimeDaemon;
 
   private stat: StatisticApi | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
-  private lifecycleInterval = 1;
-  private nextReplicaUrl = "";
-  private daemon: NodeJS.Timeout | null = null;
-  private daysRunning: number[] = [];
   private selfUrl = "";
 
   constructor(
@@ -32,6 +27,8 @@ export class ExpressServer {
     private readonly version: string
   ) {
     logger.info("Initializing express server");
+
+    this.uptimeDaemon = new UptimeDaemon(version);
 
     this.httpsOptions = {
       cert: httpsCert,
@@ -79,6 +76,7 @@ export class ExpressServer {
 
   public setStat(stat: StatisticApi): this {
     this.stat = stat;
+    this.uptimeDaemon.setStat(stat);
     return this;
   }
 
@@ -129,9 +127,9 @@ export class ExpressServer {
           () =>
             new Promise((resolveFn, rejectFn) => {
               logger.warn("Shutting down the server instance");
-              if (this.daemon) {
-                logger.warn("Stopping daemon");
-                clearInterval(this.daemon);
+              if (this.uptimeDaemon.isRunning) {
+                logger.warn("Stopping the daemon");
+                this.uptimeDaemon.stop();
               }
 
               server.close((err) => {
@@ -151,9 +149,11 @@ export class ExpressServer {
   }
 
   public applyHostLocation(): Promise<void> {
+    logger.info("Setting up bot hooks");
     return Promise.all(this.bots.map((bot) => bot.applyHostLocation())).then(
       () => {
         this.isIdle = false;
+        logger.info("Node is successfully set to be a hook receiver");
       }
     );
   }
@@ -161,125 +161,35 @@ export class ExpressServer {
   public triggerDaemon(
     nextReplicaUrl: string,
     lifecycleInterval: number
-  ): void {
+  ): Promise<void> {
+    if (!this.selfUrl) {
+      return Promise.reject(
+        new Error(
+          "Self url is not set for this node. Unable to set up the daemon"
+        )
+      );
+    }
+
     if (!nextReplicaUrl) {
-      logger.warn(
-        "Next replica url is not set for this node. Unable to set up the daemon"
-      );
-      return;
-    }
-
-    if (lifecycleInterval < 1) {
-      logger.warn(
-        `Lifecycle interval can not be less than 1 day. Falling back to 1 (Received ${lifecycleInterval})`
+      return Promise.reject(
+        new Error(
+          "Next node url is not set for this node. Unable to set up the daemon"
+        )
       );
     }
 
-    this.lifecycleInterval = lifecycleInterval < 1 ? 1 : lifecycleInterval;
-    this.nextReplicaUrl = nextReplicaUrl;
-    this.daysRunning = [];
-    logger.info(
-      `Lifecycle interval is set to ${Logger.y(
-        sSuffix("day", this.lifecycleInterval)
-      )}`
-    );
+    this.uptimeDaemon
+      .setUrls(this.selfUrl, nextReplicaUrl)
+      .setIntervalDays(lifecycleInterval);
 
-    sleepForRandom()
-      .then(() => this.applyHostLocation())
-      .then(() => this.scheduleDaemon())
-      .then(
-        () =>
-          this.stat &&
-          this.stat.node.toggleActive(this.selfUrl, true, this.version)
-      )
-      .catch((err) => logger.error("Unable to schedule replica", err));
-  }
+    return this.applyHostLocation().then(() => {
+      this.uptimeDaemon.start();
 
-  private scheduleDaemon(): void {
-    this.runDaemon();
-    this.daemon = setInterval(() => this.runDaemon(), this.daemonInterval);
-  }
+      if (!this.stat) {
+        return;
+      }
 
-  private runDaemon(): void {
-    const currentDay = new Date().getDate();
-    if (!this.daysRunning.includes(currentDay)) {
-      this.daysRunning.push(currentDay);
-    }
-
-    const daysRunning = this.daysRunning.join(", ");
-    logger.info(
-      `Daemon tick. Today is ${Logger.y(
-        currentDay
-      )} and I have been running for (${Logger.y(daysRunning)}) already`
-    );
-    const currentInterval = this.daysRunning.length;
-    if (currentInterval > this.lifecycleInterval) {
-      logger.warn(
-        "Lifecycle limit reached. Delegating execution to the next node"
-      );
-      runGetDto<HealthDto>(this.getHealthUrl(this.nextReplicaUrl))
-        .then((health) => {
-          if (health.status !== HealthStatus.Online) {
-            logger.error("Buddy replica status is not ok", health);
-            return;
-          }
-
-          if (!this.daemon) {
-            return;
-          }
-          clearInterval(this.daemon);
-          this.daysRunning = [];
-          this.isIdle = true;
-
-          logger.warn(
-            `Delegated callback to the buddy node. Daemon stopped and ${Logger.y(
-              "I am going to hibernate"
-            )}`
-          );
-
-          return (
-            this.stat &&
-            this.stat.node.toggleActive(this.selfUrl, false, this.version)
-          );
-        })
-        .catch((err) =>
-          logger.error("Unable to delegate logic. Keep working", err)
-        );
-      return;
-    }
-
-    runGetDto<HealthDto>(this.getHealthUrl())
-      .then((health) => {
-        if (health.status !== HealthStatus.Online) {
-          logger.error("Replica status is not ok", health);
-          return;
-        }
-        logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
-
-        const isCallbackOwner = health.urls.every((url) =>
-          url.includes(this.selfUrl)
-        );
-
-        if (!isCallbackOwner && this.daemon) {
-          clearInterval(this.daemon);
-          this.daysRunning = [];
-          this.isIdle = true;
-
-          logger.warn(
-            `Callback is not owner by this node. Daemon stopped and ${Logger.y(
-              "I am going to hibernate"
-            )}`
-          );
-          return (
-            this.stat &&
-            this.stat.node.toggleActive(this.selfUrl, false, this.version)
-          );
-        }
-      })
-      .catch((err) => logger.error("Unable to ping myself!", err));
-  }
-
-  private getHealthUrl(url = this.selfUrl): string {
-    return `${url}/health`;
+      return this.stat.node.toggleActive(this.selfUrl, true, this.version);
+    });
   }
 }
