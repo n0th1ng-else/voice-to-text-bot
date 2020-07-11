@@ -45,7 +45,7 @@ export class TelegramBotModel {
 
   public applyHostLocation(): Promise<boolean> {
     const hookUrl = `${this.host}${this.getPath()}`;
-    logger.warn(`WebHook url is ${hookUrl}`);
+    logger.warn(`WebHook url is ${Logger.y(hookUrl)}`);
     return runPromiseWithRetry("bot.applyHostLocation", () =>
       this.bot.setWebHook(hookUrl)
     ).then(() =>
