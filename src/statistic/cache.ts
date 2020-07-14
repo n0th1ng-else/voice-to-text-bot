@@ -42,6 +42,8 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return;
     }
 
+    logger.info(`Adding cache item with ${this.idKey}=${item[this.idKey]}`);
+
     const existingItem = this.cache.find(
       (cItem) => cItem[this.idKey] === item[this.idKey]
     );
@@ -83,6 +85,8 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return null;
     }
 
+    logger.info(`Looking for item with ${this.idKey}=${idValue} in cache`);
+
     const cachedItem = this.cache.find(
       (cItem) => cItem[this.idKey] === idValue
     );
@@ -94,9 +98,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return null;
     }
 
-    logger.info(
-      `Found the item with ${this.idKey}=${idValue} in cache. Skipping DB request`
-    );
+    logger.info(`Found the item with ${this.idKey}=${idValue} in cache`);
     return cachedItem;
   }
 
@@ -105,11 +107,17 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return;
     }
 
+    logger.info(`Removing cache item for ${this.idKey}=${idValue}`);
+
     this.cache = this.cache.filter((cItem) => cItem[this.idKey] !== idValue);
 
     logger.info(
       `Removed cache item for ${this.idKey}=${idValue}. Cache size=${this.cache.length}`
     );
+  }
+
+  public getCacheSize(): number {
+    return this.cache.length;
   }
 
   private hasCacheEnabled(): boolean {
