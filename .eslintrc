@@ -16,6 +16,8 @@
   "rules": {
     "no-mixed-spaces-and-tabs": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "no-console": "error"
+    "no-console": "error",
+    "@typescript-eslint/prefer-namespace-keyword": "off",
+    "@typescript-eslint/no-namespace": "warn"
   }
 }

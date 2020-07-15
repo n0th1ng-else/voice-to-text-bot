@@ -50,11 +50,11 @@ export function sendTelegramCallbackMessage(
     });
 }
 
-export function mockTgSetCommands(host: nock.Scope) {
+export function mockTgSetCommands(host: nock.Scope): void {
   host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
     const answer = typeof body === "string" ? parse(body) : body;
     expect(answer.commands).toBeDefined();
-    const commands = JSON.parse(answer.commands);
+    const commands = answer.commands;
     expect(commands.length).toBe(botCommands.length);
 
     botCommands.forEach((botCommand, ind) => {
@@ -66,9 +66,11 @@ export function mockTgSetCommands(host: nock.Scope) {
 }
 
 export function mockTgSetWebHook(host: nock.Scope, hookUrl: string): void {
-  host
-    .post(`/bottelegram-api-token/setWebHook?url=${hookUrl}`)
-    .reply(200, telegramApiResponseOk);
+  host.post("/bottelegram-api-token/setWebHook").reply(200, (uri, body) => {
+    const answer = typeof body === "string" ? parse(body) : body;
+    expect(answer.url).toBe(hookUrl);
+    return telegramApiResponseOk;
+  });
 }
 
 export function mockTgGetWebHook(host: nock.Scope, hookUrl: string): void {
@@ -93,7 +95,7 @@ export function mockTgReceiveRawMessage(
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
       const answer = typeof body === "string" ? parse(body) : body;
-      expect(answer.chat_id).toBe(String(chatId));
+      expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(message);
       resolve();
       return telegramApiResponseOk;
@@ -111,12 +113,12 @@ export function mockTgReceiveMessage(
   return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
       const answer = typeof body === "string" ? parse(body) : body;
-      expect(answer.chat_id).toBe(String(chatId));
+      expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(text.t(textId, lang));
       let prefixId = "";
       if (meta) {
         expect(answer.reply_markup).toBeDefined();
-        let metaItems = JSON.parse(answer.reply_markup).inline_keyboard;
+        let metaItems = answer.reply_markup.inline_keyboard;
         expect(metaItems).toBeDefined();
 
         if (meta.type === TelegramMessageMetaType.Link) {
@@ -202,9 +204,9 @@ export function mockTgReceiveCallbackMessage(
       .post("/bottelegram-api-token/editMessageText")
       .reply(200, (uri, body) => {
         const answer = typeof body === "string" ? parse(body) : body;
-        expect(answer.chat_id).toBe(String(chatId));
+        expect(answer.chat_id).toBe(chatId);
         expect(answer.text).toBe(text.t(textId, langId));
-        expect(answer.message_id).toBe(String(messageId));
+        expect(answer.message_id).toBe(messageId);
         resolve();
         return telegramApiResponseOk;
       });

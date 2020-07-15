@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TelegramApi } from "../api";
 import { StatisticApi } from "../../statistic";
 import { StartAction } from "./start";
 import { LangAction } from "./lang";
@@ -13,7 +13,7 @@ export class BotActions {
   public readonly voice: VoiceAction;
   public readonly core: CoreAction;
 
-  constructor(stat: StatisticApi, bot: TelegramBot) {
+  constructor(stat: StatisticApi, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
     this.lang = new LangAction(stat, bot);
     this.support = new SupportAction(stat, bot);

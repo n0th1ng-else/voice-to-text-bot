@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TgInlineKeyboardButton, TgMessage } from "../api/types";
 import {
   BotMessageModel,
   MessageOptions,
@@ -9,6 +9,7 @@ import { Logger } from "../../logger";
 import { StatisticApi } from "../../statistic";
 import { TextModel } from "../../text";
 import { LabelId } from "../../text/labels";
+import { TelegramApi } from "../api";
 
 const logger = new Logger("telegram-bot");
 
@@ -17,19 +18,16 @@ export abstract class GenericAction {
 
   constructor(
     protected readonly stat: StatisticApi,
-    protected readonly bot: TelegramBot
+    protected readonly bot: TelegramApi
   ) {}
 
   public abstract runAction(
-    msg: TelegramBot.Message,
+    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void>;
 
-  public abstract runCondition(
-    msg: TelegramBot.Message,
-    mdl: BotMessageModel
-  ): boolean;
+  public abstract runCondition(msg: TgMessage, mdl: BotMessageModel): boolean;
 
   public getChatLanguage(
     model: BotMessageModel,
@@ -86,10 +84,7 @@ export abstract class GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.bot
-      .editMessageText(this.text.t(id, lang), {
-        chat_id: chatId,
-        message_id: messageId,
-      })
+      .editMessageText(chatId, messageId, this.text.t(id, lang))
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`))
       .catch((err) =>
         logger.error(`${prefix.getPrefix()} Unable to edit the message`, err)
@@ -99,7 +94,7 @@ export abstract class GenericAction {
   protected sendRawMessage(
     chatId: number,
     message: string,
-    options?: TelegramBot.SendMessageOptions
+    options?: TgInlineKeyboardButton[][]
   ): Promise<void> {
     return this.bot.sendMessage(chatId, message, options).then(() => {
       // Empty promise result

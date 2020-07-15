@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import { isHelloMessage } from "../helpers";
 import { BotMessageModel, TelegramMessagePrefix } from "../types";
@@ -9,14 +9,14 @@ const logger = new Logger("telegram-bot");
 
 export class StartAction extends GenericAction {
   public runAction(
-    msg: TelegramBot.Message,
+    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.sendHelloMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TelegramBot.Message, mdl: BotMessageModel): boolean {
+  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
     return isHelloMessage(mdl, msg);
   }
 

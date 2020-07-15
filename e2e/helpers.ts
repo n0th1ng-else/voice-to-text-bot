@@ -1,4 +1,3 @@
-import TelegramBot from "node-telegram-bot-api";
 import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
 import { LanguageCode } from "../src/recognition/types";
@@ -6,6 +5,11 @@ import { LabelId } from "../src/text/labels";
 import { UsageStatKey } from "../src/statistic/types";
 import { randomIntFromInterval } from "../src/common/timer";
 import { BotButtonData } from "../src/telegram/types";
+import {
+  TgCallbackQuery,
+  TgChatType,
+  TgMessage,
+} from "../src/telegram/api/types";
 
 interface UserNameOptions {
   userName?: string;
@@ -27,7 +31,7 @@ export class TelegramMessageModel {
 
   constructor(
     public readonly chatId: number,
-    public readonly chatType: TelegramChatType
+    public readonly chatType: TgChatType
   ) {}
 
   public setName(
@@ -71,7 +75,7 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public toApi(): TelegramBot.Message {
+  public toApi(): TgMessage {
     return {
       text: this.text,
       message_id: this.messageId,
@@ -98,7 +102,7 @@ export class TelegramMessageModel {
     };
   }
 
-  public toCallbackApi(): TelegramBot.CallbackQuery {
+  public toCallbackApi(): TgCallbackQuery {
     return {
       data: this.callbackData,
       id: "",
@@ -118,15 +122,8 @@ export class TelegramMessageModel {
           type: this.chatType,
         },
       },
-      chat_instance: "",
     };
   }
-}
-
-export enum TelegramChatType {
-  Private = "private",
-  Group = "group",
-  Channel = "channel",
 }
 
 export enum TelegramMessageMetaType {
@@ -167,7 +164,7 @@ export class BotStatRecordModel {
     return this;
   }
 
-  public getDto() {
+  public getDto(): Record<string, string | number | undefined> {
     return {
       objectId: this.objectId,
       [UsageStatKey.ChatId]: this.chatId,

@@ -10,7 +10,7 @@ import {
 import { ExpressServer } from "../src/server/express";
 import { HealthSsl, HealthStatus } from "../src/server/types";
 import { appVersion } from "../src/env";
-import { localhostUrl, telegramUrl } from "../src/const";
+import { localhostUrl } from "../src/const";
 import { TelegramBotModel } from "../src/telegram/bot";
 import { StatisticApi } from "../src/statistic";
 import { mockGoogleAuth } from "./requests/google";
@@ -30,6 +30,7 @@ import {
   mockTgSetWebHook,
 } from "./requests/telegram";
 import nock from "nock";
+import { TelegramApi } from "../src/telegram/api";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -61,7 +62,7 @@ const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
 const bot = new TelegramBotModel("telegram-api-token", converter, stat);
 bot.setHostLocation(hostUrl);
 
-const telegramServer = nock(telegramUrl);
+const telegramServer = nock(TelegramApi.url);
 const host = request(`${localhostUrl}:${appPort}`);
 const path = "/health";
 

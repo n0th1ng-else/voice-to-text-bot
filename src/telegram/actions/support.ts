@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TgInlineKeyboardButton, TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import { BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isSupportMessage } from "../helpers";
@@ -12,18 +12,18 @@ export class SupportAction extends GenericAction {
   private authorUrl?: string;
 
   public runAction(
-    msg: TelegramBot.Message,
+    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.sendSupportMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TelegramBot.Message, mdl: BotMessageModel): boolean {
+  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
     return isSupportMessage(mdl, msg);
   }
 
-  public setAuthorUrl(url: string) {
+  public setAuthorUrl(url: string): void {
     this.authorUrl = url;
   }
 
@@ -35,7 +35,7 @@ export class SupportAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const buttons: TelegramBot.InlineKeyboardButton[] = [];
+        const buttons: TgInlineKeyboardButton[] = [];
         buttons.push({
           text: this.text.t(LabelId.GithubIssues, lang),
           url: githubUrl,
@@ -54,11 +54,7 @@ export class SupportAction extends GenericAction {
           LabelId.SupportCommand,
           {
             lang,
-            options: {
-              reply_markup: {
-                inline_keyboard: [buttons],
-              },
-            },
+            options: [buttons],
           },
           prefix
         );

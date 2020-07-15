@@ -21,10 +21,11 @@ import {
 } from "../src/recognition";
 import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
-import { localhostUrl, telegramUrl } from "../src/const";
+import { localhostUrl } from "../src/const";
 import { getMockCertificate } from "./helpers";
 import { mockTgSetCommands, mockTgSetWebHook } from "./requests/telegram";
 import { mockGoogleAuth } from "./requests/google";
+import { TelegramApi } from "../src/telegram/api";
 
 jest.mock("../src/logger");
 
@@ -55,7 +56,7 @@ const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
 const bot = new TelegramBotModel("telegram-api-token", converter, stat);
 bot.setHostLocation(hostUrl);
 
-const telegramServer = nock(telegramUrl);
+const telegramServer = nock(TelegramApi.url);
 const dbServer = nock(dbUrl);
 const host = request(hostUrl);
 

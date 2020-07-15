@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import { BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isVoiceMessage, isVoiceMessageLong } from "../helpers";
@@ -12,7 +12,7 @@ export class VoiceAction extends GenericAction {
   private converter?: VoiceConverter;
 
   public runAction(
-    msg: TelegramBot.Message,
+    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
@@ -31,11 +31,11 @@ export class VoiceAction extends GenericAction {
     );
   }
 
-  public runCondition(msg: TelegramBot.Message, mdl: BotMessageModel): boolean {
+  public runCondition(msg: TgMessage): boolean {
     return isVoiceMessage(msg);
   }
 
-  public setConverter(converter: VoiceConverter) {
+  public setConverter(converter: VoiceConverter): void {
     this.converter = converter;
   }
 
