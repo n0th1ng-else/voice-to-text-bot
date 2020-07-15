@@ -15,7 +15,7 @@ export class Logger {
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public info(...messages: any[]): void {
-    this.output(...messages);
+    // this.output(...messages);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any

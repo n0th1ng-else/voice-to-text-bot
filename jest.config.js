@@ -15,9 +15,6 @@ module.exports = () => {
   const commonConfig = {
     rootDir: ".",
     testEnvironment: "node",
-    transform: {
-      "\\.ts$": ["ts-jest"],
-    },
     coveragePathIgnorePatterns: ["/node_modules/"],
     reporters: ["default", "jest-sonar"],
   };

@@ -1,3 +1,4 @@
+import { it, describe, expect } from "@jest/globals";
 import { getHostName } from "./tunnel";
 
 describe("Tunnel handling", () => {

@@ -62,7 +62,7 @@ export class VoiceAction extends GenericAction {
         )
       )
       .then(() =>
-        logger.info(`${prefix.getPrefix()} Voice is too message sent`)
+        logger.info(`${prefix.getPrefix()} Voice is too long message sent`)
       )
       .catch((err) =>
         logger.error(
