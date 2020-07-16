@@ -1,3 +1,4 @@
+import Parse from "parse/node";
 import { NodeStatisticApi } from "./nodes";
 import { UsageStatisticApi } from "./usage";
 
@@ -12,13 +13,9 @@ export class StatisticApi {
     masterKey: string,
     cacheSize: number
   ) {
-    this.node = new NodeStatisticApi(statUrl, appId, appKey, masterKey);
-    this.usage = new UsageStatisticApi(
-      statUrl,
-      appId,
-      appKey,
-      masterKey,
-      cacheSize
-    );
+    Parse.serverURL = statUrl;
+    Parse.initialize(appId, appKey, masterKey);
+    this.node = new NodeStatisticApi();
+    this.usage = new UsageStatisticApi(cacheSize);
   }
 }

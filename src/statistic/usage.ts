@@ -10,23 +10,19 @@ export class UsageStatisticApi {
   public static readonly dbClass = "BotStat";
   private cache: CacheProvider<UsageStatCache, UsageStatKey.ChatId>;
 
-  constructor(
-    statUrl: string,
-    appId: string,
-    appKey: string,
-    masterKey: string,
-    cacheSize: number
-  ) {
-    Parse.serverURL = statUrl;
-    Parse.initialize(appId, appKey, masterKey);
+  constructor(cacheSize: number) {
     this.cache = new CacheProvider<UsageStatCache, UsageStatKey.ChatId>(
       cacheSize,
       UsageStatKey.ChatId
     );
   }
 
-  public updateUsageCount(chatId: number, username: string): Promise<void> {
-    return this.getStatIfNotExists(chatId, username).then((stat) =>
+  public updateUsageCount(
+    chatId: number,
+    username: string,
+    lang: LanguageCode
+  ): Promise<void> {
+    return this.getStatIfNotExists(chatId, username, lang).then((stat) =>
       this.updateStatCount(stat, username)
     );
   }
@@ -39,13 +35,17 @@ export class UsageStatisticApi {
     );
   }
 
-  public getLanguage(chatId: number, username: string): Promise<LanguageCode> {
+  public getLanguage(
+    chatId: number,
+    username: string,
+    lang: LanguageCode
+  ): Promise<LanguageCode> {
     const cachedItem = this.cache.getItem(chatId);
     if (cachedItem) {
       return Promise.resolve(cachedItem[UsageStatKey.LangId]);
     }
 
-    return this.getStatIfNotExists(chatId, username).then((stat) => {
+    return this.getStatIfNotExists(chatId, username, lang).then((stat) => {
       this.addCacheItem(stat);
       return stat.get(UsageStatKey.LangId);
     });
@@ -64,9 +64,10 @@ export class UsageStatisticApi {
 
   private getStatIfNotExists(
     chatId: number,
-    username?: string
+    username?: string,
+    lang?: LanguageCode
   ): Promise<Parse.Object> {
-    return this.getStatId(chatId, username).then((statId) =>
+    return this.getStatId(chatId, username, lang).then((statId) =>
       this.getStat(statId)
     );
   }
@@ -121,7 +122,11 @@ export class UsageStatisticApi {
     return query.get(statId);
   }
 
-  private getStatId(chatId: number, username?: string): Promise<string> {
+  private getStatId(
+    chatId: number,
+    username?: string,
+    lang = LanguageCode.En
+  ): Promise<string> {
     logger.info(`Looking for statId for chatId ${Logger.y(chatId)}`);
 
     const BotStatClass = Parse.Object.extend(UsageStatisticApi.dbClass);
@@ -132,7 +137,7 @@ export class UsageStatisticApi {
     return query.find().then((results) => {
       switch (results.length) {
         case 0: // No items in the DB
-          return this.createStat(chatId, LanguageCode.En, username);
+          return this.createStat(chatId, lang, username);
         case 1: // Single item in the DB
           return this.getFirstResultIdInArray(results);
         default:

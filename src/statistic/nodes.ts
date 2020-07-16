@@ -7,16 +7,6 @@ const logger = new Logger("db");
 export class NodeStatisticApi {
   public static readonly dbClass = "NodeStat";
 
-  constructor(
-    statUrl: string,
-    appId: string,
-    appKey: string,
-    masterKey: string
-  ) {
-    Parse.serverURL = statUrl;
-    Parse.initialize(appId, appKey, masterKey);
-  }
-
   public toggleActive(
     selfUrl: string,
     active: boolean,

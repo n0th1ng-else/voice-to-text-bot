@@ -148,7 +148,12 @@ describe("[russian language]", () => {
 
     it("responds on a /start message", () => {
       tgMessage.setText(testMessageId, BotCommand.Start);
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -170,7 +175,12 @@ describe("[russian language]", () => {
         testMessageId,
         `${BotCommand.Start}@${telegramBotName}`
       );
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -189,7 +199,12 @@ describe("[russian language]", () => {
 
     it("responds on a /support message", () => {
       tgMessage.setText(testMessageId, BotCommand.Support);
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -210,7 +225,12 @@ describe("[russian language]", () => {
         testMessageId,
         `${BotCommand.Support}@${telegramBotName}`
       );
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -230,7 +250,12 @@ describe("[russian language]", () => {
       const authorUrl = "some-author-url";
       bot.setAuthor(authorUrl);
       tgMessage.setText(testMessageId, BotCommand.Support);
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -255,7 +280,12 @@ describe("[russian language]", () => {
         `${BotCommand.Support}@${telegramBotName}`
       );
 
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -274,7 +304,12 @@ describe("[russian language]", () => {
 
     it("responds on a /lang message", () => {
       tgMessage.setText(testMessageId, BotCommand.Language);
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -296,7 +331,12 @@ describe("[russian language]", () => {
         testMessageId,
         `${BotCommand.Language}@${telegramBotName}`
       );
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -315,7 +355,12 @@ describe("[russian language]", () => {
 
     it("changes language using the /lang callback message", () => {
       tgMessage.setText(testMessageId, BotCommand.Language);
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -352,7 +397,12 @@ describe("[russian language]", () => {
         testMessageId,
         `${BotCommand.Language}@${telegramBotName}`
       );
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -390,7 +440,12 @@ describe("[russian language]", () => {
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
 
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
       mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
@@ -416,7 +471,12 @@ describe("[russian language]", () => {
       const userName = "test-user";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       tgMessage.setName(testMessageId, { userName });
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
       mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
@@ -447,7 +507,12 @@ describe("[russian language]", () => {
         userName,
         firstName,
       });
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
       mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
@@ -478,7 +543,12 @@ describe("[russian language]", () => {
         userName,
         lastName,
       });
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
       mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
@@ -511,7 +581,12 @@ describe("[russian language]", () => {
         firstName,
         lastName,
       });
-      const statModel = mockGetBotStatItem(dbServer, tgMessage.chatId, botStat);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        botStat.langId,
+        botStat
+      );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
       mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
