@@ -240,8 +240,8 @@ describe("[russian language]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
             new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
+            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])
         ),
       ]);
@@ -265,8 +265,8 @@ describe("[russian language]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
             new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
+            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])
         ),
       ]);

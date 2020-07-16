@@ -35,18 +35,19 @@ export class SupportAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const buttons: TgInlineKeyboardButton[] = [];
-        buttons.push({
+        const issueBtn: TgInlineKeyboardButton = {
           text: this.text.t(LabelId.GithubIssues, lang),
           url: githubUrl,
-        });
+        };
 
-        if (this.authorUrl) {
-          buttons.push({
-            text: this.text.t(LabelId.ContactAuthor, lang),
-            url: this.authorUrl,
-          });
-        }
+        const authorBtn: TgInlineKeyboardButton = {
+          text: this.text.t(LabelId.ContactAuthor, lang),
+          url: this.authorUrl,
+        };
+
+        const buttons: TgInlineKeyboardButton[][] = this.authorUrl
+          ? [[authorBtn], [issueBtn]]
+          : [[issueBtn]];
 
         return this.sendMessage(
           model.id,
@@ -54,7 +55,7 @@ export class SupportAction extends GenericAction {
           LabelId.SupportCommand,
           {
             lang,
-            options: [buttons],
+            options: buttons,
           },
           prefix
         );
