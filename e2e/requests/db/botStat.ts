@@ -10,11 +10,12 @@ const path = `/classes/${UsageStatisticApi.dbClass}`;
 export function mockGetBotStatItem(
   host: nock.Scope,
   chatId: number,
+  lang: LanguageCode,
   item?: BotStatRecordModel
 ): BotStatRecordModel {
   if (!item) {
     mockBotStatFind(host, chatId);
-    const stat = mockBotStatCreate(host, chatId, "");
+    const stat = mockBotStatCreate(host, chatId, "", lang);
     mockBotStatGet(host, stat);
     return stat;
   }
@@ -63,9 +64,10 @@ function mockBotStatFind(
 function mockBotStatCreate(
   host: nock.Scope,
   chatId: number,
-  userName: string
+  userName: string,
+  lang: LanguageCode
 ): BotStatRecordModel {
-  const stat = new BotStatRecordModel(chatId, LanguageCode.En);
+  const stat = new BotStatRecordModel(chatId, lang);
   const objectId = randomIntFromInterval(1, 100000);
   stat.setObjectId(objectId).setUserName(userName);
 

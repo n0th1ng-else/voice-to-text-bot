@@ -28,6 +28,7 @@ export class TelegramMessageModel {
   private firstName = "";
   private lastName = "";
   private userName = "";
+  private userLanguage = "";
 
   constructor(
     public readonly chatId: number,
@@ -37,7 +38,8 @@ export class TelegramMessageModel {
   public setName(
     messageId: number,
     options: UserNameOptions,
-    isBot = false
+    isBot = false,
+    lang = ""
   ): this {
     this.messageId = messageId;
     this.isBot = isBot;
@@ -45,6 +47,7 @@ export class TelegramMessageModel {
     this.firstName = options.firstName || "";
     this.lastName = options.lastName || "";
     this.userName = options.userName || "";
+    this.userLanguage = lang;
     return this;
   }
 
@@ -87,6 +90,7 @@ export class TelegramMessageModel {
             first_name: this.firstName,
             last_name: this.lastName,
             username: this.userName,
+            language_code: this.userLanguage,
           }
         : undefined,
       chat: {

@@ -2,6 +2,7 @@ import {
   getChatId,
   getFullUserName,
   getGroupName,
+  getUserLanguage,
   getUserName,
   getVoiceDuration,
   getVoiceFile,
@@ -29,6 +30,7 @@ export class BotMessageModel {
   public readonly groupName: string;
   public readonly voiceFileId: string;
   public readonly voiceDuration: number;
+  public readonly userLanguage: LanguageCode;
 
   constructor(msg: TgMessage) {
     this.id = msg.message_id;
@@ -39,6 +41,7 @@ export class BotMessageModel {
     this.groupName = getGroupName(msg);
     this.voiceFileId = getVoiceFile(msg);
     this.voiceDuration = getVoiceDuration(msg);
+    this.userLanguage = getUserLanguage(msg);
   }
 
   public get name(): string {

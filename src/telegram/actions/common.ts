@@ -40,7 +40,7 @@ export abstract class GenericAction {
 
     logger.info(`${prefix.getPrefix()} Fetching language`);
     return this.stat.usage
-      .getLanguage(model.chatId, model.name)
+      .getLanguage(model.chatId, model.name, model.userLanguage)
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to get the lang`, err);
         return this.text.fallbackLanguage;

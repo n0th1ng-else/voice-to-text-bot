@@ -168,7 +168,7 @@ export class VoiceAction extends GenericAction {
     logger.info(`${prefix.getPrefix()} Updating usage count`);
 
     return this.stat.usage
-      .updateUsageCount(model.chatId, model.name)
+      .updateUsageCount(model.chatId, model.name, model.userLanguage)
       .then(() => logger.info(`${prefix.getPrefix()} Usage count updated`))
       .catch((err) =>
         logger.error(`${prefix.getPrefix()} Unable to update usage count`, err)
