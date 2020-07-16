@@ -55,7 +55,7 @@ export function mockTgSetCommands(host: nock.Scope): void {
     const answer = typeof body === "string" ? parse(body) : body;
     expect(answer.commands).toBeDefined();
     const commands = answer.commands;
-    expect(commands.length).toBe(botCommands.length);
+    expect(commands).toHaveLength(botCommands.length);
 
     botCommands.forEach((botCommand, ind) => {
       expect(commands[ind].command).toBe(botCommand.command);
@@ -118,39 +118,31 @@ export function mockTgReceiveMessage(
       let prefixId = "";
       if (meta) {
         expect(answer.reply_markup).toBeDefined();
-        let metaItems = answer.reply_markup.inline_keyboard;
+        const metaItems = answer.reply_markup.inline_keyboard;
         expect(metaItems).toBeDefined();
 
-        if (meta.type === TelegramMessageMetaType.Link) {
-          expect(metaItems).toHaveLength(1);
-          metaItems = metaItems.shift();
-          expect(metaItems).toHaveLength(meta.items.length);
+        expect(metaItems).toHaveLength(meta.items.length);
+        metaItems.forEach((metaItem, ind) => {
+          const itemInfo = metaItem.shift();
+          const metaItemInfo = meta.items[ind];
 
-          metaItems.forEach((metaItem, ind) => {
-            const itemInfo = metaItem;
-            const metaItemInfo = meta.items[ind];
-            expect(itemInfo).toBeDefined();
-            expect(itemInfo.text).toBe(text.t(metaItemInfo.title, lang));
-            expect(itemInfo.url).toBe(metaItemInfo.data);
-          });
-        }
+          expect(itemInfo).toBeDefined();
+          expect(metaItemInfo).toBeDefined();
+          expect(itemInfo.text).toBe(text.t(metaItemInfo.title, lang));
 
-        if (meta.type === TelegramMessageMetaType.Button) {
-          expect(metaItems).toHaveLength(meta.items.length);
-          metaItems.forEach((metaItem, ind) => {
-            const itemInfo = metaItem.shift();
-            const metaItemInfo = meta.items[ind];
-
-            expect(itemInfo).toBeDefined();
-            expect(itemInfo.text).toBe(text.t(metaItemInfo.title, lang));
+          if (meta.type === TelegramMessageMetaType.Button) {
             const callbackData: BotButtonData = JSON.parse(
               itemInfo.callback_data
             );
             expect(callbackData.l).toBe(metaItemInfo.data);
             expect(callbackData.i).toBeDefined();
             prefixId = callbackData.i;
-          });
-        }
+          } else if (meta.type === TelegramMessageMetaType.Link) {
+            expect(itemInfo.url).toBe(metaItemInfo.data);
+          } else {
+            throw new Error("type is not defined");
+          }
+        });
       }
       resolve(prefixId);
       return telegramApiResponseOk;
