@@ -13,7 +13,7 @@ export class Logger {
 
   constructor(private readonly id: string = "") {}
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   public info(...messages: any[]): void {
     // this.output(...messages);
   }

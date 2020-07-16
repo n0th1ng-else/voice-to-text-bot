@@ -10,6 +10,7 @@ function getService(environmentVars) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function createSecret(environmentVars, secretName) {
   return getService(environmentVars).createSecret({
     parent: `projects/${environmentVars.GOOGLE_PROJECT_ID}`,
@@ -23,6 +24,7 @@ function createSecret(environmentVars, secretName) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setSecretValue(environmentVars, secret) {
   return getService(environmentVars).addSecretVersion({
     parent: "projects/845739657426/secrets/telegram-token",
@@ -32,6 +34,7 @@ function setSecretValue(environmentVars, secret) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getSecretVersion(environmentVars, secretName) {
   return getService(environmentVars)
     .accessSecretVersion({
@@ -40,6 +43,7 @@ function getSecretVersion(environmentVars, secretName) {
     .then(([data]) => data.payload.data.toString("utf8"));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleTelegramToken(environmentVars, secretName, token) {
   return (
     getSecretVersion(environmentVars)

@@ -23,11 +23,10 @@ import {
 } from "../src/recognition";
 import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
-import { githubUrl, localhostUrl, telegramUrl } from "../src/const";
+import { githubUrl, localhostUrl } from "../src/const";
 import {
   BotStatRecordModel,
   getMockCertificate,
-  TelegramChatType,
   TelegramMessageMeta,
   TelegramMessageMetaItem,
   TelegramMessageMetaType,
@@ -53,6 +52,8 @@ import {
 import { randomIntFromInterval } from "../src/common/timer";
 import { BotCommand } from "../src/telegram/types";
 import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google";
+import { TgChatType } from "../src/telegram/api/types";
+import { TelegramApi } from "../src/telegram/api";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -84,7 +85,7 @@ const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
 const bot = new TelegramBotModel("telegram-api-token", converter, stat);
 bot.setHostLocation(hostUrl);
 
-const telegramServer = nock(telegramUrl);
+const telegramServer = nock(TelegramApi.url);
 const dbServer = nock(dbUrl);
 const host = request(hostUrl);
 
@@ -92,7 +93,7 @@ let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
 const testLangId = LanguageCode.Ru;
-let chatType: TelegramChatType = TelegramChatType.Channel;
+let chatType: TgChatType = TgChatType.Channel;
 let testMessageId = 0;
 let testChatId = 0;
 let tgMessage: TelegramMessageModel = new TelegramMessageModel(
@@ -122,7 +123,7 @@ describe("[russian language]", () => {
 
   beforeEach(() => {
     bot.setAuthor("");
-    chatType = TelegramChatType.Group;
+    chatType = TgChatType.Channel;
     testMessageId = randomIntFromInterval(1, 100000);
     testChatId = 0 - randomIntFromInterval(1, 100000);
   });

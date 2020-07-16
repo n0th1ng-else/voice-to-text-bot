@@ -1,4 +1,3 @@
-import TelegramBot from "node-telegram-bot-api";
 import {
   getChatId,
   getFullUserName,
@@ -13,6 +12,7 @@ import { nanoid } from "nanoid";
 import { Logger } from "../logger";
 import { LabelId } from "../text/labels";
 import { TextModel } from "../text";
+import { TgInlineKeyboardButton, TgMessage } from "./api/types";
 
 export enum BotCommand {
   Start = "/start",
@@ -30,7 +30,7 @@ export class BotMessageModel {
   public readonly voiceFileId: string;
   public readonly voiceDuration: number;
 
-  constructor(msg: TelegramBot.Message) {
+  constructor(msg: TgMessage) {
     this.id = msg.message_id;
     this.chatId = getChatId(msg);
     this.isGroup = isChatGroup(msg);
@@ -48,7 +48,7 @@ export class BotMessageModel {
 
 export interface MessageOptions {
   lang: LanguageCode;
-  options?: TelegramBot.SendMessageOptions;
+  options?: TgInlineKeyboardButton[][];
 }
 
 export interface BotButtonData {

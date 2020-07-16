@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TgCallbackQuery, TgMessage, TgUpdate } from "./api/types";
 import { Logger } from "../logger";
 import { VoiceConverter } from "../recognition/types";
 import { StatisticApi } from "../statistic";
@@ -9,11 +9,12 @@ import { runPromiseWithRetry } from "../common/helpers";
 import { getMd5Hash } from "../common/hash";
 import { BotActions } from "./actions";
 import { botCommands } from "./data";
+import { TelegramApi } from "./api";
 
 const logger = new Logger("telegram-bot");
 
 export class TelegramBotModel {
-  private readonly bot: TelegramBot;
+  private readonly bot: TelegramApi;
   private readonly actions: BotActions;
   private id = "";
   private host = "";
@@ -24,11 +25,9 @@ export class TelegramBotModel {
     converter: VoiceConverter,
     stat: StatisticApi
   ) {
-    this.bot = new TelegramBot(this.token);
+    this.bot = new TelegramApi(this.token);
     this.actions = new BotActions(stat, this.bot);
     this.actions.voice.setConverter(converter);
-    this.bot.on("message", (msg) => this.handleMessage(msg));
-    this.bot.on("callback_query", (msg) => this.handleCallbackQuery(msg));
   }
 
   public setHostLocation(host: string, path = "/bot/message"): this {
@@ -63,15 +62,20 @@ export class TelegramBotModel {
     return `${this.path}/${this.id}`;
   }
 
-  public handleApiMessage(message: TelegramBot.Update): void {
+  public handleApiMessage(message: TgUpdate): void {
     try {
-      this.bot.processUpdate(message);
+      if (message.message) {
+        this.handleMessage(message.message);
+      }
+      if (message.callback_query) {
+        this.handleCallbackQuery(message.callback_query);
+      }
     } catch (e) {
       logger.error("Failed to handle api request", e);
     }
   }
 
-  private handleMessage(msg: TelegramBot.Message): Promise<void> {
+  private handleMessage(msg: TgMessage): Promise<void> {
     const model = new BotMessageModel(msg);
     const prefix = new TelegramMessagePrefix(model.chatId);
 
@@ -93,7 +97,7 @@ export class TelegramBotModel {
       return this.actions.support.runAction(msg, model, prefix);
     }
 
-    if (this.actions.voice.runCondition(msg, model)) {
+    if (this.actions.voice.runCondition(msg)) {
       return this.actions.voice.runAction(msg, model, prefix);
     }
 
@@ -133,7 +137,7 @@ export class TelegramBotModel {
       );
   }
 
-  private handleCallbackQuery(msg: TelegramBot.CallbackQuery): void {
+  private handleCallbackQuery(msg: TgCallbackQuery): void {
     this.actions.lang.handleLanguageChange(msg);
   }
 }

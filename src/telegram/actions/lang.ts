@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import { TgCallbackQuery, TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import {
   BotButtonData,
@@ -15,18 +15,18 @@ const logger = new Logger("telegram-bot");
 
 export class LangAction extends GenericAction {
   public runAction(
-    msg: TelegramBot.Message,
+    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.showLanguageSelection(mdl, prefix);
   }
 
-  public runCondition(msg: TelegramBot.Message, mdl: BotMessageModel): boolean {
+  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
     return isLangMessage(mdl, msg);
   }
 
-  public handleLanguageChange(msg: TelegramBot.CallbackQuery): void {
+  public handleLanguageChange(msg: TgCallbackQuery): void {
     const message = msg.message;
     if (!message) {
       const msgError = new Error("No message passed in callback query");
@@ -122,24 +122,20 @@ export class LangAction extends GenericAction {
           LabelId.ChangeLangTitle,
           {
             lang,
-            options: {
-              reply_markup: {
-                inline_keyboard: [
-                  [
-                    {
-                      text: this.text.t(LabelId.BtnRussian, lang),
-                      callback_data: JSON.stringify(RuData),
-                    },
-                  ],
-                  [
-                    {
-                      text: this.text.t(LabelId.BtnEnglish, lang),
-                      callback_data: JSON.stringify(EnData),
-                    },
-                  ],
-                ],
-              },
-            },
+            options: [
+              [
+                {
+                  text: this.text.t(LabelId.BtnRussian, lang),
+                  callback_data: JSON.stringify(RuData),
+                },
+              ],
+              [
+                {
+                  text: this.text.t(LabelId.BtnEnglish, lang),
+                  callback_data: JSON.stringify(EnData),
+                },
+              ],
+            ],
           },
           prefix
         );

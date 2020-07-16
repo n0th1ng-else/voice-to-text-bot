@@ -25,6 +25,7 @@
     "@types/parse": "2.12.1",
     "@types/winston-loggly-bulk": "3.0.0",
     "aws-sdk": "2.680.0",
+    "axios": "0.19.2",
     "express": "4.17.1",
     "google-gax": "1.6.2",
     "kleur": "4.0.1",
