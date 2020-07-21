@@ -50,7 +50,25 @@ export function isVoiceMessageLong(model: BotMessageModel): boolean {
 }
 
 export function isVoiceMessage(msg: TgMessage): boolean {
-  return msg && !!msg.voice;
+  if (!msg) {
+    return false;
+  }
+
+  const data = msg.voice || msg.audio;
+
+  if (!data) {
+    return false;
+  }
+
+  if (!data.duration || typeof data.duration !== "number") {
+    return false;
+  }
+
+  const mimeType = data.mime_type || "";
+  const isAudioSupported = ["audio/ogg", "audio/opus"].includes(
+    mimeType.toLowerCase()
+  );
+  return isAudioSupported;
 }
 
 export function isMessageSupported(msg: TgMessage): boolean {
@@ -88,11 +106,31 @@ export function getGroupName(msg: TgMessage): string {
 }
 
 export function getVoiceFile(msg: TgMessage): string {
-  return msg.voice ? msg.voice.file_id : "";
+  if (!msg) {
+    return "";
+  }
+
+  const data = msg.voice || msg.audio;
+
+  if (!data) {
+    return "";
+  }
+
+  return data.file_id || "";
 }
 
 export function getVoiceDuration(msg: TgMessage): number {
-  return msg.voice ? msg.voice.duration : 0;
+  if (!msg) {
+    return 0;
+  }
+
+  const data = msg.voice || msg.audio;
+
+  if (!data) {
+    return 0;
+  }
+
+  return data.duration || 0;
 }
 
 export function getUserLanguage(msg: TgMessage): LanguageCode {

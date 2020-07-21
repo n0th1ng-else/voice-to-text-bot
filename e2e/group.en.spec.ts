@@ -38,6 +38,7 @@ import {
   mockTgReceiveMessage,
   mockTgReceiveMessages,
   mockTgReceiveRawMessage,
+  mockTgReceiveUnexpectedMessage,
   mockTgSetCommands,
   mockTgSetWebHook,
   sendTelegramCallbackMessage,
@@ -585,18 +586,121 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on a big voice files more than 60 sec", () => {
+    it("keeps calm on a big voice files more than 60 sec", (done) => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 60;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
+      mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage);
+      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+        expect(nock.pendingMocks()).toHaveLength(1);
+        nock.cleanAll();
+        return done && done();
+      });
     });
 
-    it("keeps calm if the message is from another bot", () => {
+    it("keeps calm if the message is from another bot", (done) => {
       tgMessage.setName(testMessageId, {}, true);
+      mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage);
+      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+        expect(nock.pendingMocks()).toHaveLength(1);
+        nock.cleanAll();
+        return done && done();
+      });
+    });
+
+    it("keeps calm on a voice file with wrong mime type", (done) => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 59;
+      tgMessage.setVoice(
+        testMessageId,
+        voiceFileId,
+        voiceFileDuration,
+        "application/json"
+      );
+
+      mockTgReceiveUnexpectedMessage(telegramServer, done);
+
+      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+        expect(nock.pendingMocks()).toHaveLength(1);
+        nock.cleanAll();
+        return done && done();
+      });
+    });
+
+    it("keeps calm on a voice file with empty duration", (done) => {
+      const voiceFileId = "some-file-id";
+      tgMessage.setVoice(testMessageId, voiceFileId, 0);
+
+      mockTgReceiveUnexpectedMessage(telegramServer, done);
+
+      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+        expect(nock.pendingMocks()).toHaveLength(1);
+        nock.cleanAll();
+        return done && done();
+      });
+    });
+
+    it("keeps calm on an audio file with wrong mime type", (done) => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 59;
+      tgMessage.setAudio(
+        testMessageId,
+        voiceFileId,
+        voiceFileDuration,
+        "audio/flac"
+      );
+
+      mockTgReceiveUnexpectedMessage(telegramServer, done);
+
+      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+        expect(nock.pendingMocks()).toHaveLength(1);
+        nock.cleanAll();
+        return done && done();
+      });
+    });
+
+    it("keeps calm on an audio file with empty duration", (done) => {
+      const voiceFileId = "some-file-id";
+      tgMessage.setAudio(testMessageId, voiceFileId, 0);
+
+      mockTgReceiveUnexpectedMessage(telegramServer, done);
+
+      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+        expect(nock.pendingMocks()).toHaveLength(1);
+        nock.cleanAll();
+        return done && done();
+      });
+    });
+
+    it("converts audio into text (it fits 60s limit) - no username", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 12;
+      const voiceFileContent = "supergroup";
+      tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
+
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      const speechScope = mockSpeechRecognition(voiceFileContent);
+      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveRawMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          `🗣 ${voiceFileContent}`
+        ),
+        mockUpdateBotStatUsage(dbServer, statModel),
+      ]).then(() => {
+        expect(speechScope.isDone()).toBeTruthy();
+      });
     });
   });
 });

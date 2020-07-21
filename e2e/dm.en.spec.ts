@@ -385,5 +385,153 @@ describe("[default language - english]", () => {
 
       return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
     });
+
+    it("responds on a voice message with wrong mime type", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 60;
+      tgMessage.setVoice(
+        testMessageId,
+        voiceFileId,
+        voiceFileDuration,
+        "broken/type"
+      );
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.NoContent
+        ),
+      ]);
+    });
+
+    it("responds on a voice message with empty duration", () => {
+      const voiceFileId = "some-file-id";
+      tgMessage.setVoice(testMessageId, voiceFileId, 0);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.NoContent
+        ),
+      ]);
+    });
+
+    it("converts audio into text (it fits 60s limit)", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 59;
+      const voiceFileContent = "supergroup";
+      tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
+
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      const speechScope = mockSpeechRecognition(voiceFileContent);
+      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.InProgress
+        ),
+        mockTgReceiveRawMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          `🗣 ${voiceFileContent}`
+        ),
+        mockUpdateBotStatUsage(dbServer, statModel),
+      ]).then(() => {
+        expect(speechScope.isDone()).toBeTruthy();
+      });
+    });
+
+    it("denies to convert big audio files more than 60 sec", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 60;
+      tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessages(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          [LabelId.LongVoiceMessage]
+        ),
+      ]);
+    });
+
+    it("responds on an audio message with wrong mime type", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 60;
+      tgMessage.setAudio(
+        testMessageId,
+        voiceFileId,
+        voiceFileDuration,
+        "broken/test"
+      );
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.NoContent
+        ),
+      ]);
+    });
+
+    it("responds on an audio message with empty duration", () => {
+      const voiceFileId = "some-file-id";
+      tgMessage.setAudio(testMessageId, voiceFileId, 0);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.NoContent
+        ),
+      ]);
+    });
   });
 });

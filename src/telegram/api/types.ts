@@ -27,7 +27,8 @@ export interface TgMessage {
   chat: TgChat;
   text?: string;
   from?: TgUser;
-  voice?: TgVoice;
+  voice?: TgAudio;
+  audio?: TgAudio;
 }
 
 export interface TgChat {
@@ -39,9 +40,10 @@ export interface TgChat {
   last_name?: string;
 }
 
-export interface TgVoice {
+export interface TgAudio {
   file_id: string;
   duration: number;
+  mime_type?: string;
 }
 
 export enum TgChatType {
