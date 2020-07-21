@@ -4,7 +4,7 @@ import { createServer as createHttps } from "https";
 import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
 import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
-import { HealthDto, HealthSsl, HealthStatus } from "./types";
+import { HealthDto, HealthModel } from "./types";
 import { StatisticApi } from "../statistic";
 import { sSuffix } from "../text";
 import { UptimeDaemon } from "./uptime";
@@ -36,42 +36,42 @@ export class ExpressServer {
     };
 
     this.app.use(express.json());
-    this.app.get("/health", (req, res) => {
+
+    const statusHandler = (
+      req: express.Request,
+      res: express.Response<HealthDto>
+    ): void => {
+      const status = new HealthModel(this.version, this.isHttps);
       if (this.isIdle) {
-        const status: HealthDto = {
-          status: HealthStatus.InProgress,
-          ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
-          message: "Waiting for bots to set up",
-          urls: [],
-          version: this.version,
-        };
-        res.status(400).send(status);
+        res.status(400).send(status.getDto());
         return;
       }
 
       Promise.all(this.bots.map((bot) => bot.getHostLocation()))
         .then((urls) => {
-          const status: HealthDto = {
-            status: HealthStatus.Online,
-            ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
-            message: "All is good",
-            urls,
-            version: this.version,
-          };
-          res.status(200).send(status);
+          status.setOnline(urls);
+          res.status(200).send(status.getDto());
         })
         .catch((err) => {
-          logger.error("Unable to get bot urls", err);
-          const status: HealthDto = {
-            status: HealthStatus.Error,
-            ssl: this.isHttps ? HealthSsl.On : HealthSsl.Off,
-            message: "Unable to get bot urls",
-            urls: [],
-            version: this.version,
-          };
-          res.status(400).send(status);
+          const errMessage = "Unable to get bot urls";
+          logger.error(errMessage, err);
+          status.setError(errMessage);
+          res.status(400).send(status.getDto());
         });
-    });
+    };
+
+    this.app.get(
+      "/health",
+      (req: express.Request, res: express.Response<HealthDto>) =>
+        statusHandler(req, res)
+    );
+    this.app.post(
+      "/lifecycle",
+      (req: express.Request, res: express.Response<HealthDto>) => {
+        logger.warn("Received app:restart hook from the buddy node", req.body);
+        statusHandler(req, res);
+      }
+    );
   }
 
   public setStat(stat: StatisticApi): this {

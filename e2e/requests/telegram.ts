@@ -86,6 +86,12 @@ export function mockTgGetWebHookError(host: nock.Scope): void {
   });
 }
 
+export function mockTgReceiveUnexpectedMessage(host: nock.Scope, done) {
+  host
+    .post("/bottelegram-api-token/sendMessage")
+    .reply(500, () => done.fail(new Error("The message is not expected")));
+}
+
 export function mockTgReceiveRawMessage(
   host: nock.Scope,
   chatId: number,
