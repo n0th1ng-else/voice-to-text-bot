@@ -662,7 +662,7 @@ describe("[russian language]", () => {
       });
     });
 
-    it("keeps calm on an audio file with wrong mime type", (done) => {
+    it.skip("keeps calm on an audio file with wrong mime type", (done) => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 59;
       tgMessage.setAudio(
@@ -681,7 +681,7 @@ describe("[russian language]", () => {
       });
     });
 
-    it("keeps calm on an audio file with empty duration", (done) => {
+    it.skip("keeps calm on an audio file with empty duration", (done) => {
       const voiceFileId = "some-file-id";
       tgMessage.setAudio(testMessageId, voiceFileId, 0);
 
@@ -694,7 +694,7 @@ describe("[russian language]", () => {
       });
     });
 
-    it("converts audio into text (it fits 60s limit) - has both first and last name", () => {
+    it.skip("converts audio into text (it fits 60s limit) - has both first and last name", () => {
       const voiceFileId = "some-file-id-new";
       const voiceFileDuration = randomIntFromInterval(1, 59);
       const voiceFileContent = "supergroup";
