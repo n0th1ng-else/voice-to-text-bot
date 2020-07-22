@@ -59,9 +59,7 @@ export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
     return new VoiceContentReasonModel(VoiceContentReason.NoContent);
   }
 
-  // const data = msg.voice || msg.audio;
-  // TODO fix
-  const data = msg.voice;
+  const data = msg.voice || msg.audio;
 
   if (!data) {
     return new VoiceContentReasonModel(VoiceContentReason.NoContent);

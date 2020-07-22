@@ -432,7 +432,7 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it.skip("converts audio into text (it fits 60s limit)", () => {
+    it("converts audio into text (it fits 60s limit)", () => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 59;
       const voiceFileContent = "supergroup";
@@ -467,7 +467,7 @@ describe("[default language - english]", () => {
       });
     });
 
-    it.skip("denies to convert big audio files more than 60 sec", () => {
+    it("denies to convert big audio files more than 60 sec", () => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 60;
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
@@ -488,7 +488,7 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it.skip("responds on an audio message with wrong mime type", () => {
+    it("responds on an audio message with wrong mime type", () => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 60;
       tgMessage.setAudio(
@@ -514,7 +514,7 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it.skip("responds on an audio message with empty duration", () => {
+    it("responds on an audio message with empty duration", () => {
       const voiceFileId = "some-file-id";
       tgMessage.setAudio(testMessageId, voiceFileId, 0);
       const statModel = mockGetBotStatItem(
