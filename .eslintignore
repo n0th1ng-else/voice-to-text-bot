@@ -6,3 +6,7 @@ dist
 
 # dont't lint assets
 assets
+
+# overage reports
+coverage-e2e
+coverage-unit

@@ -3,3 +3,5 @@ package-lock.json
 .eslintignore
 dist/
 assets/
+coverage-e2e/
+coverage-unit/
