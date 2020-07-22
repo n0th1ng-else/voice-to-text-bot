@@ -7,20 +7,28 @@
 <div>
     <span>
         <a href="https://t.me/AudioMessBot" target="_blank">
-            <img alt="Number of installs" src="https://img.shields.io/badge/installs-400%2B-blueviolet"> 
+            <img alt="Number of installs" src="https://img.shields.io/badge/installs-600%2B-blueviolet"> 
         </a>
     </span>
     <span>
-        <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/n0th1ng-else/voice-to-text-bot"> 
+        <a href="https://github.com/n0th1ng-else/voice-to-text-bot/releases">
+            <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/n0th1ng-else/voice-to-text-bot"> 
+        </a>
     </span>
     <span>
-        <img alt="Sonar Violations (long format)" src="https://img.shields.io/sonar/violations/n0th1ng-else_voice-to-text-bot?format=long&server=https%3A%2F%2Fsonarcloud.io"> 
+        <a href="https://sonarcloud.io/project/issues?id=n0th1ng-else_voice-to-text-bot&resolved=false" target="_blank">
+            <img alt="Sonar Violations (long format)" src="https://img.shields.io/sonar/violations/n0th1ng-else_voice-to-text-bot?format=long&server=https%3A%2F%2Fsonarcloud.io"> 
+        </a>
     </span>
     <span>
-        <img alt="Sonar Quality Gate" src="https://img.shields.io/sonar/quality_gate/n0th1ng-else_voice-to-text-bot?server=https%3A%2F%2Fsonarcloud.io"> 
+        <a href="https://sonarcloud.io/dashboard?id=n0th1ng-else_voice-to-text-bot" target="_blank">
+            <img alt="Sonar Quality Gate" src="https://img.shields.io/sonar/quality_gate/n0th1ng-else_voice-to-text-bot?server=https%3A%2F%2Fsonarcloud.io"> 
+        </a>
     </span>
     <span>
-        <img alt="Sonar Coverage" src="https://img.shields.io/sonar/coverage/n0th1ng-else_voice-to-text-bot?server=https%3A%2F%2Fsonarcloud.io">
+        <a href="https://sonarcloud.io/component_measures?id=n0th1ng-else_voice-to-text-bot&metric=coverage&view=list" target="_blank">
+            <img alt="Sonar Coverage" src="https://img.shields.io/sonar/coverage/n0th1ng-else_voice-to-text-bot?server=https%3A%2F%2Fsonarcloud.io">
+        </a>
     </span>
 </div>
 
