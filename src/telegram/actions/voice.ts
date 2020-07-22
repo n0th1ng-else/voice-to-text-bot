@@ -1,6 +1,10 @@
 import { TgMessage } from "../api/types";
 import { GenericAction } from "./common";
-import { BotMessageModel, TelegramMessagePrefix } from "../types";
+import {
+  BotMessageModel,
+  TelegramMessagePrefix,
+  VoiceContentReason,
+} from "../types";
 import { isVoiceMessage, isVoiceMessageLong } from "../helpers";
 import { Logger } from "../../logger";
 import { LabelId } from "../../text/labels";
@@ -32,7 +36,18 @@ export class VoiceAction extends GenericAction {
   }
 
   public runCondition(msg: TgMessage): boolean {
-    return isVoiceMessage(msg);
+    const type = isVoiceMessage(msg);
+    const isVoice = type.type === VoiceContentReason.Ok;
+    const isNoContent = type.type === VoiceContentReason.NoContent;
+
+    if (!isVoice && !isNoContent) {
+      logger.warn(
+        "Some problems identified during the voice object detection",
+        type
+      );
+    }
+
+    return isVoice;
   }
 
   public setConverter(converter: VoiceConverter): void {

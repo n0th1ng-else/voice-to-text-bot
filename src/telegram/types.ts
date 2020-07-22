@@ -15,6 +15,20 @@ import { LabelId } from "../text/labels";
 import { TextModel } from "../text";
 import { TgInlineKeyboardButton, TgMessage } from "./api/types";
 
+export enum VoiceContentReason {
+  Ok = "Ok",
+  NoContent = "NoContent",
+  NoDuration = "NoDuration",
+  WrongMimeType = "WrongMimeType",
+}
+
+export class VoiceContentReasonModel {
+  constructor(
+    public readonly type: VoiceContentReason,
+    public readonly info?: string | number
+  ) {}
+}
+
 export enum BotCommand {
   Start = "/start",
   Language = "/lang",

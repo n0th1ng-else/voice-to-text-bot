@@ -1,4 +1,9 @@
-import { BotCommand, BotMessageModel } from "./types";
+import {
+  BotCommand,
+  BotMessageModel,
+  VoiceContentReason,
+  VoiceContentReasonModel,
+} from "./types";
 import { telegramBotName } from "../env";
 import { TgChatType, TgMessage } from "./api/types";
 import { LanguageCode } from "../recognition/types";
@@ -49,26 +54,34 @@ export function isVoiceMessageLong(model: BotMessageModel): boolean {
   return model.voiceDuration > durationLimitSec;
 }
 
-export function isVoiceMessage(msg: TgMessage): boolean {
+export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
   if (!msg) {
-    return false;
+    return new VoiceContentReasonModel(VoiceContentReason.NoContent);
   }
 
   const data = msg.voice || msg.audio;
 
   if (!data) {
-    return false;
+    return new VoiceContentReasonModel(VoiceContentReason.NoContent);
   }
 
   if (!data.duration || typeof data.duration !== "number") {
-    return false;
+    return new VoiceContentReasonModel(
+      VoiceContentReason.NoDuration,
+      data.duration
+    );
   }
 
   const mimeType = data.mime_type || "";
   const isAudioSupported = ["audio/ogg", "audio/opus"].includes(
     mimeType.toLowerCase()
   );
-  return isAudioSupported;
+  return isAudioSupported
+    ? new VoiceContentReasonModel(VoiceContentReason.Ok)
+    : new VoiceContentReasonModel(
+        VoiceContentReason.WrongMimeType,
+        data.mime_type
+      );
 }
 
 export function isMessageSupported(msg: TgMessage): boolean {
