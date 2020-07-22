@@ -642,7 +642,7 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on an audio file with wrong mime type", (done) => {
+    it.skip("keeps calm on an audio file with wrong mime type", (done) => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 59;
       tgMessage.setAudio(
@@ -661,7 +661,7 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on an audio file with empty duration", (done) => {
+    it.skip("keeps calm on an audio file with empty duration", (done) => {
       const voiceFileId = "some-file-id";
       tgMessage.setAudio(testMessageId, voiceFileId, 0);
 
@@ -674,7 +674,7 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("converts audio into text (it fits 60s limit) - no username", () => {
+    it.skip("converts audio into text (it fits 60s limit) - no username", () => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 12;
       const voiceFileContent = "supergroup";
