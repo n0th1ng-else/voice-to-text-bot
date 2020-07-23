@@ -27,6 +27,7 @@
     "aws-sdk": "2.680.0",
     "axios": "0.19.2",
     "express": "4.17.1",
+    "ffmpeg-static": "4.2.6",
     "google-gax": "1.6.2",
     "kleur": "4.0.1",
     "nanoid": "3.1.10",
