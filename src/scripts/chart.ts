@@ -4,8 +4,8 @@ import { createServer as createHttp } from "http";
 import { resolve as resolvePath } from "path";
 import { Logger } from "../logger";
 import { appPort, enableSSL } from "../env";
-import { httpsCert, httpsKey } from "../../certs";
 import { sSuffix } from "../text";
+import { httpsOptions } from "../../certs";
 
 const logger = new Logger("chart-script");
 
@@ -20,11 +20,6 @@ export function run(): void {
   });
 
   logger.info(`Starting ${Logger.y(sSuffix("http", enableSSL))} server`);
-
-  const httpsOptions = {
-    cert: httpsCert,
-    key: httpsKey,
-  };
 
   const server = enableSSL ? createHttps(httpsOptions, app) : createHttp(app);
 

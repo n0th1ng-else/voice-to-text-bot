@@ -4,6 +4,7 @@ export interface HealthDto {
   message: string;
   urls: string[];
   version: string;
+  threadId: number;
 }
 
 export enum HealthStatus {
@@ -23,7 +24,11 @@ export class HealthModel {
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
 
-  constructor(private readonly version: string, isHttps: boolean) {
+  constructor(
+    private readonly version: string,
+    isHttps: boolean,
+    private readonly threadId: number
+  ) {
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
 
@@ -45,6 +50,7 @@ export class HealthModel {
       status: this.status,
       urls: this.urls,
       message: this.message,
+      threadId: this.threadId,
     };
   }
 }

@@ -1,0 +1,20 @@
+config:
+  target: "https://localhost:3100"
+  plugins:
+    expect: {}
+  phases:
+    - duration: 20
+      arrivalRate: 20
+scenarios:
+  - flow:
+      - get:
+          url: "/health"
+          capture:
+            - json: "$.threadId"
+              as: threadId
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - equals:
+                - 1
+                - "{{ threadId }}"

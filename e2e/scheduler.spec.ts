@@ -13,6 +13,7 @@ import * as requestObj from "../src/server/request";
 import { getHealthUrl } from "../src/server/helpers";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types";
 import { WaiterForCalls } from "./helpers/waitFor";
+import { httpsOptions } from "../certs";
 
 const waiter = new WaiterForCalls();
 
@@ -29,6 +30,7 @@ const getRequestSpy = jest
         status: HealthStatus.Online,
         message: "ok",
         ssl: HealthSsl.Off,
+        threadId: 0,
       };
       waiter.tick();
       return Promise.resolve(response);
@@ -56,7 +58,7 @@ describe("[uptime daemon]", () => {
   beforeEach(() => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date().setHours(23, 58, 0, 0));
-    server = new ExpressServer(appPort, enableSSL, appVersion);
+    server = new ExpressServer(appPort, enableSSL, appVersion, httpsOptions);
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 

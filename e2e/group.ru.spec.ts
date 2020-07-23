@@ -11,7 +11,7 @@ import {
   afterAll,
 } from "@jest/globals";
 import { ExpressServer } from "../src/server/express";
-import { appVersion, telegramBotName } from "../src/env";
+import { appVersion, launchTime, telegramBotName } from "../src/env";
 import {
   LanguageCode,
   VoiceConverterOptions,
@@ -35,13 +35,12 @@ import {
 import { LabelId } from "../src/text/labels";
 import {
   mockTgGetFileUrl,
+  mockTgGetWebHook,
   mockTgReceiveCallbackMessage,
   mockTgReceiveMessage,
   mockTgReceiveMessages,
   mockTgReceiveRawMessage,
   mockTgReceiveUnexpectedMessage,
-  mockTgSetCommands,
-  mockTgSetWebHook,
   sendTelegramCallbackMessage,
   sendTelegramMessage,
 } from "./requests/telegram";
@@ -55,6 +54,7 @@ import { BotCommand } from "../src/telegram/types";
 import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google";
 import { TgChatType } from "../src/telegram/api/types";
 import { TelegramApi } from "../src/telegram/api";
+import { httpsOptions } from "../certs";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -84,7 +84,7 @@ const enableSSL = false;
 const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
 
 const bot = new TelegramBotModel("telegram-api-token", converter, stat);
-bot.setHostLocation(hostUrl);
+bot.setHostLocation(hostUrl, launchTime);
 
 const telegramServer = nock(TelegramApi.url);
 const dbServer = nock(dbUrl);
@@ -105,10 +105,14 @@ let botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
 
 describe("[russian language]", () => {
   beforeAll(() => {
-    mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
-    mockTgSetCommands(telegramServer);
+    mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
 
-    const server = new ExpressServer(appPort, enableSSL, appVersion);
+    const server = new ExpressServer(
+      appPort,
+      enableSSL,
+      appVersion,
+      httpsOptions
+    );
     return server
       .setSelfUrl(hostUrl)
       .setBots([bot])
