@@ -649,9 +649,9 @@ describe("[russian language]", () => {
       });
     });
 
-    it("keeps calm on a voice file with empty duration", (done) => {
+    it("keeps calm on a voice file with broken duration", (done) => {
       const voiceFileId = "some-file-id";
-      tgMessage.setVoice(testMessageId, voiceFileId, 0);
+      tgMessage.setVoice(testMessageId, voiceFileId, -53);
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
@@ -681,9 +681,9 @@ describe("[russian language]", () => {
       });
     });
 
-    it("keeps calm on an audio file with empty duration", (done) => {
+    it("keeps calm on an audio file with broken duration", (done) => {
       const voiceFileId = "some-file-id";
-      tgMessage.setAudio(testMessageId, voiceFileId, 0);
+      tgMessage.setAudio(testMessageId, voiceFileId, -123);
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 

@@ -65,7 +65,7 @@ export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
     return new VoiceContentReasonModel(VoiceContentReason.NoContent);
   }
 
-  if (!data.duration || typeof data.duration !== "number") {
+  if (typeof data.duration !== "number" || data.duration < 0) {
     return new VoiceContentReasonModel(
       VoiceContentReason.NoDuration,
       data.duration
