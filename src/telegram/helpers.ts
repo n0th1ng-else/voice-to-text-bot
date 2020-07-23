@@ -73,9 +73,11 @@ export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
   }
 
   const mimeType = data.mime_type || "";
-  const isAudioSupported = ["audio/ogg", "audio/opus"].includes(
-    mimeType.toLowerCase()
-  );
+  const isAudioSupported = [
+    "audio/ogg",
+    "audio/opus",
+    "audio/x-opus+ogg",
+  ].includes(mimeType.toLowerCase());
   return isAudioSupported
     ? new VoiceContentReasonModel(VoiceContentReason.Ok)
     : new VoiceContentReasonModel(

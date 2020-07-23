@@ -702,7 +702,12 @@ describe("[russian language]", () => {
       const firstName = "her-next-big-thing";
       const lastName = "their-number-chair";
 
-      tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
+      tgMessage.setAudio(
+        testMessageId,
+        voiceFileId,
+        voiceFileDuration,
+        "audio/x-opus+ogg"
+      );
       tgMessage.setName(testMessageId, {
         userName,
         firstName,
