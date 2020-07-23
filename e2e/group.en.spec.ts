@@ -629,9 +629,13 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on a voice file with empty duration", (done) => {
+    it("keeps calm on a voice file with broken duration", (done) => {
       const voiceFileId = "some-file-id";
-      tgMessage.setVoice(testMessageId, voiceFileId, 0);
+      tgMessage.setVoice(
+        testMessageId,
+        voiceFileId,
+        ("-34" as unknown) as number
+      );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
@@ -661,9 +665,13 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on an audio file with empty duration", (done) => {
+    it("keeps calm on an audio file with broken duration", (done) => {
       const voiceFileId = "some-file-id";
-      tgMessage.setAudio(testMessageId, voiceFileId, 0);
+      tgMessage.setAudio(
+        testMessageId,
+        voiceFileId,
+        ("-1" as unknown) as number
+      );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 

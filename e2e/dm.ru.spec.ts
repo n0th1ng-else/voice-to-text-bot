@@ -397,9 +397,13 @@ describe("[russian language]", () => {
       ]);
     });
 
-    it("responds on a voice message with empty duration", () => {
+    it("responds on a voice message with broken duration", () => {
       const voiceFileId = "some-file-id";
-      tgMessage.setVoice(testMessageId, voiceFileId, 0);
+      tgMessage.setVoice(
+        testMessageId,
+        voiceFileId,
+        ("123" as unknown) as number
+      );
       const statModel = mockGetBotStatItem(
         dbServer,
         tgMessage.chatId,
@@ -503,9 +507,9 @@ describe("[russian language]", () => {
       ]);
     });
 
-    it("responds on an audio message with empty duration", () => {
+    it("responds on an audio message with broken duration", () => {
       const voiceFileId = "some-file-id";
-      tgMessage.setAudio(testMessageId, voiceFileId, 0);
+      tgMessage.setAudio(testMessageId, voiceFileId, -41);
       const statModel = mockGetBotStatItem(
         dbServer,
         tgMessage.chatId,
