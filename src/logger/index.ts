@@ -15,9 +15,12 @@ export class Logger {
   }
 
   private get prefix(): string {
-    const idPrefix = `[${this.id}]`;
-    const timePrefix = `[${this.time}]`;
-    return `${timePrefix} ${idPrefix}`;
+    const prefixes = [this.id, this.time];
+    if (this.additionalPrefix) {
+      prefixes.push(this.additionalPrefix);
+    }
+
+    return prefixes.map((prefix) => `[${prefix}]`).join(" ");
   }
 
   private get time(): string {
@@ -34,26 +37,32 @@ export class Logger {
       .replace("T", " ");
   }
 
+  private additionalPrefix = "";
+
   constructor(private readonly id: string = "") {}
+
+  public setAdditionalPrefix(prefix: string): void {
+    this.additionalPrefix = prefix;
+  }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public info(msg: string, ...message: any[]): void {
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), msg, ...message);
-    sendLogs(LogType.Info, this.id, msg);
+    sendLogs(LogType.Info, this.id, this.additionalPrefix, msg);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public warn(msg: string, ...data: any[]): void {
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.prefix), msg, ...data);
-    sendLogs(LogType.Warn, this.id, msg, data);
+    sendLogs(LogType.Warn, this.id, this.additionalPrefix, msg, data);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public error(msg: string, ...data: any[]): void {
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), ...data);
-    sendLogs(LogType.Error, this.id, msg, data);
+    sendLogs(LogType.Error, this.id, this.additionalPrefix, msg, data);
   }
 }

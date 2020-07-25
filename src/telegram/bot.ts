@@ -30,10 +30,14 @@ export class TelegramBotModel {
     this.actions.voice.setConverter(converter);
   }
 
-  public setHostLocation(host: string, path = "/bot/message"): this {
+  public setHostLocation(
+    host: string,
+    launchTime: number,
+    path = "/bot/message"
+  ): this {
     this.host = host;
     this.path = path;
-    this.id = getMd5Hash(`${this.host}${this.path}:${this.token}`);
+    this.id = getMd5Hash(`${this.host}${this.path}:${this.token}`, launchTime);
     return this;
   }
 
@@ -42,11 +46,28 @@ export class TelegramBotModel {
     return this;
   }
 
-  public applyHostLocation(): Promise<boolean> {
+  public applyHostLocationIfNeeded(timeoutMs: number): Promise<boolean> {
     const hookUrl = `${this.host}${this.getPath()}`;
     logger.warn(`WebHook url is ${Logger.y(hookUrl)}`);
-    return runPromiseWithRetry("bot.applyHostLocation", () =>
-      this.bot.setWebHook(hookUrl)
+
+    return runPromiseWithRetry("bot.getWebHookInfo", () =>
+      this.bot.getWebHookInfo()
+    ).then((info) => {
+      if (info.url === hookUrl) {
+        return true;
+      }
+
+      return this.applyHostLocation(timeoutMs);
+    });
+  }
+
+  private applyHostLocation(timeoutMs: number): Promise<boolean> {
+    const hookUrl = `${this.host}${this.getPath()}`;
+    logger.warn(`Applying WebHook url is ${Logger.y(hookUrl)}`);
+    return runPromiseWithRetry(
+      "bot.applyHostLocation",
+      () => this.bot.setWebHook(hookUrl),
+      timeoutMs
     ).then(() =>
       runPromiseWithRetry("bot.setMyCommands", () =>
         this.bot.setMyCommands(botCommands)

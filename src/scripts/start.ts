@@ -13,6 +13,7 @@ import {
   ngRokToken,
   cacheSize,
   memoryLimit,
+  launchTime,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -27,11 +28,19 @@ import { getHostName } from "../server/tunnel";
 import { ScheduleDaemon } from "../scheduler";
 import { printCurrentMemoryStat } from "../memory";
 import { StopListener } from "../process";
+import { httpsOptions } from "../../certs";
 
 const logger = new Logger("start-script");
 
-export function run(): void {
-  const server = new ExpressServer(appPort, enableSSL, appVersion);
+export function run(threadId = 0): void {
+  const launchDelay = threadId ? (threadId - 1) * 10_000 : 0;
+
+  const server = new ExpressServer(
+    appPort,
+    enableSSL,
+    appVersion,
+    httpsOptions
+  );
 
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: googleApi.privateKey,
@@ -62,12 +71,21 @@ export function run(): void {
   getHostName(appPort, selfUrl, ngRokToken)
     .then((host) => {
       logger.info(`Telling telegram our location is ${Logger.y(host)}`);
-      bot.setHostLocation(host);
-      return server.setSelfUrl(host).setBots([bot]).setStat(stat).start();
+      bot.setHostLocation(host, launchTime);
+      return server
+        .setSelfUrl(host)
+        .setBots([bot])
+        .setStat(stat)
+        .setThreadId(threadId)
+        .start();
     })
     .then((stopFn) => {
       stopListener.addTrigger(() => stopFn());
-      return server.triggerDaemon(nextReplicaUrl, replicaLifecycleInterval);
+      return server.triggerDaemon(
+        nextReplicaUrl,
+        replicaLifecycleInterval,
+        launchDelay
+      );
     })
     .catch((err) => logger.error("Failed to run the server", err));
 }

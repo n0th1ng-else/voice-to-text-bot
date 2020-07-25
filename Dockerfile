@@ -23,4 +23,4 @@ RUN npm run build
 
 RUN find $APP_DIR/src -type f | xargs -L1 rm -f
 
-CMD ["npm", "run", "start:js"]
+CMD ["npm", "run", "cluster:js"]

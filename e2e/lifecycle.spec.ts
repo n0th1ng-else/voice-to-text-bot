@@ -9,7 +9,7 @@ import {
 } from "@jest/globals";
 import { ExpressServer } from "../src/server/express";
 import { HealthSsl, HealthStatus } from "../src/server/types";
-import { appVersion } from "../src/env";
+import { appVersion, launchTime } from "../src/env";
 import { localhostUrl } from "../src/const";
 import { TelegramBotModel } from "../src/telegram/bot";
 import { StatisticApi } from "../src/statistic";
@@ -23,14 +23,10 @@ import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
 } from "../src/recognition";
-import {
-  mockTgGetWebHook,
-  mockTgGetWebHookError,
-  mockTgSetCommands,
-  mockTgSetWebHook,
-} from "./requests/telegram";
+import { mockTgGetWebHook, mockTgGetWebHookError } from "./requests/telegram";
 import nock from "nock";
 import { TelegramApi } from "../src/telegram/api";
+import { httpsOptions } from "../certs";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -60,7 +56,7 @@ const enableSSL = false;
 const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
 
 const bot = new TelegramBotModel("telegram-api-token", converter, stat);
-bot.setHostLocation(hostUrl);
+bot.setHostLocation(hostUrl, launchTime);
 
 const telegramServer = nock(TelegramApi.url);
 const host = request(`${localhostUrl}:${appPort}`);
@@ -75,7 +71,7 @@ let server: ExpressServer;
 
 describe("[lifecycle]", () => {
   beforeEach(() => {
-    server = new ExpressServer(appPort, enableSSL, appVersion);
+    server = new ExpressServer(appPort, enableSSL, appVersion, httpsOptions);
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 
@@ -111,8 +107,7 @@ describe("[lifecycle]", () => {
 
   describe("starts with bots", () => {
     beforeEach(() => {
-      mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
-      mockTgSetCommands(telegramServer);
+      mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
 
       return server.setBots([bot]).applyHostLocation();
     });

@@ -3,7 +3,7 @@ import { createServer as createHttp } from "http";
 import { createServer as createHttps } from "https";
 import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
-import { httpsCert, httpsKey, HttpsOptions } from "../../certs";
+import { HttpsOptions } from "../../certs";
 import { HealthDto, HealthModel } from "./types";
 import { StatisticApi } from "../statistic";
 import { sSuffix } from "../text";
@@ -13,27 +13,23 @@ const logger = new Logger("server");
 
 export class ExpressServer {
   private readonly app = express();
-  private readonly httpsOptions: HttpsOptions;
   private readonly uptimeDaemon: UptimeDaemon;
 
   private stat: StatisticApi | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
+  private threadId = 0;
 
   constructor(
     private readonly port: number,
     private readonly isHttps: boolean,
-    private readonly version: string
+    private readonly version: string,
+    private readonly httpsOptions: HttpsOptions
   ) {
     logger.info("Initializing express server");
 
     this.uptimeDaemon = new UptimeDaemon(version);
-
-    this.httpsOptions = {
-      cert: httpsCert,
-      key: httpsKey,
-    };
 
     this.app.use(express.json());
 
@@ -41,7 +37,7 @@ export class ExpressServer {
       req: express.Request,
       res: express.Response<HealthDto>
     ): void => {
-      const status = new HealthModel(this.version, this.isHttps);
+      const status = new HealthModel(this.version, this.isHttps, this.threadId);
       if (this.isIdle) {
         res.status(400).send(status.getDto());
         return;
@@ -80,6 +76,14 @@ export class ExpressServer {
     return this;
   }
 
+  public setThreadId(threadId = 0): this {
+    this.threadId = threadId;
+    if (this.threadId) {
+      logger.setAdditionalPrefix(`thread-${this.threadId}`);
+    }
+    return this;
+  }
+
   public setBots(bots: TelegramBotModel[] = []): this {
     this.bots = bots;
     logger.info(`Requested ${Logger.y(sSuffix("bot", bots.length))} to set up`);
@@ -87,6 +91,7 @@ export class ExpressServer {
     bots.forEach((bot) => {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
       this.app.post(bot.getPath(), (req, res) => {
+        logger.info("Incoming message");
         bot.handleApiMessage(req.body);
         res.sendStatus(200);
       });
@@ -148,19 +153,20 @@ export class ExpressServer {
     });
   }
 
-  public applyHostLocation(): Promise<void> {
+  public applyHostLocation(timeoutMs = 0): Promise<void> {
     logger.info("Setting up bot hooks");
-    return Promise.all(this.bots.map((bot) => bot.applyHostLocation())).then(
-      () => {
-        this.isIdle = false;
-        logger.info("Node is successfully set to be a hook receiver");
-      }
-    );
+    return Promise.all(
+      this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs))
+    ).then(() => {
+      this.isIdle = false;
+      logger.info("Node is successfully set to be a hook receiver");
+    });
   }
 
   public triggerDaemon(
     nextReplicaUrl: string,
-    lifecycleInterval: number
+    lifecycleInterval: number,
+    timeoutMs = 0
   ): Promise<void> {
     if (!this.selfUrl) {
       return Promise.reject(
@@ -182,7 +188,7 @@ export class ExpressServer {
       .setUrls(this.selfUrl, nextReplicaUrl)
       .setIntervalDays(lifecycleInterval);
 
-    return this.applyHostLocation().then(() => {
+    return this.applyHostLocation(timeoutMs).then(() => {
       this.uptimeDaemon.start();
 
       if (!this.stat) {
