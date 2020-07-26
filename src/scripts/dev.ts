@@ -12,6 +12,7 @@ import {
   cacheSize,
   launchTime,
   memoryLimit,
+  dbPostgres,
 } from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
@@ -27,6 +28,7 @@ import { StopListener } from "../process";
 import { httpsOptions } from "../../certs";
 import { ScheduleDaemon } from "../scheduler";
 import { printCurrentMemoryStat } from "../memory";
+import { DbClient } from "../db";
 
 const logger = new Logger("dev-script");
 
@@ -48,13 +50,22 @@ export function run(threadId = 0): void {
     converterOptions
   );
 
+  const db = new DbClient({
+    user: dbPostgres.user,
+    password: dbPostgres.password,
+    host: dbPostgres.host,
+    database: dbPostgres.database,
+    port: dbPostgres.port,
+  });
+
   const stat = new StatisticApi(
     dbStat.statUrl,
     dbStat.appId,
     dbStat.appKey,
     dbStat.masterKey,
     cacheSize
-  );
+  ).connect(db);
+
   const bot = new TelegramBotModel(telegramBotApi, converter, stat).setAuthor(
     authorTelegramAccount
   );
@@ -64,7 +75,8 @@ export function run(threadId = 0): void {
   ).start();
   const stopListener = new StopListener().addTrigger(() => daemon.stop());
 
-  getHostName(appPort, selfUrl, ngRokToken)
+  db.init()
+    .then(() => getHostName(appPort, selfUrl, ngRokToken))
     .then((host) => {
       logger.info(`Telling telegram our location is ${Logger.y(host)}`);
       bot.setHostLocation(host, launchTime);

@@ -53,3 +53,11 @@ export const clusterSize = Number(process.env.CLUSTER_SIZE) || 1;
 
 export const launchTime =
   Number(process.env.LAUNCH_TIME) || new Date().getTime();
+
+export const dbPostgres = {
+  user: process.env.DB_USER || "",
+  password: process.env.DB_PASSWORD || "",
+  host: process.env.DB_HOST || "",
+  database: process.env.DB_DATABASE || "",
+  port: Number(process.env.DB_PORT) || 5432,
+};

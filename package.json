@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "import": "node src/scripts/runTs.js import ts",
     "chart": "node src/scripts/runTs.js chart ts",
     "start": "node src/scripts/runTs.js start ts",
     "dev": "node src/scripts/runTs.js dev ts",
@@ -26,6 +27,7 @@
     "@types/node": "14.0.26",
     "@types/node-telegram-bot-api": "0.50.2",
     "@types/parse": "2.12.2",
+    "@types/pg": "7.14.4",
     "@types/winston-loggly-bulk": "3.0.0",
     "aws-sdk": "2.720.0",
     "axios": "0.19.2",
@@ -38,6 +40,7 @@
     "node-fetch": "2.6.0",
     "node-telegram-bot-api": "0.50.0",
     "parse": "2.15.0",
+    "pg": "8.3.0",
     "prism-media": "1.2.2",
     "signal-exit": "3.0.3",
     "strip-ansi": "6.0.0",
