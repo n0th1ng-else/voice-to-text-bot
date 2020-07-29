@@ -158,3 +158,13 @@ export function getUserLanguage(msg: TgMessage): LanguageCode {
 
   return LanguageCode.En;
 }
+
+export function getLanguageByText(lang: string): LanguageCode {
+  switch (lang) {
+    case LanguageCode.Ru:
+      return LanguageCode.Ru;
+    case LanguageCode.En:
+    default:
+      return LanguageCode.En;
+  }
+}

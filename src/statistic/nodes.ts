@@ -32,7 +32,7 @@ export class NodeStatisticApi {
     });
   }
 
-  public createStat(
+  private createStat(
     selfUrl: string,
     active: boolean,
     version: string
