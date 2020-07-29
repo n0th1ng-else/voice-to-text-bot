@@ -14,7 +14,7 @@ export function run(): void {
   const chartHtml = resolvePath(__dirname, "../import/index.html");
 
   const app = express();
-  app.use(express.json());
+  app.use(express.json({ limit: "10240kb" }));
 
   app.get("/", (req: express.Request, res: express.Response) => {
     res.status(200).sendFile(chartHtml);

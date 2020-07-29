@@ -10,6 +10,7 @@ import {
   TgChatType,
   TgMessage,
 } from "../src/telegram/api/types";
+import { UsageRowScheme } from "../src/db/sql/usages";
 
 interface UserNameOptions {
   userName?: string;
@@ -207,6 +208,18 @@ export class BotStatRecordModel {
       [UsageStatKey.LangId]: this.langId,
       [UsageStatKey.UsageCount]: this.usageCount,
       [UsageStatKey.UserName]: this.user,
+    };
+  }
+
+  public getDbDto(): UsageRowScheme {
+    return {
+      usage_id: this.objectId || "",
+      chat_id: this.chatId,
+      user_name: this.user,
+      usage_count: this.usageCount,
+      lang_id: this.langId,
+      created_at: new Date(),
+      updated_at: new Date(),
     };
   }
 }

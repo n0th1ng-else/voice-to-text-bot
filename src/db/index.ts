@@ -19,14 +19,8 @@ export class DbClient {
 
   private readonly initialized: boolean;
 
-  constructor(config: DbConnectionConfig) {
-    this.initialized = Object.values(config).every((val) => val);
-    if (!this.initialized) {
-      logger.error(
-        "Missing connection data for postgres server. Check the config"
-      );
-    }
-    const pool = new Pool({
+  private static getPool(config: DbConnectionConfig): Pool {
+    return new Pool({
       host: config.host,
       user: config.user,
       password: config.password,
@@ -34,6 +28,15 @@ export class DbClient {
       port: config.port,
       max: 1,
     });
+  }
+
+  constructor(config: DbConnectionConfig, pool = DbClient.getPool(config)) {
+    this.initialized = Object.values(config).every((val) => val);
+    if (!this.initialized) {
+      logger.error(
+        "Missing connection data for postgres server. Check the config"
+      );
+    }
 
     this.setDefaults();
     this.setParsers();

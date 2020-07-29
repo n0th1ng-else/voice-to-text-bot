@@ -53,8 +53,13 @@ import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google";
 import { TgChatType } from "../src/telegram/api/types";
 import { TelegramApi } from "../src/telegram/api";
 import { httpsOptions } from "../certs";
+import { DbClient } from "../src/db";
+import { Pool as MockPool } from "../src/db/__mocks__/pg";
+import { NodesSql } from "../src/db/sql/nodes.sql";
+import { UsagesSql } from "../src/db/sql/usages.sql";
 
 jest.mock("../src/logger");
+jest.mock("../src/env");
 
 mockGoogleAuth();
 
@@ -78,7 +83,23 @@ const dbUrl = `${localhostUrl}:${dbPort}`;
 
 const enableSSL = false;
 
-const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
+const dbConfig = {
+  user: "spy-user",
+  password: "not-me",
+  host: "localhost",
+  database: "test-db",
+  port: 5432,
+};
+const testPool = new MockPool(dbConfig);
+const db = new DbClient(dbConfig, testPool);
+
+const stat = new StatisticApi(
+  dbUrl,
+  "db-app",
+  "db-key",
+  "db-master",
+  0
+).connect(db);
 
 const bot = new TelegramBotModel("telegram-api-token", converter, stat);
 bot.setHostLocation(hostUrl, launchTime);
@@ -108,11 +129,15 @@ describe("[default language - english]", () => {
       appVersion,
       httpsOptions
     );
-    return server
-      .setSelfUrl(hostUrl)
-      .setBots([bot])
-      .setStat(stat)
-      .start()
+
+    testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
+    testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
+
+    return db
+      .init()
+      .then(() =>
+        server.setSelfUrl(hostUrl).setBots([bot]).setStat(stat).start()
+      )
       .then((stopFn) => {
         stopHandler = stopFn;
         return server.applyHostLocation();
@@ -129,8 +154,9 @@ describe("[default language - english]", () => {
   });
 
   afterEach(() => {
-    expect(dbServer.isDone()).toBeTruthy();
-    expect(telegramServer.isDone()).toBeTruthy();
+    expect(dbServer.isDone()).toBe(true);
+    expect(telegramServer.isDone()).toBe(true);
+    expect(testPool.isDone()).toBe(true);
   });
 
   describe("private messages", () => {
@@ -142,6 +168,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, "some text");
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -161,6 +188,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, "some text");
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.Ru
       );
@@ -181,6 +209,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, "some text");
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -201,6 +230,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, BotCommand.Start);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -224,6 +254,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, BotCommand.Support);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -248,6 +279,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, BotCommand.Support);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -271,6 +303,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, BotCommand.Language);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -294,6 +327,7 @@ describe("[default language - english]", () => {
       tgMessage.setText(testMessageId, BotCommand.Language);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -323,7 +357,7 @@ describe("[default language - english]", () => {
             newLangId,
             LabelId.ChangeLang
           ),
-          mockUpdateBotStatLang(dbServer, statModel, newLangId),
+          mockUpdateBotStatLang(dbServer, testPool, statModel, newLangId),
         ]);
       });
     });
@@ -336,6 +370,7 @@ describe("[default language - english]", () => {
 
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -357,7 +392,7 @@ describe("[default language - english]", () => {
           statModel.langId,
           `🗣 ${voiceFileContent}`
         ),
-        mockUpdateBotStatUsage(dbServer, statModel),
+        mockUpdateBotStatUsage(dbServer, testPool, statModel),
       ]).then(() => {
         expect(speechScope.isDone()).toBeTruthy();
       });
@@ -369,6 +404,7 @@ describe("[default language - english]", () => {
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -401,6 +437,7 @@ describe("[default language - english]", () => {
       );
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -421,6 +458,7 @@ describe("[default language - english]", () => {
       tgMessage.setVoice(testMessageId, voiceFileId, -1);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -444,6 +482,7 @@ describe("[default language - english]", () => {
 
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -465,7 +504,7 @@ describe("[default language - english]", () => {
           statModel.langId,
           `🗣 ${voiceFileContent}`
         ),
-        mockUpdateBotStatUsage(dbServer, statModel),
+        mockUpdateBotStatUsage(dbServer, testPool, statModel),
       ]).then(() => {
         expect(speechScope.isDone()).toBeTruthy();
       });
@@ -477,6 +516,7 @@ describe("[default language - english]", () => {
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -503,6 +543,7 @@ describe("[default language - english]", () => {
       );
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
@@ -523,6 +564,7 @@ describe("[default language - english]", () => {
       tgMessage.setAudio(testMessageId, voiceFileId, -38);
       const statModel = mockGetBotStatItem(
         dbServer,
+        testPool,
         tgMessage.chatId,
         LanguageCode.En
       );
