@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { nanoid } from "nanoid";
+import { NodesSql } from "./nodes.sql";
 
 export interface NodeRowScheme {
   node_id: string;
@@ -16,16 +17,7 @@ export class NodesDb {
   constructor(private readonly pool: Pool) {}
 
   public init(): Promise<void> {
-    const query = `
-      CREATE TABLE IF NOT EXISTS nodes (
-        node_id varchar(20) PRIMARY KEY,
-        self_url text UNIQUE NOT NULL,
-        is_active boolean NOT NULL,
-        version varchar(100) NOT NULL,
-        created_at timestamptz NOT NULL,
-        updated_at timestamptz NOT NULL
-      );
-    `;
+    const query = NodesSql.createTable;
     const values = [];
     return this.pool.query(query, values).then(() => {
       this.initialized = true;
@@ -42,11 +34,7 @@ export class NodesDb {
         new Error("The table nodes is not initialized yet")
       );
     }
-    const query = `
-      INSERT INTO nodes(node_id, self_url, is_active, version, created_at, updated_at) 
-      VALUES($1, $2, $3, $4, $5, $6)
-      RETURNING node_id, self_url, is_active, version, created_at, updated_at;
-    `;
+    const query = NodesSql.insertRow;
     const nodeId = nanoid(15);
     const createdAt = new Date();
     const updatedAt = createdAt;
@@ -70,14 +58,7 @@ export class NodesDb {
         new Error("The table nodes is not initialized yet")
       );
     }
-    const query = `
-      UPDATE nodes SET
-        is_active=$1,
-        version=$2,
-        updated_at=$3
-      WHERE node_id=$4
-      RETURNING node_id, self_url, is_active, version, created_at, updated_at;
-    `;
+    const query = NodesSql.updateRow;
     const updatedAt = new Date();
     const values = [isActive, version, updatedAt, nodeId];
     return this.pool.query<NodeRowScheme>(query, values).then((queryData) => {
@@ -97,12 +78,7 @@ export class NodesDb {
         new Error("The table nodes is not initialized yet")
       );
     }
-    const query = `
-      SELECT node_id, self_url, is_active, version, created_at, updated_at 
-      FROM nodes 
-      WHERE self_url=$1 
-      ORDER BY created_at;
-    `;
+    const query = NodesSql.getRows;
     const values = [selfUrl];
     return this.pool
       .query<NodeRowScheme>(query, values)

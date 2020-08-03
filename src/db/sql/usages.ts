@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { nanoid } from "nanoid";
+import { UsagesSql } from "./usages.sql";
 
 export interface UsageRowScheme {
   usage_id: string;
@@ -17,17 +18,7 @@ export class UsagesDb {
   constructor(private readonly pool: Pool) {}
 
   public init(): Promise<void> {
-    const query = `
-      CREATE TABLE IF NOT EXISTS usages (
-        usage_id varchar(20) PRIMARY KEY,
-        chat_id bigint UNIQUE NOT NULL,
-        user_name text NOT NULL,
-        usage_count bigint NOT NULL,
-        lang_id varchar(20) NOT NULL,
-        created_at timestamptz NOT NULL,
-        updated_at timestamptz NOT NULL
-      );
-    `;
+    const query = UsagesSql.createTable;
     const values = [];
     return this.pool.query(query, values).then(() => {
       this.initialized = true;
@@ -46,11 +37,7 @@ export class UsagesDb {
       );
     }
 
-    const query = `
-      INSERT INTO usages(usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at) 
-      VALUES($1, $2, $3, $4, $5, $6, $7)
-      RETURNING usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at;
-    `;
+    const query = UsagesSql.insertRow;
     const usageId = nanoid(15);
     const createdAt = new Date();
     const updatedAt = createdAt;
@@ -83,15 +70,7 @@ export class UsagesDb {
         new Error("The table usages is not initialized yet")
       );
     }
-    const query = `
-      UPDATE usages SET
-        user_name=$1,
-        usage_count=$2,
-        lang_id=$3,
-        updated_at=$4
-      WHERE usage_id=$5
-      RETURNING usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at;
-    `;
+    const query = UsagesSql.updateRow;
     const updatedAt = new Date();
     const values = [username, usageCount, langId, updatedAt, usageId];
     return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
@@ -121,16 +100,7 @@ export class UsagesDb {
         new Error("The table usages is not initialized yet")
       );
     }
-    const query = `
-      UPDATE usages SET
-        user_name=$1,
-        usage_count=$2,
-        lang_id=$3,
-        created_at=$4,
-        updated_at=$5
-      WHERE usage_id=$6
-      RETURNING usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at;
-    `;
+    const query = UsagesSql.updateRowWithDate;
     const values = [
       username,
       usageCount,
@@ -157,12 +127,7 @@ export class UsagesDb {
       );
     }
 
-    const query = `
-      SELECT usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at 
-      FROM usages 
-      WHERE chat_id=$1 
-      ORDER BY created_at;
-    `;
+    const query = UsagesSql.getRows;
     const values = [chatId];
     return this.pool
       .query<UsageRowScheme>(query, values)
