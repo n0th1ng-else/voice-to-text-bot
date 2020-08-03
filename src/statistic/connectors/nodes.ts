@@ -18,23 +18,33 @@ export class NodesConnector {
     active: boolean,
     version: string
   ): Promise<void> {
-    return this.toggleActiveDB(selfUrl, active, version).then(() =>
-      this.stat.toggleActive(selfUrl, active, version)
+    return this.toggleActiveOBJ(selfUrl, active, version).then(() =>
+      this.toggleActiveDB(selfUrl, active, version)
     );
   }
 
-  public toggleActiveDB(
+  private toggleActiveDB(
     selfUrl: string,
     active: boolean,
     version: string
   ): Promise<void> {
     if (!this.db) {
-      return Promise.resolve();
+      return Promise.reject(new Error("Postgres in not initialized"));
     }
 
-    return this.db.updateState(selfUrl, active, version).then(
-      () => logger.info("POSTGRES OK RESULT"),
-      (err) => logger.error("POSTGRES ERROR", err)
+    return this.db.updateState(selfUrl, active, version).then(() => {
+      // Flatten promise
+    });
+  }
+
+  private toggleActiveOBJ(
+    selfUrl: string,
+    active: boolean,
+    version: string
+  ): Promise<void> {
+    return this.stat.toggleActive(selfUrl, active, version).then(
+      () => logger.info("STAT OK RESULT"),
+      (err) => logger.error("STAT ERROR", err)
     );
   }
 }

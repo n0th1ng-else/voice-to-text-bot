@@ -144,6 +144,7 @@ function mockBotStatUpdateUsage(
       expect(rUsageCount).toBe(item.usageCount + 1);
       expect(rLangId).toBe(item.langId);
       expect(rUsageId).toBe(item.objectId);
+      resolve();
 
       return Promise.resolve({ rows: [item.getDbDto()] });
     });
@@ -153,7 +154,7 @@ function mockBotStatUpdateUsage(
 
       expect(requestBody.usageCount).toBe(item.usageCount + 1);
       expect(requestBody.user).toBe(item.user);
-      resolve();
+
       return [200, JSON.stringify({})];
     });
   });
@@ -175,6 +176,7 @@ function mockBotStatUpdateLang(
       expect(rUsageId).toBe(item.objectId);
 
       item.setLang(langId);
+      resolve();
 
       return Promise.resolve({ rows: [item.getDbDto()] });
     });
@@ -184,7 +186,7 @@ function mockBotStatUpdateLang(
 
       expect(requestBody.langId).toBe(langId);
       item.setLang(langId);
-      resolve();
+
       return [200, JSON.stringify({})];
     });
   });
