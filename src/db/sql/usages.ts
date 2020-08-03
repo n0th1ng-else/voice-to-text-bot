@@ -53,7 +53,7 @@ export class UsagesDb {
     return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
       const firstRow = queryData.rows.shift();
       if (!firstRow) {
-        return Promise.reject(new Error("Unable create the row"));
+        return Promise.reject(new Error("Unable to get created row info"));
       }
       return firstRow;
     });
@@ -76,9 +76,7 @@ export class UsagesDb {
     return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
       const firstRow = queryData.rows.shift();
       if (!firstRow) {
-        return Promise.reject(
-          new Error("Row not found. No update was applied")
-        );
+        return Promise.reject(new Error("Unable to get updated row info"));
       }
       return firstRow;
     });
@@ -112,9 +110,7 @@ export class UsagesDb {
     return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
       const firstRow = queryData.rows.shift();
       if (!firstRow) {
-        return Promise.reject(
-          new Error("Row not found. No update was applied")
-        );
+        return Promise.reject(new Error("Unable to get updated row info"));
       }
       return firstRow;
     });
