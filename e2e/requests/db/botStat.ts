@@ -136,18 +136,18 @@ function mockBotStatUpdateUsage(
   pool: MockPool,
   item: BotStatRecordModel
 ): Promise<void> {
-  pool.mockQuery(UsagesSql.updateRow, (values) => {
-    expect(values).toHaveLength(5);
-    const [rUser, rUsageCount, rLangId, , rUsageId] = values;
-    expect(rUser).toBe(item.user);
-    expect(rUsageCount).toBe(item.usageCount + 1);
-    expect(rLangId).toBe(item.langId);
-    expect(rUsageId).toBe(item.objectId);
-
-    return Promise.resolve({ rows: [item.getDbDto()] });
-  });
-
   return new Promise((resolve) => {
+    pool.mockQuery(UsagesSql.updateRow, (values) => {
+      expect(values).toHaveLength(5);
+      const [rUser, rUsageCount, rLangId, , rUsageId] = values;
+      expect(rUser).toBe(item.user);
+      expect(rUsageCount).toBe(item.usageCount + 1);
+      expect(rLangId).toBe(item.langId);
+      expect(rUsageId).toBe(item.objectId);
+
+      return Promise.resolve({ rows: [item.getDbDto()] });
+    });
+
     host.post(`${path}/${item.objectId}`).reply((uri, body) => {
       const requestBody = typeof body === "string" ? JSON.parse(body) : body;
 
@@ -165,20 +165,20 @@ function mockBotStatUpdateLang(
   item: BotStatRecordModel,
   langId: LanguageCode
 ): Promise<void> {
-  pool.mockQuery(UsagesSql.updateRow, (values) => {
-    expect(values).toHaveLength(5);
-    const [rUser, rUsageCount, rLangId, , rUsageId] = values;
-    expect(rUser).toBe(item.user);
-    expect(rUsageCount).toBe(item.usageCount);
-    expect(rLangId).toBe(langId);
-    expect(rUsageId).toBe(item.objectId);
-
-    item.setLang(langId);
-
-    return Promise.resolve({ rows: [item.getDbDto()] });
-  });
-
   return new Promise((resolve) => {
+    pool.mockQuery(UsagesSql.updateRow, (values) => {
+      expect(values).toHaveLength(5);
+      const [rUser, rUsageCount, rLangId, , rUsageId] = values;
+      expect(rUser).toBe(item.user);
+      expect(rUsageCount).toBe(item.usageCount);
+      expect(rLangId).toBe(langId);
+      expect(rUsageId).toBe(item.objectId);
+
+      item.setLang(langId);
+
+      return Promise.resolve({ rows: [item.getDbDto()] });
+    });
+
     host.post(`${path}/${item.objectId}`).reply((uri, body) => {
       const requestBody = typeof body === "string" ? JSON.parse(body) : body;
 
