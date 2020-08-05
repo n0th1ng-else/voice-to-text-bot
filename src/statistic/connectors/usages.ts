@@ -19,14 +19,14 @@ export class UsagesConnector {
     username: string,
     lang: LanguageCode
   ): Promise<void> {
-    return this.updateUsageCountDB(chatId, username, lang).then(() =>
-      this.stat.updateUsageCount(chatId, username, lang)
+    return this.updateUsageCountOBJ(chatId, username, lang).then(() =>
+      this.updateUsageCountDB(chatId, username, lang)
     );
   }
 
   public updateLanguage(chatId: number, lang: LanguageCode): Promise<void> {
-    return this.updateLanguageDB(chatId, lang).then(() =>
-      this.stat.updateLanguage(chatId, lang)
+    return this.updateLanguageOBJ(chatId, lang).then(() =>
+      this.updateLanguageDB(chatId, lang)
     );
   }
 
@@ -35,49 +35,73 @@ export class UsagesConnector {
     username: string,
     lang: LanguageCode
   ): Promise<LanguageCode> {
-    return this.getLanguageDB(chatId, username, lang).then(() =>
-      this.stat.getLanguage(chatId, username, lang)
+    return this.getLanguageOBJ(chatId, username, lang).then(() =>
+      this.getLanguageDB(chatId, username, lang)
     );
   }
 
-  public updateUsageCountDB(
+  private updateUsageCountDB(
     chatId: number,
     username: string,
     lang: LanguageCode
   ): Promise<void> {
     if (!this.db) {
-      return Promise.resolve();
+      return Promise.reject(new Error("Postgres in not initialized"));
     }
 
-    return this.db.updateUsageCount(chatId, username, lang).then(
-      () => logger.info("POSTGRES OK RESULT"),
-      (err) => logger.error("POSTGRES ERROR", err)
-    );
+    return this.db.updateUsageCount(chatId, username, lang).then(() => {
+      // Flatten promise
+    });
   }
 
-  public updateLanguageDB(chatId: number, lang: LanguageCode): Promise<void> {
+  private updateLanguageDB(chatId: number, lang: LanguageCode): Promise<void> {
     if (!this.db) {
-      return Promise.resolve();
+      return Promise.reject(new Error("Postgres in not initialized"));
     }
 
-    return this.db.updateLangId(chatId, lang).then(
-      () => logger.info("POSTGRES OK RESULT"),
-      (err) => logger.error("POSTGRES ERROR", err)
-    );
+    return this.db.updateLangId(chatId, lang).then(() => {
+      // Flatten promise
+    });
   }
 
-  public getLanguageDB(
+  private getLanguageDB(
+    chatId: number,
+    username: string,
+    lang: LanguageCode
+  ): Promise<LanguageCode> {
+    if (!this.db) {
+      return Promise.reject(new Error("Postgres in not initialized"));
+    }
+
+    return this.db.getLangId(chatId, username, lang);
+  }
+
+  private updateUsageCountOBJ(
     chatId: number,
     username: string,
     lang: LanguageCode
   ): Promise<void> {
-    if (!this.db) {
-      return Promise.resolve();
-    }
+    return this.stat.updateUsageCount(chatId, username, lang).then(
+      () => logger.info("STAT OK RESULT"),
+      (err) => logger.error("STAT ERROR", err)
+    );
+  }
 
-    return this.db.getLangId(chatId, username, lang).then(
-      (langId) => logger.info("POSTGRES OK RESULT", langId),
-      (err) => logger.error("POSTGRES ERROR", err)
+  private updateLanguageOBJ(chatId: number, lang: LanguageCode): Promise<void> {
+    return this.stat.updateLanguage(chatId, lang).then(
+      () => logger.info("STAT OK RESULT"),
+      (err) => logger.error("STAT ERROR", err)
+    );
+  }
+
+  private getLanguageOBJ(
+    chatId: number,
+    username: string,
+    lang: LanguageCode
+  ): Promise<void> {
+    return this.stat.getLanguage(chatId, username, lang).then(
+      (langId) => logger.info("STAT OK RESULT", langId),
+      (err) => logger.error("STAT ERROR", err)
     );
   }
 }
