@@ -26,6 +26,10 @@ export function isSupportMessage(
   return isCommandMessage(model, msg, BotCommand.Support);
 }
 
+export function isFundMessage(model: BotMessageModel, msg: TgMessage): boolean {
+  return isCommandMessage(model, msg, BotCommand.Fund);
+}
+
 function isCommandMessage(
   model: BotMessageModel,
   msg: TgMessage,

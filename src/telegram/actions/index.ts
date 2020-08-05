@@ -5,6 +5,7 @@ import { LangAction } from "./lang";
 import { SupportAction } from "./support";
 import { VoiceAction } from "./voice";
 import { CoreAction } from "./common";
+import { FundAction } from "./fund";
 
 export class BotActions {
   public readonly start: StartAction;
@@ -12,6 +13,7 @@ export class BotActions {
   public readonly support: SupportAction;
   public readonly voice: VoiceAction;
   public readonly core: CoreAction;
+  public readonly fund: FundAction;
 
   constructor(stat: StatisticApi, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -19,5 +21,6 @@ export class BotActions {
     this.support = new SupportAction(stat, bot);
     this.voice = new VoiceAction(stat, bot);
     this.core = new CoreAction(stat, bot);
+    this.fund = new FundAction(stat, bot);
   }
 }

@@ -23,7 +23,7 @@ import {
 } from "../src/recognition";
 import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
-import { githubUrl, localhostUrl } from "../src/const";
+import { githubUrl, localhostUrl, patreonAccount } from "../src/const";
 import {
   getMockCertificate,
   TelegramMessageMeta,
@@ -360,6 +360,32 @@ describe("[default language - english]", () => {
           mockUpdateBotStatLang(dbServer, testPool, statModel, newLangId),
         ]);
       });
+    });
+
+    it("responds on a /fund message", () => {
+      tgMessage.setText(testMessageId, BotCommand.Fund);
+      const statModel = mockGetBotStatItem(
+        dbServer,
+        testPool,
+        tgMessage.chatId,
+        LanguageCode.En
+      );
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.FundCommandMessage,
+          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.PatreonLinkTitle,
+              patreonAccount
+            ),
+          ])
+        ),
+      ]);
     });
 
     it("converts voice into text (it fits 60s limit)", () => {
