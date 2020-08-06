@@ -44,10 +44,19 @@ const getRows = `
       ORDER BY created_at;
     `;
 
+const statRows = `
+      SELECT usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at
+      FROM usages 
+      WHERE usage_count>=$1 
+      AND created_at BETWEEN $2 AND $3
+      ORDER BY created_at;
+    `;
+
 export const UsagesSql = {
   createTable,
   insertRow,
   updateRow,
   updateRowWithDate,
   getRows,
+  statRows,
 };

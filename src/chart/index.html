@@ -9,20 +9,54 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@0.1.3/src/chartjs-plugin-trendline.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@0.5.7/chartjs-plugin-annotation.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel@2.0.3/dist/chartjs-plugin-doughnutlabel.min.js"></script>
+    <script src="/index.js"></script>
     <title>Chart generator</title>
+
+    <style>
+      .flex {
+        display: flex;
+      }
+
+      .side-panel {
+        flex: 0 0 300px;
+      }
+
+      .spaced {
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .chart {
+        flex: 1 1 100%;
+        height: 550px;
+        padding: 10px;
+      }
+
+      .panel {
+        padding: 10px;
+        background-color: rgba(180, 1, 255, 0.15);
+      }
+
+      .padded {
+        margin-bottom: 20px;
+      }
+
+      .column {
+        flex-direction: column;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
   </head>
 
   <body>
-    <div>
-      <div style="display: flex; justify-content: space-between;">
-        <div>
-          <label for="fileEl">Choose a file:</label>
-          <input type="file" onchange="onFileSelect()" id="fileEl" />
-        </div>
-
-        <div>
-          <label for="chartTypeEl">Choose a type:</label>
-          <select id="chartTypeEl" onchange="onTypeSelect()">
+    <div class="flex">
+      <div class="flex side-panel panel column">
+        <div class="flex spaced padded">
+          <label for="typeEl">Choose a type:</label>
+          <select id="typeEl">
             <option value="language">Language</option>
             <option value="language-total">Language Total</option>
             <option value="installs">Installs</option>
@@ -34,537 +68,58 @@
             <option value="direct-group-usages">Direct vs Groups usages</option>
           </select>
         </div>
+        <div class="flex spaced padded">
+          <label for="legacyEl">Use file (legacy)</label>
+          <input type="checkbox" id="legacyEl" onchange="switchMethod()" />
+        </div>
 
-        <div>
+        <div class="flex spaced padded column" id="options">
+          <div class="flex spaced">
+            <label for="fromEl">From date</label>
+            <input type="date" id="fromEl" />
+          </div>
+          <div class="flex spaced">
+            <label for="toEl">To date</label>
+            <input type="date" id="toEl" />
+          </div>
+          <div class="flex spaced padded">
+            <label for="usageEl">Usage count</label>
+            <input type="number" id="usageEl" value="0" />
+          </div>
+
+          <div class="flex spaced">
+            <label for="pgUser">Username</label>
+            <input type="text" id="pgUser" />
+          </div>
+          <div class="flex spaced">
+            <label for="pgPwd">Password</label>
+            <input type="password" id="pgPwd" />
+          </div>
+          <div class="flex spaced">
+            <label for="pgHost">Host</label>
+            <input type="tel" id="pgHost" value="rogue.db.elephantsql.com" />
+          </div>
+          <div class="flex spaced">
+            <label for="pgPort">Port</label>
+            <input type="number" id="pgPort" value="5432" />
+          </div>
+        </div>
+
+        <div class="flex spaced padded column hidden" id="legacy-options">
+          <div class="flex spaced">
+            <input type="file" id="fileEl" />
+          </div>
+        </div>
+
+        <div class="flex spaced padded">
           <button onclick="onReset()">Reset</button>
+          <button onclick="onDraw()">Draw</button>
         </div>
       </div>
-      <div style="width: 900px; height: 550px; margin: 40px auto;">
+
+      <div class="chart">
         <canvas id="chartEl"></canvas>
       </div>
     </div>
-
-    <script>
-      const colors = {
-        regular: {
-          blue: "rgb(54,162,236)",
-          red: "rgb(255,98,132)",
-          white: "rgb(256,256,256)",
-        },
-        light: {
-          blue: "rgba(54,162,236, .8)",
-          red: "rgba(255,98,132, .8)",
-        },
-        lighter: {
-          blue: "rgba(54,162,236, .15)",
-          red: "rgba(255,98,132, .15)",
-        },
-      };
-      let chartType = "language";
-      let chardData = [];
-      let chart = null;
-
-      class DataModel {
-        constructor(item) {
-          this.chatId = item.chatId;
-          this.langId = item.langId;
-          this.createdAt = new Date(item.createdAt);
-          this.updatedAt = new Date(item.updatedAt);
-          this.usageCount = item.usageCount;
-        }
-
-        getDateString(date) {
-          const day = date.getDate();
-          const month = date.getMonth() + 1;
-          const dayStr = day < 10 ? `0${day}` : day.toString();
-          const monthStr = month < 10 ? `0${month}` : month.toString();
-          return `${dayStr}.${monthStr}`;
-        }
-      }
-
-      const renderLanguageChart = (arr, ctx) => {
-        let currentDay = 100;
-        let currentDayIndex = 0;
-
-        const data = arr.reduce((res, item) => {
-          const day = item.createdAt.getDate();
-          const date = item.getDateString(item.createdAt);
-
-          const isEn = item.langId === "en-US";
-          const forRu = isEn ? 0 : 1;
-          const forEn = isEn ? 1 : 0;
-
-          if (day === currentDay) {
-            res[currentDayIndex].en += forEn;
-            res[currentDayIndex].ru += forRu;
-          } else {
-            currentDayIndex++;
-            currentDay = day;
-
-            res[currentDayIndex] = { en: forEn, ru: forRu, date };
-          }
-
-          return res;
-        }, {});
-        delete data[currentDayIndex]; // last day is not relevant
-
-        const dataSize = Object.keys(data).length;
-        const sum = {
-          en: Object.keys(data).reduce((res, key) => res + data[key].en, 0),
-          ru: Object.keys(data).reduce((res, key) => res + data[key].ru, 0),
-        };
-
-        chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: Object.keys(data).reduce((res, key) => {
-              res.push(data[key].date);
-              return res;
-            }, []),
-            datasets: [
-              {
-                label: "English chats",
-                fill: false,
-                data: Object.keys(data).reduce((res, key) => {
-                  res.push(data[key].en);
-                  return res;
-                }, []),
-                borderColor: colors.regular.red,
-                backgroundColor: colors.regular.red,
-              },
-              {
-                label: "Russian chats",
-                fill: false,
-                data: Object.keys(data).reduce((res, key) => {
-                  res.push(data[key].ru);
-                  return res;
-                }, []),
-                borderColor: colors.regular.blue,
-                backgroundColor: colors.regular.blue,
-              },
-            ],
-          },
-          options: {
-            plugins: {
-              labels: {
-                fontSize: 24,
-                fontColor: colors.regular.white,
-                render: () => "",
-              },
-            },
-            annotation: {
-              annotations: [
-                {
-                  id: "ru-line",
-                  type: "line",
-                  mode: "horizontal",
-                  scaleID: "y-axis-0",
-                  value: dataSize ? sum.ru / dataSize : 0,
-                  borderColor: colors.light.blue,
-                  borderWidth: 2,
-                  borderDash: [2, 2],
-                },
-                {
-                  id: "en-line",
-                  type: "line",
-                  mode: "horizontal",
-                  scaleID: "y-axis-0",
-                  value: dataSize ? sum.en / dataSize : 0,
-                  borderColor: colors.light.red,
-                  borderWidth: 2,
-                  borderDash: [2, 2],
-                },
-              ],
-            },
-            scales: {
-              yAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "# of chats",
-                  },
-                },
-              ],
-              xAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "Date",
-                  },
-                },
-              ],
-            },
-          },
-        });
-      };
-
-      const renderTotalLanguagePie = (arr, ctx) => {
-        const data = arr.reduce(
-          (res, item) => {
-            const isEn = item.langId === "en-US";
-            const forRu = isEn ? 0 : 1;
-            const forEn = isEn ? 1 : 0;
-            res.en += forEn;
-            res.ru += forRu;
-
-            return res;
-          },
-          { en: 0, ru: 0 }
-        );
-
-        chart = new Chart(ctx, {
-          type: "pie",
-          data: {
-            labels: ["English chats", "Russian chats"],
-            datasets: [
-              {
-                data: [data.en, data.ru],
-                backgroundColor: [colors.regular.red, colors.regular.blue],
-              },
-            ],
-          },
-          options: {
-            plugins: {
-              labels: {
-                fontSize: 24,
-                fontColor: colors.regular.white,
-              },
-            },
-          },
-        });
-      };
-
-      const renderInstallsChart = (arr, ctx) => {
-        let currentDay = 100;
-        let currentDayIndex = 0;
-
-        const data = arr.reduce((res, item) => {
-          const day = item.createdAt.getDate();
-          const date = item.getDateString(item.createdAt);
-
-          if (day === currentDay) {
-            res[currentDayIndex].count++;
-          } else {
-            currentDayIndex++;
-            currentDay = day;
-
-            res[currentDayIndex] = { count: 1, date };
-          }
-
-          return res;
-        }, {});
-        delete data[currentDayIndex]; // last day is not relevant
-
-        chart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: Object.keys(data).reduce((res, key) => {
-              res.push(data[key].date);
-              return res;
-            }, []),
-            datasets: [
-              {
-                label: "# of installs",
-                data: Object.keys(data).reduce((res, key) => {
-                  res.push(data[key].count);
-                  return res;
-                }, []),
-                borderColor: colors.regular.blue,
-                backgroundColor: colors.lighter.blue,
-                trendlineLinear: {
-                  style: colors.light.red,
-                  lineStyle: "dotted|solid",
-                  width: 2,
-                },
-              },
-            ],
-          },
-          options: {
-            scales: {
-              yAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "# of chats",
-                  },
-                },
-              ],
-              xAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "Date",
-                  },
-                },
-              ],
-            },
-          },
-        });
-      };
-
-      const renderInstallsCumulativeChart = (arr, ctx) => {
-        let currentDay = 100;
-        let currentDayIndex = 0;
-
-        const data = arr.reduce((res, item) => {
-          const day = item.createdAt.getDate();
-          const date = item.getDateString(item.createdAt);
-
-          if (day === currentDay) {
-            res[currentDayIndex].count++;
-          } else {
-            const lastDayCount =
-              (res[currentDayIndex] && res[currentDayIndex].count) || 1;
-            currentDayIndex++;
-            currentDay = day;
-
-            res[currentDayIndex] = { count: lastDayCount, date };
-          }
-
-          return res;
-        }, {});
-        delete data[currentDayIndex]; // last day is not relevant
-
-        chart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: Object.keys(data).reduce((res, key) => {
-              res.push(data[key].date);
-              return res;
-            }, []),
-            datasets: [
-              {
-                label: "# of installs",
-                data: Object.keys(data).reduce((res, key) => {
-                  res.push(data[key].count);
-                  return res;
-                }, []),
-                borderColor: colors.regular.blue,
-                backgroundColor: colors.lighter.blue,
-                trendlineLinear: {
-                  style: colors.light.red,
-                  lineStyle: "dotted|solid",
-                  width: 2,
-                },
-              },
-            ],
-          },
-          options: {
-            scales: {
-              yAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "# of chats",
-                  },
-                },
-              ],
-              xAxes: [
-                {
-                  scaleLabel: {
-                    display: true,
-                    labelString: "Date",
-                  },
-                },
-              ],
-            },
-          },
-        });
-      };
-
-      const renderInstallsUsagesPie = (arr, ctx) => {
-        const data = arr.reduce(
-          (res, item) => {
-            const usedOnce = item.usageCount ? 1 : 0;
-            res.installs += 1;
-            res.usages += usedOnce;
-
-            return res;
-          },
-          { installs: 0, usages: 0 }
-        );
-        const percentage = Math.floor((data.usages * 100) / data.installs);
-
-        chart = new Chart(ctx, {
-          type: "doughnut",
-          data: {
-            labels: ["Installed", "Used at least once"],
-            datasets: [
-              {
-                data: [data.installs, data.usages],
-                backgroundColor: [colors.regular.red, colors.regular.blue],
-              },
-            ],
-          },
-          options: {
-            plugins: {
-              labels: {
-                fontSize: 24,
-                fontColor: colors.regular.white,
-                render: "value",
-              },
-              doughnutlabel: {
-                labels: [
-                  {
-                    text: `${percentage}%`,
-                    font: {
-                      size: "60",
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        });
-      };
-
-      const renderDirectVsGroupsPie = (arr, ctx) => {
-        const data = arr.reduce(
-          (res, item) => {
-            const isDirect = item.chatId > 0;
-            const forGroup = isDirect ? 0 : 1;
-            const forDirect = isDirect ? 1 : 0;
-            res.group += forGroup;
-            res.direct += forDirect;
-
-            return res;
-          },
-          { direct: 0, group: 0 }
-        );
-
-        chart = new Chart(ctx, {
-          type: "pie",
-          data: {
-            labels: ["Direct messages", "Groups and channels"],
-            datasets: [
-              {
-                data: [data.direct, data.group],
-                backgroundColor: [colors.regular.red, colors.regular.blue],
-              },
-            ],
-          },
-          options: {
-            plugins: {
-              labels: {
-                fontSize: 24,
-                fontColor: colors.regular.white,
-              },
-            },
-          },
-        });
-      };
-
-      const renderDirectVsGroupsUsagePie = (arr, ctx) => {
-        const data = arr.reduce(
-          (res, item) => {
-            const isDirect = item.chatId > 0;
-            const forGroup = isDirect ? 0 : item.usageCount;
-            const forDirect = isDirect ? item.usageCount : 0;
-            res.group += forGroup;
-            res.direct += forDirect;
-
-            return res;
-          },
-          { direct: 0, group: 0 }
-        );
-
-        chart = new Chart(ctx, {
-          type: "pie",
-          data: {
-            labels: ["Direct messages", "Groups and channels"],
-            datasets: [
-              {
-                data: [data.direct, data.group],
-                backgroundColor: [colors.regular.red, colors.regular.blue],
-              },
-            ],
-          },
-          options: {
-            plugins: {
-              labels: {
-                fontSize: 24,
-                fontColor: colors.regular.white,
-              },
-            },
-          },
-        });
-      };
-
-      const renderChart = () => {
-        const ctx = document.getElementById("chartEl").getContext("2d");
-
-        if (chart) {
-          chart.destroy();
-        }
-
-        if (!chardData || !chardData.length) {
-          return;
-        }
-
-        chardData.reduce((res, item) => {
-          const duplicate = res.includes(item.chatId) && item.chatId;
-          console.warn("duplicated?", duplicate && `true ${duplicate}`);
-          res.push(item.chatId);
-          return res;
-        }, []);
-
-        switch (chartType) {
-          case "language":
-            return renderLanguageChart(chardData, ctx);
-          case "language-total":
-            return renderTotalLanguagePie(chardData, ctx);
-          case "installs":
-            return renderInstallsChart(chardData, ctx);
-          case "installs-cumulative":
-            return renderInstallsCumulativeChart(chardData, ctx);
-          case "installs-usages":
-            return renderInstallsUsagesPie(chardData, ctx);
-          case "direct-group-install":
-            return renderDirectVsGroupsPie(chardData, ctx);
-          case "direct-group-usages":
-            return renderDirectVsGroupsUsagePie(chardData, ctx);
-          default:
-            console.error("Unknown chart type");
-        }
-      };
-
-      const onReaderLoad = (event) => {
-        try {
-          const data = JSON.parse(event.target.result);
-          if (!data.results) {
-            throw new Error("No results in data.results");
-          }
-          chardData = data.results.map((res) => new DataModel(res));
-          renderChart();
-        } catch (err) {
-          console.error("Unable to parse stat file", err);
-        }
-      };
-
-      const onFileSelect = () => {
-        const el = document.getElementById("fileEl");
-        const reader = new FileReader();
-        reader.onload = onReaderLoad;
-        reader.readAsText(el.files[0]);
-      };
-
-      const onTypeSelect = () => {
-        const el = document.getElementById("chartTypeEl");
-        chartType = el.value;
-        renderChart();
-      };
-
-      const onReset = () => {
-        const el1 = document.getElementById("fileEl");
-        el1.value = "";
-
-        const el2 = document.getElementById("chartTypeEl");
-        el2.value = "language";
-
-        chartType = "language";
-        chardData = [];
-        renderChart();
-      };
-    </script>
   </body>
 </html>

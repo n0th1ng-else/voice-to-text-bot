@@ -112,6 +112,27 @@ export class UsagesClient {
       );
   }
 
+  /**
+   * @deprecated Use it only for chart
+   */
+  public statRows(
+    from: Date,
+    to: Date,
+    usageCountFrom: number
+  ): Promise<UsageRowScheme[]> {
+    logger.info("Looking for rows");
+    return this.db
+      .statRows(from, to, usageCountFrom)
+      .then((rows) => {
+        logger.info("Row search has been executed");
+        return rows;
+      })
+      .catch((err) => {
+        logger.error("Unable provide a search");
+        throw err;
+      });
+  }
+
   private updateRow(
     usageId: string,
     langId: string,
