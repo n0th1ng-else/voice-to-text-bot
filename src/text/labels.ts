@@ -22,6 +22,9 @@ export enum LabelId {
   FundCommandDescription,
   FundCommandMessage,
   PatreonLinkTitle,
+  AudioNotSupportedMessage,
+  SupportedFormatsMessage,
+  SupportedFormatsMessageExplanation,
 }
 
 export const labels = {
@@ -48,7 +51,13 @@ export const labels = {
       "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
     [LabelId.PatreonLinkTitle]: "Поддержать на Патреоне",
     [LabelId.FundCommandMessage]:
-      "Спасибо, что пользуетесь ботом. Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы быть онлайн 24/7 и превращать голос в текст. Я буду рад, если вы поддержите проект финансово, и поможете мне двигаться дальше. Напишите мне (автору), если у вас возникнут вопросы.",
+      "Спасибо, что пользуетесь ботом. Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы быть онлайн 24/7 и превращать голос в текст. Я буду рад, если вы поддержите проект финансово, и поможете мне двигаться дальше. Напишите мне (автору), если у вас возникли вопросы",
+    [LabelId.AudioNotSupportedMessage]:
+      "Формат аудио файла не поддерживается 🌚",
+    [LabelId.SupportedFormatsMessage]:
+      "Форматы, с которыми я работаю: *.ogg, *.opus",
+    [LabelId.SupportedFormatsMessageExplanation]:
+      "Большинство приложений записывают голос в данном формате. Напишите автору, если у вас возникли проблемы с этим",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -77,6 +86,12 @@ export const labels = {
     [LabelId.FundCommandDescription]: "Help us with funding the project",
     [LabelId.PatreonLinkTitle]: "Donate on Patreon",
     [LabelId.FundCommandMessage]:
-      "I hope you found the bot useful and have fun using its skills. This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text. I would ask you to support the project and fund us so I can keep the bot up and running. Contact me (the author) if you have any questions related.",
+      "I hope you found the bot useful and have fun using its skills. This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text. I would ask you to support the project and fund us so I can keep the bot up and running. Contact me (the author) if you have any questions related",
+    [LabelId.AudioNotSupportedMessage]:
+      "The audio file format is not supported at the moment 🌚",
+    [LabelId.SupportedFormatsMessage]:
+      "I work with these formats: *.ogg, *.opus",
+    [LabelId.SupportedFormatsMessageExplanation]:
+      "Typically, most messengers record voice in this format. Contact the author if you experience any problems",
   },
 };

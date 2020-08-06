@@ -122,6 +122,10 @@ export class TelegramBotModel {
       return this.actions.fund.runAction(msg, model, prefix);
     }
 
+    if (this.actions.voiceFormat.runCondition(msg)) {
+      return this.actions.voiceFormat.runAction(msg, model, prefix);
+    }
+
     if (this.actions.voice.runCondition(msg)) {
       return this.actions.voice.runAction(msg, model, prefix);
     }
