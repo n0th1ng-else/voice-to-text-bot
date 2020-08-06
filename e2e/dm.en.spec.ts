@@ -470,11 +470,15 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
-        mockTgReceiveMessage(
+        mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          [
+            LabelId.AudioNotSupportedMessage,
+            LabelId.SupportedFormatsMessage,
+            LabelId.SupportedFormatsMessageExplanation,
+          ]
         ),
       ]);
     });
@@ -576,11 +580,15 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
-        mockTgReceiveMessage(
+        mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          [
+            LabelId.AudioNotSupportedMessage,
+            LabelId.SupportedFormatsMessage,
+            LabelId.SupportedFormatsMessageExplanation,
+          ]
         ),
       ]);
     });
