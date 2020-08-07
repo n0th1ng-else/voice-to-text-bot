@@ -25,9 +25,9 @@ import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
 import {
   githubUrl,
-  kofiAccount,
   localhostUrl,
   patreonAccount,
+  yandexAccount,
 } from "../src/const";
 import {
   getMockCertificate,
@@ -550,7 +550,8 @@ describe("[default language - english]", () => {
               LabelId.PatreonLinkTitle,
               patreonAccount
             ),
-            new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
+            // new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
+            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
           ])
         ),
       ]);
@@ -577,7 +578,8 @@ describe("[default language - english]", () => {
               LabelId.PatreonLinkTitle,
               patreonAccount
             ),
-            new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
+            // new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
+            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
           ])
         ),
       ]);

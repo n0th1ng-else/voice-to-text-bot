@@ -3,7 +3,7 @@ import { GenericAction } from "./common";
 import { BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isFundMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
-import { kofiAccount, patreonAccount } from "../../const";
+import { patreonAccount, yandexAccount } from "../../const";
 import { Logger } from "../../logger";
 
 const logger = new Logger("telegram-bot");
@@ -34,12 +34,21 @@ export class FundAction extends GenericAction {
           url: patreonAccount,
         };
 
-        const kofiBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.KofiLinkTitle, lang),
-          url: kofiAccount,
+        // const kofiBtn: TgInlineKeyboardButton = {
+        //   text: this.text.t(LabelId.KofiLinkTitle, lang),
+        //   url: kofiAccount,
+        // };
+
+        const yandexBtn: TgInlineKeyboardButton = {
+          text: this.text.t(LabelId.YandexLinkTitle, lang),
+          url: yandexAccount,
         };
 
-        const buttons: TgInlineKeyboardButton[][] = [[patreonBtn], [kofiBtn]];
+        const buttons: TgInlineKeyboardButton[][] = [
+          [patreonBtn],
+          // [kofiBtn],
+          [yandexBtn],
+        ];
 
         return this.sendMessage(
           model.id,

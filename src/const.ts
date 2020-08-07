@@ -5,3 +5,5 @@ export const localhostUrl = "http://localhost";
 export const patreonAccount = "https://patreon.com/audiomessbot";
 
 export const kofiAccount = "https://ko-fi.com/audiomessbot";
+
+export const yandexAccount = "https://yasobe.ru/na/audiomessbot";
