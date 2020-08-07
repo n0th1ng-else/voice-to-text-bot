@@ -25,6 +25,7 @@ export enum LabelId {
   AudioNotSupportedMessage,
   SupportedFormatsMessage,
   SupportedFormatsMessageExplanation,
+  KofiLinkTitle,
 }
 
 export const labels = {
@@ -49,7 +50,7 @@ export const labels = {
       "Сообщения длиной больше 1 минуты не поддерживаются 🌚",
     [LabelId.UpdateLanguageError]:
       "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
-    [LabelId.PatreonLinkTitle]: "Поддержать на Патреоне",
+    [LabelId.PatreonLinkTitle]: "Подписаться на Патреоне",
     [LabelId.FundCommandMessage]:
       "Спасибо, что пользуетесь ботом. Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы быть онлайн 24/7 и превращать голос в текст. Я буду рад, если вы поддержите проект финансово, и поможете мне двигаться дальше. Напишите мне (автору), если у вас возникли вопросы",
     [LabelId.AudioNotSupportedMessage]:
@@ -58,6 +59,7 @@ export const labels = {
       "Форматы, с которыми я работаю: *.ogg, *.opus",
     [LabelId.SupportedFormatsMessageExplanation]:
       "Большинство приложений записывают голос в данном формате. Напишите автору, если у вас возникли проблемы с этим",
+    [LabelId.KofiLinkTitle]: "Отправить денег без подписки",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -84,7 +86,7 @@ export const labels = {
     [LabelId.SupportCommandDescription]: "Show support links",
     [LabelId.StartCommandDescription]: "Say hello and see bot info",
     [LabelId.FundCommandDescription]: "Help us with funding the project",
-    [LabelId.PatreonLinkTitle]: "Donate on Patreon",
+    [LabelId.PatreonLinkTitle]: "Subscribe on Patreon",
     [LabelId.FundCommandMessage]:
       "I hope you found the bot useful and have fun using its skills. This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text. I would ask you to support the project and fund us so I can keep the bot up and running. Contact me (the author) if you have any questions related",
     [LabelId.AudioNotSupportedMessage]:
@@ -93,5 +95,6 @@ export const labels = {
       "I work with these formats: *.ogg, *.opus",
     [LabelId.SupportedFormatsMessageExplanation]:
       "Typically, most messengers record voice in this format. Contact the author if you experience any problems",
+    [LabelId.KofiLinkTitle]: "Send money without a subscription",
   },
 };
