@@ -133,4 +133,19 @@ export class UsagesDb {
   public getId(row: UsageRowScheme): string {
     return row.usage_id;
   }
+
+  /**
+   * @deprecated Use it only for chart
+   */
+  public statRows(
+    from: Date,
+    to: Date,
+    usageCountFrom: number
+  ): Promise<UsageRowScheme[]> {
+    const query = UsagesSql.statRows;
+    const values = [usageCountFrom, from, to];
+    return this.pool
+      .query<UsageRowScheme>(query, values)
+      .then((queryData) => queryData.rows);
+  }
 }
