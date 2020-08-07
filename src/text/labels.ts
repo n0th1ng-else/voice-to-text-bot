@@ -26,6 +26,7 @@ export enum LabelId {
   SupportedFormatsMessage,
   SupportedFormatsMessageExplanation,
   KofiLinkTitle,
+  YandexLinkTitle,
 }
 
 export const labels = {
@@ -59,7 +60,8 @@ export const labels = {
       "Форматы, с которыми я работаю: *.ogg, *.opus",
     [LabelId.SupportedFormatsMessageExplanation]:
       "Большинство приложений записывают голос в данном формате. Напишите автору, если у вас возникли проблемы с этим",
-    [LabelId.KofiLinkTitle]: "Отправить денег без подписки",
+    [LabelId.KofiLinkTitle]: "Отправить через Paypal",
+    [LabelId.YandexLinkTitle]: "Отправить картой",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -95,6 +97,7 @@ export const labels = {
       "I work with these formats: *.ogg, *.opus",
     [LabelId.SupportedFormatsMessageExplanation]:
       "Typically, most messengers record voice in this format. Contact the author if you experience any problems",
-    [LabelId.KofiLinkTitle]: "Send money without a subscription",
+    [LabelId.KofiLinkTitle]: "Send money via Paypal",
+    [LabelId.YandexLinkTitle]: "Quick donation in Rubbles",
   },
 };
