@@ -23,7 +23,12 @@ import {
 } from "../src/recognition";
 import { StatisticApi } from "../src/statistic";
 import { TelegramBotModel } from "../src/telegram/bot";
-import { githubUrl, localhostUrl, patreonAccount } from "../src/const";
+import {
+  githubUrl,
+  kofiAccount,
+  localhostUrl,
+  patreonAccount,
+} from "../src/const";
 import {
   BotStatRecordModel,
   getMockCertificate,
@@ -379,6 +384,7 @@ describe("[russian language]", () => {
               LabelId.PatreonLinkTitle,
               patreonAccount
             ),
+            new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
           ])
         ),
       ]);
