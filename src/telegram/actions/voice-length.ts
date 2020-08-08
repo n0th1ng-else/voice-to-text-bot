@@ -5,57 +5,51 @@ import {
   TelegramMessagePrefix,
   VoiceContentReason,
 } from "../types";
-import { isVoiceMessage } from "../helpers";
+import { isVoiceMessage, isVoiceMessageLong } from "../helpers";
 import { Logger } from "../../logger";
 import { LabelId } from "../../text/labels";
 import { collectAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
-export class VoiceFormatAction extends GenericAction {
+export class VoiceLengthAction extends GenericAction {
   public runAction(
     msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    return this.sendWrongFormatMessage(mdl, prefix);
+    return this.sendVoiceIsTooLongMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage): boolean {
+  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
-    const isWrongFormat = type.type === VoiceContentReason.WrongMimeType;
-    const triggersAction = !isVoice && isWrongFormat;
-
-    if (triggersAction) {
-      logger.warn("Wrong audio file mime-type", type);
-    }
-
-    return triggersAction;
+    return isVoice && isVoiceMessageLong(mdl);
   }
 
-  private sendWrongFormatMessage(
+  private sendVoiceIsTooLongMessage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    logger.warn(
+      `${prefix.getPrefix()} Message is too long duration=${
+        model.voiceDuration
+      }s`
+    );
+
     if (model.isGroup) {
-      logger.info(`${prefix.getPrefix()} Voice mime-type is not supported`);
       return collectAnalytics(
-        model.analytics.setCommand("Mime-type message", "/voice")
+        model.analytics.setCommand("Voice is too long message", "/voice")
       );
     }
 
-    logger.info(`${prefix.getPrefix()} Sending mime-type is not supported`);
+    logger.info(`${prefix.getPrefix()} Sending voice is too long`);
     return this.getChatLanguage(model, prefix)
       .then((lang) =>
         this.sendMessage(
           model.id,
           model.chatId,
-          [
-            LabelId.AudioNotSupportedMessage,
-            LabelId.SupportedFormatsMessage,
-            LabelId.SupportedFormatsMessageExplanation,
-          ],
+          LabelId.LongVoiceMessage,
           {
             lang,
           },
@@ -63,19 +57,17 @@ export class VoiceFormatAction extends GenericAction {
         )
       )
       .then(() =>
-        logger.info(
-          `${prefix.getPrefix()} Mime-type is not supported message sent`
-        )
+        logger.info(`${prefix.getPrefix()} Voice is too long message sent`)
       )
       .catch((err) =>
         logger.error(
-          `${prefix.getPrefix()} Unable to send mime-type is not supported`,
+          `${prefix.getPrefix()} Unable to send voice is too long`,
           err
         )
       )
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Mime-type message", "/voice")
+          model.analytics.setCommand("Voice is too long message", "/voice")
         )
       );
   }

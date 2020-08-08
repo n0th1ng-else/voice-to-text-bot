@@ -2,6 +2,7 @@ import {
   getChatId,
   getFullUserName,
   getGroupName,
+  getRawUserLanguage,
   getUserLanguage,
   getUserName,
   getVoiceDuration,
@@ -14,6 +15,7 @@ import { Logger } from "../logger";
 import { LabelId } from "../text/labels";
 import { TextModel } from "../text";
 import { TgInlineKeyboardButton, TgMessage } from "./api/types";
+import { AnalyticsData } from "../analytics/api/types";
 
 export enum VoiceContentReason {
   Ok = "Ok",
@@ -46,8 +48,9 @@ export class BotMessageModel {
   public readonly voiceFileId: string;
   public readonly voiceDuration: number;
   public readonly userLanguage: LanguageCode;
+  public readonly analytics: AnalyticsData;
 
-  constructor(msg: TgMessage) {
+  constructor(msg: TgMessage, appVersion: string) {
     this.id = msg.message_id;
     this.chatId = getChatId(msg);
     this.isGroup = isChatGroup(msg);
@@ -57,6 +60,11 @@ export class BotMessageModel {
     this.voiceFileId = getVoiceFile(msg);
     this.voiceDuration = getVoiceDuration(msg);
     this.userLanguage = getUserLanguage(msg);
+    this.analytics = new AnalyticsData(
+      appVersion,
+      this.chatId,
+      getRawUserLanguage(msg)
+    );
   }
 
   public get name(): string {

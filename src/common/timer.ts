@@ -15,3 +15,18 @@ export function sleepForRandom(): Promise<void> {
   const ms = randomIntFromInterval(100, 3000);
   return sleepFor(ms);
 }
+
+export class TimeMeasure {
+  private readonly start: [number, number];
+
+  constructor() {
+    this.start = process.hrtime();
+  }
+
+  public getMs(): number {
+    const [sec, nanosec] = process.hrtime(this.start);
+    const nanoseconds = sec * 1e9 + nanosec;
+    const milliseconds = nanoseconds / 1e6;
+    return Math.ceil(milliseconds);
+  }
+}

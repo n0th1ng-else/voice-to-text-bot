@@ -10,6 +10,7 @@ import { getMd5Hash } from "../common/hash";
 import { BotActions } from "./actions";
 import { botCommands } from "./data";
 import { TelegramApi } from "./api";
+import { collectAnalytics } from "../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -83,27 +84,27 @@ export class TelegramBotModel {
     return `${this.path}/${this.id}`;
   }
 
-  public handleApiMessage(message: TgUpdate): void {
+  public handleApiMessage(message: TgUpdate, appVersion: string): void {
     try {
       if (message.message) {
-        this.handleMessage(message.message);
+        this.handleMessage(message.message, appVersion);
       }
       if (message.callback_query) {
-        this.handleCallbackQuery(message.callback_query);
+        this.handleCallbackQuery(message.callback_query, appVersion);
       }
     } catch (e) {
       logger.error("Failed to handle api request", e);
     }
   }
 
-  private handleMessage(msg: TgMessage): Promise<void> {
-    const model = new BotMessageModel(msg);
+  private handleMessage(msg: TgMessage, appVersion: string): Promise<void> {
+    const model = new BotMessageModel(msg, appVersion);
     const prefix = new TelegramMessagePrefix(model.chatId);
 
     logger.info(`${prefix.getPrefix()} Incoming message`);
 
     if (!isMessageSupported(msg)) {
-      return TelegramBotModel.logNotSupportedMessage(prefix);
+      return TelegramBotModel.logNotSupportedMessage(model, prefix);
     }
 
     if (this.actions.start.runCondition(msg, model)) {
@@ -126,6 +127,10 @@ export class TelegramBotModel {
       return this.actions.voiceFormat.runAction(msg, model, prefix);
     }
 
+    if (this.actions.voiceLength.runCondition(msg, model)) {
+      return this.actions.voiceLength.runAction(msg, model, prefix);
+    }
+
     if (this.actions.voice.runCondition(msg)) {
       return this.actions.voice.runAction(msg, model, prefix);
     }
@@ -134,10 +139,13 @@ export class TelegramBotModel {
   }
 
   private static logNotSupportedMessage(
+    model: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     logger.warn(`${prefix.getPrefix()} Message is not supported`);
-    return Promise.resolve();
+    return collectAnalytics(
+      model.analytics.setCommand("Message is not supported", "/bot")
+    );
   }
 
   private sendNoVoiceMessage(
@@ -146,7 +154,9 @@ export class TelegramBotModel {
   ): Promise<void> {
     if (model.isGroup) {
       logger.info(`${prefix.getPrefix()} No content`);
-      return Promise.resolve();
+      return collectAnalytics(
+        model.analytics.setCommand("No content message", "/bot")
+      );
     }
 
     logger.info(`${prefix.getPrefix()} Sending no content`);
@@ -163,10 +173,15 @@ export class TelegramBotModel {
       )
       .catch((err) =>
         logger.error(`${prefix.getPrefix()} Unable to send no content`, err)
+      )
+      .then(() =>
+        collectAnalytics(
+          model.analytics.setCommand("No content message", "/bot")
+        )
       );
   }
 
-  private handleCallbackQuery(msg: TgCallbackQuery): void {
-    this.actions.lang.handleLanguageChange(msg);
+  private handleCallbackQuery(msg: TgCallbackQuery, appVersion: string): void {
+    this.actions.lang.handleLanguageChange(msg, appVersion);
   }
 }

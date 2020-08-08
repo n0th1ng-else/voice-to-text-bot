@@ -7,6 +7,7 @@ import { VoiceAction } from "./voice";
 import { CoreAction } from "./common";
 import { FundAction } from "./fund";
 import { VoiceFormatAction } from "./voice-format";
+import { VoiceLengthAction } from "./voice-length";
 
 export class BotActions {
   public readonly start: StartAction;
@@ -16,6 +17,7 @@ export class BotActions {
   public readonly core: CoreAction;
   public readonly fund: FundAction;
   public readonly voiceFormat: VoiceFormatAction;
+  public readonly voiceLength: VoiceLengthAction;
 
   constructor(stat: StatisticApi, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -25,5 +27,6 @@ export class BotActions {
     this.core = new CoreAction(stat, bot);
     this.fund = new FundAction(stat, bot);
     this.voiceFormat = new VoiceFormatAction(stat, bot);
+    this.voiceLength = new VoiceLengthAction(stat, bot);
   }
 }
