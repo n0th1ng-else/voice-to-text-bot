@@ -33,7 +33,7 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      uid: String(this.id),
+      cid: String(this.id),
       dp: encodeURIComponent(this.command),
       dr: encodeURIComponent(TelegramApi.url),
       ul: this.lang,
@@ -60,7 +60,7 @@ export interface AnalyticsDataDto {
   // Indicates the data source of the hit.
   ds?: string;
   // User Id
-  uid: string;
+  cid: string;
   // Specifies which referral source brought traffic to a website
   dr: string;
   // Specifies the language
