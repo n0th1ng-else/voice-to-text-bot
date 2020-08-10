@@ -5,10 +5,11 @@ import {
   TelegramMessagePrefix,
   VoiceContentReason,
 } from "../types";
-import { isVoiceMessage, isVoiceMessageLong } from "../helpers";
+import { isVoiceMessage } from "../helpers";
 import { Logger } from "../../logger";
 import { LabelId } from "../../text/labels";
 import { LanguageCode, VoiceConverter } from "../../recognition/types";
+import { collectAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -17,22 +18,15 @@ export class VoiceAction extends GenericAction {
 
   public runAction(
     msg: TgMessage,
-    mdl: BotMessageModel,
+    model: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    if (isVoiceMessageLong(mdl)) {
-      logger.warn(
-        `${prefix.getPrefix()} Message is too long duration=${
-          mdl.voiceDuration
-        }s`
-      );
-      return this.sendVoiceMessageTooLong(mdl, prefix);
-    }
-
     logger.info(`${prefix.getPrefix()} Voice message`);
-    return this.getChatLanguage(mdl, prefix).then((lang) =>
-      this.recogniseVoiceMessage(mdl, lang, prefix)
-    );
+    return this.getChatLanguage(model, prefix)
+      .then((lang) => this.recogniseVoiceMessage(model, lang, prefix))
+      .then(() =>
+        collectAnalytics(model.analytics.setCommand("Voice message", "/voice"))
+      );
   }
 
   public runCondition(msg: TgMessage): boolean {
@@ -52,39 +46,6 @@ export class VoiceAction extends GenericAction {
 
   public setConverter(converter: VoiceConverter): void {
     this.converter = converter;
-  }
-
-  private sendVoiceMessageTooLong(
-    model: BotMessageModel,
-    prefix: TelegramMessagePrefix
-  ): Promise<void> {
-    if (model.isGroup) {
-      logger.info(`${prefix.getPrefix()} Voice is too long`);
-      return Promise.resolve();
-    }
-
-    logger.info(`${prefix.getPrefix()} Sending voice is too long`);
-    return this.getChatLanguage(model, prefix)
-      .then((lang) =>
-        this.sendMessage(
-          model.id,
-          model.chatId,
-          LabelId.LongVoiceMessage,
-          {
-            lang,
-          },
-          prefix
-        )
-      )
-      .then(() =>
-        logger.info(`${prefix.getPrefix()} Voice is too long message sent`)
-      )
-      .catch((err) =>
-        logger.error(
-          `${prefix.getPrefix()} Unable to send voice is too long`,
-          err
-        )
-      );
   }
 
   private recogniseVoiceMessage(

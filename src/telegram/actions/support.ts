@@ -1,10 +1,11 @@
 import { TgInlineKeyboardButton, TgMessage } from "../api/types";
 import { GenericAction } from "./common";
-import { BotMessageModel, TelegramMessagePrefix } from "../types";
+import { BotCommand, BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isSupportMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
 import { githubUrl } from "../../const";
 import { Logger } from "../../logger";
+import { collectAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -65,6 +66,11 @@ export class SupportAction extends GenericAction {
         logger.error(
           `${prefix.getPrefix()} Unable to send support message`,
           err
+        )
+      )
+      .then(() =>
+        collectAnalytics(
+          model.analytics.setCommand("Support message", BotCommand.Support)
         )
       );
   }

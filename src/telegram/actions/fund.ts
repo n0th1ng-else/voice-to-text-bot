@@ -1,10 +1,11 @@
 import { TgInlineKeyboardButton, TgMessage } from "../api/types";
 import { GenericAction } from "./common";
-import { BotMessageModel, TelegramMessagePrefix } from "../types";
+import { BotCommand, BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isFundMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
 import { patreonAccount, yandexAccount } from "../../const";
 import { Logger } from "../../logger";
+import { collectAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -64,6 +65,11 @@ export class FundAction extends GenericAction {
       .then(() => logger.info(`${prefix.getPrefix()} Fund message sent`))
       .catch((err) =>
         logger.error(`${prefix.getPrefix()} Unable to send fund message`, err)
+      )
+      .then(() =>
+        collectAnalytics(
+          model.analytics.setCommand("Fund message", BotCommand.Fund)
+        )
       );
   }
 }

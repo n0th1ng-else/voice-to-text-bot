@@ -5,7 +5,7 @@ import {
   VoiceContentReasonModel,
 } from "./types";
 import { telegramBotName } from "../env";
-import { TgChatType, TgMessage } from "./api/types";
+import { TgCallbackQuery, TgChatType, TgMessage } from "./api/types";
 import { LanguageCode } from "../recognition/types";
 
 export function isLangMessage(model: BotMessageModel, msg: TgMessage): boolean {
@@ -153,7 +153,7 @@ export function getVoiceDuration(msg: TgMessage): number {
 }
 
 export function getUserLanguage(msg: TgMessage): LanguageCode {
-  const msgLang = (msg.from && msg.from.language_code) || "";
+  const msgLang = getRawUserLanguage(msg);
   const globalPart = msgLang.slice(0, 2).toLowerCase();
 
   if (globalPart === "ru") {
@@ -161,6 +161,10 @@ export function getUserLanguage(msg: TgMessage): LanguageCode {
   }
 
   return LanguageCode.En;
+}
+
+export function getRawUserLanguage(msg: TgMessage | TgCallbackQuery): string {
+  return (msg.from && msg.from.language_code) || "";
 }
 
 export function getLanguageByText(lang: string): LanguageCode {

@@ -2,14 +2,17 @@ import { TgCallbackQuery, TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import {
   BotButtonData,
+  BotCommand,
   BotLangData,
   BotMessageModel,
   TelegramMessagePrefix,
 } from "../types";
-import { isLangMessage } from "../helpers";
+import { getRawUserLanguage, isLangMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
 import { LanguageCode } from "../../recognition/types";
 import { Logger } from "../../logger";
+import { AnalyticsData } from "../../analytics/api/types";
+import { collectAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -26,7 +29,7 @@ export class LangAction extends GenericAction {
     return isLangMessage(mdl, msg);
   }
 
-  public handleLanguageChange(msg: TgCallbackQuery): void {
+  public handleLanguageChange(msg: TgCallbackQuery, appVersion: string): void {
     const message = msg.message;
     if (!message) {
       const msgError = new Error("No message passed in callback query");
@@ -35,10 +38,19 @@ export class LangAction extends GenericAction {
     }
     const messageId = message.message_id;
     const chatId = message.chat.id;
-
-    this.getLangData(chatId, msg.data).then((opts) =>
-      this.updateLanguage(opts, chatId, messageId)
+    const analytics = new AnalyticsData(
+      appVersion,
+      message.chat.id,
+      getRawUserLanguage(msg)
     );
+
+    this.getLangData(chatId, msg.data)
+      .then((opts) => this.updateLanguage(opts, chatId, messageId))
+      .then(() =>
+        collectAnalytics(
+          analytics.setCommand("Update language callback", BotCommand.Language)
+        )
+      );
   }
 
   private updateLanguage(
@@ -145,6 +157,11 @@ export class LangAction extends GenericAction {
         logger.error(
           `${prefix.getPrefix()} Unable to send language selector`,
           err
+        )
+      )
+      .then(() =>
+        collectAnalytics(
+          model.analytics.setCommand("Update language", BotCommand.Language)
         )
       );
   }

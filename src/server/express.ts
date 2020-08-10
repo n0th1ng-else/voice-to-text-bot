@@ -92,7 +92,7 @@ export class ExpressServer {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
       this.app.post(bot.getPath(), (req, res) => {
         logger.info("Incoming message");
-        bot.handleApiMessage(req.body);
+        bot.handleApiMessage(req.body, this.version);
         res.sendStatus(200);
       });
 

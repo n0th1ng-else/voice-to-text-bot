@@ -1,9 +1,10 @@
 import { TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import { isHelloMessage } from "../helpers";
-import { BotMessageModel, TelegramMessagePrefix } from "../types";
+import { BotCommand, BotMessageModel, TelegramMessagePrefix } from "../types";
 import { LabelId } from "../../text/labels";
 import { Logger } from "../../logger";
+import { collectAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -42,6 +43,11 @@ export class StartAction extends GenericAction {
       .then(() => logger.info(`${prefix.getPrefix()} Hello message sent`))
       .catch((err) =>
         logger.error(`${prefix.getPrefix()} Unable to send hello message`, err)
+      )
+      .then(() =>
+        collectAnalytics(
+          model.analytics.setCommand("Hello message", BotCommand.Start)
+        )
       );
   }
 }

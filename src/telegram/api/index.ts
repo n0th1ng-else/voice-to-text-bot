@@ -129,7 +129,7 @@ export class TelegramApi {
       );
   }
 
-  private getApiUrl(methodName: string) {
+  private getApiUrl(methodName: string): string {
     return `/${TelegramApi.path}${this.apiToken}/${methodName}`;
   }
 }

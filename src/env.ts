@@ -61,3 +61,5 @@ export const dbPostgres = {
   database: process.env.DB_DATABASE || "",
   port: Number(process.env.DB_PORT) || 5432,
 };
+
+export const analyticsId = process.env.GA_TRACKING_ID || "";
