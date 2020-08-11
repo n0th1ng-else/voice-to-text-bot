@@ -7,7 +7,7 @@
 <div>
     <span>
         <a href="https://t.me/AudioMessBot" target="_blank">
-            <img alt="Number of installs" src="https://img.shields.io/badge/installs-800%2B-blueviolet"> 
+            <img alt="Number of installs" src="https://img.shields.io/badge/installs-1000%2B-blueviolet"> 
         </a>
     </span>
     <span>
@@ -46,6 +46,7 @@ and the results you can see below in the table.
 - ExpressJS
 - PostgreSQL
 - Google Cloud API
+- Google Analytics
 
 # Service model
 
