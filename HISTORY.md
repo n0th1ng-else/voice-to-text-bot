@@ -1,54 +1,54 @@
 ### Typescript issues
 
-First time I released my application, I bumped into the issue that it reached the memory limits.
+The first time I released my application, I bumped into the issue that it reached the memory limits.
 Since I use free plans as much as possible it was a problem. Turns out `ts-node` consumes tons of RAM,
 so I decided to compile all the code into JS. This allowed me to use 5 times less memory and live
 under the 512mb limit (now it consumes ~100mb)
 
 ### First feedback (Added groups support)
 
-During first releases I blocked the bot from adding to groups. I did not check how it works in there
-and tried to turn such usage off. Nevertheless, some guy asked me if the bot works in groups. I was
-inspired by this communication and modified the code, so it got less verbose in groups. Now groups
-took significant role in bot statistic.
+During the first releases, I blocked the bot from adding to groups. I did not check how it works
+in there and tried to turn such usage off. Nevertheless, some guy asked me if the bot works in
+groups. I was inspired by this communication and modified the code, so it got less verbose in groups.
+Now groups took a significant role in bot statistic.
 
 ### OGG 44.100Hz issue
 
-Dealing with audio codecs in NodeJS is fun. You don't know what to expect next time. You barely can
-handle errors. It just breaks whole application. It is interesting that Google does not support
+Dealing with audio codecs in NodeJS is fun. You don't know what to expect next time. You barely
+can handle errors. It just breaks the whole application. Interestingly, Google does not support
 the most popular sample rate for OGG files. So I had to convert OGG files into WAV using the FFMPEG
-engine. Now iphone users are happy and can proceed with voice messages as well.
+engine. Now iPhone users are happy and can proceed with voice messages as well.
 
 ### Groups flooded the DB access
 
-So I allowed bot to be added to groups. The same day I got my first #worldisonfire. Turns out I was
-querying the DB table each time some telegram message comes. This was an issue. In groups people
-write messages, and the bot does not answer (since most of them are not voice messages). But DB
-requests were coming and coming. And yes, finally I got 503 error from DB as I use free plan and
-there was a limitation on access requests. So I refactored the code, now it fires the request only
-when it really needs some DB data.
+So I allowed the bot to be added to groups. The same day I got my first #worldisonfire. Turns
+out I was querying the DB table each time some telegram message comes. This was an issue. In groups,
+people write messages, and the bot does not answer (since most of them are not voice messages).
+But DB requests were coming and coming. And yes, finally I got a 503 error from DB as I use a
+free plan and there was a limitation on access requests. So I refactored the code, now it fires
+the request only when it really needs some DB data.
 
 ### Unwrap log data in Loggly
 
 Going through the logs I realized that I send data in form Loggly can't handle. It could not parse
-additional data object, so I couldn't find by particular value. I modified log integration code
-and now it looks fine, and I can look into issues easily.
+additional data objects, so I couldn't find some particular value. I modified the log integration
+code and now it looks fine, and I can look into issues easily.
 
 ### More logs
 
 I could not understand the exact place where the issues come from. So I started following the
-full-log-coverage strategy. In most places I log when the function starts async action, then
-I log success result and error result as well. Now logs show detailed data, and I can analyze
-that is going on.
+full-log-coverage strategy. In most places, I log when the function starts async action, then
+I log the success result message and error result message as well. Now logs show detailed data,
+and I can analyze that is going on.
 
 ### DB Raised duplications
 
 I used some CRUD service as the database storage. It was okay (except, maybe the requests per
 second limit on a free plan: see `Groups flooded the DB access` issue above) but somehow it
 could create a duplicated row for the same chat id. It could happen once per week or so. So
-I implemented duplication resolver with simple strategy - if there are duplicated rows appeared,
-then keep the old one as the real one and remove new duplications. Not an ideal solution, but
-it works and is enough as I don't have enough information on how this might happen.
+I implemented duplication resolver with a simple strategy - if there are duplicated rows
+appeared, then keep the old one as the real one and remove new duplications. Not an ideal
+solution, but it works and is enough as I don't have enough information on how this might happen.
 
 ### Heroku free hours
 
@@ -56,10 +56,10 @@ Initially, I wanted to research how Heroku counts free hours. I knew the applica
 be up 24/7, so I wanted to figure out the exact way it works. First of all, I run an app daemon
 that pings itself every minute. It helped to avoid app hibernation (Heroku stops applications
 that were unused for 30 minutes). Next due to free plan limitations the application still can't
-live whole month, it has to be asleep for some time. Then I implemented so called "replicas"
+live the whole month, it has to be asleep for some time. Then I implemented so-called "replicas"
 approach. This means that I create another application on Heroku and deploy the same code.
 Doing this allowed me to run one app instance during the even days of the month, and the other
-one during the odd days. That's it. After one month in production I realized that Heroku sums
+one during the odd days. That's it. After one month in production, I realized that Heroku sums
 all applications hours in the account. So make my approach working I had to create a new Heroku
 account. Configuration remained the same as described. Or you can **attach credit card** in the
 account settings, and it will gain more free hours for your applications.
@@ -75,23 +75,105 @@ downtime when Heroku launches your NodeJS application, and it sets everything up
 ### Telegram API
 
 For quick started I picked `node-telegram-bot-api` package from npm. It (plus types lib)
-made me fully equipped for any kinds of api requests and responses. When project got more
-stable I decided to write the api client on my own. Thus, I decreased memory usage by ~20mb.
+made me fully equipped for any kind of API requests and responses. When the project got more
+stable I decided to write the API client on my own. Thus, I decreased memory usage by ~20mb.
 (memory consumption is really a metric for applications on free plans. Heroku offers 512mb).
 Also, I made sure it is tested and works as expected.
 
 ### Typescript for the win
 
-I would never be so confident in writing the code and implementing new features, if there
-would not be the thing like Typescript. It makes me feel so smooth and happy, I did not
+I would never be so confident in writing the code and implementing new features if there
+would not be a thing like Typescript. It makes me feel so smooth and happy, I did not
 write tests at all in first releases (so this is a startup situation lol). **Always enable
-as much strict rules as possible** and then Typescript will cover your back. What an awesome
+as many strict rules as possible** and then Typescript will cover your back. What an awesome
 toolchain.
 
 ### Tests are must-have
 
 Nevertheless, the project is getting bigger and bigger. It is almost impossible now to
-write new stuff and keep everything working. So I picked Jest, Nock and Supertest libs
+write new stuff and keep everything working. So I picked Jest, Nock, and Supertest libs
 to cover all cases I have. Now I have so-called smoke tests (actually kind of integration
 tests) that cover critical flows in chats and groups in general. And, I do write unit
-tests for new features. When I have some time, I cover old code as well.
+tests for new features. When I have some time, I cover the old code as well.
+
+### Predict user language
+
+As I wrote before, I re-implemented the Telegram API client and thus learned some
+interesting details. One detail is that Telegram sends user client language. That is
+super cool as I can use it. I added language detection so now Russian-speaking
+customers have the bot set up in Russian from the beginning. They don't have to
+change recognition language manually. At least, if they set Telegram application
+interface language to Russian.
+
+### Voice file mime-type
+
+For some reason, sometimes Telegram fails to detect the correct mime-type of the
+audio file. Imagine you expect `audio/ogg`, but it is actually `audio/mpeg`. This
+thing was breaking the whole instance until it was fixed. I switched to use FFMpeg
+codec instead of OPUS. Now it looks much more stable and promising.
+
+### Clustered application
+
+Okay, NodeJS might be single-threaded, but it has builtin tools for extending capacity
+and manage load balancing. I used the `worker_thread` module before in another project. The
+time has come, and I decided to try the `cluster` NodeJS module. One big advantage is that
+all forks share the same port which is exactly my case. So I tweaked the initialization
+code to reflect the thread number. This allowed me to avoid race conditions in all parts
+of the application (Telegram API doesn't like it when the server floods it with the same
+request multiple times in the same moment) and extended the capacity to receive HTTP
+requests from the Telegram servers.
+
+### Memory usage
+
+Since I can run multiple cluster forks on the same instance, it became crucial
+to follow the memory usage. I implemented a daemon that tracks and logs NodeJS memory
+consumption. I also run only 2 cluster forks as I don't need more currently.
+
+### Detect voice from audio attachments
+
+It was a popular request, again. People wanted to send voice messages from Whatsapp
+messenger right into the bot's direct messages (since I did not dive into Whatsapp
+bot frameworks, they wanted to have a workaround). External voice message comes as
+an audio attachment, not voice attachment. So I improved audio detection and now
+scan Telegram message for voice attachment and if I did not find any, try to find
+audio attachment. By the way, I have implemented more strict file format detection,
+as a user can attach any audio, let's say audio/mp3 and so forth (I only support
+_.ogg and _.opus at the moment).
+
+### Switch to PostgreSQL
+
+Time flies, and I reached the point where I needed to have a stable DB service.
+The CRUD service I used before was okay, but I felt like I need to deal with
+duplications and connection stability. So I migrated all data to the Postgres DB,
+then run the instance to write info in sync into both places. It appeared to be
+okay and working. Now I use Postgres as the source of truth, did not get any
+duplication issues yet. Postgres will also allow me to scale connections since
+it has Pool implementation. All parts of the application are now scalable.
+
+### First donation!
+
+My bot is a non-commercial project. But I have to pay. Google speech-to-text
+engine is not free. I run all other parts under free plans, but at some point,
+it might be required to scale the power. And that `DB flooding issue` had me
+to pay for a plan that covers more requests per second to hold that #worldisonfire
+problem. Now it is more stable. Anyway, I started campaigns for donation on
+Patreon and Yandex.Money. You can subscribe or just send me some money by card.
+I really appreciate the community I have built. I believe they will support
+the project. And I already received my very first donation! What a feeling.
+
+### Collect analytics
+
+So far so good. I realized that I don't know how people use my bot. So I
+decided to collect bot usages and behavior and analyze. Since this is a
+backend NodeJS application, there are not many metrics to grab. I collect
+all the messages and command executed. All data is anonymous (Telegram
+doesn't send any sensitive info anyway). But I think it would be enough
+at least to see how many people use the bot during the day and how they
+do it.
+
+### 1000 installs in two months
+
+Yes, we have reached **1000** installs in total! That's HUGE. It took me two
+months and... maybe a week. It is just great. 1000+ installs, 1100+ voice
+minutes were recognized. Almost all people came organically as there
+was an only announcement in my empty twitter account lol. Great news!
