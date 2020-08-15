@@ -1,7 +1,8 @@
-import { AnalyticsData, AnalyticsDataDto, AnalyticsHitType } from "./api/types";
+import { AnalyticsData, AnalyticsDataDto } from "./api/types";
 import { GoogleAnalyticsApi } from "./api";
 import { analyticsId } from "../env";
 import { Logger } from "../logger";
+import { flattenPromise } from "../common/helpers";
 
 const logger = new Logger("analytics");
 
@@ -17,14 +18,12 @@ export function collectAnalytics(analytics: AnalyticsData): Promise<void> {
   logger.info("Collecting analytic data");
 
   return Promise.all([
-    runAnalyticsRequest(analytics.getDto(analyticsId)),
-    runAnalyticsRequest(analytics.getDto(analyticsId, AnalyticsHitType.Timing)),
-  ]).then(() => {
-    // Flatten promise
-  });
+    analytics.getListDto(analyticsId).map((dto) => runAnalyticsRequest(dto)),
+  ]).then(flattenPromise);
 }
 
 function runAnalyticsRequest(data: AnalyticsDataDto): Promise<void> {
+  // const logged = { ...data, tid: "hidden" }; // Log event
   return new GoogleAnalyticsApi()
     .collect(data)
     .then(() => logger.info("Analytic data has been collected"))
