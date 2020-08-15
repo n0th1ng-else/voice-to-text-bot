@@ -6,10 +6,10 @@ import {
 } from "../types";
 import { LanguageCode } from "../../recognition/types";
 import { Logger } from "../../logger";
-import { StatisticApi } from "../../statistic";
 import { TextModel } from "../../text";
 import { LabelId } from "../../text/labels";
 import { TelegramApi } from "../api";
+import { DbClient } from "../../db";
 
 const logger = new Logger("telegram-bot");
 
@@ -17,7 +17,7 @@ export abstract class GenericAction {
   protected readonly text = new TextModel();
 
   constructor(
-    protected readonly stat: StatisticApi,
+    protected readonly stat: DbClient,
     protected readonly bot: TelegramApi
   ) {}
 
@@ -39,8 +39,8 @@ export abstract class GenericAction {
     }
 
     logger.info(`${prefix.getPrefix()} Fetching language`);
-    return this.stat.usage
-      .getLanguage(model.chatId, model.name, model.userLanguage)
+    return this.stat.usages
+      .getLangId(model.chatId, model.name, model.userLanguage)
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to get the lang`, err);
         return this.text.fallbackLanguage;

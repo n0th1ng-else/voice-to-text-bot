@@ -4,7 +4,7 @@ import { runGetDto } from "./request";
 import { HealthDto, HealthStatus } from "./types";
 import { sSuffix } from "../text";
 import { getHealthUrl } from "./helpers";
-import { StatisticApi } from "../statistic";
+import { DbClient } from "../db";
 
 const logger = new Logger("uptime");
 
@@ -16,7 +16,7 @@ export class UptimeDaemon {
   private nextUrl = "";
   private lifecycleInterval = UptimeDaemon.minLifecycleInterval;
   private daysRunning: number[] = [];
-  private stat: StatisticApi | null = null;
+  private stat: DbClient | null = null;
 
   public get isRunning(): boolean {
     return this.daemon.isRunning;
@@ -68,7 +68,7 @@ export class UptimeDaemon {
     return this;
   }
 
-  public setStat(stat: StatisticApi): this {
+  public setStat(stat: DbClient): this {
     this.stat = stat;
     return this;
   }
@@ -109,11 +109,11 @@ export class UptimeDaemon {
           }
 
           const isActive = false;
-          return this.stat.node.toggleActive(
-            this.currentUrl,
-            isActive,
-            this.version
-          );
+          return this.stat.nodes
+            .updateState(this.currentUrl, isActive, this.version)
+            .then(() => {
+              // Empty promise result
+            });
         }
       }
     );
@@ -137,11 +137,11 @@ export class UptimeDaemon {
       }
 
       const isActive = false;
-      return this.stat.node.toggleActive(
-        this.currentUrl,
-        isActive,
-        this.version
-      );
+      return this.stat.nodes
+        .updateState(this.currentUrl, isActive, this.version)
+        .then(() => {
+          // Empty promise result
+        });
     });
   }
 

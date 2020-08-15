@@ -12,7 +12,6 @@ import { HealthSsl, HealthStatus } from "../src/server/types";
 import { appVersion, launchTime } from "../src/env";
 import { localhostUrl } from "../src/const";
 import { TelegramBotModel } from "../src/telegram/bot";
-import { StatisticApi } from "../src/statistic";
 import { mockGoogleAuth } from "./requests/google";
 import {
   VoiceConverterOptions,
@@ -32,6 +31,8 @@ import {
 import nock from "nock";
 import { TelegramApi } from "../src/telegram/api";
 import { httpsOptions } from "../certs";
+import { Pool as MockPool } from "../src/db/__mocks__/pg";
+import { DbClient } from "../src/db";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -54,13 +55,20 @@ const appPort = 3300;
 const dbPort = appPort + 1;
 
 const hostUrl = `${localhostUrl}:${appPort}`;
-const dbUrl = `${localhostUrl}:${dbPort}`;
 
 const enableSSL = false;
 
-const stat = new StatisticApi(dbUrl, "db-app", "db-key", "db-master", 0);
+const dbConfig = {
+  user: "spy-user",
+  password: "not-me",
+  host: "localhost",
+  database: "test-db",
+  port: dbPort,
+};
+const testPool = new MockPool(dbConfig);
+const db = new DbClient(dbConfig, testPool);
 
-const bot = new TelegramBotModel("telegram-api-token", converter, stat);
+const bot = new TelegramBotModel("telegram-api-token", converter, db);
 bot.setHostLocation(hostUrl, launchTime);
 
 const telegramServer = nock(TelegramApi.url);
@@ -82,7 +90,8 @@ describe("[health]", () => {
 
   afterEach(() => {
     return stopHandler().then(() => {
-      expect(telegramServer.isDone()).toBeTruthy();
+      expect(telegramServer.isDone()).toBe(true);
+      expect(testPool.isDone()).toBe(true);
     });
   });
 

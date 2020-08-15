@@ -35,13 +35,6 @@ export const googleApi = {
   privateKey: process.env.GOOGLE_PRIVATE_KEY || "",
 };
 
-export const dbStat = {
-  statUrl: process.env.DB_STAT_URL || "",
-  appId: process.env.DB_STAT_APP_ID || "",
-  appKey: process.env.DB_STAT_APP_KEY || "",
-  masterKey: process.env.DB_STAT_MASTER_KEY || "",
-};
-
 export const logApi = {
   apiToken: process.env.LOG_API_TOKEN || "",
   projectId: process.env.LOG_PROJECT_ID || "",

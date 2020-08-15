@@ -1,5 +1,4 @@
 import { TelegramApi } from "../api";
-import { StatisticApi } from "../../statistic";
 import { StartAction } from "./start";
 import { LangAction } from "./lang";
 import { SupportAction } from "./support";
@@ -8,6 +7,7 @@ import { CoreAction } from "./common";
 import { FundAction } from "./fund";
 import { VoiceFormatAction } from "./voice-format";
 import { VoiceLengthAction } from "./voice-length";
+import { DbClient } from "../../db";
 
 export class BotActions {
   public readonly start: StartAction;
@@ -19,7 +19,7 @@ export class BotActions {
   public readonly voiceFormat: VoiceFormatAction;
   public readonly voiceLength: VoiceLengthAction;
 
-  constructor(stat: StatisticApi, bot: TelegramApi) {
+  constructor(stat: DbClient, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
     this.lang = new LangAction(stat, bot);
     this.support = new SupportAction(stat, bot);
