@@ -61,8 +61,8 @@ export class LangAction extends GenericAction {
     const lang = opts.langId;
     const prefix = opts.prefix;
 
-    return this.stat.usage
-      .updateLanguage(chatId, lang)
+    return this.stat.usages
+      .updateLangId(chatId, lang)
       .then(() =>
         this.editMessage(chatId, lang, messageId, LabelId.ChangeLang, prefix)
       )

@@ -1,56 +1,44 @@
 import { expect } from "@jest/globals";
-import nock from "nock";
-import { UsageStatisticApi } from "../../../src/statistic/usage";
 import { LanguageCode } from "../../../src/recognition/types";
 import { BotStatRecordModel } from "../../helpers";
 import { randomIntFromInterval } from "../../../src/common/timer";
 import { Pool as MockPool } from "../../../src/db/__mocks__/pg";
 import { UsagesSql } from "../../../src/db/sql/usages.sql";
 
-const path = `/classes/${UsageStatisticApi.dbClass}`;
-
 export function mockGetBotStatItem(
-  host: nock.Scope,
   pool: MockPool,
   chatId: number,
   lang: LanguageCode,
   item?: BotStatRecordModel
 ): BotStatRecordModel {
   if (!item) {
-    mockBotStatFind(host, pool, chatId);
-    const stat = mockBotStatCreate(host, pool, chatId, "", lang);
-    mockBotStatGet(host, stat);
+    mockBotStatFind(pool, chatId);
+    const stat = mockBotStatCreate(pool, chatId, "", lang);
     return stat;
   }
 
-  mockBotStatFind(host, pool, chatId, [item]);
-  mockBotStatGet(host, item);
+  mockBotStatFind(pool, chatId, [item]);
   return item;
 }
 
 export function mockUpdateBotStatUsage(
-  host: nock.Scope,
   pool: MockPool,
   item: BotStatRecordModel
 ): Promise<void> {
-  mockBotStatFind(host, pool, item.chatId, [item]);
-  mockBotStatGet(host, item);
-  return mockBotStatUpdateUsage(host, pool, item);
+  mockBotStatFind(pool, item.chatId, [item]);
+  return mockBotStatUpdateUsage(pool, item);
 }
 
 export function mockUpdateBotStatLang(
-  host: nock.Scope,
   pool: MockPool,
   item: BotStatRecordModel,
   langId: LanguageCode
 ): Promise<void> {
-  mockBotStatFind(host, pool, item.chatId, [item]);
-  mockBotStatGet(host, item);
-  return mockBotStatUpdateLang(host, pool, item, langId);
+  mockBotStatFind(pool, item.chatId, [item]);
+  return mockBotStatUpdateLang(pool, item, langId);
 }
 
 function mockBotStatFind(
-  host: nock.Scope,
   pool: MockPool,
   chatId: number,
   items: BotStatRecordModel[] = []
@@ -60,21 +48,9 @@ function mockBotStatFind(
     expect(values[0]).toBe(chatId);
     return Promise.resolve({ rows: items.map((stat) => stat.getDbDto()) });
   });
-
-  host.post(path).reply((uri, body) => {
-    const requestBody = typeof body === "string" ? JSON.parse(body) : body;
-
-    expect(requestBody.where.chatId).toBe(chatId);
-    expect(requestBody.order).toBe("createdAt");
-    return [
-      200,
-      JSON.stringify({ results: items.map((stat) => stat.getDto()) }),
-    ];
-  });
 }
 
 function mockBotStatCreate(
-  host: nock.Scope,
   pool: MockPool,
   chatId: number,
   userName: string,
@@ -105,34 +81,10 @@ function mockBotStatCreate(
     return Promise.resolve({ rows: [stat.getDbDto()] });
   });
 
-  host.post(path).reply((uri, body) => {
-    const requestBody = typeof body === "string" ? JSON.parse(body) : body;
-
-    expect(requestBody.chatId).toBe(stat.chatId);
-    expect(requestBody.user).toBe(stat.user);
-    expect(requestBody.langId).toBe(stat.langId);
-    expect(requestBody.usageCount).toBe(stat.usageCount);
-    return [200, JSON.stringify(stat.getDto())];
-  });
-
   return stat;
 }
 
-function mockBotStatGet(host: nock.Scope, stat: BotStatRecordModel): void {
-  host.post(path).reply((uri, body) => {
-    const requestBody = typeof body === "string" ? JSON.parse(body) : body;
-    expect(requestBody.where.objectId).toBe(stat.objectId);
-    return [
-      200,
-      JSON.stringify({
-        results: [stat.getDto()],
-      }),
-    ];
-  });
-}
-
 function mockBotStatUpdateUsage(
-  host: nock.Scope,
   pool: MockPool,
   item: BotStatRecordModel
 ): Promise<void> {
@@ -148,20 +100,10 @@ function mockBotStatUpdateUsage(
 
       return Promise.resolve({ rows: [item.getDbDto()] });
     });
-
-    host.post(`${path}/${item.objectId}`).reply((uri, body) => {
-      const requestBody = typeof body === "string" ? JSON.parse(body) : body;
-
-      expect(requestBody.usageCount).toBe(item.usageCount + 1);
-      expect(requestBody.user).toBe(item.user);
-
-      return [200, JSON.stringify({})];
-    });
   });
 }
 
 function mockBotStatUpdateLang(
-  host: nock.Scope,
   pool: MockPool,
   item: BotStatRecordModel,
   langId: LanguageCode
@@ -179,15 +121,6 @@ function mockBotStatUpdateLang(
       resolve();
 
       return Promise.resolve({ rows: [item.getDbDto()] });
-    });
-
-    host.post(`${path}/${item.objectId}`).reply((uri, body) => {
-      const requestBody = typeof body === "string" ? JSON.parse(body) : body;
-
-      expect(requestBody.langId).toBe(langId);
-      item.setLang(langId);
-
-      return [200, JSON.stringify({})];
     });
   });
 }

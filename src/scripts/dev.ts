@@ -5,11 +5,9 @@ import {
   provider,
   selfUrl,
   telegramBotApi,
-  dbStat,
   ngRokToken,
   authorTelegramAccount,
   appVersion,
-  cacheSize,
   launchTime,
   memoryLimit,
   dbPostgres,
@@ -21,7 +19,6 @@ import {
   getVoiceConverterProvider,
 } from "../recognition";
 import { getHostName } from "../server/tunnel";
-import { StatisticApi } from "../statistic";
 import { TelegramBotModel } from "../telegram/bot";
 import { ExpressServer } from "../server/express";
 import { StopListener } from "../process";
@@ -58,15 +55,7 @@ export function run(threadId = 0): void {
     port: dbPostgres.port,
   });
 
-  const stat = new StatisticApi(
-    dbStat.statUrl,
-    dbStat.appId,
-    dbStat.appKey,
-    dbStat.masterKey,
-    cacheSize
-  ).connect(db);
-
-  const bot = new TelegramBotModel(telegramBotApi, converter, stat).setAuthor(
+  const bot = new TelegramBotModel(telegramBotApi, converter, db).setAuthor(
     authorTelegramAccount
   );
 
@@ -83,7 +72,7 @@ export function run(threadId = 0): void {
       return server
         .setSelfUrl(host)
         .setBots([bot])
-        .setStat(stat)
+        .setStat(db)
         .setThreadId(threadId)
         .applyHostLocation(launchDelay);
     })

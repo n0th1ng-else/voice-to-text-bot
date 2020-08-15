@@ -1,7 +1,6 @@
 import { TgCallbackQuery, TgMessage, TgUpdate } from "./api/types";
 import { Logger } from "../logger";
 import { VoiceConverter } from "../recognition/types";
-import { StatisticApi } from "../statistic";
 import { LabelId } from "../text/labels";
 import { BotMessageModel, TelegramMessagePrefix } from "./types";
 import { isMessageSupported } from "./helpers";
@@ -11,6 +10,7 @@ import { BotActions } from "./actions";
 import { botCommands } from "./data";
 import { TelegramApi } from "./api";
 import { collectAnalytics } from "../analytics";
+import { DbClient } from "../db";
 
 const logger = new Logger("telegram-bot");
 
@@ -24,7 +24,7 @@ export class TelegramBotModel {
   constructor(
     private readonly token: string,
     converter: VoiceConverter,
-    stat: StatisticApi
+    stat: DbClient
   ) {
     this.bot = new TelegramApi(this.token);
     this.actions = new BotActions(stat, this.bot);

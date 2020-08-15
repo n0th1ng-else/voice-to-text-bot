@@ -2,7 +2,6 @@ import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
 import { LanguageCode } from "../src/recognition/types";
 import { LabelId } from "../src/text/labels";
-import { UsageStatKey } from "../src/statistic/types";
 import { randomIntFromInterval } from "../src/common/timer";
 import { BotButtonData } from "../src/telegram/types";
 import {
@@ -199,16 +198,6 @@ export class BotStatRecordModel {
   public setLang(lang: LanguageCode): this {
     this.langId = lang;
     return this;
-  }
-
-  public getDto(): Record<string, string | number | undefined> {
-    return {
-      objectId: this.objectId,
-      [UsageStatKey.ChatId]: this.chatId,
-      [UsageStatKey.LangId]: this.langId,
-      [UsageStatKey.UsageCount]: this.usageCount,
-      [UsageStatKey.UserName]: this.user,
-    };
   }
 
   public getDbDto(): UsageRowScheme {

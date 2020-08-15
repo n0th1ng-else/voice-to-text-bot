@@ -5,9 +5,9 @@ import { Logger } from "../logger";
 import { TelegramBotModel } from "../telegram/bot";
 import { HttpsOptions } from "../../certs";
 import { HealthDto, HealthModel } from "./types";
-import { StatisticApi } from "../statistic";
 import { sSuffix } from "../text";
 import { UptimeDaemon } from "./uptime";
+import { DbClient } from "../db";
 
 const logger = new Logger("server");
 
@@ -15,7 +15,7 @@ export class ExpressServer {
   private readonly app = express();
   private readonly uptimeDaemon: UptimeDaemon;
 
-  private stat: StatisticApi | null = null;
+  private stat: DbClient | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
@@ -70,7 +70,7 @@ export class ExpressServer {
     );
   }
 
-  public setStat(stat: StatisticApi): this {
+  public setStat(stat: DbClient): this {
     this.stat = stat;
     this.uptimeDaemon.setStat(stat);
     return this;
@@ -195,7 +195,11 @@ export class ExpressServer {
         return;
       }
 
-      return this.stat.node.toggleActive(this.selfUrl, true, this.version);
+      return this.stat.nodes
+        .updateState(this.selfUrl, true, this.version)
+        .then(() => {
+          // Empty promise result
+        });
     });
   }
 }

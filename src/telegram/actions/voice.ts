@@ -143,7 +143,7 @@ export class VoiceAction extends GenericAction {
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Updating usage count`);
 
-    return this.stat.usage
+    return this.stat.usages
       .updateUsageCount(model.chatId, model.name, model.userLanguage)
       .then(() => logger.info(`${prefix.getPrefix()} Usage count updated`))
       .catch((err) =>
