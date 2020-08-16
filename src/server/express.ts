@@ -9,6 +9,7 @@ import { sSuffix } from "../text";
 import { UptimeDaemon } from "./uptime";
 import { DbClient } from "../db";
 import { flattenPromise } from "../common/helpers";
+import { AnalyticsData } from "../analytics/api/types";
 
 const logger = new Logger("server");
 
@@ -93,7 +94,12 @@ export class ExpressServer {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
       this.app.post(bot.getPath(), (req, res) => {
         logger.info("Incoming message");
-        bot.handleApiMessage(req.body, this.version);
+        const analytics = new AnalyticsData(
+          this.version,
+          this.selfUrl,
+          this.threadId
+        );
+        bot.handleApiMessage(req.body, analytics);
         res.sendStatus(200);
       });
 

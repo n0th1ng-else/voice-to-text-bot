@@ -50,7 +50,7 @@ export class BotMessageModel {
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
 
-  constructor(msg: TgMessage, appVersion: string) {
+  constructor(msg: TgMessage, analytics: AnalyticsData) {
     this.id = msg.message_id;
     this.chatId = getChatId(msg);
     this.isGroup = isChatGroup(msg);
@@ -60,11 +60,9 @@ export class BotMessageModel {
     this.voiceFileId = getVoiceFile(msg);
     this.voiceDuration = getVoiceDuration(msg);
     this.userLanguage = getUserLanguage(msg);
-    this.analytics = new AnalyticsData(
-      appVersion,
-      this.chatId,
-      getRawUserLanguage(msg)
-    );
+    this.analytics = analytics
+      .setId(this.chatId)
+      .setLang(getRawUserLanguage(msg));
   }
 
   public get name(): string {

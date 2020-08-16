@@ -11,6 +11,7 @@ import { botCommands } from "./data";
 import { TelegramApi } from "./api";
 import { collectAnalytics } from "../analytics";
 import { DbClient } from "../db";
+import { AnalyticsData } from "../analytics/api/types";
 
 const logger = new Logger("telegram-bot");
 
@@ -84,21 +85,24 @@ export class TelegramBotModel {
     return `${this.path}/${this.id}`;
   }
 
-  public handleApiMessage(message: TgUpdate, appVersion: string): void {
+  public handleApiMessage(message: TgUpdate, analytics: AnalyticsData): void {
     try {
       if (message.message) {
-        this.handleMessage(message.message, appVersion);
+        this.handleMessage(message.message, analytics);
       }
       if (message.callback_query) {
-        this.handleCallbackQuery(message.callback_query, appVersion);
+        this.handleCallbackQuery(message.callback_query, analytics);
       }
     } catch (e) {
       logger.error("Failed to handle api request", e);
     }
   }
 
-  private handleMessage(msg: TgMessage, appVersion: string): Promise<void> {
-    const model = new BotMessageModel(msg, appVersion);
+  private handleMessage(
+    msg: TgMessage,
+    analytics: AnalyticsData
+  ): Promise<void> {
+    const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId);
 
     logger.info(`${prefix.getPrefix()} Incoming message`);
@@ -183,7 +187,10 @@ export class TelegramBotModel {
       );
   }
 
-  private handleCallbackQuery(msg: TgCallbackQuery, appVersion: string): void {
-    this.actions.lang.handleLanguageChange(msg, appVersion);
+  private handleCallbackQuery(
+    msg: TgCallbackQuery,
+    analytics: AnalyticsData
+  ): void {
+    this.actions.lang.handleLanguageChange(msg, analytics);
   }
 }
