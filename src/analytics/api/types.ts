@@ -11,6 +11,7 @@ export class AnalyticsData {
 
   private command = "/";
   private text = "";
+  private errorMessage = "";
 
   constructor(
     private readonly appVersion: string,
@@ -26,21 +27,28 @@ export class AnalyticsData {
     return this;
   }
 
-  public getDto(
-    token: string,
-    type: AnalyticsHitType = AnalyticsHitType.Event
-  ): AnalyticsDataDto {
+  public setError(errorMessage: string): this {
+    this.errorMessage = errorMessage;
+    return this;
+  }
+
+  public getListDto(token: string): AnalyticsDataDto[] {
+    const regular = [this.getEventDto(token), this.getTimingDto(token)];
+    return this.errorMessage ? [...regular, this.getErrorDto(token)] : regular;
+  }
+
+  private getEventDto(token: string): AnalyticsDataDto {
     return {
       v: this.apiVersion,
       tid: token,
       cid: String(this.id),
+      t: AnalyticsHitType.Event,
+      //
       dp: encodeURIComponent(this.command),
       dr: encodeURIComponent(TelegramApi.url),
-      ul: this.lang,
-      t: type,
+      ul: encodeURIComponent(this.lang),
       an: encodeURIComponent(this.appName),
       av: encodeURIComponent(this.appVersion),
-      srt: this.timer.getMs(),
       ec: encodeURIComponent(this.category),
       ea: encodeURIComponent(this.action),
       el: encodeURIComponent(this.text),
@@ -48,41 +56,81 @@ export class AnalyticsData {
       ds: "nodejs",
     };
   }
+
+  private getTimingDto(token: string): AnalyticsDataDto {
+    return {
+      v: this.apiVersion,
+      tid: token,
+      cid: String(this.id),
+      t: AnalyticsHitType.Timing,
+      //
+      utt: this.timer.getMs(),
+      utc: "ServerTiming",
+      utv: encodeURIComponent(this.command),
+    };
+  }
+
+  private getErrorDto(token: string): AnalyticsDataDto {
+    return {
+      v: this.apiVersion,
+      tid: token,
+      cid: String(this.id),
+      t: AnalyticsHitType.Exception,
+      //
+      exf: 0,
+      exd: this.errorMessage,
+    };
+  }
 }
 
 export interface AnalyticsDataDto {
+  // Required
+
   // The Protocol version
   v: string;
   // The measurement ID
   tid: string;
+  // User Id
+  cid: string;
+  // Event hit type.
+  t: AnalyticsHitType;
+
+  // Optional
+
   // When present, the IP address of the sender will be anonymized
   aip?: number;
   // Indicates the data source of the hit.
   ds?: string;
-  // User Id
-  cid: string;
   // Specifies which referral source brought traffic to a website
-  dr: string;
+  dr?: string;
   // Specifies the language
-  ul: string;
-  // Event hit type.
-  t: AnalyticsHitType;
+  ul?: string;
   // Specifies the application name
-  an: string;
+  an?: string;
   // Specifies the application version
-  av: string;
+  av?: string;
   // Event category.
-  ec: string;
+  ec?: string;
   // Event action.
-  ea: string;
+  ea?: string;
   // Event label.
-  el: string;
+  el?: string;
   // Server response time in milliseconds
-  srt: number;
+  srt?: number;
+  // User timing value
+  utt?: number;
+  // User timing category
+  utc?: string;
+  // User timing variable
+  utv?: string;
   // The path portion of the page URL
-  dp: string;
+  dp?: string;
   // Document title
-  dt: string;
+  dt?: string;
+  // Error description
+  exd?: string;
+  // Is error fatal
+  exf?: 0 | 1;
 }
 
 export enum AnalyticsHitType {

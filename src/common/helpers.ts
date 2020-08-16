@@ -26,3 +26,7 @@ export function runPromiseWithRetry<D>(
       return runPromiseWithRetry(fnName, fn, 10_000, tries - 1);
     });
 }
+
+export function flattenPromise() {
+  // Flatten promise
+}
