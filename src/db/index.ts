@@ -2,6 +2,7 @@ import { Pool, types as PGTypes, defaults as PGDefaults } from "pg";
 import { NodesClient } from "./nodes";
 import { UsagesClient } from "./usages";
 import { Logger } from "../logger";
+import { flattenPromise } from "../common/helpers";
 
 const logger = new Logger("postgres-client");
 
@@ -50,9 +51,9 @@ export class DbClient {
       return Promise.resolve();
     }
 
-    return Promise.all([this.usages.init(), this.nodes.init()]).then(() => {
-      // Flatten promise
-    });
+    return Promise.all([this.usages.init(), this.nodes.init()]).then(
+      flattenPromise
+    );
   }
 
   private setParsers(): void {

@@ -5,6 +5,7 @@ import { HealthDto, HealthStatus } from "./types";
 import { sSuffix } from "../text";
 import { getHealthUrl } from "./helpers";
 import { DbClient } from "../db";
+import { flattenPromise } from "../common/helpers";
 
 const logger = new Logger("uptime");
 
@@ -111,9 +112,7 @@ export class UptimeDaemon {
           const isActive = false;
           return this.stat.nodes
             .updateState(this.currentUrl, isActive, this.version)
-            .then(() => {
-              // Empty promise result
-            });
+            .then(flattenPromise);
         }
       }
     );
@@ -139,9 +138,7 @@ export class UptimeDaemon {
       const isActive = false;
       return this.stat.nodes
         .updateState(this.currentUrl, isActive, this.version)
-        .then(() => {
-          // Empty promise result
-        });
+        .then(flattenPromise);
     });
   }
 

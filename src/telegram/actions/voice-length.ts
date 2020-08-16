@@ -59,12 +59,11 @@ export class VoiceLengthAction extends GenericAction {
       .then(() =>
         logger.info(`${prefix.getPrefix()} Voice is too long message sent`)
       )
-      .catch((err) =>
-        logger.error(
-          `${prefix.getPrefix()} Unable to send voice is too long`,
-          err
-        )
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send voice is too long";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("Voice is too long message", "/voice")

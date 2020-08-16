@@ -171,9 +171,11 @@ export class TelegramBotModel {
           prefix
         )
       )
-      .catch((err) =>
-        logger.error(`${prefix.getPrefix()} Unable to send no content`, err)
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send no content";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("No content message", "/bot")

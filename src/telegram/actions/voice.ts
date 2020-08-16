@@ -57,19 +57,16 @@ export class VoiceAction extends GenericAction {
 
     return this.getFileLInk(model, prefix)
       .then((fileLink) => {
-        this.sendInProgressMessage(model, lang, prefix);
-
         if (!this.converter) {
           return Promise.reject(new Error("Voice converter is not set!"));
         }
 
-        return this.converter.transformToText(
-          fileLink,
-          model.voiceFileId,
-          lang
-        );
+        return Promise.all([
+          this.converter.transformToText(fileLink, model.voiceFileId, lang),
+          this.sendInProgressMessage(model, lang, prefix),
+        ]);
       })
-      .then((text: string) => {
+      .then(([text]) => {
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
         return Promise.all([
@@ -81,24 +78,39 @@ export class VoiceAction extends GenericAction {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`)
       )
       .catch((err) => {
-        if (!model.isGroup) {
-          this.sendMessage(
-            model.id,
-            model.chatId,
-            LabelId.RecognitionFailed,
-            {
-              lang,
-            },
-            prefix
-          );
-        }
-
+        const errorMessage = "Unable to recognize the file";
         logger.error(
-          `${prefix.getPrefix()} Unable to recognize the file ${Logger.y(
+          `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
             model.voiceFileId
           )}`,
           err
         );
+        model.analytics.setError(errorMessage);
+
+        if (model.isGroup) {
+          return;
+        }
+
+        return this.sendMessage(
+          model.id,
+          model.chatId,
+          LabelId.RecognitionFailed,
+          {
+            lang,
+          },
+          prefix
+        );
+      })
+      .catch((err) => {
+        const errorMessage =
+          "Unable to send a message that file is unable to recognize";
+        logger.error(
+          `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
+            model.voiceFileId
+          )}`,
+          err
+        );
+        model.analytics.setError(errorMessage);
       });
   }
 
@@ -134,7 +146,11 @@ export class VoiceAction extends GenericAction {
         lang,
       },
       prefix
-    );
+    ).catch((err) => {
+      const errorMessage = "Unable to send in progress message";
+      logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+      model.analytics.setError(errorMessage);
+    });
   }
 
   private updateUsageCount(
@@ -146,8 +162,10 @@ export class VoiceAction extends GenericAction {
     return this.stat.usages
       .updateUsageCount(model.chatId, model.name, model.userLanguage)
       .then(() => logger.info(`${prefix.getPrefix()} Usage count updated`))
-      .catch((err) =>
-        logger.error(`${prefix.getPrefix()} Unable to update usage count`, err)
-      );
+      .catch((err) => {
+        const errorMessage = "Unable to update usage count";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      });
   }
 }
