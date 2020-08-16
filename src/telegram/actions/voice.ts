@@ -80,7 +80,7 @@ export class VoiceAction extends GenericAction {
       .then(() =>
         logger.info(`${prefix.getPrefix()} Voice successfully converted`)
       )
-      .catch((err: Error) => {
+      .catch((err) => {
         if (!model.isGroup) {
           this.sendMessage(
             model.id,

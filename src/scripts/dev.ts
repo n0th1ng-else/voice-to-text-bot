@@ -78,5 +78,5 @@ export function run(threadId = 0): void {
     })
     .then(() => server.start())
     .then((onStop) => stopListener.addTrigger(() => onStop()))
-    .catch((err: Error) => logger.error("Failed to run dev instance", err));
+    .catch((err) => logger.error("Failed to run dev instance", err));
 }

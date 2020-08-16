@@ -67,6 +67,7 @@ export class AnalyticsData {
       utt: this.timer.getMs(),
       utc: "ServerTiming",
       utv: encodeURIComponent(this.command),
+      ul: encodeURIComponent(this.lang),
     };
   }
 
