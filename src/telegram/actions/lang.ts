@@ -29,7 +29,10 @@ export class LangAction extends GenericAction {
     return isLangMessage(mdl, msg);
   }
 
-  public handleLanguageChange(msg: TgCallbackQuery, appVersion: string): void {
+  public handleLanguageChange(
+    msg: TgCallbackQuery,
+    analytics: AnalyticsData
+  ): void {
     const message = msg.message;
     if (!message) {
       const msgError = new Error("No message passed in callback query");
@@ -38,11 +41,7 @@ export class LangAction extends GenericAction {
     }
     const messageId = message.message_id;
     const chatId = message.chat.id;
-    const analytics = new AnalyticsData(
-      appVersion,
-      chatId,
-      getRawUserLanguage(msg)
-    );
+    analytics.setId(chatId).setLang(getRawUserLanguage(msg));
 
     this.getLangData(chatId, msg.data)
       .then((opts) => this.updateLanguage(opts, chatId, messageId, analytics))

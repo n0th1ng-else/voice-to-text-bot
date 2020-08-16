@@ -6,19 +6,31 @@ export class AnalyticsData {
   private readonly timer: TimeMeasure;
   private readonly apiVersion = "1";
   private readonly appName = "Voice to Speech Bot";
-  private readonly category = "Telegram bot";
   private readonly action = "User message";
+  private readonly appType = "NodeJS";
 
   private command = "/";
   private text = "";
   private errorMessages: string[] = [];
+  private id = 0;
+  private lang = "not provided";
 
   constructor(
     private readonly appVersion: string,
-    private readonly id: number,
-    private readonly lang: string
+    private readonly url: string,
+    private readonly threadId: number
   ) {
     this.timer = new TimeMeasure();
+  }
+
+  public setId(id: number): this {
+    this.id = id;
+    return this;
+  }
+
+  public setLang(lang: string): this {
+    this.lang = lang || "not provided";
+    return this;
   }
 
   public setCommand(text: string, command: BotCommand | string = "/"): this {
@@ -47,16 +59,17 @@ export class AnalyticsData {
       cid: String(this.id),
       t: AnalyticsHitType.Event,
       //
+      dh: encodeURIComponent(this.url),
       dp: encodeURIComponent(this.command),
       dr: encodeURIComponent(TelegramApi.url),
       ul: encodeURIComponent(this.lang),
       an: encodeURIComponent(this.appName),
       av: encodeURIComponent(this.appVersion),
-      ec: encodeURIComponent(this.category),
+      ec: encodeURIComponent(`Thread ${this.threadId}`),
       ea: encodeURIComponent(this.action),
       el: encodeURIComponent(this.text),
       dt: encodeURIComponent(this.text),
-      ds: "nodejs",
+      ds: encodeURIComponent(this.appType),
     };
   }
 
@@ -68,9 +81,9 @@ export class AnalyticsData {
       t: AnalyticsHitType.Timing,
       //
       utt: this.timer.getMs(),
-      utc: "ServerTiming",
+      utc: encodeURIComponent("Server Timing"),
       utv: encodeURIComponent(this.command),
-      ul: encodeURIComponent(this.lang),
+      utl: encodeURIComponent(`Thread ${this.threadId}`),
     };
   }
 
@@ -135,6 +148,10 @@ export interface AnalyticsDataDto {
   exd?: string;
   // Is error fatal
   exf?: 0 | 1;
+  // Specifies the hostname from which content was hosted
+  dh?: string;
+  // Specifies the user timing label
+  utl?: string;
 }
 
 export enum AnalyticsHitType {
