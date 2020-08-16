@@ -14,6 +14,7 @@ import { LanguageCode } from "../../src/recognition/types";
 import { LabelId } from "../../src/text/labels";
 import { BotButtonData } from "../../src/telegram/types";
 import { botCommands } from "../../src/telegram/data";
+import { flattenPromise } from "../../src/common/helpers";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -164,9 +165,7 @@ export function mockTgReceiveMessages(
 ): Promise<void> {
   return Promise.all(
     textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId))
-  ).then(() => {
-    // Flatten promise
-  });
+  ).then(flattenPromise);
 }
 
 export function mockTgGetFileUrl(host: nock.Scope, fileId: string): void {

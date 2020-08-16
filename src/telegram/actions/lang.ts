@@ -40,12 +40,12 @@ export class LangAction extends GenericAction {
     const chatId = message.chat.id;
     const analytics = new AnalyticsData(
       appVersion,
-      message.chat.id,
+      chatId,
       getRawUserLanguage(msg)
     );
 
     this.getLangData(chatId, msg.data)
-      .then((opts) => this.updateLanguage(opts, chatId, messageId))
+      .then((opts) => this.updateLanguage(opts, chatId, messageId, analytics))
       .then(() =>
         collectAnalytics(
           analytics.setCommand("Update language callback", BotCommand.Language)
@@ -56,32 +56,56 @@ export class LangAction extends GenericAction {
   private updateLanguage(
     opts: BotLangData,
     chatId: number,
-    messageId: number
+    messageId: number,
+    analytics: AnalyticsData
   ): Promise<void> {
     const lang = opts.langId;
     const prefix = opts.prefix;
 
     return this.stat.usages
       .updateLangId(chatId, lang)
-      .then(() =>
-        this.editMessage(chatId, lang, messageId, LabelId.ChangeLang, prefix)
+      .then(() => logger.info(`${prefix.getPrefix()} Language updated in DB`))
+      .then(
+        () => this.sendLangUpdatedMessage(chatId, lang, messageId, prefix),
+        (err) => {
+          const errorMessage = "Unable to set the language in DB";
+          logger.error(
+            `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
+            err
+          );
+          analytics.setError(errorMessage);
+          return this.sendMessage(
+            messageId,
+            chatId,
+            LabelId.UpdateLanguageError,
+            { lang },
+            prefix
+          );
+        }
       )
-      .then(() => logger.info(`${prefix.getPrefix()} Language updated`))
       .catch((err) => {
-        this.sendMessage(
-          messageId,
-          chatId,
-          LabelId.UpdateLanguageError,
-          { lang },
-          prefix
-        );
+        const errorMessage = "Unable to set the language";
         logger.error(
-          `${prefix.getPrefix()} Unable to set the language lang=${Logger.y(
-            lang
-          )}`,
+          `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
           err
         );
+        analytics.setError(errorMessage);
       });
+  }
+
+  private sendLangUpdatedMessage(
+    chatId: number,
+    lang: LanguageCode,
+    messageId: number,
+    prefix: TelegramMessagePrefix
+  ): Promise<void> {
+    return this.editMessage(
+      chatId,
+      lang,
+      messageId,
+      LabelId.ChangeLang,
+      prefix
+    ).then(() => logger.info(`${prefix.getPrefix()} Language updated`));
   }
 
   private getLangData(chatId: number, data?: string): Promise<BotLangData> {
@@ -153,12 +177,11 @@ export class LangAction extends GenericAction {
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Language selector sent`))
-      .catch((err) =>
-        logger.error(
-          `${prefix.getPrefix()} Unable to send language selector`,
-          err
-        )
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send language selector";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("Update language", BotCommand.Language)

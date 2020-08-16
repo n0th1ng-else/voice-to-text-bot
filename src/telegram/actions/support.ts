@@ -62,12 +62,11 @@ export class SupportAction extends GenericAction {
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Support message sent`))
-      .catch((err) =>
-        logger.error(
-          `${prefix.getPrefix()} Unable to send support message`,
-          err
-        )
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send support message";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("Support message", BotCommand.Support)

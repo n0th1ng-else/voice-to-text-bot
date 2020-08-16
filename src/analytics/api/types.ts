@@ -11,7 +11,7 @@ export class AnalyticsData {
 
   private command = "/";
   private text = "";
-  private errorMessage = "";
+  private errorMessages: string[] = [];
 
   constructor(
     private readonly appVersion: string,
@@ -28,13 +28,16 @@ export class AnalyticsData {
   }
 
   public setError(errorMessage: string): this {
-    this.errorMessage = errorMessage;
+    this.errorMessages.push(errorMessage);
     return this;
   }
 
   public getListDto(token: string): AnalyticsDataDto[] {
     const regular = [this.getEventDto(token), this.getTimingDto(token)];
-    return this.errorMessage ? [...regular, this.getErrorDto(token)] : regular;
+    const errors = this.errorMessages.map((msg) =>
+      this.getErrorDto(token, msg)
+    );
+    return this.errorMessages.length ? [...regular, ...errors] : regular;
   }
 
   private getEventDto(token: string): AnalyticsDataDto {
@@ -71,7 +74,7 @@ export class AnalyticsData {
     };
   }
 
-  private getErrorDto(token: string): AnalyticsDataDto {
+  private getErrorDto(token: string, message: string): AnalyticsDataDto {
     return {
       v: this.apiVersion,
       tid: token,
@@ -79,7 +82,7 @@ export class AnalyticsData {
       t: AnalyticsHitType.Exception,
       //
       exf: 0,
-      exd: this.errorMessage,
+      exd: encodeURIComponent(message),
     };
   }
 }

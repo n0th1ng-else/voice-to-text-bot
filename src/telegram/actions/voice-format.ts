@@ -67,12 +67,11 @@ export class VoiceFormatAction extends GenericAction {
           `${prefix.getPrefix()} Mime-type is not supported message sent`
         )
       )
-      .catch((err) =>
-        logger.error(
-          `${prefix.getPrefix()} Unable to send mime-type is not supported`,
-          err
-        )
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send mime-type is not supported";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("Mime-type message", "/voice")

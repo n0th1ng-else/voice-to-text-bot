@@ -63,9 +63,11 @@ export class FundAction extends GenericAction {
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Fund message sent`))
-      .catch((err) =>
-        logger.error(`${prefix.getPrefix()} Unable to send fund message`, err)
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send fund message";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("Fund message", BotCommand.Fund)

@@ -23,9 +23,9 @@ export function collectAnalytics(analytics: AnalyticsData): Promise<void> {
 }
 
 function runAnalyticsRequest(data: AnalyticsDataDto): Promise<void> {
-  // const logged = { ...data, tid: "hidden" }; // Log event
+  const logged = { ul: data.ul, cid: data.cid, t: data.t };
   return new GoogleAnalyticsApi()
     .collect(data)
-    .then(() => logger.info("Analytic data has been collected"))
+    .then(() => logger.info("Analytic data has been collected", logged))
     .catch((err) => logger.warn("Failed to collect analytic data", err));
 }

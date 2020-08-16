@@ -41,9 +41,11 @@ export class StartAction extends GenericAction {
         )
       )
       .then(() => logger.info(`${prefix.getPrefix()} Hello message sent`))
-      .catch((err) =>
-        logger.error(`${prefix.getPrefix()} Unable to send hello message`, err)
-      )
+      .catch((err) => {
+        const errorMessage = "Unable to send hello message";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           model.analytics.setCommand("Hello message", BotCommand.Start)

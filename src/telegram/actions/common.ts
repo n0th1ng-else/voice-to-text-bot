@@ -10,6 +10,7 @@ import { TextModel } from "../../text";
 import { LabelId } from "../../text/labels";
 import { TelegramApi } from "../api";
 import { DbClient } from "../../db";
+import { flattenPromise } from "../../common/helpers";
 
 const logger = new Logger("telegram-bot");
 
@@ -42,7 +43,9 @@ export abstract class GenericAction {
     return this.stat.usages
       .getLangId(model.chatId, model.name, model.userLanguage)
       .catch((err) => {
-        logger.error(`${prefix.getPrefix()} Unable to get the lang`, err);
+        const errorMessage = "Unable to get the lang";
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+        model.analytics.setError(errorMessage);
         return this.text.fallbackLanguage;
       });
   }
@@ -71,9 +74,10 @@ export abstract class GenericAction {
       meta.options
     )
       .then(() => this.sendMessage(messageId, chatId, msgs, meta, prefix))
-      .catch((err) =>
-        logger.error(`${prefix.getPrefix()} Unable to send the message`, err)
-      );
+      .catch((err) => {
+        logger.error(`${prefix.getPrefix()} Unable to send the message`, err);
+        throw err;
+      });
   }
 
   public editMessage(
@@ -86,9 +90,10 @@ export abstract class GenericAction {
     return this.bot
       .editMessageText(chatId, messageId, this.text.t(id, lang))
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`))
-      .catch((err) =>
-        logger.error(`${prefix.getPrefix()} Unable to edit the message`, err)
-      );
+      .catch((err) => {
+        logger.error(`${prefix.getPrefix()} Unable to update the message`, err);
+        throw err;
+      });
   }
 
   protected sendRawMessage(
@@ -96,9 +101,7 @@ export abstract class GenericAction {
     message: string,
     options?: TgInlineKeyboardButton[][]
   ): Promise<void> {
-    return this.bot.sendMessage(chatId, message, options).then(() => {
-      // Empty promise result
-    });
+    return this.bot.sendMessage(chatId, message, options).then(flattenPromise);
   }
 }
 

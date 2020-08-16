@@ -8,6 +8,7 @@ import { HealthDto, HealthModel } from "./types";
 import { sSuffix } from "../text";
 import { UptimeDaemon } from "./uptime";
 import { DbClient } from "../db";
+import { flattenPromise } from "../common/helpers";
 
 const logger = new Logger("server");
 
@@ -197,9 +198,7 @@ export class ExpressServer {
 
       return this.stat.nodes
         .updateState(this.selfUrl, true, this.version)
-        .then(() => {
-          // Empty promise result
-        });
+        .then(flattenPromise);
     });
   }
 }
