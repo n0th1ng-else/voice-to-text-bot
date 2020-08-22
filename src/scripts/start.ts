@@ -57,7 +57,7 @@ export function run(threadId = 0): void {
     host: dbPostgres.host,
     database: dbPostgres.database,
     port: dbPostgres.port,
-  });
+  }).setClientName(threadId);
 
   const bot = new TelegramBotModel(telegramBotApi, converter, db).setAuthor(
     authorTelegramAccount

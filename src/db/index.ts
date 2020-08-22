@@ -56,6 +56,11 @@ export class DbClient {
     );
   }
 
+  public setClientName(threadId: number): this {
+    PGDefaults.application_name = `bot sql stream for replica ${threadId}`;
+    return this;
+  }
+
   private setParsers(): void {
     PGTypes.setTypeParser(PGTypes.builtins.INT8, (val) => parseInt(val));
   }
