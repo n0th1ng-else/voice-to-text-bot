@@ -37,7 +37,7 @@
     "kleur": "4.0.2",
     "nanoid": "3.1.10",
     "ngrok": "3.2.7",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.1",
     "node-telegram-bot-api": "0.50.0",
     "parse": "2.15.0",
     "pg": "8.3.0",
