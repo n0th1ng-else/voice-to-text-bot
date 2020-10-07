@@ -1,14 +1,14 @@
 import request from "supertest";
 import nock from "nock";
 import {
-  jest,
-  expect,
-  beforeEach,
-  afterEach,
-  it,
-  describe,
-  beforeAll,
   afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
 } from "@jest/globals";
 import { ExpressServer } from "../src/server/express";
 import { appVersion, launchTime, telegramBotName } from "../src/env";
@@ -25,6 +25,7 @@ import { TelegramBotModel } from "../src/telegram/bot";
 import {
   githubUrl,
   localhostUrl,
+  officialChannelAccount,
   patreonAccount,
   yandexAccount,
 } from "../src/const";
@@ -184,6 +185,7 @@ describe("[default language - english]", () => {
             LabelId.WelcomeMessage,
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
+            LabelId.DonateMessage,
           ]
         ),
       ]);
@@ -210,6 +212,7 @@ describe("[default language - english]", () => {
             LabelId.WelcomeMessage,
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
+            LabelId.DonateMessage,
           ]
         ),
       ]);
@@ -231,6 +234,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.OfficialChannel,
+              officialChannelAccount
+            ),
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])
         ),
@@ -256,6 +263,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.OfficialChannel,
+              officialChannelAccount
+            ),
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])
         ),
@@ -280,6 +291,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.OfficialChannel,
+              officialChannelAccount
+            ),
             new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])
@@ -309,6 +324,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.OfficialChannel,
+              officialChannelAccount
+            ),
             new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])

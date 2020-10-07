@@ -25,6 +25,7 @@ import { TelegramBotModel } from "../src/telegram/bot";
 import {
   githubUrl,
   localhostUrl,
+  officialChannelAccount,
   patreonAccount,
   yandexAccount,
 } from "../src/const";
@@ -232,6 +233,7 @@ describe("[default language - english]", () => {
             LabelId.WelcomeMessage,
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
+            LabelId.DonateMessage,
           ]
         ),
       ]);
@@ -253,6 +255,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.OfficialChannel,
+              officialChannelAccount
+            ),
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])
         ),
@@ -277,6 +283,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           LabelId.SupportCommand,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(
+              LabelId.OfficialChannel,
+              officialChannelAccount
+            ),
             new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
             new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
           ])

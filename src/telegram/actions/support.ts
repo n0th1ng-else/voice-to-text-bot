@@ -3,7 +3,7 @@ import { GenericAction } from "./common";
 import { BotCommand, BotMessageModel, TelegramMessagePrefix } from "../types";
 import { isSupportMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
-import { githubUrl } from "../../const";
+import { githubUrl, officialChannelAccount } from "../../const";
 import { Logger } from "../../logger";
 import { collectAnalytics } from "../../analytics";
 
@@ -41,14 +41,19 @@ export class SupportAction extends GenericAction {
           url: githubUrl,
         };
 
+        const newsBtn: TgInlineKeyboardButton = {
+          text: this.text.t(LabelId.OfficialChannel, lang),
+          url: officialChannelAccount,
+        };
+
         const authorBtn: TgInlineKeyboardButton = {
           text: this.text.t(LabelId.ContactAuthor, lang),
           url: this.authorUrl,
         };
 
         const buttons: TgInlineKeyboardButton[][] = this.authorUrl
-          ? [[authorBtn], [issueBtn]]
-          : [[issueBtn]];
+          ? [[newsBtn], [authorBtn], [issueBtn]]
+          : [[newsBtn], [issueBtn]];
 
         return this.sendMessage(
           model.id,

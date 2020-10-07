@@ -27,6 +27,8 @@ export enum LabelId {
   SupportedFormatsMessageExplanation,
   KofiLinkTitle,
   YandexLinkTitle,
+  DonateMessage,
+  OfficialChannel,
 }
 
 export const labels = {
@@ -46,14 +48,15 @@ export const labels = {
       "Не забудь выбрать язык голосовых сообщений с помощью команды /lang",
     [LabelId.GithubIssues]: "Написать об ошибке",
     [LabelId.ContactAuthor]: "Связаться с автором",
-    [LabelId.SupportCommand]: "Поддержка",
+    [LabelId.SupportCommand]:
+      "Если у вас возникли вопросы и предложения, вы можете связаться со мной одним из следующих способов",
     [LabelId.LongVoiceMessage]:
       "Сообщения длиной больше 1 минуты не поддерживаются 🌚",
     [LabelId.UpdateLanguageError]:
       "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
     [LabelId.PatreonLinkTitle]: "Подписаться на Патреоне",
     [LabelId.FundCommandMessage]:
-      "Спасибо, что пользуетесь ботом. Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы быть онлайн 24/7 и превращать голос в текст. Я буду рад, если вы поддержите проект финансово, и поможете мне двигаться дальше. Напишите мне (автору), если у вас возникли вопросы",
+      "Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы быть онлайн 24/7 и превращать голос в текст.\n\nЯ буду рад, если вы поддержите проект финансово и поможете мне двигаться дальше. Напишите мне (автору), если у вас возникли вопросы.\n\nЯ принимаю пожертвования на безвоздмездной основе. Все средства идут на оплату сервиса Google Speech-to-Text (в прошлом месяце я потратил 100$). За пожертвования вы не получите эксклюзивных функиций, но поможете сохранить проект активным.\n\nСпасибо, что помогаете проекту жить!",
     [LabelId.AudioNotSupportedMessage]:
       "Формат аудио файла не поддерживается 🌚",
     [LabelId.SupportedFormatsMessage]:
@@ -61,7 +64,10 @@ export const labels = {
     [LabelId.SupportedFormatsMessageExplanation]:
       "Большинство приложений записывают голос в данном формате. Напишите автору, если у вас возникли проблемы с этим",
     [LabelId.KofiLinkTitle]: "Отправить через Paypal",
-    [LabelId.YandexLinkTitle]: "Отправить картой",
+    [LabelId.YandexLinkTitle]: "Отправить с помощью карты",
+    [LabelId.DonateMessage]:
+      "Вы можете помочь и поддержать проект. Выполните /fund для подробностей",
+    [LabelId.OfficialChannel]: "Новости и обсуждения",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -79,7 +85,8 @@ export const labels = {
       "Don't forget to select the language you are going to recognise by typing the /lang command",
     [LabelId.GithubIssues]: "Send an issue",
     [LabelId.ContactAuthor]: "Talk to the author",
-    [LabelId.SupportCommand]: "Support menu",
+    [LabelId.SupportCommand]:
+      "If you have any questions, you can contact me using one of the following options",
     [LabelId.LongVoiceMessage]:
       "Messages with duration more than 1 minute are not supported 🌚",
     [LabelId.UpdateLanguageError]:
@@ -90,7 +97,7 @@ export const labels = {
     [LabelId.FundCommandDescription]: "Help us with funding the project",
     [LabelId.PatreonLinkTitle]: "Subscribe on Patreon",
     [LabelId.FundCommandMessage]:
-      "I hope you found the bot useful and have fun using its skills. This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text. I would ask you to support the project and fund us so I can keep the bot up and running. Contact me (the author) if you have any questions related",
+      "This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text.\n\nI would love to ask you to support the project and fund us so I can keep the bot up and running. Contact me (the author) if you have any questions related.\n\nAll donations are non-refundable. I use donations to pay for Google Speech-to-Text service usages (last month it was 100$). You would not get and extra bonuses for donating me some money, but you will take part in having the bot up all day long.\n\nThank you for supporting the project!",
     [LabelId.AudioNotSupportedMessage]:
       "The audio file format is not supported at the moment 🌚",
     [LabelId.SupportedFormatsMessage]:
@@ -99,5 +106,8 @@ export const labels = {
       "Typically, most messengers record voice in this format. Contact the author if you experience any problems",
     [LabelId.KofiLinkTitle]: "Send money via Paypal",
     [LabelId.YandexLinkTitle]: "Quick donation in Rubbles",
+    [LabelId.DonateMessage]:
+      "Help us to keep the bot alive. Run /fund command for details",
+    [LabelId.OfficialChannel]: "News and discussions",
   },
 };
