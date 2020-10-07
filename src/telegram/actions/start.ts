@@ -35,6 +35,7 @@ export class StartAction extends GenericAction {
             LabelId.WelcomeMessage,
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
+            LabelId.DonateMessage,
           ],
           { lang },
           prefix
