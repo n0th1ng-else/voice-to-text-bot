@@ -64,6 +64,8 @@ import { Pool as MockPool } from "../src/db/__mocks__/pg";
 import { DbClient } from "../src/db";
 import { NodesSql } from "../src/db/sql/nodes.sql";
 import { UsagesSql } from "../src/db/sql/usages.sql";
+import { DonationsSql } from "../src/db/sql/donations.sql";
+import { UsedEmailsSql } from "../src/db/sql/emails.sql";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -131,6 +133,8 @@ describe("[russian language]", () => {
 
     testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
     testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
+    testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
+    testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
 
     return db
       .init()
@@ -491,12 +495,11 @@ describe("[russian language]", () => {
           statModel.langId,
           LabelId.FundCommandMessage,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
             new TelegramMessageMetaItem(
               LabelId.PatreonLinkTitle,
               patreonAccount
             ),
-            // new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
-            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
           ])
         ),
       ]);
@@ -519,12 +522,11 @@ describe("[russian language]", () => {
           statModel.langId,
           LabelId.FundCommandMessage,
           new TelegramMessageMeta(TelegramMessageMetaType.Link, [
+            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
             new TelegramMessageMetaItem(
               LabelId.PatreonLinkTitle,
               patreonAccount
             ),
-            // new TelegramMessageMetaItem(LabelId.KofiLinkTitle, kofiAccount),
-            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
           ])
         ),
       ]);

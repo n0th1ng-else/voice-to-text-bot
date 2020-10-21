@@ -104,6 +104,7 @@ export class BotCommandOption {
 }
 
 export enum TelegramButtonType {
+  Donation = "d",
   Language = "l",
   Unknown = "u",
 }
