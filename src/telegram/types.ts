@@ -1,4 +1,5 @@
 import {
+  getButtonTypeByText,
   getChatId,
   getFullUserName,
   getGroupName,
@@ -75,11 +76,6 @@ export interface MessageOptions {
   options?: TgInlineKeyboardButton[][];
 }
 
-export interface BotButtonData {
-  l: LanguageCode;
-  i: string;
-}
-
 export class TelegramMessagePrefix {
   constructor(
     public readonly chatId: number,
@@ -88,13 +84,6 @@ export class TelegramMessagePrefix {
 
   public getPrefix(): string {
     return `[Id=${Logger.y(this.id)}] [ChatId=${Logger.y(this.chatId)}]`;
-  }
-
-  public getDto(langId: LanguageCode): BotButtonData {
-    return {
-      l: langId,
-      i: this.id,
-    };
   }
 }
 
@@ -112,4 +101,39 @@ export class BotCommandOption {
     const textLib = new TextModel();
     this.description = textLib.t(textId, LanguageCode.En);
   }
+}
+
+export enum TelegramButtonType {
+  Language = "l",
+  Unknown = "u",
+}
+
+export class TelegramButtonModel {
+  public static fromDto(dtoString: string): TelegramButtonModel {
+    const dto: BotButtonDto = JSON.parse(dtoString);
+    const type = getButtonTypeByText(dto.i);
+    return new TelegramButtonModel(type, dto.v, dto.l);
+  }
+
+  constructor(
+    public readonly id: TelegramButtonType,
+    public readonly value: string,
+    public readonly logPrefix: string
+  ) {}
+
+  public getDtoString(): string {
+    const dto: BotButtonDto = {
+      i: this.id,
+      l: this.logPrefix,
+      v: this.value,
+    };
+
+    return JSON.stringify(dto);
+  }
+}
+
+interface BotButtonDto {
+  i: string; // type Identifier
+  l: string; // log prefix
+  v: string; // value
 }

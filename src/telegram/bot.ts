@@ -190,7 +190,7 @@ export class TelegramBotModel {
   private handleCallbackQuery(
     msg: TgCallbackQuery,
     analytics: AnalyticsData
-  ): void {
-    this.actions.lang.handleLanguageChange(msg, analytics);
+  ): Promise<void> {
+    return this.actions.handleCallback(msg, analytics);
   }
 }

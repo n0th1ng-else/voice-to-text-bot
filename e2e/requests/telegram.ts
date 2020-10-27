@@ -12,9 +12,12 @@ import {
 import { TextModel } from "../../src/text";
 import { LanguageCode } from "../../src/recognition/types";
 import { LabelId } from "../../src/text/labels";
-import { BotButtonData } from "../../src/telegram/types";
 import { botCommands } from "../../src/telegram/data";
 import { flattenPromise } from "../../src/common/helpers";
+import {
+  TelegramButtonModel,
+  TelegramButtonType,
+} from "../../src/telegram/types";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -138,12 +141,14 @@ export function mockTgReceiveMessage(
           expect(itemInfo.text).toBe(text.t(metaItemInfo.title, lang));
 
           if (meta.type === TelegramMessageMetaType.Button) {
-            const callbackData: BotButtonData = JSON.parse(
+            const callbackData = TelegramButtonModel.fromDto(
               itemInfo.callback_data
             );
-            expect(callbackData.l).toBe(metaItemInfo.data);
-            expect(callbackData.i).toBeDefined();
-            prefixId = callbackData.i;
+
+            expect(callbackData.value).toBe(metaItemInfo.data);
+            expect(callbackData.logPrefix).toBeDefined();
+            expect(callbackData.id).toBe(TelegramButtonType.Language);
+            prefixId = callbackData.logPrefix;
           } else if (meta.type === TelegramMessageMetaType.Link) {
             expect(itemInfo.url).toBe(metaItemInfo.data);
           } else {

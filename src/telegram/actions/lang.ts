@@ -1,13 +1,18 @@
 import { TgCallbackQuery, TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import {
-  BotButtonData,
   BotCommand,
   BotLangData,
   BotMessageModel,
+  TelegramButtonModel,
+  TelegramButtonType,
   TelegramMessagePrefix,
 } from "../types";
-import { getRawUserLanguage, isLangMessage } from "../helpers";
+import {
+  getLanguageByText,
+  getRawUserLanguage,
+  isLangMessage,
+} from "../helpers";
 import { LabelId } from "../../text/labels";
 import { LanguageCode } from "../../recognition/types";
 import { Logger } from "../../logger";
@@ -29,22 +34,32 @@ export class LangAction extends GenericAction {
     return isLangMessage(mdl, msg);
   }
 
-  public handleLanguageChange(
-    msg: TgCallbackQuery,
-    analytics: AnalyticsData
-  ): void {
-    const message = msg.message;
-    if (!message) {
-      const msgError = new Error("No message passed in callback query");
-      logger.error(msgError.message, msgError);
-      return;
-    }
+  public runCallback(
+    msg: TgMessage,
+    button: TelegramButtonModel,
+    analytics: AnalyticsData,
+    query: TgCallbackQuery
+  ): Promise<void> {
+    return this.handleLanguageChange(msg, button, analytics, query);
+  }
+
+  private handleLanguageChange(
+    message: TgMessage,
+    button: TelegramButtonModel,
+    analytics: AnalyticsData,
+    msg: TgCallbackQuery
+  ): Promise<void> {
     const messageId = message.message_id;
     const chatId = message.chat.id;
     analytics.setId(chatId).setLang(getRawUserLanguage(msg));
 
-    this.getLangData(chatId, msg.data)
+    return this.getLangData(chatId, button)
       .then((opts) => this.updateLanguage(opts, chatId, messageId, analytics))
+      .catch((err) => {
+        const errorMessage = "Unable to handle language change";
+        logger.error(errorMessage, err);
+        analytics.setError(errorMessage);
+      })
       .then(() =>
         collectAnalytics(
           analytics.setCommand("Update language callback", BotCommand.Language)
@@ -107,37 +122,22 @@ export class LangAction extends GenericAction {
     ).then(() => logger.info(`${prefix.getPrefix()} Language updated`));
   }
 
-  private getLangData(chatId: number, data?: string): Promise<BotLangData> {
-    if (!data) {
+  private getLangData(
+    chatId: number,
+    button: TelegramButtonModel
+  ): Promise<BotLangData> {
+    if (!button.value) {
       return Promise.reject(
-        new Error("No callback data received. Unable to handle language change")
+        new Error("No language data received. Unable to handle language change")
       );
     }
 
-    try {
-      const obj: BotButtonData = JSON.parse(data);
-
-      const prefixId = obj.i || undefined;
-
-      let langId: LanguageCode | undefined;
-
-      if (obj.l === LanguageCode.En) {
-        langId = LanguageCode.En;
-      }
-
-      if (obj.l === LanguageCode.Ru) {
-        langId = LanguageCode.Ru;
-      }
-
-      if (!langId) {
-        return Promise.reject(new Error("New language code is not recognized"));
-      }
-
-      const prefix = new TelegramMessagePrefix(chatId, prefixId);
-      return Promise.resolve(new BotLangData(langId, prefix));
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    return Promise.resolve().then(() => {
+      const prefix = new TelegramMessagePrefix(chatId, button.logPrefix);
+      const throwOnError = true;
+      const langId = getLanguageByText(button.value, throwOnError);
+      return new BotLangData(langId, prefix);
+    });
   }
 
   private showLanguageSelection(
@@ -148,8 +148,16 @@ export class LangAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const EnData = prefix.getDto(LanguageCode.En);
-        const RuData = prefix.getDto(LanguageCode.Ru);
+        const EnData = new TelegramButtonModel(
+          TelegramButtonType.Language,
+          LanguageCode.En,
+          prefix.id
+        );
+        const RuData = new TelegramButtonModel(
+          TelegramButtonType.Language,
+          LanguageCode.Ru,
+          prefix.id
+        );
 
         return this.sendMessage(
           model.id,
@@ -161,13 +169,13 @@ export class LangAction extends GenericAction {
               [
                 {
                   text: this.text.t(LabelId.BtnRussian, lang),
-                  callback_data: JSON.stringify(RuData),
+                  callback_data: RuData.getDtoString(),
                 },
               ],
               [
                 {
                   text: this.text.t(LabelId.BtnEnglish, lang),
-                  callback_data: JSON.stringify(EnData),
+                  callback_data: EnData.getDtoString(),
                 },
               ],
             ],

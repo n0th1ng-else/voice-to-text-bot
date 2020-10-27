@@ -1,6 +1,7 @@
 import {
   BotCommand,
   BotMessageModel,
+  TelegramButtonType,
   VoiceContentReason,
   VoiceContentReasonModel,
 } from "./types";
@@ -167,12 +168,30 @@ export function getRawUserLanguage(msg: TgMessage | TgCallbackQuery): string {
   return (msg.from && msg.from.language_code) || "";
 }
 
-export function getLanguageByText(lang: string): LanguageCode {
+export function getLanguageByText(
+  lang: string,
+  throwOnError = false
+): LanguageCode {
   switch (lang) {
     case LanguageCode.Ru:
       return LanguageCode.Ru;
     case LanguageCode.En:
-    default:
       return LanguageCode.En;
+    default: {
+      if (!throwOnError) {
+        return LanguageCode.En;
+      }
+
+      throw new Error("Language code is not recognized");
+    }
+  }
+}
+
+export function getButtonTypeByText(type: string): TelegramButtonType {
+  switch (type) {
+    case TelegramButtonType.Language:
+      return TelegramButtonType.Language;
+    default:
+      return TelegramButtonType.Unknown;
   }
 }

@@ -3,13 +3,13 @@ import { resolve as resolvePath } from "path";
 import { LanguageCode } from "../src/recognition/types";
 import { LabelId } from "../src/text/labels";
 import { randomIntFromInterval } from "../src/common/timer";
-import { BotButtonData } from "../src/telegram/types";
 import {
   TgCallbackQuery,
   TgChatType,
   TgMessage,
 } from "../src/telegram/api/types";
 import { UsageRowScheme } from "../src/db/sql/usages";
+import { TelegramButtonModel, TelegramButtonType } from "../src/telegram/types";
 
 interface UserNameOptions {
   userName?: string;
@@ -92,11 +92,13 @@ export class TelegramMessageModel {
     prefixId: string
   ): this {
     this.messageId = messageId;
-    const data: BotButtonData = {
-      l: langId,
-      i: prefixId,
-    };
-    this.callbackData = JSON.stringify(data);
+    const data = new TelegramButtonModel(
+      TelegramButtonType.Language,
+      langId,
+      prefixId
+    );
+
+    this.callbackData = data.getDtoString();
     return this;
   }
 
