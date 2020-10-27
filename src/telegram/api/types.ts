@@ -93,6 +93,7 @@ export interface BotCommandDto {
 export interface MessageDto {
   chat_id: number;
   text: string;
+  message_id?: number;
   reply_markup?: {
     inline_keyboard: TgInlineKeyboardButton[][];
   };

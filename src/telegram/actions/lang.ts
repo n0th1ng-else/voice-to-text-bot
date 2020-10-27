@@ -100,8 +100,8 @@ export class LangAction extends GenericAction {
   ): Promise<void> {
     return this.editMessage(
       chatId,
-      lang,
       messageId,
+      { lang },
       LabelId.ChangeLang,
       prefix
     ).then(() => logger.info(`${prefix.getPrefix()} Language updated`));

@@ -85,13 +85,22 @@ export class TelegramApi {
   public editMessageText(
     chatId: number,
     messageId: number,
-    text: string
+    text: string,
+    buttons?: TgInlineKeyboardButton[][]
   ): Promise<TgMessage> {
-    return this.request<TgMessage, EditMessageDto>("editMessageText", {
+    const data: MessageDto = {
       text,
       chat_id: chatId,
       message_id: messageId,
-    });
+    };
+
+    if (buttons) {
+      data.reply_markup = {
+        inline_keyboard: buttons,
+      };
+    }
+
+    return this.request<TgMessage, EditMessageDto>("editMessageText", data);
   }
 
   private request<Response, Data>(
