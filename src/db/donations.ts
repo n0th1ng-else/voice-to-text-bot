@@ -50,10 +50,10 @@ export class DonationsClient {
       });
   }
 
-  public createRow(usageId: string, price: number): Promise<DonationRowScheme> {
+  public createRow(chatId: number, price: number): Promise<DonationRowScheme> {
     logger.info("Creating a new row");
     return this.db
-      .createRow(usageId, price)
+      .createRow(chatId, price)
       .then((row) => {
         const donationId = this.getRowId(row);
         logger.info(`The row with id=${donationId} has been created`);
