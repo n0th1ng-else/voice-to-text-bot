@@ -52,7 +52,9 @@ describe("Donations DB", () => {
 
   describe("not initialized", () => {
     it("can not create row", (done) => {
-      client.createRow("test-usage-id", 3).then(
+      const chatId = 23444;
+
+      client.createRow(chatId, 3).then(
         () => runFail(done),
         (err) => {
           expect(err.message).toBe(
@@ -88,11 +90,13 @@ describe("Donations DB", () => {
     });
 
     it("init error makes api unavailable", (done) => {
+      const chatId = 5231;
+
       client
         .init()
         .then(
           () => runFail(done),
-          () => client.createRow("test-id", 5)
+          () => client.createRow(chatId, 5)
         )
         .then(
           () => runFail(done),
@@ -113,14 +117,14 @@ describe("Donations DB", () => {
     });
 
     it("creates a new row", () => {
-      const usageId = "usage-id-s";
+      const chatId = 83222;
       const price = 10;
 
       testPool.mockQuery(DonationsSql.insertRow, (values) => {
         expect(values).toHaveLength(5);
-        const [rUsageId, rStatus, rPrice, rCreated, rUpdated] = values;
+        const [rChatId, rStatus, rPrice, rCreated, rUpdated] = values;
 
-        expect(rUsageId).toBe(usageId);
+        expect(rChatId).toBe(chatId);
         expect(rStatus).toBe(DonationStatus.Pending);
         expect(rPrice).toBe(price);
         expect(rCreated).toBe(rUpdated);
@@ -130,7 +134,7 @@ describe("Donations DB", () => {
             {
               donation_id: 21,
               status: DonationStatus.Pending,
-              usage_id: rUsageId,
+              chat_id: rChatId,
               price: rPrice,
               created_at: new Date(),
               updated_at: new Date(),
@@ -139,9 +143,9 @@ describe("Donations DB", () => {
         });
       });
 
-      return client.createRow(usageId, price).then((row) => {
+      return client.createRow(chatId, price).then((row) => {
         expect(typeof row.donation_id).toBe("number");
-        expect(row.usage_id).toBe(usageId);
+        expect(row.chat_id).toBe(chatId);
         expect(row.price).toBe(price);
       });
     });
@@ -163,7 +167,7 @@ describe("Donations DB", () => {
             {
               donation_id: rDonationId,
               status: rStatus,
-              usage_id: "usidd",
+              chat_id: 34444,
               price: 4,
               created_at: new Date(),
               updated_at: rUpdatedAt,
@@ -174,7 +178,7 @@ describe("Donations DB", () => {
 
       return client.updateRow(donationId, false).then((row) => {
         expect(row.donation_id).toBe(donationId);
-        expect(row.usage_id).toBe("usidd");
+        expect(row.chat_id).toBe(34444);
         expect(row.price).toBe(4);
         expect(row.status).toBe(status);
       });
@@ -197,7 +201,7 @@ describe("Donations DB", () => {
             {
               donation_id: rDonationId,
               status: rStatus,
-              usage_id: "usidd",
+              chat_id: 21344,
               price: 4,
               created_at: new Date(),
               updated_at: rUpdatedAt,
@@ -208,7 +212,7 @@ describe("Donations DB", () => {
 
       return client.updateRow(donationId, true).then((row) => {
         expect(row.donation_id).toBe(donationId);
-        expect(row.usage_id).toBe("usidd");
+        expect(row.chat_id).toBe(21344);
         expect(row.price).toBe(4);
         expect(row.status).toBe(status);
       });

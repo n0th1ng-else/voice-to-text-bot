@@ -10,7 +10,7 @@ export enum DonationStatus {
 export interface DonationRowScheme {
   donation_id: number;
   status: string;
-  usage_id: string;
+  chat_id: string;
   price: number;
   created_at: Date;
   updated_at: Date;
@@ -29,7 +29,7 @@ export class DonationsDb {
     });
   }
 
-  public createRow(usageId: string, price: number): Promise<DonationRowScheme> {
+  public createRow(chatId: number, price: number): Promise<DonationRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table donations is not initialized yet")
@@ -39,7 +39,7 @@ export class DonationsDb {
     const createdAt = new Date();
     const updatedAt = createdAt;
     const values = [
-      usageId,
+      chatId,
       DonationStatus.Pending,
       price,
       createdAt,

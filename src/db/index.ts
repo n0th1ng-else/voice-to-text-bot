@@ -3,6 +3,8 @@ import { NodesClient } from "./nodes";
 import { UsagesClient } from "./usages";
 import { Logger } from "../logger";
 import { flattenPromise } from "../common/helpers";
+import { DonationsClient } from "./donations";
+import { UsedEmailClient } from "./emails";
 
 const logger = new Logger("postgres-client");
 
@@ -17,6 +19,8 @@ interface DbConnectionConfig {
 export class DbClient {
   public readonly nodes: NodesClient;
   public readonly usages: UsagesClient;
+  public readonly donations: DonationsClient;
+  public readonly emails: UsedEmailClient;
 
   private readonly initialized: boolean;
 
@@ -44,6 +48,8 @@ export class DbClient {
 
     this.nodes = new NodesClient(pool);
     this.usages = new UsagesClient(pool);
+    this.donations = new DonationsClient(pool);
+    this.emails = new UsedEmailClient(pool);
   }
 
   public init(): Promise<void> {
