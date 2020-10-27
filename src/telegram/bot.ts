@@ -34,12 +34,12 @@ export class TelegramBotModel {
 
   public setHostLocation(
     host: string,
-    launchTime: number,
+    launchTime = new Date().getTime(),
     path = "/bot/message"
   ): this {
     this.host = host;
     this.path = path;
-    this.id = getMd5Hash(`${this.host}${this.path}:${this.token}`, launchTime);
+    this.id = getMd5Hash(this.host, this.path, this.token, launchTime);
     return this;
   }
 
