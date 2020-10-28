@@ -4,6 +4,7 @@ import { BotStatRecordModel } from "../../helpers";
 import { randomIntFromInterval } from "../../../src/common/timer";
 import { Pool as MockPool } from "../../../src/db/__mocks__/pg";
 import { UsagesSql } from "../../../src/db/sql/usages.sql";
+import { UsageRowScheme } from "../../../src/db/sql/usages";
 
 export function mockGetBotStatItem(
   pool: MockPool,
@@ -46,7 +47,7 @@ function mockBotStatFind(
   pool.mockQuery(UsagesSql.getRows, (values) => {
     expect(values).toHaveLength(1);
     expect(values[0]).toBe(chatId);
-    return Promise.resolve({ rows: items.map((stat) => stat.getDbDto()) });
+    return Promise.resolve({ rows: items.map((stat) => getDbDto(stat)) });
   });
 }
 
@@ -78,7 +79,7 @@ function mockBotStatCreate(
     expect(rLangId).toBe(stat.langId);
     expect(rCreated).toBe(rUpdated);
 
-    return Promise.resolve({ rows: [stat.getDbDto()] });
+    return Promise.resolve({ rows: [getDbDto(stat)] });
   });
 
   return stat;
@@ -98,7 +99,7 @@ function mockBotStatUpdateUsage(
       expect(rUsageId).toBe(item.objectId);
       resolve();
 
-      return Promise.resolve({ rows: [item.getDbDto()] });
+      return Promise.resolve({ rows: [getDbDto(item)] });
     });
   });
 }
@@ -120,7 +121,19 @@ function mockBotStatUpdateLang(
       item.setLang(langId);
       resolve();
 
-      return Promise.resolve({ rows: [item.getDbDto()] });
+      return Promise.resolve({ rows: [getDbDto(item)] });
     });
   });
 }
+
+const getDbDto = (item: BotStatRecordModel): UsageRowScheme => {
+  return {
+    usage_id: item.objectId || "",
+    chat_id: item.chatId,
+    user_name: item.user,
+    usage_count: item.usageCount,
+    lang_id: item.langId,
+    created_at: new Date(),
+    updated_at: new Date(),
+  };
+};

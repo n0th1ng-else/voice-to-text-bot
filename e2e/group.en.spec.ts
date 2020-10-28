@@ -22,16 +22,11 @@ import {
   getVoiceConverterProvider,
 } from "../src/recognition";
 import { TelegramBotModel } from "../src/telegram/bot";
+import { githubUrl, localhostUrl, officialChannelAccount } from "../src/const";
 import {
-  githubUrl,
-  localhostUrl,
-  officialChannelAccount,
-  patreonAccount,
-  yandexAccount,
-} from "../src/const";
-import {
+  getFundButtons,
+  getLangButtons,
   getMockCertificate,
-  TelegramMessageMeta,
   TelegramMessageMetaItem,
   TelegramMessageMetaType,
   TelegramMessageModel,
@@ -237,13 +232,22 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.SupportCommand,
-          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(
-              LabelId.OfficialChannel,
-              officialChannelAccount
-            ),
-            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
-          ])
+          [
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.OfficialChannel,
+                officialChannelAccount
+              ),
+            ],
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.GithubIssues,
+                githubUrl
+              ),
+            ],
+          ]
         ),
       ]);
     });
@@ -266,13 +270,22 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.SupportCommand,
-          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(
-              LabelId.OfficialChannel,
-              officialChannelAccount
-            ),
-            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
-          ])
+          [
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.OfficialChannel,
+                officialChannelAccount
+              ),
+            ],
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.GithubIssues,
+                githubUrl
+              ),
+            ],
+          ]
         ),
       ]);
     });
@@ -294,14 +307,29 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.SupportCommand,
-          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(
-              LabelId.OfficialChannel,
-              officialChannelAccount
-            ),
-            new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
-            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
-          ])
+          [
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.OfficialChannel,
+                officialChannelAccount
+              ),
+            ],
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.ContactAuthor,
+                authorUrl
+              ),
+            ],
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.GithubIssues,
+                githubUrl
+              ),
+            ],
+          ]
         ),
       ]);
     });
@@ -327,14 +355,29 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.SupportCommand,
-          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(
-              LabelId.OfficialChannel,
-              officialChannelAccount
-            ),
-            new TelegramMessageMetaItem(LabelId.ContactAuthor, authorUrl),
-            new TelegramMessageMetaItem(LabelId.GithubIssues, githubUrl),
-          ])
+          [
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.OfficialChannel,
+                officialChannelAccount
+              ),
+            ],
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.ContactAuthor,
+                authorUrl
+              ),
+            ],
+            [
+              new TelegramMessageMetaItem(
+                TelegramMessageMetaType.Link,
+                LabelId.GithubIssues,
+                githubUrl
+              ),
+            ],
+          ]
         ),
       ]);
     });
@@ -354,10 +397,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          new TelegramMessageMeta(TelegramMessageMetaType.Button, [
-            new TelegramMessageMetaItem(LabelId.BtnRussian, LanguageCode.Ru),
-            new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
-          ])
+          getLangButtons()
         ),
       ]);
     });
@@ -380,10 +420,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          new TelegramMessageMeta(TelegramMessageMetaType.Button, [
-            new TelegramMessageMetaItem(LabelId.BtnRussian, LanguageCode.Ru),
-            new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
-          ])
+          getLangButtons()
         ),
       ]);
     });
@@ -403,15 +440,12 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          new TelegramMessageMeta(TelegramMessageMetaType.Button, [
-            new TelegramMessageMetaItem(LabelId.BtnRussian, LanguageCode.Ru),
-            new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
-          ])
+          getLangButtons()
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId = LanguageCode.Ru;
-        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId, prefixId);
+        cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -444,15 +478,12 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          new TelegramMessageMeta(TelegramMessageMetaType.Button, [
-            new TelegramMessageMetaItem(LabelId.BtnRussian, LanguageCode.Ru),
-            new TelegramMessageMetaItem(LabelId.BtnEnglish, LanguageCode.En),
-          ])
+          getLangButtons()
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId = LanguageCode.Ru;
-        cbMessage.setCallbackData(tgMessage.messageId + 1, newLangId, prefixId);
+        cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -541,13 +572,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
-            new TelegramMessageMetaItem(
-              LabelId.PatreonLinkTitle,
-              patreonAccount
-            ),
-          ])
+          getFundButtons()
         ),
       ]);
     });
@@ -567,13 +592,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          new TelegramMessageMeta(TelegramMessageMetaType.Link, [
-            new TelegramMessageMetaItem(LabelId.YandexLinkTitle, yandexAccount),
-            new TelegramMessageMetaItem(
-              LabelId.PatreonLinkTitle,
-              patreonAccount
-            ),
-          ])
+          getFundButtons()
         ),
       ]);
     });

@@ -8,8 +8,8 @@ import {
   TgChatType,
   TgMessage,
 } from "../src/telegram/api/types";
-import { UsageRowScheme } from "../src/db/sql/usages";
 import { TelegramButtonModel, TelegramButtonType } from "../src/telegram/types";
+import { patreonAccount, yandexAccount } from "../src/const";
 
 interface UserNameOptions {
   userName?: string;
@@ -86,7 +86,7 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setCallbackData(
+  public setLangCallback(
     messageId: number,
     langId: LanguageCode,
     prefixId: string
@@ -95,6 +95,22 @@ export class TelegramMessageModel {
     const data = new TelegramButtonModel(
       TelegramButtonType.Language,
       langId,
+      prefixId
+    );
+
+    this.callbackData = data.getDtoString();
+    return this;
+  }
+
+  public setFundCallback(
+    messageId: number,
+    price: string,
+    prefixId: string
+  ): this {
+    this.messageId = messageId;
+    const data = new TelegramButtonModel(
+      TelegramButtonType.Donation,
+      price,
       prefixId
     );
 
@@ -170,13 +186,11 @@ export enum TelegramMessageMetaType {
 }
 
 export class TelegramMessageMetaItem {
-  constructor(public readonly title: LabelId, public readonly data: string) {}
-}
-
-export class TelegramMessageMeta {
   constructor(
     public readonly type: TelegramMessageMetaType,
-    public readonly items: TelegramMessageMetaItem[]
+    public readonly title: LabelId,
+    public readonly data: string,
+    public readonly btnType = TelegramButtonType.Donation
   ) {}
 }
 
@@ -201,21 +215,78 @@ export class BotStatRecordModel {
     this.langId = lang;
     return this;
   }
-
-  public getDbDto(): UsageRowScheme {
-    return {
-      usage_id: this.objectId || "",
-      chat_id: this.chatId,
-      user_name: this.user,
-      usage_count: this.usageCount,
-      lang_id: this.langId,
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
-  }
 }
 
 export function getMockCertificate(): string {
   const path = resolvePath(__dirname, "mockData", "googleapps_mock.key");
   return readFileSync(path, { encoding: "utf-8" });
 }
+
+export const getFundButtons = (
+  extended = false
+): TelegramMessageMetaItem[][] => {
+  const buttons: TelegramMessageMetaItem[][] = [];
+  const extendedButtons: TelegramMessageMetaItem[] = [
+    new TelegramMessageMetaItem(
+      TelegramMessageMetaType.Button,
+      LabelId.UsdOption1,
+      "5"
+    ),
+    new TelegramMessageMetaItem(
+      TelegramMessageMetaType.Button,
+      LabelId.UsdOption2,
+      "7"
+    ),
+    new TelegramMessageMetaItem(
+      TelegramMessageMetaType.Button,
+      LabelId.UsdOption3,
+      "10"
+    ),
+  ];
+
+  const mainButtonYa = [
+    new TelegramMessageMetaItem(
+      TelegramMessageMetaType.Link,
+      LabelId.YandexLinkTitle,
+      yandexAccount
+    ),
+  ];
+
+  const mainButtonPatr = [
+    new TelegramMessageMetaItem(
+      TelegramMessageMetaType.Link,
+      LabelId.PatreonLinkTitle,
+      patreonAccount
+    ),
+  ];
+
+  if (extended) {
+    buttons.push(extendedButtons);
+  }
+
+  buttons.push(mainButtonYa);
+  buttons.push(mainButtonPatr);
+
+  return buttons;
+};
+
+export const getLangButtons = (): TelegramMessageMetaItem[][] => {
+  return [
+    [
+      new TelegramMessageMetaItem(
+        TelegramMessageMetaType.Button,
+        LabelId.BtnRussian,
+        LanguageCode.Ru,
+        TelegramButtonType.Language
+      ),
+    ],
+    [
+      new TelegramMessageMetaItem(
+        TelegramMessageMetaType.Button,
+        LabelId.BtnEnglish,
+        LanguageCode.En,
+        TelegramButtonType.Language
+      ),
+    ],
+  ];
+};
