@@ -30,11 +30,12 @@ import { StopListener } from "../process";
 import { httpsOptions } from "../../certs";
 import { DbClient } from "../db";
 import { RobokassaPayment } from "../donate/robokassa";
+import { getLaunchDelay } from "./init";
 
 const logger = new Logger("start-script");
 
 export function run(threadId = 0): void {
-  const launchDelay = threadId ? (threadId - 1) * 10_000 : 0;
+  const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
     appPort,
