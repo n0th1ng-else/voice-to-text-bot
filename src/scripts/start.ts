@@ -13,6 +13,7 @@ import {
   memoryLimit,
   launchTime,
   dbPostgres,
+  roboKassa,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -28,6 +29,7 @@ import { printCurrentMemoryStat } from "../memory";
 import { StopListener } from "../process";
 import { httpsOptions } from "../../certs";
 import { DbClient } from "../db";
+import { RobokassaPayment } from "../donate/robokassa";
 
 const logger = new Logger("start-script");
 
@@ -46,6 +48,7 @@ export function run(threadId = 0): void {
     googleProjectId: googleApi.projectId,
     googleClientEmail: googleApi.clientEmail,
   };
+
   const converter = getVoiceConverterInstance(
     getVoiceConverterProvider(provider),
     converterOptions
@@ -58,6 +61,12 @@ export function run(threadId = 0): void {
     database: dbPostgres.database,
     port: dbPostgres.port,
   }).setClientName(threadId);
+
+  const roboPayment = new RobokassaPayment(
+    roboKassa.login,
+    roboKassa.passwordForSend,
+    roboKassa.enableTest
+  );
 
   const bot = new TelegramBotModel(telegramBotApi, converter, db).setAuthor(
     authorTelegramAccount
@@ -72,7 +81,7 @@ export function run(threadId = 0): void {
     .then(() => getHostName(appPort, selfUrl, ngRokToken))
     .then((host) => {
       logger.info(`Telling telegram our location is ${Logger.y(host)}`);
-      bot.setHostLocation(host, launchTime);
+      bot.setHostLocation(host, launchTime).setPayment(roboPayment);
       return server
         .setSelfUrl(host)
         .setBots([bot])

@@ -57,9 +57,12 @@ export class DbClient {
       return Promise.resolve();
     }
 
-    return Promise.all([this.usages.init(), this.nodes.init()]).then(
-      flattenPromise
-    );
+    return Promise.all([
+      this.usages.init(),
+      this.nodes.init(),
+      this.donations.init(),
+      this.emails.init(),
+    ]).then(flattenPromise);
   }
 
   public setClientName(threadId: number): this {

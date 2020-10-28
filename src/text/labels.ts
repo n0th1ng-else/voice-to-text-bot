@@ -29,6 +29,9 @@ export enum LabelId {
   YandexLinkTitle,
   DonateMessage,
   OfficialChannel,
+  PaymentDescription,
+  PaymentLink,
+  PaymentLinkButton,
 }
 
 export const labels = {
@@ -64,10 +67,14 @@ export const labels = {
     [LabelId.SupportedFormatsMessageExplanation]:
       "Большинство приложений записывают голос в данном формате. Напишите автору, если у вас возникли проблемы с этим",
     [LabelId.KofiLinkTitle]: "Отправить через Paypal",
-    [LabelId.YandexLinkTitle]: "Отправить с помощью карты",
+    [LabelId.YandexLinkTitle]: "Перевод в Рублях (₽)",
     [LabelId.DonateMessage]:
       "Вы можете помочь и поддержать проект. Выполните /fund для подробностей",
     [LabelId.OfficialChannel]: "Новости и обсуждения",
+    [LabelId.PaymentDescription]:
+      "Пожертвование для Telegram бота AudioMessBot. Не подлежит возврату. Спасибо вам за поддержку!",
+    [LabelId.PaymentLink]: "Ваша ссылка для оплаты",
+    [LabelId.PaymentLinkButton]: "Оплатить",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -105,9 +112,13 @@ export const labels = {
     [LabelId.SupportedFormatsMessageExplanation]:
       "Typically, most messengers record voice in this format. Contact the author if you experience any problems",
     [LabelId.KofiLinkTitle]: "Send money via Paypal",
-    [LabelId.YandexLinkTitle]: "Quick donation in Rubbles",
+    [LabelId.YandexLinkTitle]: "Donate in Rubles (₽)",
     [LabelId.DonateMessage]:
       "Help us to keep the bot alive. Run /fund command for details",
     [LabelId.OfficialChannel]: "News and discussions",
+    [LabelId.PaymentDescription]:
+      "AudioMessBot telegram bot donation. Non-refundable. Appreciate your support!",
+    [LabelId.PaymentLink]: "This is your donation link",
+    [LabelId.PaymentLinkButton]: "Donate",
   },
 };

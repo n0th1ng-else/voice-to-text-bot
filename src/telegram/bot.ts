@@ -12,6 +12,7 @@ import { TelegramApi } from "./api";
 import { collectAnalytics } from "../analytics";
 import { DbClient } from "../db";
 import { AnalyticsData } from "../analytics/api/types";
+import { PaymentService } from "../donate/types";
 
 const logger = new Logger("telegram-bot");
 
@@ -79,6 +80,11 @@ export class TelegramBotModel {
 
   public getHostLocation(): Promise<string> {
     return this.bot.getWebHookInfo().then((info) => info.url);
+  }
+
+  public setPayment(payment: PaymentService): this {
+    this.actions.setPayment(payment);
+    return this;
   }
 
   public getPath(): string {

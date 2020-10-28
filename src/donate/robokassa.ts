@@ -1,6 +1,6 @@
 import { getMd5Hash } from "../common/hash";
-// import { TextModel } from "../text";
-// import { LabelId } from "../text/labels";
+import { TextModel } from "../text";
+import { LabelId } from "../text/labels";
 import { LanguageCode } from "../recognition/types";
 import { PaymentService } from "./types";
 
@@ -9,11 +9,15 @@ export class RobokassaPayment implements PaymentService {
   private readonly currency = "USD";
   private readonly encoding = "UTF-8";
 
+  public readonly isReady: boolean = false;
+
   constructor(
     private readonly login: string,
     private readonly passwordForSend: string,
     private readonly isTestMode = true
-  ) {}
+  ) {
+    this.isReady = !!(this.login && this.passwordForSend);
+  }
 
   public getLink(price: number, paymentId: number, lang: LanguageCode): string {
     const signature = getMd5Hash(
@@ -24,10 +28,8 @@ export class RobokassaPayment implements PaymentService {
       this.passwordForSend
     );
 
-    // TODO Add labels
-    // const text = new TextModel();
-    // const description = text.t(LabelId.PaymentDescription, lang);
-    const description = "";
+    const text = new TextModel();
+    const description = text.t(LabelId.PaymentDescription, lang);
 
     const params: string[] = [];
     params.push(`MerchantLogin=${encodeURIComponent(this.login)}`);

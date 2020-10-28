@@ -189,6 +189,8 @@ export function getLanguageByText(
 
 export function getButtonTypeByText(type: string): TelegramButtonType {
   switch (type) {
+    case TelegramButtonType.Donation:
+      return TelegramButtonType.Donation;
     case TelegramButtonType.Language:
       return TelegramButtonType.Language;
     default:

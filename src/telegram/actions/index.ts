@@ -8,6 +8,7 @@ import { FundAction } from "./fund";
 import { VoiceFormatAction } from "./voice-format";
 import { VoiceLengthAction } from "./voice-length";
 import { DbClient } from "../../db";
+import { PaymentService } from "../../donate/types";
 import { TgCallbackQuery } from "../api/types";
 import { AnalyticsData } from "../../analytics/api/types";
 import { TelegramButtonModel, TelegramButtonType } from "../types";
@@ -37,6 +38,10 @@ export class BotActions {
     this.voiceLength = new VoiceLengthAction(stat, bot);
   }
 
+  public setPayment(payment: PaymentService): void {
+    this.fund.setPayment(payment);
+  }
+
   public handleCallback(
     msg: TgCallbackQuery,
     analytics: AnalyticsData
@@ -60,24 +65,24 @@ export class BotActions {
       return collectAnalytics(analytics.setCommand("Callback query"));
     }
 
-    try {
-      const button = TelegramButtonModel.fromDto(data);
+    return Promise.resolve()
+      .then(() => {
+        const button = TelegramButtonModel.fromDto(data);
 
-      switch (button.id) {
-        case TelegramButtonType.Language:
-          return this.lang.runCallback(message, button, analytics, msg);
-        default: {
-          const errorMessage = "Unknown type passed in callback query";
-          const msgError = new Error(errorMessage);
-          logger.error(errorMessage, msgError);
-          analytics.setError(errorMessage);
-          return collectAnalytics(analytics.setCommand("Callback query"));
+        switch (button.id) {
+          case TelegramButtonType.Donation:
+            return this.fund.runCallback(message, button, analytics);
+          case TelegramButtonType.Language:
+            return this.lang.runCallback(message, button, analytics, msg);
+          default:
+            throw new Error("Unknown type passed in callback query");
         }
-      }
-    } catch (e) {
-      logger.error(e.message, e);
-      analytics.setError(e.message);
-      return collectAnalytics(analytics.setCommand("Callback query"));
-    }
+      })
+      .catch((err) => {
+        const errorMessage = "Failed to execute callback query";
+        logger.error(errorMessage, err);
+        analytics.setError(errorMessage);
+        return collectAnalytics(analytics.setCommand("Callback query"));
+      });
   }
 }
