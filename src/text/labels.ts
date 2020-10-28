@@ -32,6 +32,9 @@ export enum LabelId {
   PaymentDescription,
   PaymentLink,
   PaymentLinkButton,
+  UsdOption1,
+  UsdOption2,
+  UsdOption3,
 }
 
 export const labels = {
@@ -120,5 +123,8 @@ export const labels = {
       "AudioMessBot telegram bot donation. Non-refundable. Appreciate your support!",
     [LabelId.PaymentLink]: "This is your donation link",
     [LabelId.PaymentLinkButton]: "Donate",
+    [LabelId.UsdOption1]: "5$ 😎",
+    [LabelId.UsdOption2]: "7$ 👑",
+    [LabelId.UsdOption3]: "10$ ‍🚀",
   },
 };
