@@ -91,17 +91,24 @@ export class TelegramBotModel {
     return `${this.path}/${this.id}`;
   }
 
-  public handleApiMessage(message: TgUpdate, analytics: AnalyticsData): void {
-    try {
-      if (message.message) {
-        this.handleMessage(message.message, analytics);
-      }
-      if (message.callback_query) {
-        this.handleCallbackQuery(message.callback_query, analytics);
-      }
-    } catch (e) {
-      logger.error("Failed to handle api request", e);
-    }
+  public handleApiMessage(
+    message: TgUpdate,
+    analytics: AnalyticsData
+  ): Promise<void> {
+    return Promise.resolve()
+      .then(() => {
+        if (message.message) {
+          return this.handleMessage(message.message, analytics);
+        }
+        if (message.callback_query) {
+          return this.handleCallbackQuery(message.callback_query, analytics);
+        }
+
+        logger.warn("Message is not recognized", Object.keys(message));
+      })
+      .catch((err) => {
+        logger.error("Failed to handle api request", err);
+      });
   }
 
   private handleMessage(
