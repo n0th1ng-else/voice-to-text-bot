@@ -28,11 +28,12 @@ import { ScheduleDaemon } from "../scheduler";
 import { printCurrentMemoryStat } from "../memory";
 import { DbClient } from "../db";
 import { RobokassaPayment } from "../donate/robokassa";
+import { getLaunchDelay } from "./init";
 
 const logger = new Logger("dev-script");
 
 export function run(threadId = 0): void {
-  const launchDelay = threadId ? (threadId - 1) * 10_000 : 0;
+  const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
     appPort,
