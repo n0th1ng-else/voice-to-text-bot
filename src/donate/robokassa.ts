@@ -30,18 +30,29 @@ export class RobokassaPayment implements PaymentService {
 
     const text = new TextModel();
     const description = text.t(LabelId.PaymentDescription, lang);
+    const expirationDate = this.addMinutes(30);
 
     const params: string[] = [];
-    params.push(`MerchantLogin=${encodeURIComponent(this.login)}`);
-    params.push(`InvId=${encodeURIComponent(paymentId)}`);
-    params.push(`Encoding=${encodeURIComponent(this.encoding)}`);
     params.push(`OutSum=${encodeURIComponent(price)}`);
     params.push(`OutSumCurrency=${encodeURIComponent(this.currency)}`);
+    params.push(`InvId=${encodeURIComponent(paymentId)}`);
+    params.push(`MerchantLogin=${encodeURIComponent(this.login)}`);
+    params.push(`Encoding=${encodeURIComponent(this.encoding)}`);
+    params.push(`Culture=${encodeURIComponent(lang)}`);
+    params.push(
+      `ExpirationDate=${encodeURIComponent(expirationDate.toISOString())}`
+    );
     params.push(`SignatureValue=${encodeURIComponent(signature)}`);
     params.push(`Description=${encodeURIComponent(description)}`);
-    params.push(`Culture=${encodeURIComponent(lang)}`);
-    params.push(`IsTest=${this.isTestMode ? "1" : "0"}`);
+
+    if (this.isTestMode) {
+      params.push(`IsTest=${this.isTestMode ? "1" : "0"}`);
+    }
 
     return `${this.url}?${params.join("&")}`;
+  }
+
+  private addMinutes(minutes: number): Date {
+    return new Date(new Date().getTime() + minutes * 60000);
   }
 }
