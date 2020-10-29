@@ -54,6 +54,7 @@ import { BotCommand } from "../src/telegram/types";
 import { mockGetBotStatItem } from "./requests/db/botStat";
 import { LabelId } from "../src/text/labels";
 import { mockCreateDonationRow } from "./requests/db/donetaionStat";
+import { SuperusersSql } from "../src/db/sql/superusers.sql";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -127,6 +128,7 @@ describe("[default language - english] fund", () => {
     testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
     testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
     testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
+    testPool.mockQuery(SuperusersSql.createTable, () => Promise.resolve());
 
     return db
       .init()

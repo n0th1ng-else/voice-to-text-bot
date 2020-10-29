@@ -62,6 +62,7 @@ import { NodesSql } from "../src/db/sql/nodes.sql";
 import { UsagesSql } from "../src/db/sql/usages.sql";
 import { DonationsSql } from "../src/db/sql/donations.sql";
 import { UsedEmailsSql } from "../src/db/sql/emails.sql";
+import { SuperusersSql } from "../src/db/sql/superusers.sql";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -131,6 +132,7 @@ describe("[default language - english]", () => {
     testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
     testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
     testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
+    testPool.mockQuery(SuperusersSql.createTable, () => Promise.resolve());
 
     return db
       .init()

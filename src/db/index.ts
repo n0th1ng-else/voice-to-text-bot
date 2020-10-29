@@ -5,6 +5,7 @@ import { Logger } from "../logger";
 import { flattenPromise } from "../common/helpers";
 import { DonationsClient } from "./donations";
 import { UsedEmailClient } from "./emails";
+import { SuperusersClient } from "./superusers";
 
 const logger = new Logger("postgres-client");
 
@@ -21,6 +22,7 @@ export class DbClient {
   public readonly usages: UsagesClient;
   public readonly donations: DonationsClient;
   public readonly emails: UsedEmailClient;
+  public readonly superusers: SuperusersClient;
 
   private readonly initialized: boolean;
 
@@ -50,6 +52,7 @@ export class DbClient {
     this.usages = new UsagesClient(pool);
     this.donations = new DonationsClient(pool);
     this.emails = new UsedEmailClient(pool);
+    this.superusers = new SuperusersClient(pool);
   }
 
   public init(): Promise<void> {
@@ -62,6 +65,7 @@ export class DbClient {
       this.nodes.init(),
       this.donations.init(),
       this.emails.init(),
+      this.superusers.init(),
     ]).then(flattenPromise);
   }
 
