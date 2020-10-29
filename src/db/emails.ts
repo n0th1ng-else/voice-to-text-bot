@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { Logger } from "../logger";
 import { UsedEmailDb, UsedEmailRowScheme } from "./sql/emails";
+import { flattenPromise } from "../common/helpers";
 
 const logger = new Logger("postgres-emails");
 
@@ -22,6 +23,29 @@ export class UsedEmailClient {
         logger.error(`Unable to initialize ${Logger.y("usedemails")} table`);
         throw err;
       });
+  }
+
+  public syncRow(email: string, shouldStop: boolean): Promise<void> {
+    return this.getRows(email)
+      .then((rows) => {
+        if (rows.length) {
+          const row = rows.shift();
+          if (!row) {
+            throw new Error("empty email row???");
+          }
+          return row;
+        }
+
+        return this.createRow(email);
+      })
+      .then((row) => {
+        if (!shouldStop || row.stop_at) {
+          return;
+        }
+
+        return this.updateRow(row.email_id);
+      })
+      .then(flattenPromise);
   }
 
   public updateRow(emailId: number): Promise<UsedEmailRowScheme> {

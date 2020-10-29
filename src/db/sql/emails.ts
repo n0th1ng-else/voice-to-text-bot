@@ -5,7 +5,7 @@ export interface UsedEmailRowScheme {
   email_id: number;
   email: string;
   start_at: Date;
-  stop_at: Date;
+  stop_at?: Date;
 }
 
 export class UsedEmailDb {

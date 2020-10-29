@@ -123,6 +123,44 @@ export class ExpressServer {
           });
       }
     );
+
+    this.app.get("/email", (req: express.Request, res: express.Response) => {
+      const email = String(req.query.email) || "";
+      const shouldStop = req.query.stop === "true";
+      const chatId = Number(req.query.chatid || "");
+      const hash = String(req.query.hash || "");
+
+      if (!this.stat) {
+        res.status(500).send({ message: "Wrong server configuration" });
+        return;
+      }
+
+      Promise.resolve()
+        .then(() => {
+          if (!chatId || !hash) {
+            throw new Error("Header are not provided");
+          }
+          if (!email) {
+            throw new Error("Email not provided");
+          }
+          return this.stat && this.stat.superusers.isSuperuser(chatId, hash);
+        })
+        .then((isSuper) => {
+          if (!isSuper) {
+            res.status(401).send({ message: "Not authorized" });
+            return;
+          }
+
+          return this.stat && this.stat.emails.syncRow(email, shouldStop);
+        })
+        .then(() => {
+          res.status(200).send({});
+        })
+        .catch((err) => {
+          logger.warn("Unable to execute the operation", err);
+          res.status(400).send({ message: "Unable to execute the operation" });
+        });
+    });
   }
 
   public setStat(stat: DbClient): this {
