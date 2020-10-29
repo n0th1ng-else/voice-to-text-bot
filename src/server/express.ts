@@ -58,16 +58,69 @@ export class ExpressServer {
         });
     };
 
+    // HealthCheck
     this.app.get(
       "/health",
       (req: express.Request, res: express.Response<HealthDto>) =>
         statusHandler(req, res)
     );
+
+    // Lifecycle api for external system onBeforeProcessKill
     this.app.post(
       "/lifecycle",
       (req: express.Request, res: express.Response<HealthDto>) => {
         logger.warn("Received app:restart hook from the buddy node", req.body);
         statusHandler(req, res);
+      }
+    );
+
+    this.app.get(
+      "/donations/:id/:operation",
+      (req: express.Request, res: express.Response) => {
+        const donationId = Number(req.params.id || "");
+        const shouldConfirm = req.params.operation === "confirm";
+        const shouldCancel = req.params.operation === "cancel";
+        const chatId = Number(req.query.chatid || "");
+        const hash = String(req.query.hash || "");
+
+        if (!this.stat) {
+          res.status(500).send({ message: "Wrong server configuration" });
+          return;
+        }
+
+        Promise.resolve()
+          .then(() => {
+            if (!chatId || !hash) {
+              throw new Error("Header are not provided");
+            }
+            if (!shouldCancel && !shouldConfirm) {
+              throw new Error("Unknown operation");
+            }
+            if (!donationId) {
+              throw new Error("Donation id not provided");
+            }
+            return this.stat && this.stat.superusers.isSuperuser(chatId, hash);
+          })
+          .then((isSuper) => {
+            if (!isSuper) {
+              res.status(401).send({ message: "Not authorized" });
+              return;
+            }
+
+            return (
+              this.stat &&
+              this.stat.donations.updateRow(donationId, shouldConfirm)
+            );
+          })
+          .then(() => {
+            res.status(200).send({});
+          })
+          .catch((err) => {
+            logger.warn("Unable to execute the operation", err);
+            res
+              .status(400)
+              .send({ message: "Unable to execute the operation" });
+          });
       }
     );
   }
