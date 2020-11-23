@@ -62,3 +62,8 @@ export const roboKassa = {
   passwordForSend: process.env.ROBO_PASSWORD_SEND || "",
   enableTest: !!process.env.ROBO_ENABLE_TEST,
 };
+
+export const witAiApi = {
+  tokenEn: process.env.WIT_AI_TOKEN_EN || "",
+  tokenRu: process.env.WIT_AI_TOKEN_RU || "",
+};

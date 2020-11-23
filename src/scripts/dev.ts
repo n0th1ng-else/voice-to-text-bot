@@ -12,6 +12,7 @@ import {
   memoryLimit,
   dbPostgres,
   roboKassa,
+  witAiApi,
 } from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
@@ -46,6 +47,8 @@ export function run(threadId = 0): void {
     googlePrivateKey: googleApi.privateKey,
     googleProjectId: googleApi.projectId,
     googleClientEmail: googleApi.clientEmail,
+    witAiTokenEn: witAiApi.tokenEn,
+    witAiTokenRu: witAiApi.tokenRu,
   };
 
   const converter = getVoiceConverterInstance(

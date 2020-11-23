@@ -1,6 +1,7 @@
 export enum VoiceConverterProvider {
   Google = "GOOGLE",
   Aws = "AWS",
+  WitAi = "WITAI",
 }
 
 export abstract class VoiceConverter {
@@ -16,6 +17,8 @@ export interface VoiceConverterOptions {
   googleProjectId?: string;
   googleClientEmail?: string;
   googlePrivateKey?: string;
+  witAiTokenEn?: string;
+  witAiTokenRu?: string;
 }
 
 export enum LanguageCode {

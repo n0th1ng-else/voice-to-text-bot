@@ -1,31 +1,46 @@
+import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
+import { getWav } from "../ogg";
+import { Logger } from "../logger";
+
 const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
-const { getWav } = require("../ogg");
-const { writeOutput } = require("../logger");
 
-class AWSProvider {
-  constructor(environmentVars) {
-    writeOutput("Using AWS");
+const logger = new Logger("aws-recognition");
+
+export class AWSProvider extends VoiceConverter {
+  private bucket: any;
+  private storage: any;
+  private service: any;
+
+  constructor(options: VoiceConverterOptions) {
+    super();
+
+    logger.info("Using AWS");
+
     AWS.config.update({
-      region: environmentVars.AWS_BUCKET_REGION,
+      region: (options as any).AWS_BUCKET_REGION,
       credentials: new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: environmentVars.AWS_POOL_ID,
+        IdentityPoolId: (options as any).AWS_POOL_ID,
       }),
     });
 
-    this.bucket = environmentVars.AWS_BUCKET;
+    this.bucket = (options as any).AWS_BUCKET;
     this.storage = new AWS.S3();
     this.service = new AWS.TranscribeService();
   }
 
-  transformToText(fileLink, fileData) {
-    writeOutput("Starting process for", fileLink);
-    const name = `${fileData.file_unique_id}.wav`;
+  public transformToText(
+    fileLink: string,
+    fileId: string,
+    lang: LanguageCode
+  ): Promise<string> {
+    const name = `${fileId}.ogg`;
+    logger.info(`Starting process for ${Logger.y(name)}`);
     return this.getJob(name)
       .then((data) => {
         if (data.isExists) {
-          writeOutput("Job exists. skipping");
-          return this.getJobWithDelay(name, data.job);
+          logger.info("Job exists. skipping");
+          return this.getJobWithDelay(name, (data as any).job);
         }
 
         return this.processFile(fileLink, name);
@@ -34,19 +49,19 @@ class AWSProvider {
       .then((translationData) => translationData.json())
       .then((translationData) => this.cleanStorage(translationData, name))
       .then((text) => {
-        writeOutput(`Job ${name} completed`);
+        logger.info(`Job ${name} completed`);
         return text;
       });
   }
 
-  processFile(fileLink, name) {
+  private processFile(fileLink, name): Promise<any> {
     return getWav(fileLink)
       .then((file) => this.uploadToS3(name, file))
-      .then((info) => this.convertToText(name, info.Location))
+      .then((info) => this.convertToText(name, (info as any).Location))
       .then((info) => this.getJobWithDelay(name, info));
   }
 
-  unpackTranscription(translationData) {
+  private unpackTranscription(translationData): Promise<any> {
     const transcripts = translationData.results.transcripts;
     if (!transcripts || !transcripts.length) {
       throw new Error("Unable to convert into text");
@@ -55,25 +70,25 @@ class AWSProvider {
     return Promise.resolve(transcripts[0].transcript);
   }
 
-  cleanStorage(translationData, name) {
+  private cleanStorage(translationData, name): Promise<any> {
     return this.deleteFromS3(name)
       .then(() => this.removeTranscriptionJob(name))
       .then(() => this.unpackTranscription(translationData));
   }
 
-  getJobWithDelay(name, job) {
-    writeOutput("Scheduling job", name);
+  private getJobWithDelay(name, job): Promise<any> {
+    logger.info("Scheduling job", name);
     if (job.TranscriptionJob.TranscriptionJobStatus !== "IN_PROGRESS") {
       return Promise.resolve(job);
     }
 
     return new Promise((resolve) => setTimeout(() => resolve(), 1000))
       .then(() => this.getJob(name))
-      .then((info) => this.getJobWithDelay(name, info.job));
+      .then((info) => this.getJobWithDelay(name, (info as any).job));
   }
 
-  uploadToS3(name, file) {
-    writeOutput("Uploading to S3", name);
+  private uploadToS3(name, file): Promise<any> {
+    logger.info("Uploading to S3", name);
     return new Promise((resolve, reject) => {
       this.storage.upload(
         {
@@ -93,8 +108,8 @@ class AWSProvider {
     });
   }
 
-  deleteFromS3(name) {
-    writeOutput("Deleting from S3", name);
+  private deleteFromS3(name): Promise<any> {
+    logger.info("Deleting from S3", name);
 
     return new Promise((resolve, reject) => {
       this.storage.deleteObject(
@@ -114,8 +129,8 @@ class AWSProvider {
     });
   }
 
-  convertToText(name, uri) {
-    writeOutput("Start converting", name, uri);
+  private convertToText(name, uri): Promise<any> {
+    logger.info("Start converting", name, uri);
     return new Promise((resolve, reject) => {
       this.service.startTranscriptionJob(
         {
@@ -138,8 +153,8 @@ class AWSProvider {
     });
   }
 
-  removeTranscriptionJob(name) {
-    writeOutput("Remove transcription job", name);
+  private removeTranscriptionJob(name): Promise<any> {
+    logger.info("Remove transcription job", name);
     return new Promise((resolve, reject) => {
       this.service.deleteTranscriptionJob(
         {
@@ -157,8 +172,8 @@ class AWSProvider {
     });
   }
 
-  getJob(name) {
-    writeOutput("Check the job", name);
+  private getJob(name: string): Promise<any> {
+    logger.info("Check the job", name);
     return new Promise((resolve, reject) => {
       this.service.getTranscriptionJob(
         {
@@ -188,7 +203,3 @@ class AWSProvider {
       });
   }
 }
-
-module.exports = {
-  AWSProvider,
-};

@@ -14,6 +14,7 @@ import {
   launchTime,
   dbPostgres,
   roboKassa,
+  witAiApi,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -48,6 +49,8 @@ export function run(threadId = 0): void {
     googlePrivateKey: googleApi.privateKey,
     googleProjectId: googleApi.projectId,
     googleClientEmail: googleApi.clientEmail,
+    witAiTokenEn: witAiApi.tokenEn,
+    witAiTokenRu: witAiApi.tokenRu,
   };
 
   const converter = getVoiceConverterInstance(
