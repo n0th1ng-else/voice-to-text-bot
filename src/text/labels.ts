@@ -57,7 +57,7 @@ export const labels = {
     [LabelId.SupportCommand]:
       "Если у вас возникли вопросы и предложения, вы можете связаться со мной одним из следующих способов",
     [LabelId.LongVoiceMessage]:
-      "Сообщения длиной больше 1 минуты не поддерживаются 🌚",
+      "Сообщения длиной больше 20 секунд не поддерживаются 🌚",
     [LabelId.UpdateLanguageError]:
       "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
     [LabelId.PatreonLinkTitle]: "Подписаться на Патреоне",
@@ -98,7 +98,7 @@ export const labels = {
     [LabelId.SupportCommand]:
       "If you have any questions, you can contact me using one of the following options",
     [LabelId.LongVoiceMessage]:
-      "Messages with duration more than 1 minute are not supported 🌚",
+      "Messages with duration more than 20 seconds are not supported 🌚",
     [LabelId.UpdateLanguageError]:
       "Failed to update the language. Please try again later 😔",
     [LabelId.LanguageCommandDescription]: "Switch the recognition language",

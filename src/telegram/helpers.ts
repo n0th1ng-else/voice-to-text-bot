@@ -55,7 +55,7 @@ function isCommandMessage(
 }
 
 export function isVoiceMessageLong(model: BotMessageModel): boolean {
-  const durationLimitSec = 59;
+  const durationLimitSec = 19;
   return model.voiceDuration > durationLimitSec;
 }
 

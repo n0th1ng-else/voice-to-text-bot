@@ -392,9 +392,9 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it("converts voice into text (it fits 60s limit)", () => {
+    it("converts voice into text (it fits 20s limit)", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 59;
+      const voiceFileDuration = 19;
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -427,9 +427,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("denies to convert big voice files more than 60 sec", () => {
+    it("denies to convert big voice files more than 20 sec", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 60;
+      const voiceFileDuration = 20;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(
         testPool,
@@ -456,7 +456,7 @@ describe("[default language - english]", () => {
 
     it("responds on a voice message with wrong mime type", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 60;
+      const voiceFileDuration = 20;
       tgMessage.setVoice(
         testMessageId,
         voiceFileId,
@@ -504,9 +504,9 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it("converts audio into text (it fits 60s limit)", () => {
+    it("converts audio into text (it fits 20s limit)", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 59;
+      const voiceFileDuration = 19;
       const voiceFileContent = "supergroup";
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -539,9 +539,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("denies to convert big audio files more than 60 sec", () => {
+    it("denies to convert big audio files more than 20 sec", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 60;
+      const voiceFileDuration = 20;
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(
         testPool,
@@ -562,7 +562,7 @@ describe("[default language - english]", () => {
 
     it("responds on an audio message with wrong mime type", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 60;
+      const voiceFileDuration = 20;
       tgMessage.setAudio(
         testMessageId,
         voiceFileId,
