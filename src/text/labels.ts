@@ -6,6 +6,7 @@ export enum LabelId {
   NoContent,
   InProgress,
   RecognitionFailed,
+  RecognitionEmpty,
   WelcomeMessage,
   WelcomeMessageGroup,
   WelcomeMessageMore,
@@ -78,6 +79,7 @@ export const labels = {
       "Пожертвование для Telegram бота AudioMessBot. Не подлежит возврату. Спасибо вам за поддержку!",
     [LabelId.PaymentLink]: "Ваша ссылка для оплаты",
     [LabelId.PaymentLinkButton]: "Оплатить",
+    [LabelId.RecognitionEmpty]: "Я не смог найти текст в сообщении 🤔",
   },
   [LanguageCode.En]: {
     [LabelId.BtnRussian]: "🇷🇺 Russian",
@@ -126,5 +128,6 @@ export const labels = {
     [LabelId.UsdOption1]: "5$ 😎",
     [LabelId.UsdOption2]: "7$ 👑",
     [LabelId.UsdOption3]: "10$ ‍🚀",
+    [LabelId.RecognitionEmpty]: "I could not find the text in the message 🤔",
   },
 };
