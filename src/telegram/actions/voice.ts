@@ -68,6 +68,11 @@ export class VoiceAction extends GenericAction {
       })
       .then(([text]) => {
         if (!text) {
+          logger.warn(`${prefix.getPrefix()} Empty recognition response`);
+          if (model.isGroup) {
+            return;
+          }
+
           return this.sendMessage(
             model.id,
             model.chatId,

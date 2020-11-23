@@ -19,7 +19,7 @@ jobs:
         uses: dcodeIO/setup-node-nvm@v4
 
       - name: Publish to Registry
-        uses: docker/build-push-action@v2.2.0
+        uses: docker/build-push-action@v1
         with:
           registry: docker.pkg.github.com
           username: ${{ secrets.DOCKER_USERNAME }}
