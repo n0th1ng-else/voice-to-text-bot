@@ -30,13 +30,13 @@ jobs:
           CI: true
 
       - name: Store Unit-tests coverage
-        uses: actions/upload-artifact@v2.2.1
+        uses: actions/upload-artifact@v1
         with:
           name: coverage-unit
           path: coverage-unit
 
       - name: Store e2e-tests coverage
-        uses: actions/upload-artifact@v2.2.1
+        uses: actions/upload-artifact@v1
         with:
           name: coverage-e2e
           path: coverage-e2e
@@ -54,12 +54,12 @@ jobs:
           fetch-depth: 0
 
       - name: Download Unit-tests coverage
-        uses: actions/download-artifact@v2.0.6
+        uses: actions/download-artifact@v1
         with:
           name: coverage-unit
 
       - name: Download e2e-tests coverage
-        uses: actions/download-artifact@v2.0.6
+        uses: actions/download-artifact@v1
         with:
           name: coverage-e2e
 
