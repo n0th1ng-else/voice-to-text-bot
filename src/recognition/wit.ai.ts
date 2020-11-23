@@ -40,7 +40,7 @@ export class WithAiProvider extends VoiceConverter {
         const token = lang === LanguageCode.Ru ? this.tokenRu : this.tokenEn;
         return this.recognise(bufferData, token);
       })
-      .then((data) => data.text);
+      .then((data) => data.text || "");
   }
 
   private recognise(data: Buffer, authToken = ""): Promise<WitAiResponse> {
@@ -64,7 +64,7 @@ export class WithAiProvider extends VoiceConverter {
 interface WitAiResponse {
   entities: Record<string, WitAiEntity>;
   intents: WitAiIntent[];
-  text: string;
+  text?: string;
   traits: Record<string, WitAiIntent>;
 }
 

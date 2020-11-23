@@ -67,16 +67,26 @@ export class VoiceAction extends GenericAction {
         ]);
       })
       .then(([text]) => {
+        if (!text) {
+          return this.sendMessage(
+            model.id,
+            model.chatId,
+            LabelId.RecognitionEmpty,
+            {
+              lang,
+            },
+            prefix
+          );
+        }
+
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
-        return Promise.all([
-          this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`),
-          this.updateUsageCount(model, prefix),
-        ]);
+        return this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`);
       })
-      .then(() =>
-        logger.info(`${prefix.getPrefix()} Voice successfully converted`)
-      )
+      .then(() => {
+        logger.info(`${prefix.getPrefix()} Voice successfully converted`);
+        return this.updateUsageCount(model, prefix);
+      })
       .catch((err) => {
         const errorMessage = "Unable to recognize the file";
         logger.error(
