@@ -13,13 +13,13 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Set up node using nvm
-        uses: dcodeIO/setup-node-nvm@v4.0.0
+        uses: dcodeIO/setup-node-nvm@v4
 
       - name: Publish to Registry
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2.2.0
         with:
           registry: docker.pkg.github.com
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -36,10 +36,10 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Set up node using nvm
-        uses: dcodeIO/setup-node-nvm@v4.0.0
+        uses: dcodeIO/setup-node-nvm@v4
 
       - name: Docker login
         run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
@@ -79,10 +79,10 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
       - name: Set up node using nvm
-        uses: dcodeIO/setup-node-nvm@v4.0.0
+        uses: dcodeIO/setup-node-nvm@v4
 
       - name: Docker login
         run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
