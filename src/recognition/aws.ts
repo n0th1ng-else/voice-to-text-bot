@@ -82,7 +82,7 @@ export class AWSProvider extends VoiceConverter {
       return Promise.resolve(job);
     }
 
-    return new Promise((resolve) => setTimeout(() => resolve(), 1000))
+    return new Promise<void>((resolve) => setTimeout(() => resolve(), 1000))
       .then(() => this.getJob(name))
       .then((info) => this.getJobWithDelay(name, (info as any).job));
   }
@@ -155,7 +155,7 @@ export class AWSProvider extends VoiceConverter {
 
   private removeTranscriptionJob(name): Promise<any> {
     logger.info("Remove transcription job", name);
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.service.deleteTranscriptionJob(
         {
           TranscriptionJobName: name,
