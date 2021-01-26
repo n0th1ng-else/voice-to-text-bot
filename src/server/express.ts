@@ -10,6 +10,7 @@ import { UptimeDaemon } from "./uptime";
 import { DbClient } from "../db";
 import { flattenPromise } from "../common/helpers";
 import { AnalyticsData } from "../analytics/api/types";
+import { collectAnalytics } from "../analytics";
 
 const logger = new Logger("server");
 
@@ -111,7 +112,14 @@ export class ExpressServer {
 
     this.app.use((req, res) => {
       logger.error(`Unknown route ${Logger.y(req.originalUrl)}`);
+      const analytics = new AnalyticsData(
+        this.version,
+        this.selfUrl,
+        this.threadId
+      );
 
+      analytics.setError("Unknown route for the host");
+      collectAnalytics(analytics.setCommand("Server routing"));
       res
         .status(404)
         .send({ status: 404, message: "Route not found", error: "Not found" });
