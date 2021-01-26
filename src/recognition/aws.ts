@@ -40,7 +40,7 @@ export class AWSProvider extends VoiceConverter {
       .then((data) => {
         if (data.isExists) {
           logger.info("Job exists. skipping");
-          return this.getJobWithDelay(name, (data as any).job);
+          return this.getJobWithDelay(name, data.job);
         }
 
         return this.processFile(fileLink, name);
@@ -57,7 +57,7 @@ export class AWSProvider extends VoiceConverter {
   private processFile(fileLink, name): Promise<any> {
     return getWav(fileLink)
       .then((file) => this.uploadToS3(name, file))
-      .then((info) => this.convertToText(name, (info as any).Location))
+      .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));
   }
 
@@ -84,7 +84,7 @@ export class AWSProvider extends VoiceConverter {
 
     return new Promise<void>((resolve) => setTimeout(() => resolve(), 1000))
       .then(() => this.getJob(name))
-      .then((info) => this.getJobWithDelay(name, (info as any).job));
+      .then((info) => this.getJobWithDelay(name, info.job));
   }
 
   private uploadToS3(name, file): Promise<any> {
