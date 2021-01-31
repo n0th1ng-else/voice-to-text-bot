@@ -84,7 +84,11 @@ export function run(threadId = 0): void {
   db.init()
     .then(() => getHostName(appPort, selfUrl, ngRokToken))
     .then((host) => {
-      logger.info(`Telling telegram our location is ${Logger.y(host)}`);
+      logger.info(
+        `Telling telegram our location is ${Logger.y(
+          host
+        )}. Launched at ${Logger.y(launchTime)}`
+      );
       bot.setHostLocation(host, launchTime).setPayment(roboPayment);
       return server
         .setSelfUrl(host)
