@@ -728,7 +728,7 @@ describe("[russian language]", () => {
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -739,7 +739,7 @@ describe("[russian language]", () => {
       tgMessage.setName(testMessageId, {}, true);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -758,7 +758,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -771,7 +771,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -790,7 +790,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -803,7 +803,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();

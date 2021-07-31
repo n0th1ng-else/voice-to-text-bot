@@ -479,7 +479,7 @@ describe("[russian language]", () => {
       tgMessage.setVoice(
         testMessageId,
         voiceFileId,
-        ("123" as unknown) as number
+        "123" as unknown as number
       );
       const statModel = mockGetBotStatItem(
         testPool,

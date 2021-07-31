@@ -108,34 +108,30 @@ export class TelegramApi {
     data?: Data
   ): Promise<Response> {
     const url = this.getApiUrl(methodName);
-    return this.client
-      .request<TgCore<Response>>({ url, data })
-      .then(
-        (response) => {
-          const answer = response.data;
-          if (!answer.ok) {
-            return Promise.reject(
-              new TgError(answer.description)
-                .setUrl(url)
-                .setErrorCode(answer.error_code)
-                .setRetryAfter(
-                  answer.parameters && answer.parameters.retry_after
-                )
-                .setMigrateToChatId(
-                  answer.parameters && answer.parameters.migrate_to_chat_id
-                )
-            );
-          }
-
-          return answer.result;
-        },
-        (err: AxiosError<string>) => {
-          throw new TgError(err.message, err.stack)
-            .setUrl(url)
-            .setErrorCode(err.response && err.response.status)
-            .setResponse(err.response && err.response.data);
+    return this.client.request<TgCore<Response>>({ url, data }).then(
+      (response) => {
+        const answer = response.data;
+        if (!answer.ok) {
+          return Promise.reject(
+            new TgError(answer.description)
+              .setUrl(url)
+              .setErrorCode(answer.error_code)
+              .setRetryAfter(answer.parameters && answer.parameters.retry_after)
+              .setMigrateToChatId(
+                answer.parameters && answer.parameters.migrate_to_chat_id
+              )
+          );
         }
-      );
+
+        return answer.result;
+      },
+      (err: AxiosError<string>) => {
+        throw new TgError(err.message, err.stack)
+          .setUrl(url)
+          .setErrorCode(err.response && err.response.status)
+          .setResponse(err.response && err.response.data);
+      }
+    );
   }
 
   private getApiUrl(methodName: string): string {

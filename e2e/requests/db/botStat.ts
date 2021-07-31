@@ -63,15 +63,8 @@ function mockBotStatCreate(
 
   pool.mockQuery(UsagesSql.insertRow, (values) => {
     expect(values).toHaveLength(7);
-    const [
-      rId,
-      rChatId,
-      rUser,
-      rUsageCount,
-      rLangId,
-      rCreated,
-      rUpdated,
-    ] = values;
+    const [rId, rChatId, rUser, rUsageCount, rLangId, rCreated, rUpdated] =
+      values;
     expect(typeof rId).toBe("string");
     expect(rChatId).toBe(stat.chatId);
     expect(rUser).toBe(stat.user);

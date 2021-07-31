@@ -91,14 +91,8 @@ describe("Nodes DB", () => {
       testPool.mockQuery(NodesSql.getRows, () => Promise.resolve({ rows: [] }));
       testPool.mockQuery(NodesSql.insertRow, (values) => {
         expect(values).toHaveLength(6);
-        const [
-          rNodeId,
-          rSelfUrl,
-          rActive,
-          rVersion,
-          rCreated,
-          rUpdated,
-        ] = values;
+        const [rNodeId, rSelfUrl, rActive, rVersion, rCreated, rUpdated] =
+          values;
 
         expect(typeof rNodeId).toBe("string");
         expect(rSelfUrl).toBe(selfUrl);
@@ -136,14 +130,8 @@ describe("Nodes DB", () => {
       testPool.mockQuery(NodesSql.getRows, () => Promise.resolve({ rows: [] }));
       testPool.mockQuery(NodesSql.insertRow, (values) => {
         expect(values).toHaveLength(6);
-        const [
-          rNodeId,
-          rSelfUrl,
-          rActive,
-          rVersion,
-          rCreated,
-          rUpdated,
-        ] = values;
+        const [rNodeId, rSelfUrl, rActive, rVersion, rCreated, rUpdated] =
+          values;
 
         expect(typeof rNodeId).toBe("string");
         expect(rSelfUrl).toBe(selfUrl);
