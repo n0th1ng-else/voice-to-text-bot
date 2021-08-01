@@ -710,7 +710,7 @@ describe("[default language - english]", () => {
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -721,7 +721,7 @@ describe("[default language - english]", () => {
       tgMessage.setName(testMessageId, {}, true);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -740,7 +740,7 @@ describe("[default language - english]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -752,12 +752,12 @@ describe("[default language - english]", () => {
       tgMessage.setVoice(
         testMessageId,
         voiceFileId,
-        ("-34" as unknown) as number
+        "-34" as unknown as number
       );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -776,7 +776,7 @@ describe("[default language - english]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();
@@ -785,15 +785,11 @@ describe("[default language - english]", () => {
 
     it("keeps calm on an audio file with broken duration", (done) => {
       const voiceFileId = "some-file-id";
-      tgMessage.setAudio(
-        testMessageId,
-        voiceFileId,
-        ("-1" as unknown) as number
-      );
+      tgMessage.setAudio(testMessageId, voiceFileId, "-1" as unknown as number);
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
-      return sendTelegramMessage(host, bot, tgMessage).then(() => {
+      sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
         return done && done();

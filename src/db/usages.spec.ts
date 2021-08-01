@@ -301,14 +301,8 @@ describe("Usages DB", () => {
 
         testPool.mockQuery(UsagesSql.updateRowWithDate, (values) => {
           expect(values).toHaveLength(6);
-          const [
-            rUser,
-            rUsageCount,
-            rLangId,
-            rCreated,
-            rUpdated,
-            rUsageId,
-          ] = values;
+          const [rUser, rUsageCount, rLangId, rCreated, rUpdated, rUsageId] =
+            values;
 
           expect(typeof rUsageId).toBe("string");
           expect(rUser).toBe(userName);
@@ -537,14 +531,8 @@ describe("Usages DB", () => {
 
         testPool.mockQuery(UsagesSql.updateRowWithDate, (values) => {
           expect(values).toHaveLength(6);
-          const [
-            rUser,
-            rUsageCount,
-            rLangId,
-            rCreated,
-            rUpdated,
-            rUsageId,
-          ] = values;
+          const [rUser, rUsageCount, rLangId, rCreated, rUpdated, rUsageId] =
+            values;
 
           expect(typeof rUsageId).toBe("string");
           expect(rUser).toBe(userName);

@@ -107,3 +107,6 @@ dist
 env-local.json
 coverage-e2e
 coverage-unit
+
+# any wav dumps
+*.wav

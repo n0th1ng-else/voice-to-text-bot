@@ -1,17 +1,17 @@
-import { green, red, yellow } from "kleur";
+import { green, red, yellow } from "colorette";
 import { LogType, sendLogs } from "./integration";
 
 export class Logger {
   public static g(message: string | number): string {
-    return green(message);
+    return green(`${message}`);
   }
 
   public static y(message: string | number): string {
-    return yellow(message);
+    return yellow(`${message}`);
   }
 
   public static r(message: string | number): string {
-    return red(message);
+    return red(`${message}`);
   }
 
   private get prefix(): string {

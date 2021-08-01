@@ -34,6 +34,7 @@ import { Pool as MockPool } from "../src/db/__mocks__/pg";
 import { DbClient } from "../src/db";
 
 jest.mock("../src/logger");
+jest.mock("../src/env");
 
 mockGoogleAuth();
 

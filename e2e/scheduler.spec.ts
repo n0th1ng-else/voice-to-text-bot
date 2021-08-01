@@ -18,8 +18,13 @@ import { httpsOptions } from "../certs";
 const waiter = new WaiterForCalls();
 
 jest.mock("../src/logger");
+jest.mock("../src/env");
 
 const getHandler = requestObj.runGetDto;
+// TODO basically mocking the api request is not enough.
+// Jest 27 runs much faster than current version (26.x) and it becomes an issue
+// gonna do something wit it later on ¯\_(ツ)_/¯
+// two last tests are affected by this :sad:
 const getRequestSpy = jest
   .spyOn(requestObj, "runGetDto")
   .mockImplementation((getUrl) => {
@@ -35,6 +40,8 @@ const getRequestSpy = jest
       waiter.tick();
       return Promise.resolve(response);
     }
+
+    // TODO figure out why I trigger real api request here?! nonsense...
     return getHandler(getUrl).then((data) => {
       waiter.tick();
       return data;
@@ -71,7 +78,8 @@ describe("[uptime daemon]", () => {
   it("Failed to trigger the daemon if selfUrl is not set", (done) => {
     const errMessage =
       "Self url is not set for this node. Unable to set up the daemon";
-    return server.triggerDaemon("", 1).then(
+
+    server.triggerDaemon("", 1).then(
       () => {
         expect(done).toBeDefined();
         if (done) {
@@ -99,7 +107,7 @@ describe("[uptime daemon]", () => {
       const errMessage =
         "Next node url is not set for this node. Unable to set up the daemon";
 
-      return server.triggerDaemon("", 1).then(
+      server.triggerDaemon("", 1).then(
         () => {
           expect(done).toBeDefined();
           if (done) {

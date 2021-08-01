@@ -79,6 +79,7 @@ let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
 jest.mock("../src/logger");
+jest.mock("../src/env");
 
 let server: ExpressServer;
 
