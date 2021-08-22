@@ -3,6 +3,8 @@ import { FFmpeg } from "prism-media";
 import { get as runGet } from "https";
 import { writeFile } from "fs";
 import { Logger } from "../logger";
+import { isDebug } from "../env";
+import { wavSampleRate as sampleRate } from "../const";
 
 const logger = new Logger("ogg-to-wav");
 
@@ -17,7 +19,7 @@ const getWavBuffer = (fileLink: string): Promise<Buffer> => {
       // WAV header here we go
       wavBuffer.push(
         generateHeader(0, {
-          sampleRate: 48000,
+          sampleRate,
         })
       );
 
@@ -38,7 +40,7 @@ const getMpegDecoder = (): FFmpeg =>
       "-f",
       "s16le",
       "-ar",
-      "48000",
+      String(sampleRate),
       "-ac",
       "1",
     ],
@@ -54,9 +56,9 @@ const saveBufferToFile = (buff: Buffer, fileName = "output.wav"): void => {
   });
 };
 
-export const getWav = (fileLink: string, debug = false): Promise<Buffer> => {
+export const getWav = (fileLink: string): Promise<Buffer> => {
   return getWavBuffer(fileLink).then((buff) => {
-    if (debug) {
+    if (isDebug) {
       saveBufferToFile(buff);
     }
 
