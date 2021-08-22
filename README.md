@@ -7,7 +7,7 @@
 <div>
     <span>
         <a href="https://t.me/AudioMessBot" target="_blank">
-            <img alt="Number of installs" src="https://img.shields.io/badge/installs-7000%2B-blueviolet"> 
+            <img alt="Number of installs" src="https://img.shields.io/badge/installs-11000%2B-blueviolet"> 
         </a>
     </span>
     <span>
@@ -54,12 +54,13 @@ and the results you can see below in the table.
 
 # Services overview
 
-| Service provider | Russian lang | Synchronous API | Duration limitation      | File upload     | Speed                   |
-| ---------------- | ------------ | --------------- | ------------------------ | --------------- | ----------------------- |
-| IBM Watson       | no           | no              | N/A                      | Unknown         | Unknown                 |
-| Microsoft Azure  | no           | no              | N/A                      | Unknown         | Unknown                 |
-| Amazon AWS       | **yes**      | no              | Unlimited                | S3              | Minutes                 |
-| Google Cloud     | **yes**      | **yes**         | 1 minute<sup>\*[1]</sup> | Direct / GDrive | Instant<sup>\*[2]</sup> |
+| Service provider                                                                                | Russian lang | Synchronous API | Duration limitation      | File upload     | Speed                   |
+| ----------------------------------------------------------------------------------------------- | ------------ | --------------- | ------------------------ | --------------- | ----------------------- |
+| [IBM Watson](https://www.ibm.com/cloud/watson-speech-to-text)                                   | no           | no              | N/A                      | Unknown         | Unknown                 |
+| [Microsoft Azure](https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text) | no           | no              | N/A                      | Unknown         | Unknown                 |
+| [Amazon AWS](https://aws.amazon.com/transcribe)                                                 | **yes**      | no              | Unlimited                | S3              | Minutes                 |
+| [Google Cloud](https://cloud.google.com/speech-to-text)                                         | **yes**      | **yes**         | 1 minute<sup>\*[1]</sup> | Direct / GDrive | Instant<sup>\*[2]</sup> |
+| [Wit.ai](https://wit.ai)                                                                        | **yes**      | **yes**         | 20 seconds               | Direct          | Instant                 |
 
 - For direct upload
   <br/>

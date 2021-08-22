@@ -11,3 +11,5 @@ export const yandexAccount = "https://yasobe.ru/na/audiomessbot";
 export const officialChannelAccount = "https://t.me/AudioMessBotNews";
 
 export const wavSampleRate = 16_000; // 16kHz
+
+export const durationLimitSec = 20; // Most strict limit for Wit.ai
