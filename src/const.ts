@@ -9,3 +9,5 @@ export const kofiAccount = "https://ko-fi.com/audiomessbot";
 export const yandexAccount = "https://yasobe.ru/na/audiomessbot";
 
 export const officialChannelAccount = "https://t.me/AudioMessBotNews";
+
+export const wavSampleRate = 16_000; // 16kHz

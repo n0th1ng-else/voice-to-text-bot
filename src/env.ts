@@ -67,3 +67,5 @@ export const witAiApi = {
   tokenEn: process.env.WIT_AI_TOKEN_EN || "",
   tokenRu: process.env.WIT_AI_TOKEN_RU || "",
 };
+
+export const isDebug = process.env.DEBUG === "true";
