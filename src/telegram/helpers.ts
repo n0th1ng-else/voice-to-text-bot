@@ -8,6 +8,7 @@ import {
 import { telegramBotName } from "../env";
 import { TgCallbackQuery, TgChatType, TgMessage } from "./api/types";
 import { LanguageCode } from "../recognition/types";
+import { durationLimitSec } from "../const";
 
 export function isLangMessage(model: BotMessageModel, msg: TgMessage): boolean {
   return isCommandMessage(model, msg, BotCommand.Language);
@@ -54,10 +55,8 @@ function isCommandMessage(
   );
 }
 
-export function isVoiceMessageLong(model: BotMessageModel): boolean {
-  const durationLimitSec = 19;
-  return model.voiceDuration > durationLimitSec;
-}
+export const isVoiceMessageLong = (model: BotMessageModel): boolean =>
+  model.voiceDuration >= durationLimitSec;
 
 export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
   if (!msg) {
