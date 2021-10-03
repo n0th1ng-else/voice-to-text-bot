@@ -48,13 +48,6 @@ jobs:
           D_PWD: ${{ secrets.HEROKU_API_KEY }}
           D_REGISTRY: registry.heroku.com
 
-      - name: Docker build
-        run: docker build . --file Dockerfile --build-arg APP_VERSION=${{ env.D_VERSION }} --tag ${{ env.D_REGISTRY }}/${{ env.D_NAME }}/web
-        env:
-          D_REGISTRY: registry.heroku.com
-          D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
-          D_VERSION: ${{ github.sha }}
-
       - name: Push docker image
         run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
         env:
@@ -90,13 +83,6 @@ jobs:
           D_LOGIN: ${{ secrets.HEROKU_EMAIL }}
           D_PWD: ${{ secrets.HEROKU_API_KEY }}
           D_REGISTRY: registry.heroku.com
-
-      - name: Docker build
-        run: docker build . --file Dockerfile --build-arg APP_VERSION=${{ env.D_VERSION }} --tag ${{ env.D_REGISTRY }}/${{ env.D_NAME }}/web
-        env:
-          D_REGISTRY: registry.heroku.com
-          D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
-          D_VERSION: ${{ github.sha }}
 
       - name: Push docker image
         run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
