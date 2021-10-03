@@ -48,7 +48,7 @@ export class WithAiProvider extends VoiceConverter {
       return Promise.reject(new Error("The auth token is not provided"));
     }
     return this.client
-      .request<WitAiResponse>({
+      .request<WitAiResponse | string>({
         data,
         url: "/speech",
         headers: {
@@ -57,7 +57,35 @@ export class WithAiProvider extends VoiceConverter {
           "Content-Type": "audio/wav",
         },
       })
-      .then((res) => res.data);
+      .then(({ data }) => {
+        if (typeof data !== "string") {
+          return data;
+        }
+
+        const chunks = data.split("\r\n");
+        const lastChunk = chunks.pop();
+        if (!lastChunk) {
+          throw new Error(
+            "The final response chunk not found. Transcription is empty."
+          );
+        }
+        try {
+          const chunkData: WitAiResponse = JSON.parse(lastChunk);
+          return chunkData;
+        } catch (err) {
+          logger.error(
+            "Unable to parse transcription response",
+            {
+              raw: data,
+              last: lastChunk,
+            },
+            err
+          );
+          throw new Error(
+            "Unable to parse the last chunk json. Invalid transcription response."
+          );
+        }
+      });
   }
 }
 
