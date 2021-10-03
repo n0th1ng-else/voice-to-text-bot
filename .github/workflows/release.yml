@@ -19,6 +19,6 @@ jobs:
         uses: dcodeIO/setup-node-nvm@v4
 
       - name: Run semantic release
-        run: npx semantic-release
+        run: npx semantic-release@17.4.7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
