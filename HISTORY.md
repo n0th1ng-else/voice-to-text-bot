@@ -171,9 +171,38 @@ doesn't send any sensitive info anyway). But I think it would be enough
 at least to see how many people use the bot during the day and how they
 do it.
 
-### 1000 installs in two months
+### 1000+ installations in two months
 
 Yes, we have reached **1000** installs in total! That's HUGE. It took me two
 months and... maybe a week. It is just great. 1000+ installs, 1100+ voice
 minutes were recognized. Almost all people came organically as there
 was an only announcement in my empty twitter account lol. Great news!
+
+### Downgrade audio sample rate
+
+For some reason, wit.ai changed the flow and now 48kHz wav audio
+can not be processed properly. The Suggestion was to downgrade the
+sample rate to 16kHz and it works now. Took me a while to figure out why
+it was not working and the documentation on the site updates without
+any marks on what was updated, really. I guess it was a couple of weeks
+the bot did not work. Big downtime. But now all is good.
+
+### Chunked response
+
+Last update wit.ai has implemented a feature to transcribe the voice
+message in form of chunks. now the result is slowly progressing and responds
+with some partial transcription results. Like, you receive the usual json response
+as a chunk and with yet new iteration the transcription gets populated more and more.
+I use axios to fire the request for transcription. And it silently fails to
+parse the response, as it now looks like a string if concatenated json object, and
+thus can not be parsed into something meaningful. To deal with this, I detect if axios
+was able to parse the result from the string into object. If not, I am trying to find
+the last chunk and parse data from there. Let's see how it will work in production.
+
+### 12000+ installations after 16 months in production
+
+I did not notice that we have reached 12k+ instals in 16 months! Simple amazing result.
+What I love the most is that people tend to tell me if something goes wrong. So far
+There was not any issues in my code but rather a communication problems with 3rd party
+services. Also, one of my donation wallets stopped working. I guess I would go into
+bitcoin in the near future, the donation does not work anyway. /shrug
