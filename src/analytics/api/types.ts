@@ -68,7 +68,6 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: encodeURIComponent(this.getCid(this.threadId)),
       uid: String(this.id),
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.PageView,
@@ -97,7 +96,6 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: encodeURIComponent(this.getCid(this.threadId)),
       uid: String(this.id),
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Event,
@@ -117,6 +115,7 @@ export class AnalyticsData {
       ea: encodeURIComponent(this.action),
       // Event label - request data / response
       el: encodeURIComponent(this.label),
+      ev: this.threadId,
     };
   }
 
@@ -124,7 +123,6 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: encodeURIComponent(this.getCid(this.threadId)),
       uid: String(this.id),
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Timing,
@@ -140,7 +138,6 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: encodeURIComponent(this.getCid(this.threadId)),
       uid: String(this.id),
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Exception,
@@ -160,7 +157,7 @@ export interface AnalyticsDataDto {
   // The google analytics tracking ID UA-XXXXXXX-X
   tid: string;
   // Client Id (Thread Id)
-  cid: string;
+  cid?: string;
   // User Id (Chat Id)
   uid: string;
   // Event hit type.
