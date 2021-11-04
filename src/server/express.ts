@@ -119,7 +119,7 @@ export class ExpressServer {
       );
 
       analytics.setError("Unknown route for the host");
-      collectAnalytics(analytics.setCommand("Server routing"));
+      collectAnalytics(analytics.setCommand("/app", "Server route not found"));
       res
         .status(404)
         .send({ status: 404, message: "Route not found", error: "Not found" });

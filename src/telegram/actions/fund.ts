@@ -25,6 +25,7 @@ export class FundAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, BotCommand.Fund);
     return this.sendFundMessage(mdl, prefix);
   }
 
@@ -37,6 +38,7 @@ export class FundAction extends GenericAction {
     button: TelegramButtonModel,
     analytics: AnalyticsData
   ): Promise<void> {
+    collectAnalytics(analytics, BotCommand.Fund);
     return this.formLinkButton(msg, button, analytics);
   }
 
@@ -98,7 +100,7 @@ export class FundAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Fund message", BotCommand.Fund)
+          model.analytics.setCommand(BotCommand.Fund, "Fund message", "Init")
         )
       );
   }
@@ -117,7 +119,11 @@ export class FundAction extends GenericAction {
       logger.error(`${prefix.getPrefix()} ${errorMessage}`);
       model.analytics.setError(errorMessage);
       return collectAnalytics(
-        model.analytics.setCommand("Fund message", BotCommand.Fund)
+        model.analytics.setCommand(
+          BotCommand.Fund,
+          "Fund message error",
+          "Price is not specified"
+        )
       );
     }
 
@@ -131,7 +137,11 @@ export class FundAction extends GenericAction {
           logger.error(`${prefix.getPrefix()} ${errorMessage}`);
           model.analytics.setError(errorMessage);
           return collectAnalytics(
-            model.analytics.setCommand("Fund message", BotCommand.Fund)
+            model.analytics.setCommand(
+              BotCommand.Fund,
+              "Fund message error",
+              "Payment service is not set"
+            )
           );
         }
 

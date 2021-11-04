@@ -91,7 +91,7 @@ export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
 }
 
 export function isMessageSupported(msg: TgMessage): boolean {
-  const isBot = !!(msg.from && msg.from.is_bot);
+  const isBot = Boolean(msg.from && msg.from.is_bot);
   return !isBot;
 }
 

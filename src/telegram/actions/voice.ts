@@ -1,6 +1,7 @@
 import { TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import {
+  BotCommand,
   BotMessageModel,
   TelegramMessagePrefix,
   VoiceContentReason,
@@ -18,14 +19,17 @@ export class VoiceAction extends GenericAction {
 
   public runAction(
     msg: TgMessage,
-    model: BotMessageModel,
+    mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, "/voice");
     logger.info(`${prefix.getPrefix()} Voice message`);
-    return this.getChatLanguage(model, prefix)
-      .then((lang) => this.recogniseVoiceMessage(model, lang, prefix))
+    return this.getChatLanguage(mdl, prefix)
+      .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
       .then(() =>
-        collectAnalytics(model.analytics.setCommand("Voice message", "/voice"))
+        collectAnalytics(
+          mdl.analytics.setCommand("/voice", "Voice message", "Init")
+        )
       );
   }
 

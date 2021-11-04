@@ -18,6 +18,7 @@ export class VoiceFormatAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, "/voice");
     return this.sendWrongFormatMessage(mdl, prefix);
   }
 
@@ -41,7 +42,11 @@ export class VoiceFormatAction extends GenericAction {
     if (model.isGroup) {
       logger.info(`${prefix.getPrefix()} Voice mime-type is not supported`);
       return collectAnalytics(
-        model.analytics.setCommand("Mime-type message", "/voice")
+        model.analytics.setCommand(
+          "/voice",
+          "Wrong voice message mime-type",
+          "Group"
+        )
       );
     }
 
@@ -74,7 +79,11 @@ export class VoiceFormatAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Mime-type message", "/voice")
+          model.analytics.setCommand(
+            "/voice",
+            "Wrong voice message mime-type",
+            "Private"
+          )
         )
       );
   }

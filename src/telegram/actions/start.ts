@@ -14,6 +14,7 @@ export class StartAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, BotCommand.Start);
     return this.sendHelloMessage(mdl, prefix);
   }
 
@@ -49,7 +50,7 @@ export class StartAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Hello message", BotCommand.Start)
+          model.analytics.setCommand(BotCommand.Start, "Hello message", "Init")
         )
       );
   }

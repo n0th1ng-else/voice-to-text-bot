@@ -18,6 +18,7 @@ export class VoiceLengthAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, "/voice");
     return this.sendVoiceIsTooLongMessage(mdl, prefix);
   }
 
@@ -39,7 +40,11 @@ export class VoiceLengthAction extends GenericAction {
 
     if (model.isGroup) {
       return collectAnalytics(
-        model.analytics.setCommand("Voice is too long message", "/voice")
+        model.analytics.setCommand(
+          "/voice",
+          "Voice message is too long",
+          "Group"
+        )
       );
     }
 
@@ -66,7 +71,11 @@ export class VoiceLengthAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Voice is too long message", "/voice")
+          model.analytics.setCommand(
+            "/voice",
+            "Voice message is too long",
+            "Private"
+          )
         )
       );
   }
