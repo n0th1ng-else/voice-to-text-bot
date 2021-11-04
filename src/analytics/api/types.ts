@@ -89,7 +89,7 @@ export class AnalyticsData {
   }
 
   private getAppVersion(version: string, threadId: number): string {
-    return `${version} @ thread #${threadId}`;
+    return `${version}.${threadId}`;
   }
 
   private getEventDto(token: string): AnalyticsDataDto {
