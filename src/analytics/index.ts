@@ -31,7 +31,7 @@ export function collectAnalytics(
 }
 
 function runAnalyticsRequest(data: AnalyticsDataDto): Promise<void> {
-  const logged = { ul: data.ul, cid: data.cid, t: data.t };
+  const logged = { ul: data.ul, cid: data.cid, uid: data.uid, t: data.t };
   return new GoogleAnalyticsApi()
     .collect(data)
     .then(() => logger.info("Analytic data has been collected", logged))

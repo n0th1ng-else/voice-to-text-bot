@@ -26,7 +26,7 @@ export class GoogleAnalyticsApi {
 
   public collect(dto: AnalyticsDataDto): Promise<void> {
     const query = Object.keys(dto)
-      .map((key) => `${key}=${dto[key]}`)
+      .map((key) => `${key}=${encodeURIComponent(dto[key])}`)
       .join("&");
     return this.request<void, void>(`${GoogleAnalyticsApi.path}?${query}`);
   }
