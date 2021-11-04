@@ -54,7 +54,9 @@ export class BotActions {
       const msgError = new Error(errorMessage);
       logger.error(msgError.message, msgError);
       analytics.setError(errorMessage);
-      return collectAnalytics(analytics.setCommand("Callback query"));
+      return collectAnalytics(
+        analytics.setCommand("/app", "Callback query error", "No message")
+      );
     }
 
     if (!data) {
@@ -62,7 +64,9 @@ export class BotActions {
       const msgError = new Error(errorMessage);
       logger.error(msgError.message, msgError);
       analytics.setError(errorMessage);
-      return collectAnalytics(analytics.setCommand("Callback query"));
+      return collectAnalytics(
+        analytics.setCommand("/app", "Callback query error", "No data")
+      );
     }
 
     return Promise.resolve()
@@ -82,7 +86,9 @@ export class BotActions {
         const errorMessage = "Failed to execute callback query";
         logger.error(errorMessage, err);
         analytics.setError(errorMessage);
-        return collectAnalytics(analytics.setCommand("Callback query"));
+        return collectAnalytics(
+          analytics.setCommand("/app", "Callback query error", "Unknown")
+        );
       });
   }
 }

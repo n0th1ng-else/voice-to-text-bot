@@ -17,6 +17,7 @@ export class SupportAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, BotCommand.Support);
     return this.sendSupportMessage(mdl, prefix);
   }
 
@@ -74,7 +75,11 @@ export class SupportAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Support message", BotCommand.Support)
+          model.analytics.setCommand(
+            BotCommand.Support,
+            "Support message",
+            "Init"
+          )
         )
       );
   }

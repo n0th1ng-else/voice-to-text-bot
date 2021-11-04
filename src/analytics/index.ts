@@ -3,10 +3,14 @@ import { GoogleAnalyticsApi } from "./api";
 import { analyticsId } from "../env";
 import { Logger } from "../logger";
 import { flattenPromise } from "../common/helpers";
+import { BotCommand } from "../telegram/types";
 
 const logger = new Logger("analytics");
 
-export function collectAnalytics(analytics: AnalyticsData): Promise<void> {
+export function collectAnalytics(
+  analytics: AnalyticsData,
+  page?: BotCommand | "/voice"
+): Promise<void> {
   if (!analyticsId) {
     logger.error(
       "Analytics Token is not provided!",
@@ -16,6 +20,10 @@ export function collectAnalytics(analytics: AnalyticsData): Promise<void> {
   }
 
   logger.info("Collecting analytic data");
+
+  if (page) {
+    return runAnalyticsRequest(analytics.getPageDto(analyticsId, page));
+  }
 
   return Promise.all([
     analytics.getListDto(analyticsId).map((dto) => runAnalyticsRequest(dto)),

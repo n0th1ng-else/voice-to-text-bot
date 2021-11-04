@@ -2,18 +2,21 @@ import { TimeMeasure } from "../../common/timer";
 import { BotCommand } from "../../telegram/types";
 import { TelegramApi } from "../../telegram/api";
 
+const defaultLang = "not provided";
+
+type AnalyticsAction = BotCommand | "/voice" | "/app";
+
 export class AnalyticsData {
   private readonly timer: TimeMeasure;
   private readonly apiVersion = "1";
   private readonly appName = "Voice to Speech Bot";
-  private readonly action = "User message";
-  private readonly appType = "NodeJS";
 
-  private command = "/";
-  private text = "";
+  private category: AnalyticsAction = "/app";
+  private action = "";
+  private label = "";
   private errorMessages: string[] = [];
   private id = 0;
-  private lang = "not provided";
+  private lang = defaultLang;
 
   constructor(
     private readonly appVersion: string,
@@ -29,13 +32,18 @@ export class AnalyticsData {
   }
 
   public setLang(lang: string): this {
-    this.lang = lang || "not provided";
+    this.lang = lang || defaultLang;
     return this;
   }
 
-  public setCommand(text: string, command: BotCommand | string = "/"): this {
-    this.command = command;
-    this.text = text;
+  public setCommand(
+    category: AnalyticsAction,
+    action: string,
+    label?: string
+  ): this {
+    this.category = category;
+    this.action = action;
+    this.label = label || "";
     return this;
   }
 
@@ -52,24 +60,63 @@ export class AnalyticsData {
     return this.errorMessages.length ? [...regular, ...errors] : regular;
   }
 
+  public getPageDto(
+    token: string,
+    category: AnalyticsAction
+  ): AnalyticsDataDto {
+    // Category is not set at this moment. force to specify it
+    return {
+      v: this.apiVersion,
+      tid: token,
+      cid: encodeURIComponent(this.getCid(this.threadId)),
+      uid: String(this.id),
+      ds: AnalyticsDataSource.App,
+      t: AnalyticsHitType.PageView,
+      //
+      dr: encodeURIComponent(TelegramApi.url),
+      av: encodeURIComponent(this.appVersion),
+      //
+      dh: encodeURIComponent(this.url),
+      dp: encodeURIComponent(category),
+      dt: encodeURIComponent(this.getTitle(category)),
+      an: encodeURIComponent(this.appName),
+      ul: encodeURIComponent(this.lang),
+    };
+  }
+
+  private getTitle(action: AnalyticsAction): string {
+    const title = action.substring(1);
+    return `${title[0].toUpperCase()}${title.substring(1)}`;
+  }
+
+  private getCid(threadId: number): string {
+    return `Thread #${threadId}`;
+  }
+
   private getEventDto(token: string): AnalyticsDataDto {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: String(this.id),
+      cid: encodeURIComponent(this.getCid(this.threadId)),
+      uid: String(this.id),
+      ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Event,
       //
-      dh: encodeURIComponent(this.url),
-      dp: encodeURIComponent(this.command),
       dr: encodeURIComponent(TelegramApi.url),
-      ul: encodeURIComponent(this.lang),
-      an: encodeURIComponent(this.appName),
       av: encodeURIComponent(this.appVersion),
-      ec: encodeURIComponent(`Thread ${this.threadId}`),
+      //
+      dh: encodeURIComponent(this.url),
+      dp: encodeURIComponent(this.category),
+      dt: encodeURIComponent(this.getTitle(this.category)),
+      an: encodeURIComponent(this.appName),
+      ul: encodeURIComponent(this.lang),
+
+      // user command, bot response (AnalyticsHitCategory)
+      ec: encodeURIComponent(this.category),
+      // Event action - start, lang, support...
       ea: encodeURIComponent(this.action),
-      el: encodeURIComponent(this.text),
-      dt: encodeURIComponent(this.text),
-      ds: encodeURIComponent(this.appType),
+      // Event label - request data / response
+      el: encodeURIComponent(this.label),
     };
   }
 
@@ -77,13 +124,15 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: String(this.id),
+      cid: encodeURIComponent(this.getCid(this.threadId)),
+      uid: String(this.id),
+      ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Timing,
       //
+      ul: encodeURIComponent(this.lang),
       utt: this.timer.getMs(),
       utc: encodeURIComponent("Server Timing"),
-      utv: encodeURIComponent(this.command),
-      utl: encodeURIComponent(`Thread ${this.threadId}`),
+      utv: encodeURIComponent(this.action),
     };
   }
 
@@ -91,9 +140,12 @@ export class AnalyticsData {
     return {
       v: this.apiVersion,
       tid: token,
-      cid: String(this.id),
+      cid: encodeURIComponent(this.getCid(this.threadId)),
+      uid: String(this.id),
+      ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Exception,
       //
+      ul: encodeURIComponent(this.lang),
       exf: 0,
       exd: encodeURIComponent(message),
     };
@@ -103,35 +155,44 @@ export class AnalyticsData {
 export interface AnalyticsDataDto {
   // Required
 
-  // The Protocol version
-  v: string;
-  // The measurement ID
+  // The Protocol version. Always 1
+  v: "1";
+  // The google analytics tracking ID UA-XXXXXXX-X
   tid: string;
-  // User Id
+  // Client Id (Thread Id)
   cid: string;
+  // User Id (Chat Id)
+  uid: string;
   // Event hit type.
   t: AnalyticsHitType;
+  // Indicates the data source of the hit.
+  ds: AnalyticsDataSource;
 
   // Optional
 
-  // When present, the IP address of the sender will be anonymized
-  aip?: number;
-  // Indicates the data source of the hit.
-  ds?: string;
-  // Specifies which referral source brought traffic to a website
+  // Specifies which referral source brought traffic to a website (telegram?)
   dr?: string;
-  // Specifies the language
+  // Specifies the user language
   ul?: string;
   // Specifies the application name
   an?: string;
   // Specifies the application version
   av?: string;
+
+  // Geo Location Id (country code is available two letters uppercase - US)
+  geoid?: string;
+  // When present, the IP address of the sender will be anonymized
+  aip?: number;
+
   // Event category.
   ec?: string;
-  // Event action.
+  // Event action
   ea?: string;
-  // Event label.
+  // Event label
   el?: string;
+
+  // Event value
+  ev?: number;
   // Server response time in milliseconds
   srt?: number;
   // User timing value
@@ -140,16 +201,18 @@ export interface AnalyticsDataDto {
   utc?: string;
   // User timing variable
   utv?: string;
+
+  // Specifies the hostname from which content was hosted
+  dh?: string;
   // The path portion of the page URL
   dp?: string;
   // Document title
   dt?: string;
+
   // Error description
   exd?: string;
   // Is error fatal
   exf?: 0 | 1;
-  // Specifies the hostname from which content was hosted
-  dh?: string;
   // Specifies the user timing label
   utl?: string;
 }
@@ -163,4 +226,9 @@ export enum AnalyticsHitType {
   Social = "social",
   Exception = "exception",
   Timing = "timing",
+}
+
+enum AnalyticsDataSource {
+  Web = "web",
+  App = "app",
 }

@@ -27,6 +27,7 @@ export class LangAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
+    collectAnalytics(mdl.analytics, BotCommand.Language);
     return this.showLanguageSelection(mdl, prefix);
   }
 
@@ -40,6 +41,7 @@ export class LangAction extends GenericAction {
     analytics: AnalyticsData,
     query: TgCallbackQuery
   ): Promise<void> {
+    collectAnalytics(analytics, BotCommand.Language);
     return this.handleLanguageChange(msg, button, analytics, query);
   }
 
@@ -62,7 +64,11 @@ export class LangAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          analytics.setCommand("Update language callback", BotCommand.Language)
+          analytics.setCommand(
+            BotCommand.Language,
+            "Language message",
+            "Callback"
+          )
         )
       );
   }
@@ -191,7 +197,11 @@ export class LangAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("Update language", BotCommand.Language)
+          model.analytics.setCommand(
+            BotCommand.Language,
+            "Language message",
+            "Init"
+          )
         )
       );
   }

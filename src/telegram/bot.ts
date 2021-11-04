@@ -161,7 +161,7 @@ export class TelegramBotModel {
   ): Promise<void> {
     logger.warn(`${prefix.getPrefix()} Message is not supported`);
     return collectAnalytics(
-      model.analytics.setCommand("Message is not supported", "/bot")
+      model.analytics.setCommand("/app", "Message is not supported")
     );
   }
 
@@ -172,7 +172,7 @@ export class TelegramBotModel {
     if (model.isGroup) {
       logger.info(`${prefix.getPrefix()} No content`);
       return collectAnalytics(
-        model.analytics.setCommand("No content message", "/bot")
+        model.analytics.setCommand("/voice", "No voice content", "Group")
       );
     }
 
@@ -195,7 +195,7 @@ export class TelegramBotModel {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("No content message", "/bot")
+          model.analytics.setCommand("/voice", "No voice content", "Private")
         )
       );
   }
