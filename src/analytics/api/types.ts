@@ -72,14 +72,14 @@ export class AnalyticsData {
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.PageView,
       //
-      dr: encodeURIComponent(TelegramApi.url),
-      av: encodeURIComponent(this.appVersion),
+      dr: TelegramApi.url,
+      av: this.getAppVersion(this.appVersion, this.threadId),
       //
-      dh: encodeURIComponent(this.url),
-      dp: encodeURIComponent(category),
-      dt: encodeURIComponent(this.getTitle(category)),
-      an: encodeURIComponent(this.appName),
-      ul: encodeURIComponent(this.lang),
+      dh: this.url,
+      dp: category,
+      dt: this.getTitle(category),
+      an: this.appName,
+      ul: this.lang,
     };
   }
 
@@ -88,8 +88,8 @@ export class AnalyticsData {
     return `${title[0].toUpperCase()}${title.substring(1)}`;
   }
 
-  private getCid(threadId: number): string {
-    return `Thread #${threadId}`;
+  private getAppVersion(version: string, threadId: number): string {
+    return `${version} @ thread #${threadId}`;
   }
 
   private getEventDto(token: string): AnalyticsDataDto {
@@ -100,21 +100,21 @@ export class AnalyticsData {
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Event,
       //
-      dr: encodeURIComponent(TelegramApi.url),
-      av: encodeURIComponent(this.appVersion),
+      dr: TelegramApi.url,
+      av: this.getAppVersion(this.appVersion, this.threadId),
       //
-      dh: encodeURIComponent(this.url),
-      dp: encodeURIComponent(this.category),
-      dt: encodeURIComponent(this.getTitle(this.category)),
-      an: encodeURIComponent(this.appName),
-      ul: encodeURIComponent(this.lang),
+      dh: this.url,
+      dp: this.category,
+      dt: this.getTitle(this.category),
+      an: this.appName,
+      ul: this.lang,
 
       // user command, bot response (AnalyticsHitCategory)
-      ec: encodeURIComponent(this.category),
+      ec: this.category,
       // Event action - start, lang, support...
-      ea: encodeURIComponent(this.action),
+      ea: this.action,
       // Event label - request data / response
-      el: encodeURIComponent(this.label),
+      el: this.label,
       ev: this.threadId,
     };
   }
@@ -127,10 +127,12 @@ export class AnalyticsData {
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Timing,
       //
-      ul: encodeURIComponent(this.lang),
+      dr: TelegramApi.url,
+      av: this.getAppVersion(this.appVersion, this.threadId),
+      ul: this.lang,
       utt: this.timer.getMs(),
-      utc: encodeURIComponent("Server Timing"),
-      utv: encodeURIComponent(this.action),
+      utc: "Server Timing",
+      utv: this.action,
     };
   }
 
@@ -142,9 +144,11 @@ export class AnalyticsData {
       ds: AnalyticsDataSource.App,
       t: AnalyticsHitType.Exception,
       //
-      ul: encodeURIComponent(this.lang),
+      dr: TelegramApi.url,
+      av: this.getAppVersion(this.appVersion, this.threadId),
+      ul: this.lang,
       exf: 0,
-      exd: encodeURIComponent(message),
+      exd: message,
     };
   }
 }
