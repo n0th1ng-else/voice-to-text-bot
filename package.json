@@ -28,7 +28,7 @@
     "express": "4.17.1",
     "ffmpeg-static": "4.4.0",
     "google-gax": "2.20.0",
-    "nanoid": "3.1.23",
+    "nanoid": "3.1.31",
     "ngrok": "4.1.0",
     "node-fetch": "2.6.1",
     "node-telegram-bot-api": "0.54.0",
