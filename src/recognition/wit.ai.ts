@@ -62,7 +62,7 @@ export class WithAiProvider extends VoiceConverter {
           return data;
         }
 
-        const chunks = data.split("\r\n");
+        const chunks = WithAiProvider.cleanupChunks(data);
         const lastChunk = chunks.pop();
         if (!lastChunk) {
           throw new Error(
@@ -86,6 +86,21 @@ export class WithAiProvider extends VoiceConverter {
           );
         }
       });
+  }
+
+  private static cleanupChunks(body: string): string[] {
+    const chunks = body.split("\r\n");
+    const initialSize = chunks.length;
+    const onlyJson = chunks
+      .map((chunk) => chunk.trim())
+      .filter((chunk) => chunk[0] === "{" && chunk[chunk.length - 1] === "}");
+
+    const resultSize = onlyJson.length;
+    if (resultSize !== initialSize) {
+      logger.warn("Invalid chunks received!", { body });
+    }
+
+    return onlyJson;
   }
 }
 
