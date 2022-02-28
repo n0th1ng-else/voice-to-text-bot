@@ -89,18 +89,10 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private static cleanupChunks(body: string): string[] {
-    const chunks = body.split("\r\n");
-    const initialSize = chunks.length;
-    const onlyJson = chunks
+    return body
+      .split("\r\n")
       .map((chunk) => chunk.trim())
       .filter((chunk) => chunk[0] === "{" && chunk[chunk.length - 1] === "}");
-
-    const resultSize = onlyJson.length;
-    if (resultSize !== initialSize) {
-      logger.warn("Invalid chunks received!", { body });
-    }
-
-    return onlyJson;
   }
 }
 
