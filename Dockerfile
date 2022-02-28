@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:12.22.10
 
 EXPOSE 8080
 
