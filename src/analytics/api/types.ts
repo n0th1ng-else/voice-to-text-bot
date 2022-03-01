@@ -147,7 +147,7 @@ export class AnalyticsData {
       dr: TelegramApi.url,
       av: this.getAppVersion(this.appVersion, this.threadId),
       ul: this.lang,
-      exf: 0,
+      exf: false,
       exd: message,
     };
   }
@@ -213,7 +213,7 @@ export interface AnalyticsDataDto {
   // Error description
   exd?: string;
   // Is error fatal
-  exf?: 0 | 1;
+  exf?: boolean;
   // Specifies the user timing label
   utl?: string;
 }
