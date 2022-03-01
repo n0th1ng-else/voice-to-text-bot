@@ -11,7 +11,7 @@
     "format": "prettier --write",
     "lint": "eslint",
     "build": "tsc",
-    "overload": "artillery run load.yml --insecure",
+    "test:load": "artillery run load.yml --insecure",
     "test:unit": "jest --coverage",
     "test:e2e": "TEST_PACKAGE=e2e jest --coverage",
     "test:unit:watch": "jest --watch",
