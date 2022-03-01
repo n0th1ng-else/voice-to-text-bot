@@ -66,8 +66,8 @@ const clientSpy = jest
     expect(config.timeout).toBe(TelegramApi.timeout);
     expect(config.method).toBe("POST");
     expect(config.responseType).toBe("json");
-    expect(config.headers.Accept).toBe("application/json");
-    expect(config.headers["Content-Type"]).toBe("application/json");
+    expect(config.headers?.Accept).toBe("application/json");
+    expect(config.headers?.["Content-Type"]).toBe("application/json");
     return testClient;
   });
 
