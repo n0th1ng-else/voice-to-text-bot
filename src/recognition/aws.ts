@@ -1,9 +1,9 @@
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ogg";
 import { Logger } from "../logger";
+import fetch from "isomorphic-fetch";
 
 const AWS = require("aws-sdk");
-const fetch = require("node-fetch");
 
 const logger = new Logger("aws-recognition");
 
