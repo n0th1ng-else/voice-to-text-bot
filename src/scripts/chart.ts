@@ -10,7 +10,7 @@ import { DbClient } from "../db";
 
 const logger = new Logger("chart-script");
 
-export function run(): void {
+export const run = (): void => {
   const files = {
     html: resolvePath(__dirname, "../chart/index.html"),
     js: resolvePath(__dirname, "../chart/index.js"),
@@ -92,4 +92,4 @@ export function run(): void {
   server.listen(appPort, () => {
     logger.info(`Express server is listening on ${Logger.y(appPort)}`);
   });
-}
+};

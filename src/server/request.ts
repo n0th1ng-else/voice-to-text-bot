@@ -1,7 +1,7 @@
 import { get as httpsGet } from "https";
 import { get as httpGet } from "http";
 
-export function runGetDto<R>(url: string): Promise<R> {
+export const runGetDto = <R>(url: string): Promise<R> => {
   return new Promise<R>((resolve, reject) => {
     const isHttps = /^https:\/\/.+/;
     const getHandler = isHttps.test(url) ? httpsGet : httpGet;
@@ -19,9 +19,9 @@ export function runGetDto<R>(url: string): Promise<R> {
       });
     }).on("error", (err) => reject(err));
   });
-}
+};
 
-export function runGetBuffer(url: string): Promise<Buffer> {
+export const runGetBuffer = (url: string): Promise<Buffer> => {
   return new Promise<Buffer>((resolve, reject) => {
     const isHttps = /^https:\/\/.+/;
     const getHandler = isHttps.test(url) ? httpsGet : httpGet;
@@ -33,4 +33,4 @@ export function runGetBuffer(url: string): Promise<Buffer> {
       response.on("end", () => resolve(Buffer.concat(buff)));
     }).on("error", (err) => reject(err));
   });
-}
+};

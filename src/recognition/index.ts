@@ -7,9 +7,9 @@ import { GoogleProvider } from "./google";
 import { WithAiProvider } from "./wit.ai";
 import { AWSProvider } from "./aws";
 
-export function getVoiceConverterProvider(
+export const getVoiceConverterProvider = (
   provider: string
-): VoiceConverterProvider {
+): VoiceConverterProvider => {
   switch (provider) {
     case VoiceConverterProvider.Aws:
       return VoiceConverterProvider.Aws;
@@ -20,12 +20,12 @@ export function getVoiceConverterProvider(
     default:
       return VoiceConverterProvider.Google;
   }
-}
+};
 
-export function getVoiceConverterInstance(
+export const getVoiceConverterInstance = (
   provider: VoiceConverterProvider,
   options: VoiceConverterOptions
-): VoiceConverter {
+): VoiceConverter => {
   switch (provider) {
     case VoiceConverterProvider.Google:
       return new GoogleProvider(options);
@@ -36,4 +36,4 @@ export function getVoiceConverterInstance(
     default:
       throw new Error("Voice recognition provider is not specified");
   }
-}
+};

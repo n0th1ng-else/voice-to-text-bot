@@ -10,33 +10,31 @@ import { TgCallbackQuery, TgChatType, TgMessage } from "./api/types";
 import { LanguageCode } from "../recognition/types";
 import { durationLimitSec } from "../const";
 
-export function isLangMessage(model: BotMessageModel, msg: TgMessage): boolean {
-  return isCommandMessage(model, msg, BotCommand.Language);
-}
-
-export function isHelloMessage(
+export const isLangMessage = (
   model: BotMessageModel,
   msg: TgMessage
-): boolean {
-  return isCommandMessage(model, msg, BotCommand.Start);
-}
+): boolean => isCommandMessage(model, msg, BotCommand.Language);
 
-export function isSupportMessage(
+export const isHelloMessage = (
   model: BotMessageModel,
   msg: TgMessage
-): boolean {
-  return isCommandMessage(model, msg, BotCommand.Support);
-}
+): boolean => isCommandMessage(model, msg, BotCommand.Start);
 
-export function isFundMessage(model: BotMessageModel, msg: TgMessage): boolean {
-  return isCommandMessage(model, msg, BotCommand.Fund);
-}
+export const isSupportMessage = (
+  model: BotMessageModel,
+  msg: TgMessage
+): boolean => isCommandMessage(model, msg, BotCommand.Support);
 
-function isCommandMessage(
+export const isFundMessage = (
+  model: BotMessageModel,
+  msg: TgMessage
+): boolean => isCommandMessage(model, msg, BotCommand.Fund);
+
+const isCommandMessage = (
   model: BotMessageModel,
   msg: TgMessage,
   command: BotCommand
-): boolean {
+): boolean => {
   if (!msg || !msg.text) {
     return false;
   }
@@ -53,12 +51,12 @@ function isCommandMessage(
     model.isGroup &&
     msg.text.toLowerCase() === `${command}@${telegramBotName.toLowerCase()}`
   );
-}
+};
 
 export const isVoiceMessageLong = (model: BotMessageModel): boolean =>
   model.voiceDuration >= durationLimitSec;
 
-export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
+export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   if (!msg) {
     return new VoiceContentReasonModel(VoiceContentReason.NoContent);
   }
@@ -88,43 +86,40 @@ export function isVoiceMessage(msg: TgMessage): VoiceContentReasonModel {
         VoiceContentReason.WrongMimeType,
         data.mime_type
       );
-}
+};
 
-export function isMessageSupported(msg: TgMessage): boolean {
+export const isMessageSupported = (msg: TgMessage): boolean => {
   const isBot = Boolean(msg.from && msg.from.is_bot);
   return !isBot;
-}
+};
 
-export function getChatId(msg: TgMessage): number {
-  return msg.chat.id;
-}
+export const getChatId = (msg: TgMessage): number => msg.chat.id;
 
-export function isChatGroup(msg: TgMessage): boolean {
-  return msg.chat.type !== TgChatType.Private;
-}
+export const isChatGroup = (msg: TgMessage): boolean =>
+  msg.chat.type !== TgChatType.Private;
 
-export function getUserName(msg: TgMessage): string {
+export const getUserName = (msg: TgMessage): string => {
   const fromUserName = msg.from && msg.from.username;
   return fromUserName || getFullUserName(msg) || getGroupName(msg) || "";
-}
+};
 
-export function getFullUserName(msg: TgMessage): string {
+export const getFullUserName = (msg: TgMessage): string => {
   const fromUserFullName =
     msg.from &&
     [msg.from.first_name, msg.from.last_name].filter((k) => k).join(" ");
 
   return fromUserFullName || "";
-}
+};
 
-export function getGroupName(msg: TgMessage): string {
+export const getGroupName = (msg: TgMessage): string => {
   const chatName = msg.chat.title;
   const chatFullName = [msg.chat.first_name, msg.chat.last_name]
     .filter((k) => k)
     .join(" ");
   return chatName || chatFullName || "";
-}
+};
 
-export function getVoiceFile(msg: TgMessage): string {
+export const getVoiceFile = (msg: TgMessage): string => {
   if (!msg) {
     return "";
   }
@@ -136,9 +131,9 @@ export function getVoiceFile(msg: TgMessage): string {
   }
 
   return data.file_id || "";
-}
+};
 
-export function getVoiceDuration(msg: TgMessage): number {
+export const getVoiceDuration = (msg: TgMessage): number => {
   if (!msg) {
     return 0;
   }
@@ -150,9 +145,9 @@ export function getVoiceDuration(msg: TgMessage): number {
   }
 
   return data.duration || 0;
-}
+};
 
-export function getUserLanguage(msg: TgMessage): LanguageCode {
+export const getUserLanguage = (msg: TgMessage): LanguageCode => {
   const msgLang = getRawUserLanguage(msg);
   const globalPart = msgLang.slice(0, 2).toLowerCase();
 
@@ -161,16 +156,18 @@ export function getUserLanguage(msg: TgMessage): LanguageCode {
   }
 
   return LanguageCode.En;
-}
+};
 
-export function getRawUserLanguage(msg: TgMessage | TgCallbackQuery): string {
+export const getRawUserLanguage = (
+  msg: TgMessage | TgCallbackQuery
+): string => {
   return (msg.from && msg.from.language_code) || "";
-}
+};
 
-export function getLanguageByText(
+export const getLanguageByText = (
   lang: string,
   throwOnError = false
-): LanguageCode {
+): LanguageCode => {
   switch (lang) {
     case LanguageCode.Ru:
       return LanguageCode.Ru;
@@ -184,9 +181,9 @@ export function getLanguageByText(
       throw new Error("Language code is not recognized");
     }
   }
-}
+};
 
-export function getButtonTypeByText(type: string): TelegramButtonType {
+export const getButtonTypeByText = (type: string): TelegramButtonType => {
   switch (type) {
     case TelegramButtonType.Donation:
       return TelegramButtonType.Donation;
@@ -195,4 +192,4 @@ export function getButtonTypeByText(type: string): TelegramButtonType {
     default:
       return TelegramButtonType.Unknown;
   }
-}
+};

@@ -6,7 +6,7 @@ import { getHostName } from "../server/tunnel";
 
 const logger = new Logger("cluster");
 
-export function run(): void {
+export const run = (): void => {
   const launchTime = new Date().getTime();
 
   getHostName(appPort, selfUrl, ngRokToken).then((host) => {
@@ -39,4 +39,4 @@ export function run(): void {
       });
     });
   });
-}
+};
