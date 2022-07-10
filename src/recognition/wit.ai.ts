@@ -2,6 +2,7 @@ import { Logger } from "../logger";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ogg";
 import { fetchWithTimeout, parseChunkedResponse } from "../common/request";
+import { wavSampleRate } from "../const";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -76,7 +77,7 @@ export class WithAiProvider extends VoiceConverter {
         headers: {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
-          "Content-Type": "audio/wav",
+          "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
           "Transfer-Encoding": "chunked",
         },
       }
