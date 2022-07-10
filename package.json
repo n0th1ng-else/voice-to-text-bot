@@ -23,7 +23,7 @@
     "@google-cloud/pubsub": "2.16.1",
     "@google-cloud/secret-manager": "3.9.0",
     "@google-cloud/speech": "4.5.5",
-    "aws-sdk": "2.958.0",
+    "aws-sdk": "2.1171.0",
     "axios": "0.26.0",
     "colorette": "2.0.16",
     "express": "4.17.3",
