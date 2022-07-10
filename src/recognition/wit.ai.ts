@@ -1,13 +1,13 @@
-import fetch from "isomorphic-fetch";
 import { Logger } from "../logger";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ogg";
+import { fetchWithTimeout, parseChunkedResponse } from "../common/request";
 
 const logger = new Logger("wit-ai-recognition");
 
 export class WithAiProvider extends VoiceConverter {
   public static readonly url = "https://api.wit.ai";
-  public static readonly timeout = 60_000;
+  public static readonly timeout = 30_000;
   private static readonly apiVersion = "20220622";
   private readonly tokenEn: string;
   private readonly tokenRu: string;
@@ -31,22 +31,44 @@ export class WithAiProvider extends VoiceConverter {
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         const token = lang === LanguageCode.Ru ? this.tokenRu : this.tokenEn;
-        return this.recogniseSpeech(bufferData, token);
+        return WithAiProvider.recogniseDictation(bufferData, token);
       })
-      .then((data) => data.text || "");
+      .then((chunks) => chunks.map(({ text }) => text).join(" ") || "");
   }
 
-  private recogniseSpeech(
+  private static recogniseSpeech(
     data: Buffer,
     authToken = ""
-  ): Promise<WitAiSpeechResponse> {
+  ): Promise<WitAiSpeechResponse[]> {
+    return WithAiProvider.runRequest<WitAiSpeechResponse>(
+      data,
+      "speech",
+      authToken
+    );
+  }
+
+  private static recogniseDictation(
+    data: Buffer,
+    authToken = ""
+  ): Promise<WitAiDictationResponse[]> {
+    return WithAiProvider.runRequest<WitAiDictationResponse>(
+      data,
+      "dictation",
+      authToken
+    );
+  }
+
+  private static runRequest<Dto extends WitAiBaseResponse>(
+    data: Buffer,
+    path: "speech" | "dictation",
+    authToken = ""
+  ): Promise<Dto[]> {
     if (!authToken) {
       return Promise.reject(new Error("The auth token is not provided"));
     }
 
-    const path = "speech";
-    // TODO timeout === WithAiProvider.timeout
-    const apiRequest = fetch(
+    const apiRequest = fetchWithTimeout(
+      WithAiProvider.timeout,
       `${WithAiProvider.url}/${path}?v=${WithAiProvider.apiVersion}`,
       {
         body: data,
@@ -61,53 +83,39 @@ export class WithAiProvider extends VoiceConverter {
     );
 
     return apiRequest
-      .then((response) => Promise.all([response.text(), response.status]))
-      .then(([contents, status]) => {
-        if (status !== 200) {
+      .then((response) => {
+        if (response.status !== 200) {
           throw new Error("The api request was unsuccessful");
         }
-        const chunks =
-          WithAiProvider.parseChunkedResponse<WitAiSpeechResponse>(contents);
-        const final = chunks.find((chunk) => chunk.is_final);
-        if (!final) {
+        return response.text();
+      })
+      .then((response) => {
+        const chunks = parseChunkedResponse<Dto>(response);
+        const finalizedChunks = chunks.filter(
+          ({ is_final: isFinal }) => isFinal
+        );
+        if (!finalizedChunks.length) {
           throw new Error(
             "The final response chunk not found. Transcription is empty."
           );
         }
-        return final;
+        return finalizedChunks;
       });
   }
-
-  private static parseChunkedResponse<Dto>(body: string): Dto[] {
-    // Split by newline, trim, remove empty lines
-    const chunks = body
-      .split("\r\n")
-      .map((chunk) => chunk.trim())
-      .filter((chunk) => Boolean(chunk.length));
-
-    // Loop through the chunks and try to Json.parse
-    return chunks.reduce<{ prev: string; acc: Dto[] }>(
-      ({ prev, acc }, chunk) => {
-        const newPrev = `${prev}${chunk}`;
-        try {
-          const newChunk: Dto = JSON.parse(newPrev);
-          return { prev: "", acc: [...acc, newChunk] };
-        } catch (err) {
-          return { prev: newPrev, acc };
-        }
-      },
-      { prev: "", acc: [] }
-    ).acc;
-  }
 }
 
-interface WitAiSpeechResponse {
-  entities: Record<string, WitAiEntity>;
-  intents: WitAiIntent[];
+interface WitAiBaseResponse {
   text?: string;
-  traits: Record<string, WitAiIntent>;
   is_final?: boolean;
 }
+
+interface WitAiSpeechResponse extends WitAiBaseResponse {
+  entities: Record<string, WitAiEntity>;
+  intents: WitAiIntent[];
+  traits: Record<string, WitAiIntent>;
+}
+
+interface WitAiDictationResponse extends WitAiBaseResponse {}
 
 interface WitAiIntent {
   id: string;
