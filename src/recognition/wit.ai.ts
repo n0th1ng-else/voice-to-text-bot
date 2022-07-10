@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import fetch from "isomorphic-fetch";
 import { Logger } from "../logger";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ogg";
@@ -6,11 +6,11 @@ import { getWav } from "../ogg";
 const logger = new Logger("wit-ai-recognition");
 
 export class WithAiProvider extends VoiceConverter {
-  private readonly tokenEn: string;
   public static readonly url = "https://api.wit.ai";
   public static readonly timeout = 60_000;
+  private static readonly apiVersion = "20220622";
+  private readonly tokenEn: string;
   private readonly tokenRu: string;
-  private readonly client: AxiosInstance;
 
   constructor(options: VoiceConverterOptions) {
     super();
@@ -18,13 +18,6 @@ export class WithAiProvider extends VoiceConverter {
     logger.info("Using Wit.ai");
     this.tokenEn = options.witAiTokenEn || "";
     this.tokenRu = options.witAiTokenRu || "";
-
-    this.client = axios.create({
-      method: "POST",
-      baseURL: WithAiProvider.url,
-      timeout: WithAiProvider.timeout,
-      responseType: "json",
-    });
   }
 
   public transformToText(
@@ -38,69 +31,82 @@ export class WithAiProvider extends VoiceConverter {
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         const token = lang === LanguageCode.Ru ? this.tokenRu : this.tokenEn;
-        return this.recognise(bufferData, token);
+        return this.recogniseSpeech(bufferData, token);
       })
       .then((data) => data.text || "");
   }
 
-  private recognise(data: Buffer, authToken = ""): Promise<WitAiResponse> {
+  private recogniseSpeech(
+    data: Buffer,
+    authToken = ""
+  ): Promise<WitAiSpeechResponse> {
     if (!authToken) {
       return Promise.reject(new Error("The auth token is not provided"));
     }
-    return this.client
-      .request<WitAiResponse | string>({
-        data,
-        url: "/speech",
+
+    const path = "speech";
+    // TODO timeout === WithAiProvider.timeout
+    const apiRequest = fetch(
+      `${WithAiProvider.url}/${path}?v=${WithAiProvider.apiVersion}`,
+      {
+        body: data,
+        method: "POST",
         headers: {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
           "Content-Type": "audio/wav",
+          "Transfer-Encoding": "chunked",
         },
-      })
-      .then(({ data }) => {
-        if (typeof data !== "string") {
-          return data;
-        }
+      }
+    );
 
-        const chunks = WithAiProvider.cleanupChunks(data);
-        const lastChunk = chunks.pop();
-        if (!lastChunk) {
+    return apiRequest
+      .then((response) => Promise.all([response.text(), response.status]))
+      .then(([contents, status]) => {
+        if (status !== 200) {
+          throw new Error("The api request was unsuccessful");
+        }
+        const chunks =
+          WithAiProvider.parseChunkedResponse<WitAiSpeechResponse>(contents);
+        const final = chunks.find((chunk) => chunk.is_final);
+        if (!final) {
           throw new Error(
             "The final response chunk not found. Transcription is empty."
           );
         }
-        try {
-          const chunkData: WitAiResponse = JSON.parse(lastChunk);
-          return chunkData;
-        } catch (err) {
-          logger.error(
-            "Unable to parse transcription response",
-            {
-              raw: data,
-              last: lastChunk,
-            },
-            err
-          );
-          throw new Error(
-            "Unable to parse the last chunk json. Invalid transcription response."
-          );
-        }
+        return final;
       });
   }
 
-  private static cleanupChunks(body: string): string[] {
-    return body
+  private static parseChunkedResponse<Dto>(body: string): Dto[] {
+    // Split by newline, trim, remove empty lines
+    const chunks = body
       .split("\r\n")
       .map((chunk) => chunk.trim())
-      .filter((chunk) => chunk[0] === "{" && chunk[chunk.length - 1] === "}");
+      .filter((chunk) => Boolean(chunk.length));
+
+    // Loop through the chunks and try to Json.parse
+    return chunks.reduce<{ prev: string; acc: Dto[] }>(
+      ({ prev, acc }, chunk) => {
+        const newPrev = `${prev}${chunk}`;
+        try {
+          const newChunk: Dto = JSON.parse(newPrev);
+          return { prev: "", acc: [...acc, newChunk] };
+        } catch (err) {
+          return { prev: newPrev, acc };
+        }
+      },
+      { prev: "", acc: [] }
+    ).acc;
   }
 }
 
-interface WitAiResponse {
+interface WitAiSpeechResponse {
   entities: Record<string, WitAiEntity>;
   intents: WitAiIntent[];
   text?: string;
   traits: Record<string, WitAiIntent>;
+  is_final?: boolean;
 }
 
 interface WitAiIntent {
