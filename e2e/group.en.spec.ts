@@ -498,9 +498,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("converts voice into text (it fits 20s limit) - no username", () => {
+    it("converts voice into text (it fits 90 sec limit) - no username", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 19;
+      const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -527,9 +527,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("converts voice into text (it fits 20s limit) - has username", () => {
+    it("converts voice into text (it fits 90 sec limit) - has username", () => {
       const voiceFileId = "some-file-id-new";
-      const voiceFileDuration = randomIntFromInterval(1, 19);
+      const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
@@ -597,9 +597,9 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it("converts voice into text (it fits 20s limit) - has first name", () => {
+    it("converts voice into text (it fits 90 sec limit) - has first name", () => {
       const voiceFileId = "some-file-id-new";
-      const voiceFileDuration = randomIntFromInterval(1, 19);
+      const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n2";
       const firstName = "my-first-name";
@@ -632,9 +632,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("converts voice into text (it fits 20s limit) - has last name", () => {
+    it("converts voice into text (it fits 90 sec limit) - has last name", () => {
       const voiceFileId = "some-file-id-new";
-      const voiceFileDuration = randomIntFromInterval(1, 19);
+      const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n3";
       const lastName = "his-last-account";
@@ -667,9 +667,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("converts voice into text (it fits 20s limit) - has both first and last name", () => {
+    it("converts voice into text (it fits 90 sec limit) - has both first and last name", () => {
       const voiceFileId = "some-file-id-new";
-      const voiceFileDuration = randomIntFromInterval(1, 19);
+      const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n4";
       const firstName = "her-next-big-thing";
@@ -704,9 +704,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on a big voice files more than 20 sec", (done) => {
+    it("keeps calm on a big voice files more than 90 sec", (done) => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 20;
+      const voiceFileDuration = 90;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
@@ -796,9 +796,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("converts audio into text (it fits 20s limit) - no username", () => {
+    it("converts audio into text (it fits 90 sec limit) - no username", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 19;
+      const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
 
