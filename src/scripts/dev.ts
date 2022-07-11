@@ -33,7 +33,7 @@ import { getLaunchDelay } from "./init";
 
 const logger = new Logger("dev-script");
 
-export function run(threadId = 0): void {
+export const run = (threadId = 0): void => {
   const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
@@ -95,4 +95,4 @@ export function run(threadId = 0): void {
     .then(() => server.start())
     .then((onStop) => stopListener.addTrigger(() => onStop()))
     .catch((err) => logger.error("Failed to run dev instance", err));
-}
+};

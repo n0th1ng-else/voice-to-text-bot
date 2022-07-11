@@ -35,7 +35,7 @@ import { getLaunchDelay } from "./init";
 
 const logger = new Logger("start-script");
 
-export function run(threadId = 0): void {
+export const run = (threadId = 0): void => {
   const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
@@ -106,4 +106,4 @@ export function run(threadId = 0): void {
       );
     })
     .catch((err) => logger.error("Failed to run the server", err));
-}
+};

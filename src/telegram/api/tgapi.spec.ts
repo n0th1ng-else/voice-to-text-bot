@@ -37,14 +37,13 @@ const getApiResponse = <Response>(
 };
 const testClient = axios.create();
 
-function getPromiseError<R>(fn: () => Promise<R>): Promise<TgError> {
-  return new Promise((resolve, reject) => {
+const getPromiseError = <R>(fn: () => Promise<R>): Promise<TgError> =>
+  new Promise((resolve, reject) => {
     fn().then(
       (data) => reject(data),
       (err) => resolve(err)
     );
   });
-}
 
 let testApiToken = nanoid(10);
 let api = new TelegramApi(testApiToken);

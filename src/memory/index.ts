@@ -2,10 +2,10 @@ import { Logger } from "../logger";
 
 const logger = new Logger("memory");
 
-export function printCurrentMemoryStat(
+export const printCurrentMemoryStat = (
   limit?: number,
   offset = 15
-): Promise<void> {
+): Promise<void> => {
   const stat = getMemoryUsageMb();
   const line = `Current usage [rss=${stat.rss}Mb] [heapTotal=${stat.heapTotal}Mb] [heapUsed=${stat.heapUsed}Mb]`;
   if (!limit) {
@@ -35,9 +35,9 @@ export function printCurrentMemoryStat(
 
   logger.info(line);
   return Promise.resolve();
-}
+};
 
-export function getMemoryUsageMb(): NodeJS.MemoryUsage {
+export const getMemoryUsageMb = (): NodeJS.MemoryUsage => {
   const stat = process.memoryUsage();
   return {
     heapTotal: getMb(stat.heapTotal),
@@ -46,9 +46,9 @@ export function getMemoryUsageMb(): NodeJS.MemoryUsage {
     rss: getMb(stat.rss),
     arrayBuffers: stat.arrayBuffers,
   };
-}
+};
 
-function getMb(stat: number): number {
+const getMb = (stat: number): number => {
   const mb = 1024 * 1024;
   return Math.ceil(stat / mb);
-}
+};

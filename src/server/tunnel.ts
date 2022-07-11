@@ -3,7 +3,7 @@ import { Logger } from "../logger";
 
 const logger = new Logger("tunnel");
 
-function createTunnel(port: number, token?: string): Promise<string> {
+const createTunnel = (port: number, token?: string): Promise<string> => {
   logger.info("Creating tunnel");
   const localHost = `https://localhost:${port}`;
   return connect({ authtoken: token, addr: localHost }).then((host) => {
@@ -13,17 +13,17 @@ function createTunnel(port: number, token?: string): Promise<string> {
     logger.info(`Using the host ${Logger.y(host)}`);
     return host;
   });
-}
+};
 
-export function getHostName(
+export const getHostName = (
   port: number,
   selfUrl?: string,
   ngRokToken?: string
-): Promise<string> {
+): Promise<string> => {
   if (selfUrl) {
     logger.info(`Using the host ${Logger.y(selfUrl)}`);
     return Promise.resolve(selfUrl);
   }
 
   return createTunnel(port, ngRokToken);
-}
+};

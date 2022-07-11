@@ -9,9 +9,8 @@ export enum LogType {
   Error = "error",
 }
 
-function isLoggingEnabled(): boolean {
-  return !!(logApi.apiToken && logApi.projectId);
-}
+const isLoggingEnabled = (): boolean =>
+  Boolean(logApi.apiToken && logApi.projectId);
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const convertDataItem = (data: any, ind: number): Record<string, string> => {
@@ -57,14 +56,14 @@ if (isLoggingEnabled()) {
   );
 }
 
-export function sendLogs(
+export const sendLogs = (
   type: LogType,
   id: string,
   prefix: string,
   message: string,
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   data: any[] = []
-): void {
+): void => {
   if (!isLoggingEnabled()) {
     return;
   }
@@ -87,4 +86,4 @@ export function sendLogs(
     prefix: prefix || "no",
     ...logData,
   });
-}
+};

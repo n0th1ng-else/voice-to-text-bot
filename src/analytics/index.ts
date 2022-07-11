@@ -7,10 +7,10 @@ import { BotCommand } from "../telegram/types";
 
 const logger = new Logger("analytics");
 
-export function collectAnalytics(
+export const collectAnalytics = (
   analytics: AnalyticsData,
   page?: BotCommand | "/voice"
-): Promise<void> {
+): Promise<void> => {
   if (!analyticsId) {
     logger.error(
       "Analytics Token is not provided!",
@@ -28,12 +28,12 @@ export function collectAnalytics(
   return Promise.all([
     analytics.getListDto(analyticsId).map((dto) => runAnalyticsRequest(dto)),
   ]).then(flattenPromise);
-}
+};
 
-function runAnalyticsRequest(data: AnalyticsDataDto): Promise<void> {
+const runAnalyticsRequest = (data: AnalyticsDataDto): Promise<void> => {
   const logged = { ul: data.ul, cid: data.cid, uid: data.uid, t: data.t };
   return new GoogleAnalyticsApi()
     .collect(data)
     .then(() => logger.info("Analytic data has been collected", logged))
     .catch((err) => logger.warn("Failed to collect analytic data", err));
-}
+};

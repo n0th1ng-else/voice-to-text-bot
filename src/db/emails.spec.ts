@@ -27,8 +27,6 @@ const runFail = (doneFn, reason = "should not be there"): void => {
   if (!doneFn) {
     throw new Error("done is not defined");
   }
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   doneFn.fail(reason);
 };
 
