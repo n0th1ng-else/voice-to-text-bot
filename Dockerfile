@@ -10,7 +10,8 @@ RUN mkdir -p $APP_DIR
 WORKDIR $APP_DIR
 
 COPY package.json package-lock.json $APP_DIR
-RUN npm ci && npm cache clean --force
+RUN npm set-script prepare ""
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . $APP_DIR
 
