@@ -392,9 +392,9 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it("converts voice into text (it fits 20s limit)", () => {
+    it("converts voice into text (it fits 90 sec limit)", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 19;
+      const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -427,9 +427,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("denies to convert big voice files more than 20 sec", () => {
+    it("denies to convert big voice files more than 90 sec", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 20;
+      const voiceFileDuration = 90;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(
         testPool,
@@ -504,9 +504,9 @@ describe("[default language - english]", () => {
       ]);
     });
 
-    it("converts audio into text (it fits 20s limit)", () => {
+    it("converts audio into text (it fits 90 sec limit)", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 19;
+      const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -539,9 +539,9 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("denies to convert big audio files more than 20 sec", () => {
+    it("denies to convert big audio files more than 90 sec", () => {
       const voiceFileId = "some-file-id";
-      const voiceFileDuration = 20;
+      const voiceFileDuration = 90;
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(
         testPool,

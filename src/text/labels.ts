@@ -1,4 +1,14 @@
 import { LanguageCode } from "../recognition/types";
+import { durationLimitSec, secondsInOneMinute } from "../const";
+
+const getMaxDuration = (minutes: string, seconds: string): string => {
+  if (durationLimitSec < secondsInOneMinute) {
+    return `${durationLimitSec} ${seconds}`;
+  }
+  const mins = Math.floor(durationLimitSec / secondsInOneMinute);
+  const secs = durationLimitSec - mins * secondsInOneMinute;
+  return secs ? `${mins} ${minutes} ${secs} ${seconds}` : `${mins} ${minutes}`;
+};
 
 export enum LabelId {
   BtnRussian,
@@ -57,8 +67,10 @@ export const labels = {
     [LabelId.ContactAuthor]: "Связаться с автором",
     [LabelId.SupportCommand]:
       "Если у вас возникли вопросы и предложения, вы можете связаться со мной одним из следующих способов",
-    [LabelId.LongVoiceMessage]:
-      "Сообщения длиной больше 20 секунд не поддерживаются 🌚",
+    [LabelId.LongVoiceMessage]: `Сообщения длиной больше ${getMaxDuration(
+      "мин",
+      "сек"
+    )} не поддерживаются 🌚`,
     [LabelId.UpdateLanguageError]:
       "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
     [LabelId.PatreonLinkTitle]: "Подписаться на Патреоне",
@@ -99,8 +111,10 @@ export const labels = {
     [LabelId.ContactAuthor]: "Talk to the author",
     [LabelId.SupportCommand]:
       "If you have any questions, you can contact me using one of the following options",
-    [LabelId.LongVoiceMessage]:
-      "Messages with duration more than 20 seconds are not supported 🌚",
+    [LabelId.LongVoiceMessage]: `Messages with duration more than ${getMaxDuration(
+      "min",
+      "sec"
+    )} are not supported 🌚`,
     [LabelId.UpdateLanguageError]:
       "Failed to update the language. Please try again later 😔",
     [LabelId.LanguageCommandDescription]: "Switch the recognition language",
