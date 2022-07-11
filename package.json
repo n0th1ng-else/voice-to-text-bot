@@ -27,7 +27,7 @@
     "axios": "0.26.0",
     "colorette": "2.0.16",
     "express": "4.17.3",
-    "ffmpeg-static": "4.4.0",
+    "ffmpeg-static": "5.0.2",
     "google-gax": "2.20.0",
     "isomorphic-fetch": "3.0.0",
     "nanoid": "3.3.1",
