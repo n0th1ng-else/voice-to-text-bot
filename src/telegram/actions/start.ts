@@ -4,7 +4,7 @@ import { isHelloMessage } from "../helpers";
 import { BotCommand, BotMessageModel, TelegramMessagePrefix } from "../types";
 import { LabelId } from "../../text/labels";
 import { Logger } from "../../logger";
-import { collectAnalytics } from "../../analytics";
+import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -14,7 +14,7 @@ export class StartAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectAnalytics(mdl.analytics, BotCommand.Start);
+    collectPageAnalytics(mdl.analytics, BotCommand.Start);
     return this.sendHelloMessage(mdl, prefix);
   }
 

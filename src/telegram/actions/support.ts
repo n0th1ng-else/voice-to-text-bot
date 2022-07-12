@@ -5,7 +5,7 @@ import { isSupportMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
 import { githubUrl, officialChannelAccount } from "../../const";
 import { Logger } from "../../logger";
-import { collectAnalytics } from "../../analytics";
+import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -17,7 +17,7 @@ export class SupportAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectAnalytics(mdl.analytics, BotCommand.Support);
+    collectPageAnalytics(mdl.analytics, BotCommand.Support);
     return this.sendSupportMessage(mdl, prefix);
   }
 

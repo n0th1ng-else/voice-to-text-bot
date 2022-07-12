@@ -9,7 +9,7 @@ import { sSuffix } from "../text";
 import { UptimeDaemon } from "./uptime";
 import { DbClient } from "../db";
 import { flattenPromise } from "../common/helpers";
-import { AnalyticsData } from "../analytics/api/types";
+import { AnalyticsData } from "../analytics/legacy/types";
 import { collectAnalytics } from "../analytics";
 
 const logger = new Logger("server");

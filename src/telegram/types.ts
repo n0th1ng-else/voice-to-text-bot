@@ -16,7 +16,7 @@ import { Logger } from "../logger";
 import { LabelId } from "../text/labels";
 import { TextModel } from "../text";
 import { TgInlineKeyboardButton, TgMessage } from "./api/types";
-import { AnalyticsData } from "../analytics/api/types";
+import { AnalyticsData } from "../analytics/legacy/types";
 
 export enum VoiceContentReason {
   Ok = "Ok",

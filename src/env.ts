@@ -57,6 +57,11 @@ export const dbPostgres = {
 
 export const analyticsId = process.env.GA_TRACKING_ID || "";
 
+export const analytics = {
+  apiSecret: process.env.GA_V4_SECRET || "",
+  measurementId: process.env.GA_V4_MEASUREMENT_ID || "",
+};
+
 export const roboKassa = {
   login: process.env.ROBO_LOGIN || "",
   passwordForSend: process.env.ROBO_PASSWORD_SEND || "",

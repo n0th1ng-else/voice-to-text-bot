@@ -1,6 +1,7 @@
 import { TimeMeasure } from "../../common/timer";
 import { BotCommand } from "../../telegram/types";
 import { TelegramApi } from "../../telegram/api";
+import { AnalyticsDataV4 } from "../v4/types";
 
 const defaultLang = "not provided";
 
@@ -17,22 +18,26 @@ export class AnalyticsData {
   private errorMessages: string[] = [];
   private id = 0;
   private lang = defaultLang;
+  public v4: AnalyticsDataV4;
 
   constructor(
     private readonly appVersion: string,
     private readonly url: string,
     private readonly threadId: number
   ) {
+    this.v4 = new AnalyticsDataV4(appVersion, url, threadId);
     this.timer = new TimeMeasure();
   }
 
   public setId(id: number): this {
     this.id = id;
+    this.v4.setId(this.id);
     return this;
   }
 
   public setLang(lang: string): this {
     this.lang = lang || defaultLang;
+    this.v4.setLang(this.lang);
     return this;
   }
 
@@ -44,11 +49,14 @@ export class AnalyticsData {
     this.category = category;
     this.action = action;
     this.label = label || "";
+    this.v4.setCommand(category);
+    this.v4.addFlow();
     return this;
   }
 
   public setError(errorMessage: string): this {
     this.errorMessages.push(errorMessage);
+    this.v4.addError(errorMessage);
     return this;
   }
 

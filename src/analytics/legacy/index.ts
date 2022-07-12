@@ -32,7 +32,7 @@ export const collectEvents = (data: AnalyticsDataDto): Promise<void> => {
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
         "Content-Type": "application/json",
       },
-      timeout: timeout,
+      timeout,
       responseType: "json",
     })
     .then(() => logger.info("Analytic data has been collected", logged))
