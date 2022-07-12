@@ -34,7 +34,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
 
     if (!item[this.idKey]) {
       logger.error(
-        `The item with ${this.idKey}=${
+        `The item with ${String(this.idKey)}=${
           item[this.idKey]
         } can not have empty index value. Caching skipped`,
         new Error("Cache item can not have empty index value")
@@ -42,14 +42,16 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return;
     }
 
-    logger.info(`Adding cache item with ${this.idKey}=${item[this.idKey]}`);
+    logger.info(
+      `Adding cache item with ${String(this.idKey)}=${item[this.idKey]}`
+    );
 
     const existingItem = this.cache.find(
       (cItem) => cItem[this.idKey] === item[this.idKey]
     );
     if (existingItem) {
       logger.warn(
-        `The item with ${this.idKey}=${
+        `The item with ${String(this.idKey)}=${
           item[this.idKey]
         } is already exists. Removing old data from the cache`
       );
@@ -74,9 +76,9 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     );
 
     logger.info(
-      `Added cache item with ${this.idKey}=${item[this.idKey]}. Cache size=${
-        this.cache.length
-      }`
+      `Added cache item with ${String(this.idKey)}=${
+        item[this.idKey]
+      }. Cache size=${this.cache.length}`
     );
   }
 
@@ -85,7 +87,9 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return null;
     }
 
-    logger.info(`Looking for item with ${this.idKey}=${idValue} in cache`);
+    logger.info(
+      `Looking for item with ${String(this.idKey)}=${idValue} in cache`
+    );
 
     const cachedItem = this.cache.find(
       (cItem) => cItem[this.idKey] === idValue
@@ -93,12 +97,14 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
 
     if (!cachedItem) {
       logger.info(
-        `Did not find the item with ${this.idKey}=${idValue} in cache`
+        `Did not find the item with ${String(this.idKey)}=${idValue} in cache`
       );
       return null;
     }
 
-    logger.info(`Found the item with ${this.idKey}=${idValue} in cache`);
+    logger.info(
+      `Found the item with ${String(this.idKey)}=${idValue} in cache`
+    );
     return cachedItem;
   }
 
@@ -107,12 +113,14 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return;
     }
 
-    logger.info(`Removing cache item for ${this.idKey}=${idValue}`);
+    logger.info(`Removing cache item for ${String(this.idKey)}=${idValue}`);
 
     this.cache = this.cache.filter((cItem) => cItem[this.idKey] !== idValue);
 
     logger.info(
-      `Removed cache item for ${this.idKey}=${idValue}. Cache size=${this.cache.length}`
+      `Removed cache item for ${String(this.idKey)}=${idValue}. Cache size=${
+        this.cache.length
+      }`
     );
   }
 
