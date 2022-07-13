@@ -1,5 +1,5 @@
-import { AnalyticsData, AnalyticsDataDto } from "./api/types";
-import { GoogleAnalyticsApi } from "./api";
+import { AnalyticsData } from "./api/types";
+import { collectEvents } from "./api";
 import { analyticsId } from "../env";
 import { Logger } from "../logger";
 import { flattenPromise } from "../common/helpers";
@@ -11,29 +11,13 @@ export const collectAnalytics = (
   analytics: AnalyticsData,
   page?: BotCommand | "/voice"
 ): Promise<void> => {
-  if (!analyticsId) {
-    logger.error(
-      "Analytics Token is not provided!",
-      new Error("Analytics Token is not provided")
-    );
-    return Promise.resolve();
-  }
-
   logger.info("Collecting analytic data");
 
   if (page) {
-    return runAnalyticsRequest(analytics.getPageDto(analyticsId, page));
+    return collectEvents(analytics.getPageDto(analyticsId, page));
   }
 
   return Promise.all([
-    analytics.getListDto(analyticsId).map((dto) => runAnalyticsRequest(dto)),
+    analytics.getListDto(analyticsId).map((dto) => collectEvents(dto)),
   ]).then(flattenPromise);
-};
-
-const runAnalyticsRequest = (data: AnalyticsDataDto): Promise<void> => {
-  const logged = { ul: data.ul, cid: data.cid, uid: data.uid, t: data.t };
-  return new GoogleAnalyticsApi()
-    .collect(data)
-    .then(() => logger.info("Analytic data has been collected", logged))
-    .catch((err) => logger.warn("Failed to collect analytic data", err));
 };
