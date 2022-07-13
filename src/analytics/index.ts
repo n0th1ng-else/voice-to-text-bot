@@ -1,23 +1,26 @@
-import { AnalyticsData } from "./api/types";
-import { collectEvents } from "./api";
+import { AnalyticsData } from "./legacy/types";
+import { collectEvents as collectLegacy } from "./legacy";
 import { analyticsId } from "../env";
 import { Logger } from "../logger";
 import { flattenPromise } from "../common/helpers";
 import { BotCommand } from "../telegram/types";
+import { collectEvents as collectV4 } from "./v4";
 
 const logger = new Logger("analytics");
 
-export const collectAnalytics = (
-  analytics: AnalyticsData,
-  page?: BotCommand | "/voice"
-): Promise<void> => {
+export const collectAnalytics = (analytics: AnalyticsData): Promise<void> => {
   logger.info("Collecting analytic data");
 
-  if (page) {
-    return collectEvents(analytics.getPageDto(analyticsId, page));
-  }
-
   return Promise.all([
-    analytics.getListDto(analyticsId).map((dto) => collectEvents(dto)),
+    analytics.getListDto(analyticsId).map((dto) => collectLegacy(dto)),
+    collectV4(analytics.v4.getId(), analytics.v4.getEvents()),
   ]).then(flattenPromise);
+};
+
+export const collectPageAnalytics = (
+  analytics: AnalyticsData,
+  page: BotCommand | "/voice"
+): Promise<void> => {
+  logger.info("Collecting page analytic data");
+  return collectLegacy(analytics.getPageDto(analyticsId, page));
 };

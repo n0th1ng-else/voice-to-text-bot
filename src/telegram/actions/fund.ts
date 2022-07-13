@@ -11,9 +11,9 @@ import { isFundMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
 import { patreonAccount, yandexAccount } from "../../const";
 import { Logger } from "../../logger";
-import { collectAnalytics } from "../../analytics";
+import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 import { PaymentService } from "../../donate/types";
-import { AnalyticsData } from "../../analytics/api/types";
+import { AnalyticsData } from "../../analytics/legacy/types";
 
 const logger = new Logger("telegram-bot");
 
@@ -25,7 +25,7 @@ export class FundAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectAnalytics(mdl.analytics, BotCommand.Fund);
+    collectPageAnalytics(mdl.analytics, BotCommand.Fund);
     return this.sendFundMessage(mdl, prefix);
   }
 
@@ -38,7 +38,7 @@ export class FundAction extends GenericAction {
     button: TelegramButtonModel,
     analytics: AnalyticsData
   ): Promise<void> {
-    collectAnalytics(analytics, BotCommand.Fund);
+    collectPageAnalytics(analytics, BotCommand.Fund);
     return this.formLinkButton(msg, button, analytics);
   }
 

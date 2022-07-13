@@ -11,7 +11,7 @@ import { botCommands } from "./data";
 import { TelegramApi } from "./api";
 import { collectAnalytics } from "../analytics";
 import { DbClient } from "../db";
-import { AnalyticsData } from "../analytics/api/types";
+import { AnalyticsData } from "../analytics/legacy/types";
 import { PaymentService } from "../donate/types";
 
 const logger = new Logger("telegram-bot");

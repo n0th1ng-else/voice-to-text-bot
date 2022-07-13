@@ -10,7 +10,7 @@ import { VoiceLengthAction } from "./voice-length";
 import { DbClient } from "../../db";
 import { PaymentService } from "../../donate/types";
 import { TgCallbackQuery } from "../api/types";
-import { AnalyticsData } from "../../analytics/api/types";
+import { AnalyticsData } from "../../analytics/legacy/types";
 import { TelegramButtonModel, TelegramButtonType } from "../types";
 import { Logger } from "../../logger";
 import { collectAnalytics } from "../../analytics";

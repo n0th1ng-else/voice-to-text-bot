@@ -10,7 +10,8 @@ import { isVoiceMessage } from "../helpers";
 import { Logger } from "../../logger";
 import { LabelId } from "../../text/labels";
 import { LanguageCode, VoiceConverter } from "../../recognition/types";
-import { collectAnalytics } from "../../analytics";
+import { collectAnalytics, collectPageAnalytics } from "../../analytics";
+import { TimeMeasure } from "../../common/timer";
 
 const logger = new Logger("telegram-bot");
 
@@ -22,7 +23,7 @@ export class VoiceAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectAnalytics(mdl.analytics, "/voice");
+    collectPageAnalytics(mdl.analytics, "/voice");
     logger.info(`${prefix.getPrefix()} Voice message`);
     return this.getChatLanguage(mdl, prefix)
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
@@ -67,10 +68,11 @@ export class VoiceAction extends GenericAction {
 
         return Promise.all([
           this.converter.transformToText(fileLink, model.voiceFileId, lang),
+          Promise.resolve(new TimeMeasure()),
           this.sendInProgressMessage(model, lang, prefix),
         ]);
       })
-      .then(([text]) => {
+      .then(([text, time]) => {
         if (!text) {
           logger.warn(`${prefix.getPrefix()} Empty recognition response`);
           if (model.isGroup) {
@@ -88,6 +90,7 @@ export class VoiceAction extends GenericAction {
           );
         }
 
+        model.analytics.v4.addTime("voice-to-text-time", time.getMs());
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
         return this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`);

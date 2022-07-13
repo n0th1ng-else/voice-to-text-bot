@@ -16,8 +16,8 @@ import {
 import { LabelId } from "../../text/labels";
 import { LanguageCode } from "../../recognition/types";
 import { Logger } from "../../logger";
-import { AnalyticsData } from "../../analytics/api/types";
-import { collectAnalytics } from "../../analytics";
+import { AnalyticsData } from "../../analytics/legacy/types";
+import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -27,7 +27,7 @@ export class LangAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectAnalytics(mdl.analytics, BotCommand.Language);
+    collectPageAnalytics(mdl.analytics, BotCommand.Language);
     return this.showLanguageSelection(mdl, prefix);
   }
 
@@ -41,7 +41,7 @@ export class LangAction extends GenericAction {
     analytics: AnalyticsData,
     query: TgCallbackQuery
   ): Promise<void> {
-    collectAnalytics(analytics, BotCommand.Language);
+    collectPageAnalytics(analytics, BotCommand.Language);
     return this.handleLanguageChange(msg, button, analytics, query);
   }
 

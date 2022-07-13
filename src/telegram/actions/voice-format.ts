@@ -8,7 +8,7 @@ import {
 import { isVoiceMessage } from "../helpers";
 import { Logger } from "../../logger";
 import { LabelId } from "../../text/labels";
-import { collectAnalytics } from "../../analytics";
+import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 
 const logger = new Logger("telegram-bot");
 
@@ -18,7 +18,7 @@ export class VoiceFormatAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectAnalytics(mdl.analytics, "/voice");
+    collectPageAnalytics(mdl.analytics, "/voice");
     return this.sendWrongFormatMessage(mdl, prefix);
   }
 
