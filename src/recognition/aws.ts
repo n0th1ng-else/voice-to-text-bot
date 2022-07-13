@@ -1,7 +1,7 @@
+import axios from "axios";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ogg";
 import { Logger } from "../logger";
-import fetch from "isomorphic-fetch";
 
 const AWS = require("aws-sdk");
 
@@ -36,22 +36,35 @@ export class AWSProvider extends VoiceConverter {
   ): Promise<string> {
     const name = `${fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
-    return this.getJob(name)
-      .then((data) => {
-        if (data.isExists) {
-          logger.info("Job exists. skipping");
-          return this.getJobWithDelay(name, data.job);
-        }
+    return (
+      this.getJob(name)
+        .then((data) => {
+          if (data.isExists) {
+            logger.info("Job exists. skipping");
+            return this.getJobWithDelay(name, data.job);
+          }
 
-        return this.processFile(fileLink, name);
-      })
-      .then((job) => fetch(job.TranscriptionJob.Transcript.TranscriptFileUri))
-      .then((translationData) => translationData.json())
-      .then((translationData) => this.cleanStorage(translationData, name))
-      .then((text) => {
-        logger.info(`Job ${name} completed`);
-        return text;
-      });
+          return this.processFile(fileLink, name);
+        })
+        // .then((job) => fetch(job.TranscriptionJob.Transcript.TranscriptFileUri))
+        .then((job) =>
+          axios.request({
+            method: "GET",
+            url: job.TranscriptionJob.Transcript.TranscriptFileUri,
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          })
+        )
+        .then(({ data: translationData }) =>
+          this.cleanStorage(translationData, name)
+        )
+        .then((text) => {
+          logger.info(`Job ${name} completed`);
+          return text;
+        })
+    );
   }
 
   private processFile(fileLink, name): Promise<any> {
