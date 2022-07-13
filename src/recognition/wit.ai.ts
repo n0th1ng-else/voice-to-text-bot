@@ -1,7 +1,8 @@
+import axios from "axios";
 import { Logger } from "../logger";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ogg";
-import { fetchWithTimeout, parseChunkedResponse } from "../common/request";
+import { parseChunkedResponse } from "../common/request";
 import { wavSampleRate } from "../const";
 
 const logger = new Logger("wit-ai-recognition");
@@ -68,27 +69,30 @@ export class WithAiProvider extends VoiceConverter {
       return Promise.reject(new Error("The auth token is not provided"));
     }
 
-    const apiRequest = fetchWithTimeout(
-      WithAiProvider.timeout,
-      `${WithAiProvider.url}/${path}?v=${WithAiProvider.apiVersion}`,
-      {
-        body: data,
+    const url = new URL(`${WithAiProvider.url}/${path}`);
+    url.searchParams.set("v", WithAiProvider.apiVersion);
+
+    return axios
+      .request<string>({
         method: "POST",
+        url: url.toString(),
         headers: {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
           "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
           "Transfer-Encoding": "chunked",
         },
-      }
-    );
-
-    return apiRequest
+        timeout: WithAiProvider.timeout,
+        responseType: "text",
+        data,
+        transformResponse: (d) => d,
+      })
       .then((response) => {
         if (response.status !== 200) {
           throw new Error("The api request was unsuccessful");
         }
-        return response.text();
+
+        return response.data;
       })
       .then((response) => {
         const chunks = parseChunkedResponse<Dto>(response);

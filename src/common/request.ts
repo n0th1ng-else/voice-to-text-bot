@@ -1,17 +1,3 @@
-import fetch from "isomorphic-fetch";
-
-export const fetchWithTimeout = (
-  timeout: number,
-  input: RequestInfo,
-  init?: RequestInit
-): Promise<Response> => {
-  const controller = new AbortController();
-  const signal = controller.signal;
-
-  setTimeout(() => controller.abort(), timeout);
-  return fetch(input, { ...init, signal });
-};
-
 export const parseChunkedResponse = <Dto>(body = ""): Dto[] => {
   // Split by newline, trim, remove empty lines
   const chunks = body
