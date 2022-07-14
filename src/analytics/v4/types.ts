@@ -7,6 +7,7 @@ interface AnalyticsEventBase {
     url: string;
     threadId: number;
     command: string;
+    engagement_time_msec: "1";
   };
 }
 
@@ -84,6 +85,7 @@ export class AnalyticsDataV4 {
         url: this.url,
         threadId: this.threadId,
         command: this.command,
+        engagement_time_msec: "1",
       },
     };
     this.events.push(event);
@@ -99,6 +101,7 @@ export class AnalyticsDataV4 {
         url: this.url,
         threadId: this.threadId,
         command: this.command,
+        engagement_time_msec: "1",
       },
     };
     this.events.push(event);
@@ -115,6 +118,7 @@ export class AnalyticsDataV4 {
         url: this.url,
         threadId: this.threadId,
         command: this.command,
+        engagement_time_msec: "1",
       },
     };
     this.events.push(event);
