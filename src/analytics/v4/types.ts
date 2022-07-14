@@ -3,11 +3,11 @@ import { TimeMeasure } from "../../common/timer";
 
 interface AnalyticsEventBase {
   params: {
-    appVersion: string;
-    url: string;
-    threadId: number;
-    command: string;
+    app_version: string;
+    thread_id: number;
     engagement_time_msec: "1";
+    language: string;
+    page_location: string;
   };
 }
 
@@ -81,11 +81,11 @@ export class AnalyticsDataV4 {
     const event: AnalyticsFlow = {
       name: "flow",
       params: {
-        appVersion: this.appVersion,
-        url: this.url,
-        threadId: this.threadId,
-        command: this.command,
+        app_version: this.appVersion,
+        page_location: `${this.url}${this.command}`,
+        thread_id: this.threadId,
         engagement_time_msec: "1",
+        language: this.lang,
       },
     };
     this.events.push(event);
@@ -97,11 +97,11 @@ export class AnalyticsDataV4 {
       name: "failure",
       params: {
         message,
-        appVersion: this.appVersion,
-        url: this.url,
-        threadId: this.threadId,
-        command: this.command,
+        app_version: this.appVersion,
+        page_location: `${this.url}${this.command}`,
+        thread_id: this.threadId,
         engagement_time_msec: "1",
+        language: this.lang,
       },
     };
     this.events.push(event);
@@ -114,11 +114,11 @@ export class AnalyticsDataV4 {
       params: {
         name,
         duration: ms,
-        appVersion: this.appVersion,
-        url: this.url,
-        threadId: this.threadId,
-        command: this.command,
+        app_version: this.appVersion,
+        page_location: `${this.url}${this.command}`,
+        thread_id: this.threadId,
         engagement_time_msec: "1",
+        language: this.lang,
       },
     };
     this.events.push(event);
