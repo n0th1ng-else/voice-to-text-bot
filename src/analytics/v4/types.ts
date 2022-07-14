@@ -12,9 +12,11 @@ interface AnalyticsEventBase {
 }
 
 type AnalyticsError = AnalyticsEventBase & {
-  name: "failure";
+  name: "app_exception";
   params: {
     message: string;
+    fatal: false;
+    timestamp: string;
   };
 };
 
@@ -94,9 +96,11 @@ export class AnalyticsDataV4 {
 
   public addError(message: string): this {
     const event: AnalyticsError = {
-      name: "failure",
+      name: "app_exception",
       params: {
         message,
+        fatal: false,
+        timestamp: new Date().toISOString(),
         app_version: this.appVersion,
         page_location: `${this.url}${this.command}`,
         thread_id: this.threadId,
