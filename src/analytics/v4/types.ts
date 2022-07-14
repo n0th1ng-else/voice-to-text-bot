@@ -1,14 +1,13 @@
 import { BotCommand } from "../../telegram/types";
 import { TimeMeasure } from "../../common/timer";
 
-interface AnalyticsEventBase {
-  params: {
-    app_version: string;
-    thread_id: number;
-    engagement_time_msec: "1";
-    language: string;
-    page_location: string;
-  };
+interface AnalyticsEventBaseParams {
+  app_version: string;
+  thread_id: number;
+  engagement_time_msec: "1";
+  language: string;
+  page_location: string;
+  page_title: string;
 }
 
 type AnalyticsError = {
@@ -50,7 +49,9 @@ export type AnalyticsEvent =
   | AnalyticsFirstVisit
   | AnalyticsPageVisit;
 
-export type AnalyticsEventExt = AnalyticsEvent & AnalyticsEventBase;
+export type AnalyticsEventExt = AnalyticsEvent & {
+  params: AnalyticsEventBaseParams;
+};
 
 export const EVENTS_LIMIT_GA = 25;
 
@@ -64,6 +65,7 @@ export class AnalyticsDataV4 {
   private id = 0;
   private lang = defaultLang;
   private command: AnalyticsAction = "/app";
+  private title = "Audio Message Bot";
 
   constructor(
     private readonly appVersion: string,
@@ -84,9 +86,10 @@ export class AnalyticsDataV4 {
 
   public getEvents(): AnalyticsEventExt[] {
     this.addTime("command-execution", this.timer.getMs());
-    const base = {
+    const base: AnalyticsEventBaseParams = {
       app_version: this.appVersion,
       page_location: `${this.url}${this.command}`,
+      page_title: `${this.title} ${this.command}`,
       thread_id: this.threadId,
       engagement_time_msec: "1",
       language: this.lang,
