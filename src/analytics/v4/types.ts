@@ -11,7 +11,7 @@ interface AnalyticsEventBase {
   };
 }
 
-type AnalyticsError = AnalyticsEventBase & {
+type AnalyticsError = {
   name: "app_exception";
   params: {
     message: string;
@@ -20,7 +20,7 @@ type AnalyticsError = AnalyticsEventBase & {
   };
 };
 
-type AnalyticsTime = AnalyticsEventBase & {
+type AnalyticsTime = {
   name: "time";
   params: {
     name: string;
@@ -28,16 +28,19 @@ type AnalyticsTime = AnalyticsEventBase & {
   };
 };
 
-type AnalyticsFlow = AnalyticsEventBase & {
+type AnalyticsFlow = {
   name: "flow";
+  params?: any;
 };
 
-type AnalyticsFirstVisit = AnalyticsEventBase & {
+type AnalyticsFirstVisit = {
   name: "first_visit";
+  params?: any;
 };
 
-type AnalyticsPageVisit = AnalyticsEventBase & {
+type AnalyticsPageVisit = {
   name: "page_view";
+  params?: any;
 };
 
 export type AnalyticsEvent =
@@ -46,6 +49,8 @@ export type AnalyticsEvent =
   | AnalyticsFlow
   | AnalyticsFirstVisit
   | AnalyticsPageVisit;
+
+export type AnalyticsEventExt = AnalyticsEvent & AnalyticsEventBase;
 
 export const EVENTS_LIMIT_GA = 25;
 
@@ -77,9 +82,23 @@ export class AnalyticsDataV4 {
     return this.id;
   }
 
-  public getEvents(): AnalyticsEvent[] {
+  public getEvents(): AnalyticsEventExt[] {
     this.addTime("command-execution", this.timer.getMs());
-    return this.events;
+    const base = {
+      app_version: this.appVersion,
+      page_location: `${this.url}${this.command}`,
+      thread_id: this.threadId,
+      engagement_time_msec: "1",
+      language: this.lang,
+    };
+
+    return this.events.map((event) => ({
+      ...event,
+      params: {
+        ...event.params,
+        ...base,
+      },
+    }));
   }
 
   public setLang(lang: string): this {
@@ -95,13 +114,6 @@ export class AnalyticsDataV4 {
   public addFlow() {
     const event: AnalyticsFlow = {
       name: "flow",
-      params: {
-        app_version: this.appVersion,
-        page_location: `${this.url}${this.command}`,
-        thread_id: this.threadId,
-        engagement_time_msec: "1",
-        language: this.lang,
-      },
     };
     this.events.push(event);
     return this;
@@ -114,11 +126,6 @@ export class AnalyticsDataV4 {
         message,
         fatal: false,
         timestamp: new Date().toISOString(),
-        app_version: this.appVersion,
-        page_location: `${this.url}${this.command}`,
-        thread_id: this.threadId,
-        engagement_time_msec: "1",
-        language: this.lang,
       },
     };
     this.events.push(event);
@@ -131,11 +138,6 @@ export class AnalyticsDataV4 {
       params: {
         name,
         duration: ms,
-        app_version: this.appVersion,
-        page_location: `${this.url}${this.command}`,
-        thread_id: this.threadId,
-        engagement_time_msec: "1",
-        language: this.lang,
       },
     };
     this.events.push(event);
@@ -145,13 +147,6 @@ export class AnalyticsDataV4 {
   public addFirstVisit(): this {
     const event: AnalyticsFirstVisit = {
       name: "first_visit",
-      params: {
-        app_version: this.appVersion,
-        page_location: `${this.url}${this.command}`,
-        thread_id: this.threadId,
-        engagement_time_msec: "1",
-        language: this.lang,
-      },
     };
     this.events.push(event);
     return this;
@@ -160,13 +155,6 @@ export class AnalyticsDataV4 {
   public addPageVisit(): this {
     const event: AnalyticsPageVisit = {
       name: "page_view",
-      params: {
-        app_version: this.appVersion,
-        page_location: `${this.url}${this.command}`,
-        thread_id: this.threadId,
-        engagement_time_msec: "1",
-        language: this.lang,
-      },
     };
     this.events.push(event);
     return this;

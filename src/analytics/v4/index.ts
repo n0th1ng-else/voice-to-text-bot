@@ -1,13 +1,13 @@
 import axios from "axios";
 import { Logger } from "../../logger";
-import { AnalyticsEvent, EVENTS_LIMIT_GA } from "./types";
+import { AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types";
 import { analytics } from "../../env";
 
 const logger = new Logger("analytics");
 
 export const collectEvents = (
   chatId: number,
-  events: AnalyticsEvent[]
+  events: AnalyticsEventExt[]
 ): Promise<void> => {
   if (!analytics.measurementId || !analytics.apiSecret) {
     logger.error(
