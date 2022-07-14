@@ -33,7 +33,7 @@ type AnalyticsFlow = {
 };
 
 type AnalyticsFirstVisit = {
-  name: "first_visit";
+  name: "app_init";
   params?: any;
 };
 
@@ -149,7 +149,7 @@ export class AnalyticsDataV4 {
 
   public addFirstVisit(): this {
     const event: AnalyticsFirstVisit = {
-      name: "first_visit",
+      name: "app_init",
     };
     this.events.push(event);
     return this;
