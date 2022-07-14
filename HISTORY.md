@@ -201,8 +201,29 @@ the last chunk and parse data from there. Let's see how it will work in producti
 
 ### 12000+ installations after 16 months in production
 
-I did not notice that we have reached 12k+ instals in 16 months! Simple amazing result.
+I did not notice that we have reached 12k+ installs in 16 months! Simple amazing result.
 What I love the most is that people tend to tell me if something goes wrong. So far
 There was not any issues in my code but rather a communication problems with 3rd party
 services. Also, one of my donation wallets stopped working. I guess I would go into
 bitcoin in the near future, the donation does not work anyway. /shrug
+
+### Increasing the voice duration up to 1,5 minutes
+
+With new API wit.ai now able to recognise the voice messages up to 5 minutes! That's a
+real deal! In fact, I want first to keep an eye on how it is progressing, and track the
+average voice message duration in the analytics. So I set the limit up to 1,5 minutes for
+now. Let's follow the stats and understand if we can go further. In the meantime, the
+universal analytics from Google comes to end of life state, so I migrate to the brand
+new Google Analytics 4. The proper set up will take some time. THis should give some
+insights on how users interact with the bot.
+
+### 29000+ installations!
+
+We still online and making an outstanding effort service telegram people. That's an amazing
+feeling! 2 years and almost 2 month we are online and almost hit 29000 installations.
+Although I understand many people opted-out from using the bot, there is a quite a few
+guys who live with me and my bot from the earlier days. Unfortunately, I don't have a lot
+of capacity to extend the functionality at the moment. But what I do is I keep the bot
+working (which is important) and also trying to get the opportunities when something is
+happening around. I love these news that I can enable longer voice messages to be transformed
+into text. Who knows what is next?
