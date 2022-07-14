@@ -32,7 +32,15 @@ type AnalyticsFlow = AnalyticsEventBase & {
   name: "flow";
 };
 
-export type AnalyticsEvent = AnalyticsError | AnalyticsTime | AnalyticsFlow;
+type AnalyticsFirstVisit = AnalyticsEventBase & {
+  name: "first_visit";
+};
+
+export type AnalyticsEvent =
+  | AnalyticsError
+  | AnalyticsTime
+  | AnalyticsFlow
+  | AnalyticsFirstVisit;
 
 export const EVENTS_LIMIT_GA = 25;
 
@@ -118,6 +126,21 @@ export class AnalyticsDataV4 {
       params: {
         name,
         duration: ms,
+        app_version: this.appVersion,
+        page_location: `${this.url}${this.command}`,
+        thread_id: this.threadId,
+        engagement_time_msec: "1",
+        language: this.lang,
+      },
+    };
+    this.events.push(event);
+    return this;
+  }
+
+  public addFirstVisit(): this {
+    const event: AnalyticsFirstVisit = {
+      name: "first_visit",
+      params: {
         app_version: this.appVersion,
         page_location: `${this.url}${this.command}`,
         thread_id: this.threadId,
