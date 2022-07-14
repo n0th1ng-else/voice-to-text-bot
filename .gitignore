@@ -110,3 +110,6 @@ coverage-unit
 
 # any wav dumps
 *.wav
+
+# keep temp folder clear
+video-temp/*.tmp

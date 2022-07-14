@@ -9,6 +9,7 @@ import {
   getVoiceDuration,
   getVoiceFile,
   isChatGroup,
+  isVideoMessage,
 } from "./helpers";
 import { LanguageCode } from "../recognition/types";
 import { nanoid } from "nanoid";
@@ -48,6 +49,7 @@ export class BotMessageModel {
   public readonly groupName: string;
   public readonly voiceFileId: string;
   public readonly voiceDuration: number;
+  public readonly isVideo: boolean;
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
 
@@ -60,6 +62,7 @@ export class BotMessageModel {
     this.groupName = getGroupName(msg);
     this.voiceFileId = getVoiceFile(msg);
     this.voiceDuration = getVoiceDuration(msg);
+    this.isVideo = isVideoMessage(msg);
     this.userLanguage = getUserLanguage(msg);
     this.analytics = analytics
       .setId(this.chatId)

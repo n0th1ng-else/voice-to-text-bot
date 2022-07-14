@@ -1,6 +1,6 @@
 import axios from "axios";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
-import { getWav } from "../ogg";
+import { getWav } from "../ffmpeg";
 import { Logger } from "../logger";
 
 const AWS = require("aws-sdk");
@@ -32,6 +32,7 @@ export class AWSProvider extends VoiceConverter {
   public transformToText(
     fileLink: string,
     fileId: string,
+    isVideo: boolean,
     lang: LanguageCode
   ): Promise<string> {
     const name = `${fileId}.ogg`;
@@ -44,7 +45,7 @@ export class AWSProvider extends VoiceConverter {
             return this.getJobWithDelay(name, data.job);
           }
 
-          return this.processFile(fileLink, name);
+          return this.processFile(fileLink, name, isVideo);
         })
         // .then((job) => fetch(job.TranscriptionJob.Transcript.TranscriptFileUri))
         .then((job) =>
@@ -67,8 +68,8 @@ export class AWSProvider extends VoiceConverter {
     );
   }
 
-  private processFile(fileLink, name): Promise<any> {
-    return getWav(fileLink)
+  private processFile(fileLink, name, isVideo): Promise<any> {
+    return getWav(fileLink, isVideo)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));

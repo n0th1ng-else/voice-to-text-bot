@@ -8,6 +8,7 @@ export abstract class VoiceConverter {
   public abstract transformToText(
     fileLink: string,
     fileId: string,
+    isVideo: boolean,
     lang: LanguageCode
   ): Promise<string>;
 }
