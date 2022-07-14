@@ -28,6 +28,7 @@ export class LangAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, BotCommand.Language);
+    mdl.analytics.v4.addPageVisit();
     return this.showLanguageSelection(mdl, prefix);
   }
 
@@ -42,6 +43,7 @@ export class LangAction extends GenericAction {
     query: TgCallbackQuery
   ): Promise<void> {
     collectPageAnalytics(analytics, BotCommand.Language);
+    analytics.v4.addPageVisit();
     return this.handleLanguageChange(msg, button, analytics, query);
   }
 

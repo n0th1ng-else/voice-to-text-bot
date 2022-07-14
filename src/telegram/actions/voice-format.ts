@@ -19,6 +19,7 @@ export class VoiceFormatAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, "/voice");
+    mdl.analytics.v4.addPageVisit();
     return this.sendWrongFormatMessage(mdl, prefix);
   }
 

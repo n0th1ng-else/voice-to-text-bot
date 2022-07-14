@@ -19,6 +19,7 @@ export class VoiceLengthAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, "/voice");
+    mdl.analytics.v4.addPageVisit();
     return this.sendVoiceIsTooLongMessage(mdl, prefix);
   }
 

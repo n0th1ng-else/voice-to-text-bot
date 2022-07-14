@@ -24,6 +24,7 @@ export class VoiceAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, "/voice");
+    mdl.analytics.v4.addPageVisit();
     logger.info(`${prefix.getPrefix()} Voice message`);
     return this.getChatLanguage(mdl, prefix)
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
