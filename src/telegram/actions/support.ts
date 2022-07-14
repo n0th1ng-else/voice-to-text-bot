@@ -18,6 +18,7 @@ export class SupportAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, BotCommand.Support);
+    mdl.analytics.v4.addPageVisit();
     return this.sendSupportMessage(mdl, prefix);
   }
 

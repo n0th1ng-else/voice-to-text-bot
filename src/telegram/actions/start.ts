@@ -15,6 +15,8 @@ export class StartAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, BotCommand.Start);
+    mdl.analytics.v4.addFirstVisit();
+    mdl.analytics.v4.addPageVisit();
     return this.sendHelloMessage(mdl, prefix);
   }
 

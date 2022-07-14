@@ -26,6 +26,7 @@ export class FundAction extends GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     collectPageAnalytics(mdl.analytics, BotCommand.Fund);
+    mdl.analytics.v4.addPageVisit();
     return this.sendFundMessage(mdl, prefix);
   }
 
@@ -39,6 +40,7 @@ export class FundAction extends GenericAction {
     analytics: AnalyticsData
   ): Promise<void> {
     collectPageAnalytics(analytics, BotCommand.Fund);
+    analytics.v4.addPageVisit();
     return this.formLinkButton(msg, button, analytics);
   }
 

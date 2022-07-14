@@ -1,23 +1,25 @@
 import { BotCommand } from "../../telegram/types";
 import { TimeMeasure } from "../../common/timer";
 
-interface AnalyticsEventBase {
-  params: {
-    appVersion: string;
-    url: string;
-    threadId: number;
-    command: string;
-  };
+interface AnalyticsEventBaseParams {
+  app_version: string;
+  thread_id: number;
+  engagement_time_msec: "1";
+  language: string;
+  page_location: string;
+  page_title: string;
 }
 
-type AnalyticsError = AnalyticsEventBase & {
-  name: "failure";
+type AnalyticsError = {
+  name: "app_exception";
   params: {
     message: string;
+    fatal: false;
+    timestamp: string;
   };
 };
 
-type AnalyticsTime = AnalyticsEventBase & {
+type AnalyticsTime = {
   name: "time";
   params: {
     name: string;
@@ -25,11 +27,31 @@ type AnalyticsTime = AnalyticsEventBase & {
   };
 };
 
-type AnalyticsFlow = AnalyticsEventBase & {
+type AnalyticsFlow = {
   name: "flow";
+  params?: any;
 };
 
-export type AnalyticsEvent = AnalyticsError | AnalyticsTime | AnalyticsFlow;
+type AnalyticsFirstVisit = {
+  name: "app_init";
+  params?: any;
+};
+
+type AnalyticsPageVisit = {
+  name: "page_view";
+  params?: any;
+};
+
+export type AnalyticsEvent =
+  | AnalyticsError
+  | AnalyticsTime
+  | AnalyticsFlow
+  | AnalyticsFirstVisit
+  | AnalyticsPageVisit;
+
+export type AnalyticsEventExt = AnalyticsEvent & {
+  params: AnalyticsEventBaseParams;
+};
 
 export const EVENTS_LIMIT_GA = 25;
 
@@ -43,6 +65,7 @@ export class AnalyticsDataV4 {
   private id = 0;
   private lang = defaultLang;
   private command: AnalyticsAction = "/app";
+  private title = "Audio Message Bot";
 
   constructor(
     private readonly appVersion: string,
@@ -61,9 +84,24 @@ export class AnalyticsDataV4 {
     return this.id;
   }
 
-  public getEvents(): AnalyticsEvent[] {
+  public getEvents(): AnalyticsEventExt[] {
     this.addTime("command-execution", this.timer.getMs());
-    return this.events;
+    const base: AnalyticsEventBaseParams = {
+      app_version: this.appVersion,
+      page_location: `${this.url}${this.command}`,
+      page_title: `${this.title} ${this.command}`,
+      thread_id: this.threadId,
+      engagement_time_msec: "1",
+      language: this.lang,
+    };
+
+    return this.events.map((event) => ({
+      ...event,
+      params: {
+        ...event.params,
+        ...base,
+      },
+    }));
   }
 
   public setLang(lang: string): this {
@@ -79,12 +117,6 @@ export class AnalyticsDataV4 {
   public addFlow() {
     const event: AnalyticsFlow = {
       name: "flow",
-      params: {
-        appVersion: this.appVersion,
-        url: this.url,
-        threadId: this.threadId,
-        command: this.command,
-      },
     };
     this.events.push(event);
     return this;
@@ -92,13 +124,11 @@ export class AnalyticsDataV4 {
 
   public addError(message: string): this {
     const event: AnalyticsError = {
-      name: "failure",
+      name: "app_exception",
       params: {
         message,
-        appVersion: this.appVersion,
-        url: this.url,
-        threadId: this.threadId,
-        command: this.command,
+        fatal: false,
+        timestamp: new Date().toISOString(),
       },
     };
     this.events.push(event);
@@ -111,11 +141,23 @@ export class AnalyticsDataV4 {
       params: {
         name,
         duration: ms,
-        appVersion: this.appVersion,
-        url: this.url,
-        threadId: this.threadId,
-        command: this.command,
       },
+    };
+    this.events.push(event);
+    return this;
+  }
+
+  public addFirstVisit(): this {
+    const event: AnalyticsFirstVisit = {
+      name: "app_init",
+    };
+    this.events.push(event);
+    return this;
+  }
+
+  public addPageVisit(): this {
+    const event: AnalyticsPageVisit = {
+      name: "page_view",
     };
     this.events.push(event);
     return this;
