@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Logger } from "../logger";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
-import { getWav } from "../ogg";
+import { getWav } from "../ffmpeg";
 import { parseChunkedResponse } from "../common/request";
 import { wavSampleRate } from "../const";
 
@@ -25,11 +25,12 @@ export class WithAiProvider extends VoiceConverter {
   public transformToText(
     fileLink: string,
     fileId: string,
+    isVideo: boolean,
     lang: LanguageCode
   ): Promise<string> {
     const name = `${fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
-    return getWav(fileLink)
+    return getWav(fileLink, isVideo)
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         const token = lang === LanguageCode.Ru ? this.tokenRu : this.tokenEn;

@@ -2,7 +2,7 @@ import { v1 } from "@google-cloud/speech";
 import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
 import { Logger } from "../logger";
 import { google } from "@google-cloud/speech/build/protos/protos";
-import { getWav } from "../ogg";
+import { getWav } from "../ffmpeg";
 
 const logger = new Logger("google-recognition");
 
@@ -27,11 +27,12 @@ export class GoogleProvider extends VoiceConverter {
   public transformToText(
     fileLink: string,
     fileId: string,
+    isVideo: boolean,
     lang: LanguageCode
   ): Promise<string> {
     const name = `${fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
-    return getWav(fileLink)
+    return getWav(fileLink, isVideo)
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         return this.service.recognize({

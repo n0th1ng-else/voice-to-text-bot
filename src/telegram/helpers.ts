@@ -6,7 +6,7 @@ import {
   VoiceContentReasonModel,
 } from "./types";
 import { telegramBotName } from "../env";
-import { TgCallbackQuery, TgChatType, TgMessage } from "./api/types";
+import { TgCallbackQuery, TgChatType, TgMedia, TgMessage } from "./api/types";
 import { LanguageCode } from "../recognition/types";
 import { durationLimitSec } from "../const";
 
@@ -53,6 +53,12 @@ const isCommandMessage = (
   );
 };
 
+export const isVideoMessage = (msg: TgMessage): boolean =>
+  Boolean(msg.video_note);
+
+const getMediaSource = (msg: TgMessage): TgMedia | undefined =>
+  msg.voice || msg.audio || msg.video_note;
+
 export const isVoiceMessageLong = (model: BotMessageModel): boolean =>
   model.voiceDuration >= durationLimitSec;
 
@@ -61,7 +67,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
     return new VoiceContentReasonModel(VoiceContentReason.NoContent);
   }
 
-  const data = msg.voice || msg.audio;
+  const data = getMediaSource(msg);
 
   if (!data) {
     return new VoiceContentReasonModel(VoiceContentReason.NoContent);
@@ -75,12 +81,15 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   }
 
   const mimeType = data.mime_type || "";
+  const isVideo = isVideoMessage(msg);
+
   const isAudioSupported = [
     "audio/ogg",
     "audio/opus",
     "audio/x-opus+ogg",
   ].includes(mimeType.toLowerCase());
-  return isAudioSupported
+
+  return isAudioSupported || isVideo
     ? new VoiceContentReasonModel(VoiceContentReason.Ok)
     : new VoiceContentReasonModel(
         VoiceContentReason.WrongMimeType,
@@ -124,7 +133,7 @@ export const getVoiceFile = (msg: TgMessage): string => {
     return "";
   }
 
-  const data = msg.voice || msg.audio;
+  const data = getMediaSource(msg);
 
   if (!data) {
     return "";
@@ -138,7 +147,7 @@ export const getVoiceDuration = (msg: TgMessage): number => {
     return 0;
   }
 
-  const data = msg.voice || msg.audio;
+  const data = getMediaSource(msg);
 
   if (!data) {
     return 0;
