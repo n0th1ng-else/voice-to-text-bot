@@ -8,7 +8,7 @@ import {
 import { telegramBotName } from "../env";
 import { TgCallbackQuery, TgChatType, TgMedia, TgMessage } from "./api/types";
 import { LanguageCode } from "../recognition/types";
-import { durationLimitSec } from "../const";
+import { durationLimitSec, supportedAudioFormats } from "../const";
 
 export const isLangMessage = (
   model: BotMessageModel,
@@ -83,11 +83,12 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   const mimeType = data.mime_type || "";
   const isVideo = isVideoMessage(msg);
 
-  const isAudioSupported = [
-    "audio/ogg",
-    "audio/opus",
-    "audio/x-opus+ogg",
-  ].includes(mimeType.toLowerCase());
+  const formats = supportedAudioFormats.reduce(
+    (union, format) => union.add(format.mimeType.toLowerCase()),
+    new Set<string>()
+  );
+
+  const isAudioSupported = formats.has(mimeType.toLowerCase());
 
   return isAudioSupported || isVideo
     ? new VoiceContentReasonModel(VoiceContentReason.Ok)
