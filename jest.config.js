@@ -1,4 +1,5 @@
 module.exports = () => {
+  process.env.TZ = "UTC";
   const testType = process.env.TEST_PACKAGE || "unit";
   const isE2E = testType === "e2e";
 

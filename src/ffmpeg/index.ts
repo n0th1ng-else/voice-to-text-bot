@@ -15,6 +15,7 @@ const logger = new Logger("media-to-wav");
 const downloadAsStream = (url: string): Promise<IncomingMessage> =>
   axios
     .request<IncomingMessage>({
+      method: "GET",
       url,
       responseType: "stream",
     })
