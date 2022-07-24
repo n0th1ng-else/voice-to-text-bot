@@ -6,10 +6,10 @@ import {
   it,
   describe,
 } from "@jest/globals";
+import axios, { AxiosRequestConfig, AxiosStatic } from "axios";
 import { ExpressServer } from "../src/server/express";
 import { appVersion } from "../src/env";
 import { localhostUrl } from "../src/const";
-import * as requestObj from "../src/server/request";
 import { getHealthUrl } from "../src/server/helpers";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types";
 import { WaiterForCalls } from "./helpers/waitFor";
@@ -20,37 +20,39 @@ const waiter = new WaiterForCalls();
 jest.mock("../src/logger");
 jest.mock("../src/env");
 
-const getHandler = requestObj.runGetDto;
-// TODO basically mocking the api request is not enough.
-// Jest 27 runs much faster than current version (26.x) and it becomes an issue
-// gonna do something wit it later on ¯\_(ツ)_/¯
-// two last tests are affected by this :sad:
-const getRequestSpy = jest
-  .spyOn(requestObj, "runGetDto")
-  .mockImplementation((getUrl) => {
-    if (getUrl.includes(nextUrl)) {
-      const response: HealthDto = {
-        version: "new2",
-        urls: [],
-        status: HealthStatus.Online,
-        message: "ok",
-        ssl: HealthSsl.Off,
-        threadId: 0,
-      };
-      waiter.tick();
-      return Promise.resolve(response);
-    }
-
-    // TODO figure out why I trigger real api request here?! nonsense...
-    return getHandler(getUrl).then((data) => {
-      waiter.tick();
-      return data;
-    });
-  });
-
 const appPort = 3700;
 const hostUrl = `${localhostUrl}:${appPort}`;
 const nextUrl = `http://nexthost:${appPort + 1}`;
+
+const clientSpy = jest
+  .spyOn<AxiosStatic, "request">(axios, "request")
+  .mockImplementation((config?: AxiosRequestConfig) => {
+    if (!config) {
+      throw new Error("config can not be empty");
+    }
+
+    expect(config.method).toBe("GET");
+    expect(config.responseType).toBe("json");
+
+    const dto: HealthDto = {
+      version: "new2",
+      urls: [],
+      status: HealthStatus.Online,
+      message: "ok",
+      ssl: HealthSsl.Off,
+      threadId: 0,
+    };
+    waiter.tick();
+    return Promise.resolve({ data: dto });
+  });
+
+let realClearInterval = global.clearInterval;
+let clearIntervalSpy = jest
+  .spyOn(global, "clearInterval")
+  .mockImplementation((interval) => {
+    realClearInterval(interval);
+    waiter.tick();
+  });
 
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
@@ -63,16 +65,26 @@ let stopHandler: () => Promise<void> = () =>
 
 describe("[uptime daemon]", () => {
   beforeEach(() => {
-    jest.useFakeTimers("modern");
+    jest.useFakeTimers();
     jest.setSystemTime(new Date().setHours(23, 58, 0, 0));
+    realClearInterval = global.clearInterval;
+    clearIntervalSpy = jest
+      .spyOn(global, "clearInterval")
+      .mockImplementation((interval) => {
+        realClearInterval(interval);
+        waiter.tick();
+      });
+
     server = new ExpressServer(appPort, enableSSL, appVersion, httpsOptions);
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    getRequestSpy.mockClear();
-    return stopHandler();
+    clientSpy.mockClear();
+    clearIntervalSpy.mockClear();
+    return stopHandler().finally(() => {
+      jest.useRealTimers();
+    });
   });
 
   it("Failed to trigger the daemon if selfUrl is not set", (done) => {
@@ -83,8 +95,7 @@ describe("[uptime daemon]", () => {
       () => {
         expect(done).toBeDefined();
         if (done) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+          // @ts-expect-error Somehow the .fail() handler is not a part of the Jest interface
           done.fail(errMessage);
         }
       },
@@ -111,8 +122,7 @@ describe("[uptime daemon]", () => {
         () => {
           expect(done).toBeDefined();
           if (done) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+            // @ts-expect-error Somehow the .fail() handler is not a part of the Jest interface
             done.fail(errMessage);
           }
         },
@@ -135,29 +145,43 @@ describe("[uptime daemon]", () => {
       ])
         .then(() => {
           expect(jest.getTimerCount()).toBe(1);
-          expect(getRequestSpy).toBeCalledWith(getHealthUrl(hostUrl));
-          expect(getRequestSpy).toBeCalledTimes(1);
-          getRequestSpy.mockClear();
+          expect(clientSpy).toBeCalledWith({
+            method: "GET",
+            responseType: "json",
+            url: getHealthUrl(hostUrl),
+          });
+          expect(clientSpy).toBeCalledTimes(1);
+          clientSpy.mockClear();
           waiter.reset(1);
           jest.advanceTimersByTime(oneMinute);
           return waiter.waitForCondition();
         })
         .then(() => {
-          expect(getRequestSpy).toBeCalledWith(getHealthUrl(hostUrl));
-          expect(getRequestSpy).toBeCalledTimes(1);
-          getRequestSpy.mockClear();
-          waiter.reset(2);
+          expect(clientSpy).toBeCalledWith({
+            method: "GET",
+            responseType: "json",
+            url: getHealthUrl(hostUrl),
+          });
+          expect(clientSpy).toBeCalledTimes(1);
+          clientSpy.mockClear();
+          waiter.reset(3);
           jest.advanceTimersByTime(oneMinute);
           return waiter.waitForCondition();
         })
         .then(() => {
-          expect(getRequestSpy).lastCalledWith(getHealthUrl(nextUrl));
-          expect(getRequestSpy).toBeCalledTimes(2);
+          expect(clientSpy).lastCalledWith({
+            method: "GET",
+            responseType: "json",
+            url: getHealthUrl(nextUrl),
+          });
+          expect(clientSpy).toBeCalledTimes(2);
+          expect(clearIntervalSpy).toHaveBeenCalledWith(expect.any(Object));
+
           expect(jest.getTimerCount()).toBe(0);
 
-          getRequestSpy.mockClear();
+          clientSpy.mockClear();
           jest.advanceTimersByTime(oneDayMinutes);
-          expect(getRequestSpy).not.toBeCalled();
+          expect(clientSpy).not.toBeCalled();
         });
     });
 
@@ -165,8 +189,12 @@ describe("[uptime daemon]", () => {
       const wrongInterval = -2;
       return server.triggerDaemon(nextUrl, wrongInterval).then(() => {
         expect(jest.getTimerCount()).toBe(1);
-        expect(getRequestSpy).toBeCalledWith(getHealthUrl(hostUrl));
-        expect(getRequestSpy).toBeCalledTimes(1);
+        expect(clientSpy).toBeCalledWith({
+          method: "GET",
+          responseType: "json",
+          url: getHealthUrl(hostUrl),
+        });
+        expect(clientSpy).toBeCalledTimes(1);
       });
     });
   });

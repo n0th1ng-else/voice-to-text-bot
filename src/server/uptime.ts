@@ -1,6 +1,6 @@
+import axios from "axios";
 import { ScheduleDaemon } from "../scheduler";
 import { Logger } from "../logger";
-import { runGetDto } from "./request";
 import { HealthDto, HealthStatus } from "./types";
 import { sSuffix } from "../text";
 import { getHealthUrl } from "./helpers";
@@ -87,8 +87,13 @@ export class UptimeDaemon {
       )} and I have been running for (${Logger.y(daysRunning)}) already`
     );
 
-    return runGetDto<HealthDto>(getHealthUrl(this.currentUrl)).then(
-      (health) => {
+    return axios
+      .request<HealthDto>({
+        method: "GET",
+        url: getHealthUrl(this.currentUrl),
+        responseType: "json",
+      })
+      .then(({ data: health }) => {
         if (health.status !== HealthStatus.Online) {
           logger.error("Node status is not ok", health);
           throw new Error("Node status is not ok");
@@ -114,32 +119,37 @@ export class UptimeDaemon {
             .updateState(this.currentUrl, isActive, this.version)
             .then(flattenPromise);
         }
-      }
-    );
+      });
   }
 
   private onFinish(): Promise<void> {
-    return runGetDto<HealthDto>(getHealthUrl(this.nextUrl)).then((health) => {
-      if (health.status !== HealthStatus.Online) {
-        logger.error("Buddy node status is not ok", health);
-        throw new Error("Buddy node status is not ok");
-      }
+    return axios
+      .request<HealthDto>({
+        method: "GET",
+        url: getHealthUrl(this.nextUrl),
+        responseType: "json",
+      })
+      .then(({ data: health }) => {
+        if (health.status !== HealthStatus.Online) {
+          logger.error("Buddy node status is not ok", health);
+          throw new Error("Buddy node status is not ok");
+        }
 
-      logger.warn(
-        `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
-          this.nextUrl
-        )}`
-      );
+        logger.warn(
+          `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
+            this.nextUrl
+          )}`
+        );
 
-      if (!this.stat) {
-        return;
-      }
+        if (!this.stat) {
+          return;
+        }
 
-      const isActive = false;
-      return this.stat.nodes
-        .updateState(this.currentUrl, isActive, this.version)
-        .then(flattenPromise);
-    });
+        const isActive = false;
+        return this.stat.nodes
+          .updateState(this.currentUrl, isActive, this.version)
+          .then(flattenPromise);
+      });
   }
 
   private shouldStop(): boolean {
