@@ -15,3 +15,22 @@ export const wavSampleRate = 16_000; // 16kHz
 export const secondsInOneMinute = 60;
 
 export const durationLimitSec = 90;
+
+export const supportedAudioFormats = [
+  {
+    mimeType: "audio/ogg",
+    ext: "ogg",
+  },
+  {
+    mimeType: "audio/opus",
+    ext: "opus",
+  },
+  {
+    mimeType: "audio/x-opus+ogg",
+    ext: "ogg",
+  },
+  {
+    mimeType: "audio/mpeg",
+    ext: "m4a",
+  },
+] as const;

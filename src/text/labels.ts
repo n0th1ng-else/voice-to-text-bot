@@ -1,5 +1,9 @@
 import { LanguageCode } from "../recognition/types";
-import { durationLimitSec, secondsInOneMinute } from "../const";
+import {
+  durationLimitSec,
+  secondsInOneMinute,
+  supportedAudioFormats,
+} from "../const";
 
 const getMaxDuration = (minutes: string, seconds: string): string => {
   if (durationLimitSec < secondsInOneMinute) {
@@ -8,6 +12,15 @@ const getMaxDuration = (minutes: string, seconds: string): string => {
   const mins = Math.floor(durationLimitSec / secondsInOneMinute);
   const secs = durationLimitSec - mins * secondsInOneMinute;
   return secs ? `${mins} ${minutes} ${secs} ${seconds}` : `${mins} ${minutes}`;
+};
+
+const getSupportedAudioFormats = (): string => {
+  const formats = supportedAudioFormats.reduce(
+    (union, format) => union.add(format.ext.toLowerCase()),
+    new Set<string>()
+  );
+
+  return [...formats].map((format) => `*.${format}`).join(", ");
 };
 
 export enum LabelId {
@@ -78,10 +91,9 @@ export const labels = {
       "Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы быть онлайн 24/7 и превращать голос в текст.\n\nЯ буду рад, если вы поддержите проект финансово и поможете мне двигаться дальше. Напишите мне (автору), если у вас возникли вопросы.\n\nЯ принимаю пожертвования на безвоздмездной основе. Все средства идут на оплату сервиса Google Speech-to-Text (в прошлом месяце я потратил 100$). За пожертвования вы не получите эксклюзивных функиций, но поможете сохранить проект активным.\n\nСпасибо, что помогаете проекту жить!",
     [LabelId.AudioNotSupportedMessage]:
       "Формат аудио файла не поддерживается 🌚",
-    [LabelId.SupportedFormatsMessage]:
-      "Форматы, с которыми я работаю: *.ogg, *.opus",
+    [LabelId.SupportedFormatsMessage]: `Форматы, с которыми я работаю: ${getSupportedAudioFormats()}`,
     [LabelId.SupportedFormatsMessageExplanation]:
-      "Большинство приложений записывают голос в данном формате. Напишите автору, если у вас возникли проблемы с этим",
+      "Большинство приложений записывают голос в одном из этих форматов. Напишите автору, если у вас возникли проблемы с этим",
     [LabelId.KofiLinkTitle]: "Отправить через Paypal",
     [LabelId.YandexLinkTitle]: "Перевод в Рублях (₽)",
     [LabelId.DonateMessage]:
@@ -126,10 +138,9 @@ export const labels = {
       "This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text.\n\nI would love to ask you to support the project and fund us so I can keep the bot up and running. Contact me (the author) if you have any questions related.\n\nAll donations are non-refundable. I use donations to pay for Google Speech-to-Text service usages (last month it was 100$). You would not get and extra bonuses for donating me some money, but you will take part in having the bot up all day long.\n\nThank you for supporting the project!",
     [LabelId.AudioNotSupportedMessage]:
       "The audio file format is not supported at the moment 🌚",
-    [LabelId.SupportedFormatsMessage]:
-      "I work with these formats: *.ogg, *.opus",
+    [LabelId.SupportedFormatsMessage]: `I work with these formats: ${getSupportedAudioFormats()}`,
     [LabelId.SupportedFormatsMessageExplanation]:
-      "Typically, most messengers record voice in this format. Contact the author if you experience any problems",
+      "Typically, most messengers record voice in one of these formats. Contact the author if you experience any problems",
     [LabelId.KofiLinkTitle]: "Send money via Paypal",
     [LabelId.YandexLinkTitle]: "Donate in Rubles (₽)",
     [LabelId.DonateMessage]:
