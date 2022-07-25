@@ -50,7 +50,28 @@ and the results you can see below in the table.
 
 # Service model
 
-![Service model](/assets/diagram/diagram.png?raw=true "Full service model")
+```mermaid
+flowchart BT
+  subgraph tg[Telegram]
+    voice[Voice message]
+    audio[Audio]
+    video[Video note]
+    text[Text message]
+    bot[AudioMessBot API]
+  end
+  subgraph cluster[Replicas]
+    r1{{Replica 1}}
+    ar{{Active replica}}
+    r2{{Replica N}}
+  end
+  voice-->bot
+  audio-->bot
+  video-->bot
+  bot-->text
+  bot---ar
+  ar---db[(PSQL\nDatabase)]
+  ar---cloud((Cloud API provider))
+```
 
 # Services overview
 
@@ -60,7 +81,7 @@ and the results you can see below in the table.
 | [Microsoft Azure](https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text) | no           | no              | N/A                      | Unknown         | Unknown                 |
 | [Amazon AWS](https://aws.amazon.com/transcribe)                                                 | **yes**      | no              | Unlimited                | S3              | Minutes                 |
 | [Google Cloud](https://cloud.google.com/speech-to-text)                                         | **yes**      | **yes**         | 1 minute<sup>\*[1]</sup> | Direct / GDrive | Instant<sup>\*[2]</sup> |
-| [Wit.ai](https://wit.ai)                                                                        | **yes**      | **yes**         | 20 seconds               | Direct          | Instant                 |
+| [Wit.ai](https://wit.ai)                                                                        | **yes**      | **yes**         | 5 minutes                | Direct          | Instant                 |
 
 - For direct upload
   <br/>
