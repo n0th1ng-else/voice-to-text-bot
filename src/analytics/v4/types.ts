@@ -1,13 +1,16 @@
 import { BotCommand } from "../../telegram/types";
 import { TimeMeasure } from "../../common/timer";
+import { TelegramApi } from "../../telegram/api";
 
 interface AnalyticsEventBaseParams {
   app_version: string;
   thread_id: number;
-  engagement_time_msec: "1";
+  engagement_time_msec: number;
   language: string;
   page_location: string;
   page_title: string;
+  page_referrer: typeof TelegramApi.url;
+  screen_resolution: "1920x1080";
 }
 
 type AnalyticsError = {
@@ -85,14 +88,17 @@ export class AnalyticsDataV4 {
   }
 
   public getEvents(): AnalyticsEventExt[] {
-    this.addTime("command-execution", this.timer.getMs());
+    const time = this.timer.getMs();
+    this.addTime("command-execution", time);
     const base: AnalyticsEventBaseParams = {
       app_version: this.appVersion,
       page_location: `${this.url}${this.command}`,
       page_title: `${this.title} ${this.command}`,
       thread_id: this.threadId,
-      engagement_time_msec: "1",
+      engagement_time_msec: time,
       language: this.lang,
+      screen_resolution: "1920x1080",
+      page_referrer: TelegramApi.url,
     };
 
     return this.events.map((event) => ({
