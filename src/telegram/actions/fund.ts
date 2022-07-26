@@ -21,7 +21,6 @@ export class FundAction extends GenericAction {
   private payment?: PaymentService;
 
   public runAction(
-    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {

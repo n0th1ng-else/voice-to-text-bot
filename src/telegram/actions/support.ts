@@ -13,7 +13,6 @@ export class SupportAction extends GenericAction {
   private authorUrl?: string;
 
   public runAction(
-    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {

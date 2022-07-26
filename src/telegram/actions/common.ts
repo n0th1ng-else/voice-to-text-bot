@@ -23,7 +23,6 @@ export abstract class GenericAction {
   ) {}
 
   public abstract runAction(
-    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void>;

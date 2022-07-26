@@ -14,7 +14,6 @@ const logger = new Logger("telegram-bot");
 
 export class VoiceFormatAction extends GenericAction {
   public runAction(
-    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
