@@ -38,10 +38,13 @@ export const deleteFileIfExists = (
       }
       return fileName;
     })
-    .catch((err) => {
-      logger.error(`${fileName} caused errors during the delete attempt`, err);
+    .catch((catchErr) => {
+      logger.error(
+        `${fileName} caused errors during the delete attempt`,
+        catchErr
+      );
       if (shouldThrowError) {
-        return Promise.reject(err);
+        return Promise.reject(catchErr);
       }
       return fileName;
     });
