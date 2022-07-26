@@ -19,7 +19,6 @@ export class VoiceAction extends GenericAction {
   private converter?: VoiceConverter;
 
   public runAction(
-    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {

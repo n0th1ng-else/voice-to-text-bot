@@ -12,27 +12,27 @@ import { WaiterForCalls } from "../../e2e/helpers/waitFor";
 
 jest.mock("../logger");
 
-jest.useFakeTimers("modern");
+jest.useFakeTimers();
 
 const oneMinute = 60_000;
 
 let finishResult = Promise.resolve();
 const finishWatcher = new WaiterForCalls();
-const finishFn = jest.fn<Promise<void>, void[]>().mockImplementation(() => {
+const finishFn = jest.fn<() => Promise<void>>().mockImplementation(() => {
   finishWatcher.tick();
   return finishResult;
 });
 
 let shouldFinishResult = false;
 const shouldFinishWatcher = new WaiterForCalls();
-const shouldFinishFn = jest.fn<boolean, string[]>().mockImplementation(() => {
+const shouldFinishFn = jest.fn<() => boolean>().mockImplementation(() => {
   shouldFinishWatcher.tick();
   return shouldFinishResult;
 });
 
 let tickResult = Promise.resolve("");
 const tickWatcher = new WaiterForCalls();
-const tickFn = jest.fn<Promise<string>, void[]>().mockImplementation(() => {
+const tickFn = jest.fn<() => Promise<string>>().mockImplementation(() => {
   tickWatcher.tick();
   return tickResult;
 });

@@ -125,31 +125,31 @@ export class TelegramBotModel {
     }
 
     if (this.actions.start.runCondition(msg, model)) {
-      return this.actions.start.runAction(msg, model, prefix);
+      return this.actions.start.runAction(model, prefix);
     }
 
     if (this.actions.lang.runCondition(msg, model)) {
-      return this.actions.lang.runAction(msg, model, prefix);
+      return this.actions.lang.runAction(model, prefix);
     }
 
     if (this.actions.support.runCondition(msg, model)) {
-      return this.actions.support.runAction(msg, model, prefix);
+      return this.actions.support.runAction(model, prefix);
     }
 
     if (this.actions.fund.runCondition(msg, model)) {
-      return this.actions.fund.runAction(msg, model, prefix);
+      return this.actions.fund.runAction(model, prefix);
     }
 
     if (this.actions.voiceFormat.runCondition(msg)) {
-      return this.actions.voiceFormat.runAction(msg, model, prefix);
+      return this.actions.voiceFormat.runAction(model, prefix);
     }
 
     if (this.actions.voiceLength.runCondition(msg, model)) {
-      return this.actions.voiceLength.runAction(msg, model, prefix);
+      return this.actions.voiceLength.runAction(model, prefix);
     }
 
     if (this.actions.voice.runCondition(msg)) {
-      return this.actions.voice.runAction(msg, model, prefix);
+      return this.actions.voice.runAction(model, prefix);
     }
 
     return this.sendNoVoiceMessage(model, prefix);

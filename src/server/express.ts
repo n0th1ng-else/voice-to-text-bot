@@ -37,7 +37,7 @@ export class ExpressServer {
     this.app.use(express.json());
 
     const statusHandler = (
-      req: express.Request,
+      _req: express.Request,
       res: express.Response<HealthDto>
     ): void => {
       const status = new HealthModel(this.version, this.isHttps, this.threadId);
@@ -104,7 +104,7 @@ export class ExpressServer {
         res.sendStatus(200);
       });
 
-      this.app.get(bot.getPath(), (req, res, next) => {
+      this.app.get(bot.getPath(), (_req, _res, next) => {
         logger.info("Route is enabled");
         next();
       });

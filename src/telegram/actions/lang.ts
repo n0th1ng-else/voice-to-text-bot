@@ -23,7 +23,6 @@ const logger = new Logger("telegram-bot");
 
 export class LangAction extends GenericAction {
   public runAction(
-    msg: TgMessage,
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
