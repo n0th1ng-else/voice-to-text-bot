@@ -1,14 +1,12 @@
-export const githubUrl = "https://github.com/n0th1ng-else/voice-to-text-bot";
+const GITHUB_PROJECT = "https://github.com/n0th1ng-else/voice-to-text-bot";
+
+export const githubUrl = `${GITHUB_PROJECT}/issues`;
 
 export const localhostUrl = "http://localhost";
 
-export const patreonAccount = "https://patreon.com/audiomessbot";
-
-export const kofiAccount = "https://ko-fi.com/audiomessbot";
-
-export const yandexAccount = "https://yasobe.ru/na/audiomessbot";
-
 export const officialChannelAccount = "https://t.me/AudioMessBotNews";
+
+export const BOT_LOGO = `${GITHUB_PROJECT}/raw/master/assets/v2/botPic.png`;
 
 export const wavSampleRate = 16_000; // 16kHz
 
@@ -34,3 +32,18 @@ export const supportedAudioFormats = [
     ext: "m4a",
   },
 ] as const;
+
+export const donationLevels = [
+  {
+    amount: 3,
+    meta: "🚀",
+  },
+  {
+    amount: 5,
+    meta: "😎",
+  },
+  {
+    amount: 7,
+    meta: "👑",
+  },
+];

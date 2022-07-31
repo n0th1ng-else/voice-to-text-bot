@@ -9,7 +9,8 @@ import {
   TgMessage,
 } from "../src/telegram/api/types";
 import { TelegramButtonModel, TelegramButtonType } from "../src/telegram/types";
-import { patreonAccount, yandexAccount } from "../src/const";
+import { donationLevels } from "../src/const";
+import { TextModel } from "../src/text";
 
 interface UserNameOptions {
   userName?: string;
@@ -104,13 +105,13 @@ export class TelegramMessageModel {
 
   public setFundCallback(
     messageId: number,
-    price: string,
+    price: number,
     prefixId: string
   ): this {
     this.messageId = messageId;
     const data = new TelegramButtonModel(
       TelegramButtonType.Donation,
-      price,
+      String(price),
       prefixId
     );
 
@@ -188,7 +189,7 @@ export enum TelegramMessageMetaType {
 export class TelegramMessageMetaItem {
   constructor(
     public readonly type: TelegramMessageMetaType,
-    public readonly title: LabelId,
+    public readonly title: LabelId | string,
     public readonly data: string,
     public readonly btnType = TelegramButtonType.Donation
   ) {}
@@ -222,50 +223,18 @@ export function getMockCertificate(): string {
   return readFileSync(path, { encoding: "utf-8" });
 }
 
-export const getFundButtons = (
-  extended = false
-): TelegramMessageMetaItem[][] => {
+export const getFundButtons = (): TelegramMessageMetaItem[][] => {
   const buttons: TelegramMessageMetaItem[][] = [];
-  const extendedButtons: TelegramMessageMetaItem[] = [
-    new TelegramMessageMetaItem(
-      TelegramMessageMetaType.Button,
-      LabelId.UsdOption1,
-      "5"
-    ),
-    new TelegramMessageMetaItem(
-      TelegramMessageMetaType.Button,
-      LabelId.UsdOption2,
-      "7"
-    ),
-    new TelegramMessageMetaItem(
-      TelegramMessageMetaType.Button,
-      LabelId.UsdOption3,
-      "10"
-    ),
-  ];
+  const extendedButtons: TelegramMessageMetaItem[] = donationLevels.map(
+    (level) =>
+      new TelegramMessageMetaItem(
+        TelegramMessageMetaType.Button,
+        TextModel.toCurrency(level.amount, level.meta),
+        String(level.amount)
+      )
+  );
 
-  const mainButtonYa = [
-    new TelegramMessageMetaItem(
-      TelegramMessageMetaType.Link,
-      LabelId.YandexLinkTitle,
-      yandexAccount
-    ),
-  ];
-
-  const mainButtonPatr = [
-    new TelegramMessageMetaItem(
-      TelegramMessageMetaType.Link,
-      LabelId.PatreonLinkTitle,
-      patreonAccount
-    ),
-  ];
-
-  if (extended) {
-    buttons.push(extendedButtons);
-  }
-
-  buttons.push(mainButtonYa);
-  buttons.push(mainButtonPatr);
+  buttons.push(extendedButtons);
 
   return buttons;
 };

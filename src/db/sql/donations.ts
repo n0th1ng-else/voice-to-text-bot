@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import { DonationsSql } from "./donations.sql";
 
 export enum DonationStatus {
+  Initialized = "INITIALIZED",
   Pending = "PENDING",
   Canceled = "CANCELED",
   Received = "RECEIVED",
@@ -40,7 +41,7 @@ export class DonationsDb {
     const updatedAt = createdAt;
     const values = [
       chatId,
-      DonationStatus.Pending,
+      DonationStatus.Initialized,
       price,
       createdAt,
       updatedAt,

@@ -33,10 +33,9 @@ export class DonationsClient {
 
   public updateRow(
     donationId: number,
-    received: boolean
+    status: DonationStatus
   ): Promise<DonationRowScheme> {
     logger.info(`Updating the row with id=${donationId}`);
-    const status = received ? DonationStatus.Received : DonationStatus.Canceled;
     return this.db
       .updateRow(donationId, status)
       .then((row) => {

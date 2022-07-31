@@ -9,11 +9,12 @@ import { VoiceFormatAction } from "./voice-format";
 import { VoiceLengthAction } from "./voice-length";
 import { DbClient } from "../../db";
 import { PaymentService } from "../../donate/types";
-import { TgCallbackQuery } from "../api/types";
+import { TgCallbackQuery, TgCheckoutQuery } from "../api/types";
 import { AnalyticsData } from "../../analytics/legacy/types";
 import { TelegramButtonModel, TelegramButtonType } from "../types";
 import { Logger } from "../../logger";
 import { collectAnalytics } from "../../analytics";
+import { CheckoutAction } from "./checkout";
 
 const logger = new Logger("telegram-bot");
 
@@ -26,6 +27,7 @@ export class BotActions {
   public readonly fund: FundAction;
   public readonly voiceFormat: VoiceFormatAction;
   public readonly voiceLength: VoiceLengthAction;
+  public readonly checkout: CheckoutAction;
 
   constructor(stat: DbClient, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -36,6 +38,7 @@ export class BotActions {
     this.fund = new FundAction(stat, bot);
     this.voiceFormat = new VoiceFormatAction(stat, bot);
     this.voiceLength = new VoiceLengthAction(stat, bot);
+    this.checkout = new CheckoutAction(stat, bot);
   }
 
   public setPayment(payment: PaymentService): void {
@@ -90,5 +93,12 @@ export class BotActions {
           analytics.setCommand("/app", "Callback query error", "Unknown")
         );
       });
+  }
+
+  public handleCheckout(
+    msg: TgCheckoutQuery,
+    analytics: AnalyticsData
+  ): Promise<void> {
+    return this.checkout.confirmCheckout(msg, analytics);
   }
 }

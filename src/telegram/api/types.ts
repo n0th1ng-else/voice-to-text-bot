@@ -19,6 +19,7 @@ export interface TgUpdate {
   update_id: number;
   message?: TgMessage;
   callback_query?: TgCallbackQuery;
+  pre_checkout_query?: TgCheckoutQuery;
 }
 
 export interface TgMessage {
@@ -30,6 +31,7 @@ export interface TgMessage {
   voice?: TgMedia;
   audio?: TgMedia;
   video_note?: TgMedia;
+  successful_payment?: SuccessfulPayment;
 }
 
 export interface TgChat {
@@ -59,6 +61,22 @@ export interface TgCallbackQuery {
   from: TgUser;
   message?: TgMessage;
   data?: string;
+}
+
+interface Payment {
+  currency: string;
+  total_amount: number;
+  invoice_payload: string;
+}
+
+export interface TgCheckoutQuery extends Payment {
+  id: string;
+  from: TgUser;
+}
+
+export interface SuccessfulPayment extends Payment {
+  telegram_payment_charge_id: string;
+  provider_payment_charge_id: string;
 }
 
 export interface TgUser {
@@ -95,9 +113,35 @@ export interface MessageDto {
   chat_id: number;
   text: string;
   message_id?: number;
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   reply_markup?: {
     inline_keyboard: TgInlineKeyboardButton[][];
   };
+}
+
+interface LabeledPrice {
+  label: string;
+  amount: number; // Integer cents
+}
+
+export interface InvoiceDto {
+  chat_id: number;
+  title: string; // Product name
+  description: string; // Product description
+  payload: string; // Internal data
+  provider_token: string; // Provider token
+  currency: string; // EUR
+  prices: LabeledPrice[];
+  start_parameter: string; // donation id
+  photo_url: string;
+  photo_width: number;
+  photo_height: number;
+}
+
+export interface PreCheckoutQueryDto {
+  pre_checkout_query_id: string;
+  ok: boolean;
+  error_message?: string;
 }
 
 export interface EditMessageDto {

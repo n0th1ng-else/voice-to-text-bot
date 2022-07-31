@@ -35,6 +35,7 @@ export class ExpressServer {
     this.uptimeDaemon = new UptimeDaemon(version);
 
     this.app.use(express.json());
+    this.app.use("/static", express.static("assets/v2"));
 
     const statusHandler = (
       _req: express.Request,

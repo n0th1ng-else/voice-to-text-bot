@@ -1,7 +1,7 @@
 import {
-  describe,
-  beforeEach,
   afterEach,
+  beforeEach,
+  describe,
   expect,
   it,
   jest,
@@ -64,7 +64,7 @@ describe("Donations DB", () => {
     });
 
     it("can not update row", (done) => {
-      client.updateRow(23, false).then(
+      client.updateRow(23, DonationStatus.Pending).then(
         () => runFail(done),
         (err) => {
           expect(err.message).toBe(
@@ -117,13 +117,14 @@ describe("Donations DB", () => {
     it("creates a new row", () => {
       const chatId = 83222;
       const price = 10;
+      const status = DonationStatus.Initialized;
 
       testPool.mockQuery(DonationsSql.insertRow, (values) => {
         expect(values).toHaveLength(5);
         const [rChatId, rStatus, rPrice, rCreated, rUpdated] = values;
 
         expect(rChatId).toBe(chatId);
-        expect(rStatus).toBe(DonationStatus.Pending);
+        expect(rStatus).toBe(status);
         expect(rPrice).toBe(price);
         expect(rCreated).toBe(rUpdated);
 
@@ -131,7 +132,7 @@ describe("Donations DB", () => {
           rows: [
             {
               donation_id: 21,
-              status: DonationStatus.Pending,
+              status: rStatus,
               chat_id: rChatId,
               price: rPrice,
               created_at: new Date(),
@@ -145,10 +146,11 @@ describe("Donations DB", () => {
         expect(typeof row.donation_id).toBe("number");
         expect(row.chat_id).toBe(chatId);
         expect(row.price).toBe(price);
+        expect(row.status).toBe(status);
       });
     });
 
-    it("updates some row NO", () => {
+    it("updates some row as Canceled", () => {
       const donationId = 342;
       const status = DonationStatus.Canceled;
 
@@ -174,7 +176,7 @@ describe("Donations DB", () => {
         });
       });
 
-      return client.updateRow(donationId, false).then((row) => {
+      return client.updateRow(donationId, status).then((row) => {
         expect(row.donation_id).toBe(donationId);
         expect(row.chat_id).toBe(34444);
         expect(row.price).toBe(4);
@@ -182,7 +184,7 @@ describe("Donations DB", () => {
       });
     });
 
-    it("updates some row OK", () => {
+    it("updates some row as Received", () => {
       const donationId = 342;
       const status = DonationStatus.Received;
 
@@ -208,7 +210,41 @@ describe("Donations DB", () => {
         });
       });
 
-      return client.updateRow(donationId, true).then((row) => {
+      return client.updateRow(donationId, status).then((row) => {
+        expect(row.donation_id).toBe(donationId);
+        expect(row.chat_id).toBe(21344);
+        expect(row.price).toBe(4);
+        expect(row.status).toBe(status);
+      });
+    });
+
+    it("updates some row as Pending", () => {
+      const donationId = 342;
+      const status = DonationStatus.Pending;
+
+      testPool.mockQuery(DonationsSql.updateRow, (values) => {
+        expect(values).toHaveLength(3);
+        const [rStatus, rUpdatedAt, rDonationId] = values;
+
+        expect(rStatus).toBe(status);
+        expect(rDonationId).toBe(donationId);
+        expect(rUpdatedAt).toBeDefined();
+
+        return Promise.resolve({
+          rows: [
+            {
+              donation_id: rDonationId,
+              status: rStatus,
+              chat_id: 21344,
+              price: 4,
+              created_at: new Date(),
+              updated_at: rUpdatedAt,
+            },
+          ],
+        });
+      });
+
+      return client.updateRow(donationId, status).then((row) => {
         expect(row.donation_id).toBe(donationId);
         expect(row.chat_id).toBe(21344);
         expect(row.price).toBe(4);

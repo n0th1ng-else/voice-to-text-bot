@@ -4,7 +4,9 @@ import {
   BotCommandListDto,
   EditMessageDto,
   FileDto,
+  InvoiceDto,
   MessageDto,
+  PreCheckoutQueryDto,
   TgCore,
   TgError,
   TgFile,
@@ -71,6 +73,7 @@ export class TelegramApi {
     const data: MessageDto = {
       text,
       chat_id: chatId,
+      parse_mode: "HTML",
     };
 
     if (buttons) {
@@ -92,6 +95,7 @@ export class TelegramApi {
       text,
       chat_id: chatId,
       message_id: messageId,
+      parse_mode: "HTML",
     };
 
     if (buttons) {
@@ -101,6 +105,58 @@ export class TelegramApi {
     }
 
     return this.request<TgMessage, EditMessageDto>("editMessageText", data);
+  }
+
+  public answerPreCheckoutQuery(
+    queryId: string,
+    error?: string
+  ): Promise<TgMessage> {
+    const data: PreCheckoutQueryDto = {
+      pre_checkout_query_id: queryId,
+      ok: !error,
+      error_message: error,
+    };
+    return this.request<TgMessage, PreCheckoutQueryDto>(
+      "answerPreCheckoutQuery",
+      data
+    );
+  }
+
+  public sendInvoice(
+    chatId: number,
+    amount: number,
+    meta: string,
+    token: string,
+    title: string,
+    description: string,
+    label: string,
+    payload: string,
+    photo: {
+      url: string;
+      height: number;
+      width: number;
+    }
+  ): Promise<TgMessage> {
+    const data: InvoiceDto = {
+      chat_id: chatId,
+      currency: "EUR",
+      title,
+      description,
+      payload: payload,
+      prices: [
+        {
+          label: label,
+          amount: amount,
+        },
+      ],
+      provider_token: token,
+      start_parameter: meta,
+      photo_url: photo.url,
+      photo_width: photo.width,
+      photo_height: photo.height,
+    };
+
+    return this.request<TgMessage, InvoiceDto>("sendInvoice", data);
   }
 
   private request<Response, Data>(
