@@ -1,4 +1,4 @@
-import winston from "winston";
+import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
 import { selfUrl, logApi, appVersion } from "../env";
@@ -41,28 +41,33 @@ const convertDataItem = (data: any, ind: number): Record<string, string> => {
   }, {});
 };
 
-if (isLoggingEnabled()) {
-  const plainHost = selfUrl
-    ? selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-")
-    : "localhost";
+const plainHost = selfUrl
+  ? selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-")
+  : "localhost";
 
-  winston.add(
-    new Loggly({
-      token: logApi.apiToken,
-      subdomain: logApi.projectId,
-      tags: [`app.${appVersion}`, `host.${plainHost}`],
-      json: true,
-    })
-  );
-}
+const logglyTransport = isLoggingEnabled()
+  ? [
+      new Loggly({
+        token: logApi.apiToken,
+        subdomain: logApi.projectId,
+        tags: [`app.${appVersion}`, `host.${plainHost}`],
+        json: true,
+      }),
+    ]
+  : [];
+
+const { combine, json, errors } = format;
+const bulkLogger = createLogger({
+  format: combine(errors({ stack: true }), json()),
+  transports: [new transports.Console(), ...logglyTransport],
+});
 
 export const sendLogs = (
   type: LogType,
   id: string,
   prefix: string,
   message: string,
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  data: any[] = []
+  data: unknown
 ): void => {
   if (!isLoggingEnabled()) {
     return;
@@ -79,11 +84,19 @@ export const sendLogs = (
       }, {})
     : data;
 
-  winston[type]({
+  const payload = {
     level: type,
-    message: stripAnsi(message),
+    title: stripAnsi(message),
     id,
     prefix: prefix || "no",
+    raw: data,
     ...logData,
-  });
+  };
+
+  if (data instanceof Error) {
+    // @ts-expect-error We want to put the Error as a first argument to see the stacktrace
+    bulkLogger[type](data, payload);
+    return;
+  }
+  bulkLogger[type]({ ...payload, message: stripAnsi(message) });
 };

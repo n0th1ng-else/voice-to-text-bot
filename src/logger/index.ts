@@ -45,24 +45,21 @@ export class Logger {
     this.additionalPrefix = prefix;
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public info(msg: string, ...data: any[]): void {
+  public info(msg: string, ...data: unknown[]): void {
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), msg, ...data);
     sendLogs(LogType.Info, this.id, this.additionalPrefix, msg, data);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public warn(msg: string, ...data: any[]): void {
+  public warn(msg: string, data?: unknown): void {
     // eslint-disable-next-line no-console
-    console.warn(Logger.y(this.prefix), msg, ...data);
+    console.warn(Logger.y(this.prefix), msg, data ?? "");
     sendLogs(LogType.Warn, this.id, this.additionalPrefix, msg, data);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public error(msg: string, ...data: any[]): void {
+  public error(msg: string, data?: unknown): void {
     // eslint-disable-next-line no-console
-    console.error(Logger.r(this.prefix), Logger.r(msg), ...data);
+    console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
     sendLogs(LogType.Error, this.id, this.additionalPrefix, msg, data);
   }
 }
