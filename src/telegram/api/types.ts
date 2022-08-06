@@ -119,7 +119,7 @@ export interface TgFile {
 
 export class TgError extends Error {
   public code = 0;
-  public response = "";
+  public response?: TgCore<void>;
   public migrateToChatId = 0;
   public retryAfter = 0;
   public url = "";
@@ -136,7 +136,7 @@ export class TgError extends Error {
     return this;
   }
 
-  public setResponse(response = ""): this {
+  public setResponse(response?: TgCore<void>): this {
     this.response = response;
     return this;
   }
