@@ -116,20 +116,18 @@ export class TelegramApi {
             new TgError(answer.description)
               .setUrl(url)
               .setErrorCode(answer.error_code)
-              .setRetryAfter(answer.parameters && answer.parameters.retry_after)
-              .setMigrateToChatId(
-                answer.parameters && answer.parameters.migrate_to_chat_id
-              )
+              .setRetryAfter(answer?.parameters?.retry_after)
+              .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
           );
         }
 
         return answer.result;
       },
-      (err: AxiosError<string>) => {
+      (err: AxiosError<TgCore<void>>) => {
         throw new TgError(err.message, err.stack)
           .setUrl(url)
-          .setErrorCode(err.response && err.response.status)
-          .setResponse(err.response && err.response.data);
+          .setErrorCode(err?.response?.status)
+          .setResponse(err?.response?.data);
       }
     );
   }

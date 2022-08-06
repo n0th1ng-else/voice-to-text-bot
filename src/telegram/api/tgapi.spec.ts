@@ -331,7 +331,7 @@ describe("[telegram api client]", () => {
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
           expect(err.url).toBe(`/bot${testApiToken}/setWebHook`);
-          expect(err.response).toBe("");
+          expect(err.response).toBe(undefined);
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
         });
@@ -376,7 +376,7 @@ describe("[telegram api client]", () => {
             expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
             expect(err.code).toBe(testErrorCode);
             expect(err.url).toBe(`/bot${testApiToken}/setMyCommands`);
-            expect(err.response).toBe("");
+            expect(err.response).toBe(undefined);
             expect(err.migrateToChatId).toBe(0);
             expect(err.retryAfter).toBe(testRetryAfter);
           }
@@ -406,7 +406,7 @@ describe("[telegram api client]", () => {
           );
           expect(err.code).toBe(testErrorCode);
           expect(err.url).toBe(`/bot${testApiToken}/getWebhookInfo`);
-          expect(err.response).toBe("");
+          expect(err.response).toBe(undefined);
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
         });
@@ -447,7 +447,7 @@ describe("[telegram api client]", () => {
             expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
             expect(err.code).toBe(testErrorCode);
             expect(err.url).toBe(`/bot${testApiToken}/getFile`);
-            expect(err.response).toBe("");
+            expect(err.response).toBe(undefined);
             expect(err.migrateToChatId).toBe(testMigrateToChat);
             expect(err.retryAfter).toBe(testRetryAfter);
           }
@@ -515,7 +515,7 @@ describe("[telegram api client]", () => {
         expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
         expect(err.code).toBe(0);
         expect(err.url).toBe(`/bot${testApiToken}/editMessageText`);
-        expect(err.response).toBe("");
+        expect(err.response).toBe(undefined);
         expect(err.migrateToChatId).toBe(0);
         expect(err.retryAfter).toBe(0);
       });

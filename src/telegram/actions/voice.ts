@@ -1,7 +1,6 @@
 import { TgMessage } from "../api/types";
 import { GenericAction } from "./common";
 import {
-  BotCommand,
   BotMessageModel,
   TelegramMessagePrefix,
   VoiceContentReason,
@@ -12,6 +11,7 @@ import { LabelId } from "../../text/labels";
 import { LanguageCode, VoiceConverter } from "../../recognition/types";
 import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 import { TimeMeasure } from "../../common/timer";
+import { hasNoRightsToSendMessage } from "../errors";
 
 const logger = new Logger("telegram-bot");
 
@@ -105,13 +105,17 @@ export class VoiceAction extends GenericAction {
         return this.updateUsageCount(model, prefix);
       })
       .catch((err) => {
+        const hasNoRights = hasNoRightsToSendMessage(err);
         const errorMessage = "Unable to recognize the file";
-        logger.error(
-          `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
-            model.voiceFileId
-          )}`,
-          err
-        );
+        const logError = `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
+          model.voiceFileId
+        )}`;
+        if (hasNoRights) {
+          logger.warn(logError, err);
+        } else {
+          logger.error(logError, err);
+        }
+
         model.analytics.setError(errorMessage);
 
         if (model.isGroup) {
