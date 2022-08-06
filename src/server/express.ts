@@ -111,7 +111,10 @@ export class ExpressServer {
     });
 
     this.app.use((req, res) => {
-      logger.error(`Unknown route ${Logger.y(req.originalUrl)}`);
+      logger.error(
+        `Unknown route ${Logger.y(req.originalUrl)}`,
+        new Error("Unknown route")
+      );
       const analytics = new AnalyticsData(
         this.version,
         this.selfUrl,

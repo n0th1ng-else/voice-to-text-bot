@@ -19,7 +19,7 @@ export class NodesClient {
         logger.info(`Table ${Logger.y("nodes")} has been initialized`)
       )
       .catch((err) => {
-        logger.error(`Unable to initialize ${Logger.y("nodes")} table`);
+        logger.error(`Unable to initialize ${Logger.y("nodes")} table`, err);
         throw err;
       });
   }
@@ -55,7 +55,7 @@ export class NodesClient {
         return row;
       })
       .catch((err) => {
-        logger.error(`Unable to update the row with id=${nodeId}`);
+        logger.error(`Unable to update the row with id=${nodeId}`, err);
         throw err;
       });
   }
@@ -74,7 +74,7 @@ export class NodesClient {
         return row;
       })
       .catch((err) => {
-        logger.error("Unable to create a row");
+        logger.error("Unable to create a row", err);
         throw err;
       });
   }
@@ -88,7 +88,7 @@ export class NodesClient {
         return rows;
       })
       .catch((err) => {
-        logger.error(`Unable provide a search for selfUrl=${selfUrl}`);
+        logger.error(`Unable provide a search for selfUrl=${selfUrl}`, err);
         throw err;
       });
   }

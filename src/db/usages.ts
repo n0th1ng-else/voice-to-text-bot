@@ -21,7 +21,7 @@ export class UsagesClient {
         logger.info(`Table ${Logger.y("usages")} has been initialized`)
       )
       .catch((err) => {
-        logger.error(`Unable to initialize ${Logger.y("usages")} table`);
+        logger.error(`Unable to initialize ${Logger.y("usages")} table`, err);
         throw err;
       });
   }
@@ -128,7 +128,7 @@ export class UsagesClient {
         return rows;
       })
       .catch((err) => {
-        logger.error("Unable provide a search");
+        logger.error("Unable provide a search", err);
         throw err;
       });
   }
@@ -151,7 +151,7 @@ export class UsagesClient {
         return row;
       })
       .catch((err) => {
-        logger.error(`Unable to update the row with id=${usageId}`);
+        logger.error(`Unable to update the row with id=${usageId}`, err);
         throw err;
       });
   }
@@ -171,7 +171,7 @@ export class UsagesClient {
         return row;
       })
       .catch((err) => {
-        logger.error("Unable to create a row");
+        logger.error("Unable to create a row", err);
         throw err;
       });
   }
@@ -185,7 +185,7 @@ export class UsagesClient {
         return rows;
       })
       .catch((err) => {
-        logger.error(`Unable provide a search for chatId=${chatId}`);
+        logger.error(`Unable provide a search for chatId=${chatId}`, err);
         throw err;
       });
   }

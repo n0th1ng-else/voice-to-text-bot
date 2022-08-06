@@ -57,7 +57,7 @@ export class Logger {
     sendLogs(LogType.Warn, this.id, this.additionalPrefix, msg, data);
   }
 
-  public error(msg: string, data?: unknown): void {
+  public error(msg: string, data: unknown): void {
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
     sendLogs(LogType.Error, this.id, this.additionalPrefix, msg, data);

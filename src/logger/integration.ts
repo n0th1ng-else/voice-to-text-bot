@@ -35,7 +35,7 @@ const convertDataItem = (data: any, ind: number): Record<string, string> => {
     }, {});
   }
 
-  return Object.keys(data).reduce((res, key) => {
+  return Object.getOwnPropertyNames(data).reduce((res, key) => {
     res[`${recordKey}-${key}`] = data[key];
     return res;
   }, {});
