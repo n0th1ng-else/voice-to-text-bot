@@ -19,7 +19,10 @@ export class UsedEmailClient {
         logger.info(`Table ${Logger.y("usedemails")} has been initialized`)
       )
       .catch((err) => {
-        logger.error(`Unable to initialize ${Logger.y("usedemails")} table`);
+        logger.error(
+          `Unable to initialize ${Logger.y("usedemails")} table`,
+          err
+        );
         throw err;
       });
   }
@@ -38,7 +41,7 @@ export class UsedEmailClient {
         return row;
       })
       .catch((err) => {
-        logger.error(`Unable to update the row with id=${emailId}`);
+        logger.error(`Unable to update the row with id=${emailId}`, err);
         throw err;
       });
   }
@@ -53,7 +56,7 @@ export class UsedEmailClient {
         return row;
       })
       .catch((err) => {
-        logger.error("Unable to create a row");
+        logger.error("Unable to create a row", err);
         throw err;
       });
   }
@@ -67,7 +70,7 @@ export class UsedEmailClient {
         return rows;
       })
       .catch((err) => {
-        logger.error(`Unable provide a search for email=${email}`);
+        logger.error(`Unable provide a search for email=${email}`, err);
         throw err;
       });
   }

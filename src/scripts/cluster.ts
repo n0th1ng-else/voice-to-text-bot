@@ -14,7 +14,8 @@ export const run = (): void => {
       const isCLusterSizeValid = clusterSize && clusterSize > 0;
       if (!isCLusterSizeValid) {
         logger.error(
-          `Cluster size is not valid. Falling back to size=1. cLusterSize=${clusterSize}`
+          `Cluster size is not valid. Falling back to size=1. cLusterSize=${clusterSize}`,
+          new Error("Cluster size is not valid")
         );
       }
       const size = isCLusterSizeValid ? clusterSize : 1;

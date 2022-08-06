@@ -23,7 +23,10 @@ export class DonationsClient {
         logger.info(`Table ${Logger.y("donations")} has been initialized`)
       )
       .catch((err) => {
-        logger.error(`Unable to initialize ${Logger.y("donations")} table`);
+        logger.error(
+          `Unable to initialize ${Logger.y("donations")} table`,
+          err
+        );
         throw err;
       });
   }
@@ -45,7 +48,7 @@ export class DonationsClient {
         return row;
       })
       .catch((err) => {
-        logger.error(`Unable to update the row with id=${donationId}`);
+        logger.error(`Unable to update the row with id=${donationId}`, err);
         throw err;
       });
   }
@@ -60,7 +63,7 @@ export class DonationsClient {
         return row;
       })
       .catch((err) => {
-        logger.error("Unable to create a row");
+        logger.error("Unable to create a row", err);
         throw err;
       });
   }
@@ -77,7 +80,8 @@ export class DonationsClient {
       })
       .catch((err) => {
         logger.error(
-          `Unable provide a search for status=${DonationStatus.Pending}`
+          `Unable provide a search for status=${DonationStatus.Pending}`,
+          err
         );
         throw err;
       });

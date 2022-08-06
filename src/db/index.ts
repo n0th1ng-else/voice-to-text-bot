@@ -39,7 +39,8 @@ export class DbClient {
     this.initialized = Object.values(config).every((val) => val);
     if (!this.initialized) {
       logger.error(
-        "Missing connection data for postgres server. Check the config"
+        "Missing connection data for postgres server. Check the config",
+        new Error("Missing connection data for postgres server")
       );
     }
 

@@ -117,7 +117,10 @@ export class FundAction extends GenericAction {
 
     if (!price) {
       const errorMessage = `Price is not a number, got ${button.value}`;
-      logger.error(`${prefix.getPrefix()} ${errorMessage}`);
+      logger.error(
+        `${prefix.getPrefix()} ${errorMessage}`,
+        new Error("Price is not a number")
+      );
       model.analytics.setError(errorMessage);
       return collectAnalytics(
         model.analytics.setCommand(
@@ -135,7 +138,10 @@ export class FundAction extends GenericAction {
       .then(([lang, donationId]) => {
         if (!this.payment) {
           const errorMessage = "Payment service is not set for callback query";
-          logger.error(`${prefix.getPrefix()} ${errorMessage}`);
+          logger.error(
+            `${prefix.getPrefix()} ${errorMessage}`,
+            new Error("Payment service is not set")
+          );
           model.analytics.setError(errorMessage);
           return collectAnalytics(
             model.analytics.setCommand(

@@ -19,12 +19,15 @@ export const printCurrentMemoryStat = (
   const statDiff = (stat.rss * fullStat) / limit;
 
   if (statDiff > fullStat) {
-    logger.error(`Process exceeds memory limit ${limit}Mb! ${line}`);
+    logger.error(
+      `The process exceeds memory limit ${limit}Mb! ${line}`,
+      new Error("The process exceeds memory limit")
+    );
     return Promise.resolve();
   }
 
   if (statDiff > dangerStat) {
-    logger.error(line);
+    logger.error(line, new Error(line));
     return Promise.resolve();
   }
 
