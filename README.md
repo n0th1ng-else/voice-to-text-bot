@@ -34,16 +34,19 @@
 
 # Telegram Bot Converts Voice Messages Into Text
 
-<img src="/assets/v1/botPic/botPic.png?raw=true" alt="Bot logo" height="50px" align="right">
+<p align="center">
+  <img src="assets/v2/previewPic.png" alt="Bot logo" height="150px">
+</p>
 
 This is the simple bot that converts voice into text.
 I tried to review available public speech recognition services
 and the results you can see below in the table.
 
-# Techstack
+# Tech Stack
 
-- Typescript
-- ExpressJS
+- [Typescript](https://github.com/microsoft/TypeScript)
+- [ExpressJS](https://github.com/expressjs/express)
+- [Axios](https://github.com/axios/axios)
 - PostgreSQL
 - Google Cloud API
 - Google Analytics
