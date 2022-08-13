@@ -1,6 +1,8 @@
 import {
   BotCommand,
   BotMessageModel,
+  DonationDto,
+  DonationPayload,
   TelegramButtonType,
   VoiceContentReason,
   VoiceContentReasonModel,
@@ -201,5 +203,36 @@ export const getButtonTypeByText = (type: string): TelegramButtonType => {
       return TelegramButtonType.Language;
     default:
       return TelegramButtonType.Unknown;
+  }
+};
+
+export const getDonationDtoString = (
+  donationId: number,
+  chatId: number,
+  logPrefix: string
+): string => {
+  const dto: DonationDto = {
+    d: donationId,
+    c: chatId,
+    l: logPrefix,
+  };
+
+  return JSON.stringify(dto);
+};
+
+export const parseDonationPayload = (text = ""): DonationPayload => {
+  try {
+    const obj: DonationDto = JSON.parse(text);
+    return {
+      donationId: obj.d || 0,
+      chatId: obj.c || 0,
+      prefix: obj.l || "",
+    };
+  } catch (err) {
+    return {
+      donationId: 0,
+      chatId: 0,
+      prefix: "",
+    };
   }
 };

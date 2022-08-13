@@ -11,8 +11,8 @@ import {
   launchTime,
   memoryLimit,
   dbPostgres,
-  roboKassa,
   witAiApi,
+  stripeToken,
 } from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
@@ -28,7 +28,7 @@ import { httpsOptions } from "../../certs";
 import { ScheduleDaemon } from "../scheduler";
 import { printCurrentMemoryStat } from "../memory";
 import { DbClient } from "../db";
-import { RobokassaPayment } from "../donate/robokassa";
+import { StripePayment } from "../donate/stripe";
 import { getLaunchDelay } from "./init";
 
 const logger = new Logger("dev-script");
@@ -64,11 +64,7 @@ export const run = (threadId = 0): void => {
     port: dbPostgres.port,
   }).setClientName(threadId);
 
-  const roboPayment = new RobokassaPayment(
-    roboKassa.login,
-    roboKassa.passwordForSend,
-    roboKassa.enableTest
-  );
+  const paymentProvider = new StripePayment(stripeToken);
 
   const bot = new TelegramBotModel(telegramBotApi, converter, db).setAuthor(
     authorTelegramAccount
@@ -83,7 +79,7 @@ export const run = (threadId = 0): void => {
     .then(() => getHostName(appPort, selfUrl, ngRokToken))
     .then((host) => {
       logger.info(`Telling telegram our location is ${Logger.y(host)}`);
-      bot.setHostLocation(host, launchTime).setPayment(roboPayment);
+      bot.setHostLocation(host, launchTime).setPayment(paymentProvider);
 
       return server
         .setSelfUrl(host)

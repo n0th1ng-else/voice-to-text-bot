@@ -1,6 +1,7 @@
 import {
   getButtonTypeByText,
   getChatId,
+  parseDonationPayload,
   getFullUserName,
   getGroupName,
   getRawUserLanguage,
@@ -14,7 +15,7 @@ import {
 import { LanguageCode } from "../recognition/types";
 import { nanoid } from "nanoid";
 import { Logger } from "../logger";
-import { LabelId } from "../text/labels";
+import { MenuLabel } from "../text/labels";
 import { TextModel } from "../text";
 import { TgInlineKeyboardButton, TgMessage } from "./api/types";
 import { AnalyticsData } from "../analytics/legacy/types";
@@ -52,6 +53,7 @@ export class BotMessageModel {
   public readonly isVideo: boolean;
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
+  public readonly donationId: number;
 
   constructor(msg: TgMessage, analytics: AnalyticsData) {
     this.id = msg.message_id;
@@ -64,6 +66,9 @@ export class BotMessageModel {
     this.voiceDuration = getVoiceDuration(msg);
     this.isVideo = isVideoMessage(msg);
     this.userLanguage = getUserLanguage(msg);
+    this.donationId = parseDonationPayload(
+      msg.successful_payment?.invoice_payload
+    ).donationId;
     this.analytics = analytics
       .setId(this.chatId)
       .setLang(getRawUserLanguage(msg));
@@ -100,9 +105,9 @@ export class BotLangData {
 export class BotCommandOption {
   public readonly description: string;
 
-  constructor(public readonly command: BotCommand, textId: LabelId) {
+  constructor(public readonly command: BotCommand, textId: MenuLabel) {
     const textLib = new TextModel();
-    this.description = textLib.t(textId, LanguageCode.En);
+    this.description = textLib.menu(textId);
   }
 }
 
@@ -140,4 +145,16 @@ interface BotButtonDto {
   i: string; // type Identifier
   l: string; // log prefix
   v: string; // value
+}
+
+export interface DonationPayload {
+  donationId: number;
+  chatId: number;
+  prefix: string;
+}
+
+export interface DonationDto {
+  d: number; // donationId
+  c: number; // chatId
+  l: string; // log prefix
 }

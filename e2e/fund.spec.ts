@@ -18,8 +18,6 @@ import {
   BotStatRecordModel,
   getFundButtons,
   getMockCertificate,
-  TelegramMessageMetaItem,
-  TelegramMessageMetaType,
   TelegramMessageModel,
 } from "./helpers";
 import {
@@ -35,10 +33,9 @@ import nock from "nock";
 import { TelegramApi } from "../src/telegram/api";
 import request from "supertest";
 import { TgChatType } from "../src/telegram/api/types";
-import { RobokassaPayment } from "../src/donate/robokassa";
 import {
   mockTgGetWebHook,
-  mockTgReceiveCallbackMessage,
+  mockTgReceiveInvoiceMessage,
   mockTgReceiveMessage,
   sendTelegramCallbackMessage,
   sendTelegramMessage,
@@ -53,7 +50,8 @@ import { randomIntFromInterval } from "../src/common/timer";
 import { BotCommand } from "../src/telegram/types";
 import { mockGetBotStatItem } from "./requests/db/botStat";
 import { LabelId } from "../src/text/labels";
-import { mockCreateDonationRow } from "./requests/db/donetaionStat";
+import { mockCreateDonationRow } from "./requests/db/donationStat";
+import { StripePayment } from "../src/donate/stripe";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
@@ -106,9 +104,10 @@ let tgMessage: TelegramMessageModel = new TelegramMessageModel(
   chatType
 );
 
-const roboPayment = new RobokassaPayment("robo-login", "robo-pwd", false);
+const paymentToken = "stripe-token";
+const paymentProvider = new StripePayment(paymentToken);
 
-bot.setPayment(roboPayment);
+bot.setPayment(paymentProvider);
 
 let testLang = LanguageCode.En;
 
@@ -163,6 +162,9 @@ describe("[default language - english] fund", () => {
 
       it("responds on a /fund message with extra buttons and sends payment link", () => {
         tgMessage.setText(testMessageId, BotCommand.Fund);
+        const donationId = 43646456;
+        const price = 7;
+
         const statModel = mockGetBotStatItem(
           testPool,
           tgMessage.chatId,
@@ -176,31 +178,24 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons(true)
+            getFundButtons()
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, "7", prefixId);
+          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLang, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
-            mockTgReceiveCallbackMessage(
+            mockTgReceiveInvoiceMessage(
               telegramServer,
               tgMessage.chatId,
               cbMessage.messageId,
               testLang,
-              LabelId.PaymentLink,
-              [
-                [
-                  new TelegramMessageMetaItem(
-                    TelegramMessageMetaType.Link,
-                    LabelId.PaymentLinkButton,
-                    "https://auth.robokassa.ru/Merchant"
-                  ),
-                ],
-              ]
+              paymentToken,
+              donationId,
+              price
             ),
-            mockCreateDonationRow(testPool, statModel, 7),
+            mockCreateDonationRow(testPool, statModel, 7, donationId),
           ]);
         });
       });
@@ -214,6 +209,8 @@ describe("[default language - english] fund", () => {
       it("responds on a /fund message with extra buttons and sends payment link", () => {
         tgMessage.setText(testMessageId, BotCommand.Fund);
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLang);
+        const donationId = 214566;
+        const price = 3;
 
         const statModel = mockGetBotStatItem(
           testPool,
@@ -229,31 +226,24 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons(true)
+            getFundButtons()
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, "10", prefixId);
+          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLang, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
-            mockTgReceiveCallbackMessage(
+            mockTgReceiveInvoiceMessage(
               telegramServer,
               tgMessage.chatId,
               cbMessage.messageId,
               testLang,
-              LabelId.PaymentLink,
-              [
-                [
-                  new TelegramMessageMetaItem(
-                    TelegramMessageMetaType.Link,
-                    LabelId.PaymentLinkButton,
-                    "https://auth.robokassa.ru/Merchant"
-                  ),
-                ],
-              ]
+              paymentToken,
+              donationId,
+              price
             ),
-            mockCreateDonationRow(testPool, statModel, 10),
+            mockCreateDonationRow(testPool, statModel, 3, donationId),
           ]);
         });
       });
@@ -272,6 +262,8 @@ describe("[default language - english] fund", () => {
       });
 
       it("responds on a /fund message with extra buttons and sends payment link", () => {
+        const donationId = 5780;
+        const price = 5;
         tgMessage.setText(testMessageId, BotCommand.Fund);
         const statModel = mockGetBotStatItem(
           testPool,
@@ -286,31 +278,24 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons(true)
+            getFundButtons()
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, "5", prefixId);
+          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLang, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
-            mockTgReceiveCallbackMessage(
+            mockTgReceiveInvoiceMessage(
               telegramServer,
               tgMessage.chatId,
               cbMessage.messageId,
               testLang,
-              LabelId.PaymentLink,
-              [
-                [
-                  new TelegramMessageMetaItem(
-                    TelegramMessageMetaType.Link,
-                    LabelId.PaymentLinkButton,
-                    "https://auth.robokassa.ru/Merchant"
-                  ),
-                ],
-              ]
+              paymentToken,
+              donationId,
+              price
             ),
-            mockCreateDonationRow(testPool, statModel, 5),
+            mockCreateDonationRow(testPool, statModel, 5, donationId),
           ]);
         });
       });
@@ -324,6 +309,8 @@ describe("[default language - english] fund", () => {
       it("responds on a /fund message with extra buttons and sends payment link", () => {
         tgMessage.setText(testMessageId, BotCommand.Fund);
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLang);
+        const donationId = 911;
+        const price = 7;
 
         const statModel = mockGetBotStatItem(
           testPool,
@@ -339,31 +326,24 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons(true)
+            getFundButtons()
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, "7", prefixId);
+          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLang, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
-            mockTgReceiveCallbackMessage(
+            mockTgReceiveInvoiceMessage(
               telegramServer,
               tgMessage.chatId,
               cbMessage.messageId,
               testLang,
-              LabelId.PaymentLink,
-              [
-                [
-                  new TelegramMessageMetaItem(
-                    TelegramMessageMetaType.Link,
-                    LabelId.PaymentLinkButton,
-                    "https://auth.robokassa.ru/Merchant"
-                  ),
-                ],
-              ]
+              paymentToken,
+              donationId,
+              price
             ),
-            mockCreateDonationRow(testPool, statModel, 7),
+            mockCreateDonationRow(testPool, statModel, 7, donationId),
           ]);
         });
       });

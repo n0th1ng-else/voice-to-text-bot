@@ -15,6 +15,7 @@ import { LabelId } from "../../src/text/labels";
 import { botCommands } from "../../src/telegram/data";
 import { flattenPromise } from "../../src/common/helpers";
 import { TelegramButtonModel } from "../../src/telegram/types";
+import { parseDonationPayload } from "../../src/telegram/helpers";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -140,7 +141,11 @@ export function mockTgReceiveMessage(
             expect(receivedItem).toBeDefined();
             expect(expectedItem).toBeDefined();
 
-            expect(receivedItem.text).toBe(text.t(expectedItem.title, lang));
+            expect(receivedItem.text).toBe(
+              typeof expectedItem.title === "string"
+                ? expectedItem.title
+                : text.t(expectedItem.title, lang)
+            );
 
             if (expectedItem.type === TelegramMessageMetaType.Button) {
               const btnData = TelegramButtonModel.fromDto(
@@ -233,7 +238,9 @@ export function mockTgReceiveCallbackMessage(
               expect(expectedItem).toBeDefined();
 
               expect(receivedItem.text).toBe(
-                text.t(expectedItem.title, langId)
+                typeof expectedItem.title === "string"
+                  ? expectedItem.title
+                  : text.t(expectedItem.title, langId)
               );
 
               if (expectedItem.type === TelegramMessageMetaType.Button) {
@@ -257,5 +264,43 @@ export function mockTgReceiveCallbackMessage(
         resolve();
         return telegramApiResponseOk;
       });
+  });
+}
+
+export function mockTgReceiveInvoiceMessage(
+  host: nock.Scope,
+  chatId: number,
+  messageId: number,
+  langId: LanguageCode,
+  paymentToken: string,
+  donationId: number,
+  price: number
+): Promise<void> {
+  return new Promise((resolve) => {
+    host.post("/bottelegram-api-token/sendInvoice").reply(200, (uri, body) => {
+      const answer = typeof body === "string" ? parse(body) : body;
+
+      expect(answer.chat_id).toBe(chatId);
+      expect(answer.currency).toBe("EUR");
+      expect(answer.provider_token).toBe(paymentToken);
+      expect(answer.start_parameter).toBe(String(donationId));
+      const payload = parseDonationPayload(answer.payload);
+      expect(payload.chatId).toBe(chatId);
+      expect(payload.donationId).toBe(donationId);
+      expect(payload.prefix).toBeDefined();
+
+      expect(answer.title).toBe(text.t(LabelId.DonationTitle, langId));
+      expect(answer.description).toBe(
+        text.t(LabelId.DonationDescription, langId)
+      );
+      expect(answer.prices).toHaveLength(1);
+      expect(answer.prices[0].amount).toBe(price * 100);
+      expect(answer.prices[0].label).toBe(
+        text.t(LabelId.DonationLabel, langId)
+      );
+
+      resolve();
+      return telegramApiResponseOk;
+    });
   });
 }

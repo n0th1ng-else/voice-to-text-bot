@@ -7,13 +7,15 @@ import {
   TelegramButtonType,
   TelegramMessagePrefix,
 } from "../types";
-import { isFundMessage } from "../helpers";
+import { getDonationDtoString, isFundMessage } from "../helpers";
 import { LabelId } from "../../text/labels";
-import { patreonAccount, yandexAccount } from "../../const";
 import { Logger } from "../../logger";
 import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 import { PaymentService } from "../../donate/types";
 import { AnalyticsData } from "../../analytics/legacy/types";
+import { LanguageCode } from "../../recognition/types";
+import { BOT_LOGO, donationLevels } from "../../const";
+import { TextModel } from "../../text";
 
 const logger = new Logger("telegram-bot");
 
@@ -59,28 +61,12 @@ export class FundAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const patreonBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.PatreonLinkTitle, lang),
-          url: patreonAccount,
-        };
-
-        const yandexBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.YandexLinkTitle, lang),
-          url: yandexAccount,
-        };
-
-        const usd5 = FundAction.getDonationButton(5, prefix.id, "😎");
-        const usd7 = FundAction.getDonationButton(7, prefix.id, "👑");
-        const usd10 = FundAction.getDonationButton(10, prefix.id, "‍🚀");
-        const donations = [usd5, usd7, usd10];
+        const donations = donationLevels.map((level) =>
+          FundAction.getDonationButton(level.amount, prefix.id, level.meta)
+        );
 
         const buttons: TgInlineKeyboardButton[][] = [];
-        if (this.payment) {
-          buttons.push(donations);
-        }
-
-        buttons.push([yandexBtn]);
-        buttons.push([patreonBtn]);
+        buttons.push(donations);
 
         return this.sendMessage(
           model.id,
@@ -152,18 +138,14 @@ export class FundAction extends GenericAction {
           );
         }
 
-        const link = this.payment.getLink(price, donationId, lang);
+        const token = this.payment.getLink(price, donationId, lang);
 
-        const payBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.PaymentLinkButton, lang),
-          url: link,
-        };
-
-        return this.editMessage(
+        return this.sendInvoice(
           model.chatId,
-          msg.message_id,
-          { lang, options: [[payBtn]] },
-          LabelId.PaymentLink,
+          price,
+          donationId,
+          token,
+          lang,
           prefix
         );
       })
@@ -181,7 +163,7 @@ export class FundAction extends GenericAction {
     emoji: string
   ): TgInlineKeyboardButton {
     return {
-      text: `${price}$ ${emoji}`,
+      text: TextModel.toCurrency(price, emoji),
       callback_data: new TelegramButtonModel(
         TelegramButtonType.Donation,
         `${price}`,
@@ -202,8 +184,42 @@ export class FundAction extends GenericAction {
         const errorMessage = `Unable to create donationId for price=${price}`;
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.setError(errorMessage);
-        const fallbackDonationId = 9999;
-        return fallbackDonationId;
+        throw err;
+      });
+  }
+
+  private sendInvoice(
+    chatId: number,
+    amount: number,
+    donationId: number,
+    token: string,
+    lang: LanguageCode,
+    prefix: TelegramMessagePrefix
+  ): Promise<void> {
+    const title = this.text.t(LabelId.DonationTitle, lang);
+    const description = this.text.t(LabelId.DonationDescription, lang);
+    const label = this.text.t(LabelId.DonationLabel, lang);
+    const photo = {
+      url: BOT_LOGO,
+      height: 1024,
+      width: 1024,
+    };
+    return this.bot
+      .sendInvoice(
+        chatId,
+        amount * 100,
+        String(donationId),
+        token,
+        title,
+        description,
+        label,
+        getDonationDtoString(donationId, chatId, prefix.id),
+        photo
+      )
+      .then(() => logger.info(`${prefix.getPrefix()} Invoice sent`))
+      .catch((err) => {
+        logger.error(`${prefix.getPrefix()} Unable to send the invoice`, err);
+        throw err;
       });
   }
 }

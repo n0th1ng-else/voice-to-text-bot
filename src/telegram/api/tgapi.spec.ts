@@ -184,10 +184,11 @@ describe("[telegram api client]", () => {
 
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/editMessageText`);
-          expect(Object.keys(config.data)).toHaveLength(3);
+          expect(Object.keys(config.data)).toHaveLength(4);
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.message_id).toBe(testMessageId);
           expect(config.data.text).toBe(testText);
+          expect(config.data.parse_mode).toBe("HTML");
         };
 
         return api
@@ -215,9 +216,10 @@ describe("[telegram api client]", () => {
 
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(2);
+          expect(Object.keys(config.data)).toHaveLength(3);
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.text).toBe(testText);
+          expect(config.data.parse_mode).toBe("HTML");
         };
 
         return api.sendMessage(testChatId, testText).then((data) => {
@@ -247,9 +249,10 @@ describe("[telegram api client]", () => {
 
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(3);
+          expect(Object.keys(config.data)).toHaveLength(4);
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.text).toBe(testText);
+          expect(config.data.parse_mode).toBe("HTML");
           expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
             testButton.text
           );
@@ -287,9 +290,10 @@ describe("[telegram api client]", () => {
 
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(3);
+          expect(Object.keys(config.data)).toHaveLength(4);
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.text).toBe(testText);
+          expect(config.data.parse_mode).toBe("HTML");
           expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
             testButton.text
           );
@@ -502,10 +506,11 @@ describe("[telegram api client]", () => {
 
       checkApiData = (config) => {
         expect(config.url).toBe(`/bot${testApiToken}/editMessageText`);
-        expect(Object.keys(config.data)).toHaveLength(3);
+        expect(Object.keys(config.data)).toHaveLength(4);
         expect(config.data.chat_id).toBe(testChatId);
         expect(config.data.message_id).toBe(testMessageId);
         expect(config.data.text).toBe(testText);
+        expect(config.data.parse_mode).toBe("HTML");
       };
 
       return getPromiseError(() =>
@@ -561,9 +566,10 @@ describe("[telegram api client]", () => {
 
       checkApiData = (config) => {
         expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-        expect(Object.keys(config.data)).toHaveLength(2);
+        expect(Object.keys(config.data)).toHaveLength(3);
         expect(config.data.chat_id).toBe(testChatId);
         expect(config.data.text).toBe(testText);
+        expect(config.data.parse_mode).toBe("HTML");
       };
 
       return getPromiseError(() => api.sendMessage(testChatId, testText)).then(

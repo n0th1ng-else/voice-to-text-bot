@@ -10,7 +10,8 @@ import {
 export function mockCreateDonationRow(
   pool: MockPool,
   item: BotStatRecordModel,
-  price: number
+  price: number,
+  donationId: number
 ): Promise<void> {
   return new Promise((resolve) => {
     pool.mockQuery(DonationsSql.insertRow, (values) => {
@@ -18,13 +19,20 @@ export function mockCreateDonationRow(
       const [rChatId, rStatus, rPrice] = values;
 
       expect(rChatId).toBe(item.chatId);
-      expect(rStatus).toBe(DonationStatus.Pending);
+      expect(rStatus).toBe(DonationStatus.Initialized);
       expect(rPrice).toBe(price);
 
       resolve();
 
       return Promise.resolve({
-        rows: [getDbDto(String(item.chatId), price, DonationStatus.Pending)],
+        rows: [
+          getDbDto(
+            String(item.chatId),
+            price,
+            DonationStatus.Initialized,
+            donationId
+          ),
+        ],
       });
     });
   });
@@ -33,10 +41,11 @@ export function mockCreateDonationRow(
 const getDbDto = (
   chatId: string,
   price: number,
-  status: string
+  status: string,
+  donationId: number
 ): DonationRowScheme => {
   return {
-    donation_id: 234,
+    donation_id: donationId,
     status,
     chat_id: chatId,
     price: price,

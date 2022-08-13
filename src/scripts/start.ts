@@ -13,8 +13,8 @@ import {
   memoryLimit,
   launchTime,
   dbPostgres,
-  roboKassa,
   witAiApi,
+  stripeToken,
 } from "../env";
 import {
   getVoiceConverterInstance,
@@ -30,7 +30,7 @@ import { printCurrentMemoryStat } from "../memory";
 import { StopListener } from "../process";
 import { httpsOptions } from "../../certs";
 import { DbClient } from "../db";
-import { RobokassaPayment } from "../donate/robokassa";
+import { StripePayment } from "../donate/stripe";
 import { getLaunchDelay } from "./init";
 
 const logger = new Logger("start-script");
@@ -66,11 +66,7 @@ export const run = (threadId = 0): void => {
     port: dbPostgres.port,
   }).setClientName(threadId);
 
-  const roboPayment = new RobokassaPayment(
-    roboKassa.login,
-    roboKassa.passwordForSend,
-    roboKassa.enableTest
-  );
+  const paymentProvider = new StripePayment(stripeToken);
 
   const bot = new TelegramBotModel(telegramBotApi, converter, db).setAuthor(
     authorTelegramAccount
@@ -89,7 +85,7 @@ export const run = (threadId = 0): void => {
           host
         )}. Launched at ${Logger.y(launchTime)}`
       );
-      bot.setHostLocation(host, launchTime).setPayment(roboPayment);
+      bot.setHostLocation(host, launchTime).setPayment(paymentProvider);
       return server
         .setSelfUrl(host)
         .setBots([bot])

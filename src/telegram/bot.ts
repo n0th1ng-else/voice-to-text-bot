@@ -1,4 +1,9 @@
-import { TgCallbackQuery, TgMessage, TgUpdate } from "./api/types";
+import {
+  TgCallbackQuery,
+  TgCheckoutQuery,
+  TgMessage,
+  TgUpdate,
+} from "./api/types";
 import { Logger } from "../logger";
 import { VoiceConverter } from "../recognition/types";
 import { LabelId } from "../text/labels";
@@ -103,6 +108,9 @@ export class TelegramBotModel {
         if (message.callback_query) {
           return this.handleCallbackQuery(message.callback_query, analytics);
         }
+        if (message.pre_checkout_query) {
+          return this.handleCheckout(message.pre_checkout_query, analytics);
+        }
 
         logger.warn("Message is not recognized", Object.keys(message));
       })
@@ -150,6 +158,10 @@ export class TelegramBotModel {
 
     if (this.actions.voice.runCondition(msg)) {
       return this.actions.voice.runAction(model, prefix);
+    }
+
+    if (this.actions.checkout.runCondition(msg)) {
+      return this.actions.checkout.runAction(model, prefix);
     }
 
     return this.sendNoVoiceMessage(model, prefix);
@@ -205,5 +217,12 @@ export class TelegramBotModel {
     analytics: AnalyticsData
   ): Promise<void> {
     return this.actions.handleCallback(msg, analytics);
+  }
+
+  private handleCheckout(
+    msg: TgCheckoutQuery,
+    analytics: AnalyticsData
+  ): Promise<void> {
+    return this.actions.handleCheckout(msg, analytics);
   }
 }
