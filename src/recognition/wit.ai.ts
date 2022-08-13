@@ -101,13 +101,10 @@ export class WithAiProvider extends VoiceConverter {
           ({ is_final: isFinal }) => isFinal
         );
         if (!finalizedChunks.length) {
-          const errMessage =
-            "The final response chunk not found. Transcription is empty.";
           logger.warn(
-            errMessage,
+            "The final response chunk not found. Transcription is empty.",
             chunks.map(({ text }) => text)
           );
-          throw new Error(errMessage);
         }
         return finalizedChunks;
       });
