@@ -34,7 +34,7 @@
 
 # Telegram Bot Converts Voice Messages Into Text
 
-<img src="/assets/botPic/botPic.png?raw=true" alt="Bot logo" height="50px" align="right">
+<img src="/assets/v1/botPic/botPic.png?raw=true" alt="Bot logo" height="50px" align="right">
 
 This is the simple bot that converts voice into text.
 I tried to review available public speech recognition services
