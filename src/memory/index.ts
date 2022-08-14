@@ -40,7 +40,7 @@ export const printCurrentMemoryStat = (
   return Promise.resolve();
 };
 
-export const getMemoryUsageMb = (): NodeJS.MemoryUsage => {
+const getMemoryUsageMb = (): NodeJS.MemoryUsage => {
   const stat = process.memoryUsage();
   return {
     heapTotal: getMb(stat.heapTotal),

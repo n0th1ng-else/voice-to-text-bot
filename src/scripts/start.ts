@@ -32,6 +32,7 @@ import { httpsOptions } from "../../certs";
 import { DbClient } from "../db";
 import { StripePayment } from "../donate/stripe";
 import { getLaunchDelay } from "./init";
+import { printCurrentStorageUsage } from "../storage";
 
 const logger = new Logger("start-script");
 
@@ -72,10 +73,16 @@ export const run = (threadId = 0): void => {
     authorTelegramAccount
   );
 
-  const daemon = new ScheduleDaemon("memory", () =>
+  const memoryDaemon = new ScheduleDaemon("memory", () =>
     printCurrentMemoryStat(memoryLimit)
   ).start();
-  const stopListener = new StopListener().addTrigger(() => daemon.stop());
+  const storageDaemon = new ScheduleDaemon("storage", () =>
+    printCurrentStorageUsage("video-temp")
+  ).start();
+  const stopListener = new StopListener().addTrigger(() => {
+    memoryDaemon.stop();
+    storageDaemon.stop();
+  });
 
   db.init()
     .then(() => getHostName(appPort, selfUrl, ngRokToken))
