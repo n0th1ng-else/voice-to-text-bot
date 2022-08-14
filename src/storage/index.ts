@@ -7,7 +7,7 @@ const logger = new Logger("storage");
 export const printCurrentStorageUsage = (dir: string): Promise<void> => {
   return Promise.resolve().then(() => {
     try {
-      const folder = resolvePath(__dirname, "..", "..", dir);
+      const folder = resolvePath(process.cwd(), dir);
       const files = readdirSync(folder).filter(
         (file) => !file.includes("gitkeep")
       );
@@ -19,18 +19,18 @@ export const printCurrentStorageUsage = (dir: string): Promise<void> => {
       const size =
         cacheSizeMBytes < 1 ? "almost empty" : `[size=${cacheSizeMBytes}Mb]`;
       const list = files.length ? `[files=${files.join(",")}]` : "no files";
-
+      const message = `Current storage ${size} ${list}`;
       if (cacheSizeMBytes < 50) {
-        logger.info(`Current storage ${size} ${list}`);
+        logger.info(message);
         return;
       }
       if (cacheSizeMBytes < 100) {
-        logger.warn(`Current storage ${size} ${list}`);
+        logger.warn(message);
         return;
       }
 
       logger.error(
-        `Current storage ${size} ${list}`,
+        message,
         new Error("The process exceeds cache storage limit")
       );
     } catch (err) {
