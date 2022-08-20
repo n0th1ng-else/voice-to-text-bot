@@ -67,11 +67,9 @@ export abstract class GenericAction {
     }
 
     logger.info(`${prefix.getPrefix()} Sending the message`);
-    return this.sendRawMessage(
-      chatId,
-      this.text.t(part, meta.lang),
-      meta.options
-    )
+    return this.sendRawMessage(chatId, this.text.t(part, meta.lang), {
+      buttons: meta.options,
+    })
       .then(() => this.sendMessage(messageId, chatId, msgs, meta, prefix))
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to send the message`, err);
@@ -87,12 +85,9 @@ export abstract class GenericAction {
     prefix: TelegramMessagePrefix
   ): Promise<void> {
     return this.bot
-      .editMessageText(
-        chatId,
-        messageId,
-        this.text.t(id, meta.lang),
-        meta.options
-      )
+      .editMessageText(chatId, messageId, this.text.t(id, meta.lang), {
+        buttons: meta.options,
+      })
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`))
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to update the message`, err);
@@ -103,7 +98,10 @@ export abstract class GenericAction {
   protected sendRawMessage(
     chatId: number,
     message: string,
-    options?: TgInlineKeyboardButton[][]
+    options: {
+      buttons?: TgInlineKeyboardButton[][];
+      disableMarkup?: boolean;
+    } = {}
   ): Promise<void> {
     return this.bot.sendMessage(chatId, message, options).then(flattenPromise);
   }

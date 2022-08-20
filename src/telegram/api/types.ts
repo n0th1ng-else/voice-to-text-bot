@@ -1,4 +1,7 @@
 export interface TgCore<Response> {
+  /**
+   * Highlights if the request was successful
+   */
   ok: boolean;
   result: Response;
   description?: string;
@@ -8,6 +11,9 @@ export interface TgCore<Response> {
 
 export interface TgErrorParameters {
   migrate_to_chat_id?: number;
+  /**
+   * If present, tell us when we can retry the request, in seconds
+   */
   retry_after?: number;
 }
 
@@ -86,12 +92,6 @@ export interface TgUser {
   last_name?: string;
   username?: string;
   language_code?: string;
-}
-
-export interface TgSendMessageOptions {
-  reply_markup: {
-    inline_keyboard: TgInlineKeyboardButton[][];
-  };
 }
 
 export interface TgInlineKeyboardButton {

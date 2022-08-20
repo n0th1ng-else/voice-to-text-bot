@@ -262,7 +262,83 @@ describe("[telegram api client]", () => {
         };
 
         return api
-          .sendMessage(testChatId, testText, [[testButton]])
+          .sendMessage(testChatId, testText, { buttons: [[testButton]] })
+          .then((data) => {
+            expect(data).toBeDefined();
+            expect(data.chat.id).toBe(testChatId);
+            expect(data.chat.type).toBe(testChatType);
+          });
+      });
+
+      it("sendMessage without markup", () => {
+        const testChatId = 323426;
+        const testText = "<|~foo_bar~|>";
+        const testChatType = TgChatType.Private;
+
+        testApiResponse = getApiResponse<TgMessage>(true, {
+          date: new Date().getTime(),
+          message_id: 32411244,
+          chat: {
+            id: testChatId,
+            type: testChatType,
+          },
+        });
+
+        checkApiData = (config) => {
+          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
+          expect(Object.keys(config.data)).toHaveLength(2);
+          expect(config.data.chat_id).toBe(testChatId);
+          expect(config.data.text).toBe(testText);
+          expect(config.data.parse_mode).toBe(undefined);
+          expect(config.data.reply_markup).toBe(undefined);
+        };
+
+        return api
+          .sendMessage(testChatId, testText, { disableMarkup: true })
+          .then((data) => {
+            expect(data).toBeDefined();
+            expect(data.chat.id).toBe(testChatId);
+            expect(data.chat.type).toBe(testChatType);
+          });
+      });
+
+      it("sendMessage with button and without markup", () => {
+        const testChatId = 323426;
+        const testText = "<|~foo_bar~|>";
+        const testChatType = TgChatType.Private;
+
+        const testButton: TgInlineKeyboardButton = {
+          text: "cool btn",
+          callback_data: "interesting data",
+        };
+        testApiResponse = getApiResponse<TgMessage>(true, {
+          date: new Date().getTime(),
+          message_id: 32411244,
+          chat: {
+            id: testChatId,
+            type: testChatType,
+          },
+        });
+
+        checkApiData = (config) => {
+          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
+          expect(Object.keys(config.data)).toHaveLength(3);
+          expect(config.data.chat_id).toBe(testChatId);
+          expect(config.data.text).toBe(testText);
+          expect(config.data.parse_mode).toBe(undefined);
+          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
+            testButton.text
+          );
+          expect(
+            config.data.reply_markup.inline_keyboard[0][0].callback_data
+          ).toBe(testButton.callback_data);
+        };
+
+        return api
+          .sendMessage(testChatId, testText, {
+            buttons: [[testButton]],
+            disableMarkup: true,
+          })
           .then((data) => {
             expect(data).toBeDefined();
             expect(data.chat.id).toBe(testChatId);
@@ -303,7 +379,7 @@ describe("[telegram api client]", () => {
         };
 
         return api
-          .sendMessage(testChatId, testText, [[testButton]])
+          .sendMessage(testChatId, testText, { buttons: [[testButton]] })
           .then((data) => {
             expect(data).toBeDefined();
             expect(data.chat.id).toBe(testChatId);

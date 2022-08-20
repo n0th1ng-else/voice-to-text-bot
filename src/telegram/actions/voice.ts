@@ -98,7 +98,9 @@ export class VoiceAction extends GenericAction {
         model.analytics.v4.addTime("voice-to-text-time", time.getMs());
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
-        return this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`);
+        return this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`, {
+          disableMarkup: true,
+        });
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
