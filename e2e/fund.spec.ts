@@ -55,6 +55,9 @@ import { StripePayment } from "../src/donate/stripe";
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
+jest.mock("../src/analytics/amplitude", () => ({
+  collectEvents: () => Promise.resolve(),
+}));
 
 mockGoogleAuth();
 

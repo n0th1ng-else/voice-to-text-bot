@@ -3,7 +3,7 @@ import { Logger } from "../../logger";
 import { AnalyticsDataDto } from "./types";
 import { analyticsId } from "../../env";
 
-const logger = new Logger("analytics");
+const logger = new Logger("analytics:ga");
 
 export const collectEvents = (data: AnalyticsDataDto): Promise<void> => {
   if (!analyticsId) {

@@ -3,7 +3,7 @@ import { Logger } from "../../logger";
 import { AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types";
 import { analytics } from "../../env";
 
-const logger = new Logger("analytics");
+const logger = new Logger("analytics:v4");
 
 export const collectEvents = (
   chatId: number,
