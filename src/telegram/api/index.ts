@@ -68,17 +68,23 @@ export class TelegramApi {
   public sendMessage(
     chatId: number,
     text: string,
-    buttons?: TgInlineKeyboardButton[][]
+    options: {
+      buttons?: TgInlineKeyboardButton[][];
+      disableMarkup?: boolean;
+    } = {}
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
       chat_id: chatId,
-      parse_mode: "HTML",
     };
 
-    if (buttons) {
+    if (!options.disableMarkup) {
+      data.parse_mode = "HTML";
+    }
+
+    if (options.buttons) {
       data.reply_markup = {
-        inline_keyboard: buttons,
+        inline_keyboard: options.buttons,
       };
     }
 
@@ -89,18 +95,24 @@ export class TelegramApi {
     chatId: number,
     messageId: number,
     text: string,
-    buttons?: TgInlineKeyboardButton[][]
+    options: {
+      buttons?: TgInlineKeyboardButton[][];
+      disableMarkup?: boolean;
+    } = {}
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
       chat_id: chatId,
       message_id: messageId,
-      parse_mode: "HTML",
     };
 
-    if (buttons) {
+    if (!options.disableMarkup) {
+      data.parse_mode = "HTML";
+    }
+
+    if (options.buttons) {
       data.reply_markup = {
-        inline_keyboard: buttons,
+        inline_keyboard: options.buttons,
       };
     }
 
