@@ -20,6 +20,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@amplitude/node": "1.10.0",
     "@google-cloud/pubsub": "2.16.1",
     "@google-cloud/secret-manager": "3.9.0",
     "@google-cloud/speech": "4.5.5",

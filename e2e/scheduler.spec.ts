@@ -19,6 +19,9 @@ const waiter = new WaiterForCalls();
 
 jest.mock("../src/logger");
 jest.mock("../src/env");
+jest.mock("../src/analytics/amplitude", () => ({
+  collectEvents: () => Promise.resolve(),
+}));
 
 const appPort = 3700;
 const hostUrl = `${localhostUrl}:${appPort}`;
