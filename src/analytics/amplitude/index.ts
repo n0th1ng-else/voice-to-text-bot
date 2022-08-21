@@ -1,4 +1,5 @@
 import { init as initAmplitude } from "@amplitude/node";
+import { customAlphabet } from "nanoid";
 
 import { AnalyticsEventExt } from "../v4/types";
 import { Logger } from "../../logger";
@@ -17,6 +18,19 @@ export const collectEvents = (chatId: number, events: AnalyticsEventExt[]) => {
 
   return Promise.resolve()
     .then(() => {
+      const nanoid = customAlphabet("0123456789", 18);
+      const sessionIdStr = `1${nanoid()}`;
+      const sessionId = Number(sessionIdStr);
+
+      if (isNaN(sessionId)) {
+        logger.warn("Session id is not a number, got string", {
+          sessionIdStr,
+        });
+      }
+      /**
+       * SessionId, 19 chars max
+       */
+      const eventSession = isNaN(sessionId) ? {} : { session_id: sessionId };
       const client = initAmplitude(amplitudeToken);
 
       return Promise.all(
@@ -27,6 +41,7 @@ export const collectEvents = (chatId: number, events: AnalyticsEventExt[]) => {
             language: event.params.language,
             app_version: event.params.app_version,
             event_properties: event,
+            ...eventSession,
           })
         )
       );
