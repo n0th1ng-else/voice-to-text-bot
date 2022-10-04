@@ -42,7 +42,7 @@ export const logApi = {
 
 export const memoryLimit = Number(process.env.MEMORY_LIMIT_MB) || 0;
 
-export const clusterSize = Number(process.env.CLUSTER_SIZE) || 1;
+export const clusterSize = Number(process.env.CLUSTER_SIZE) || 2;
 
 export const launchTime =
   Number(process.env.LAUNCH_TIME) || new Date().getTime();

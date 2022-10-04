@@ -1,4 +1,9 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosStatic } from "axios";
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosStatic,
+  CreateAxiosDefaults,
+} from "axios";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { TelegramApi } from "./index";
 import { nanoid } from "nanoid";
@@ -56,8 +61,8 @@ let checkApiData = (config: AxiosRequestConfig): void => {
 let testApiResponse;
 
 const clientSpy = jest
-  .spyOn<AxiosStatic, "create">(axios, "create")
-  .mockImplementation((config?: AxiosRequestConfig) => {
+  .spyOn(axios, "create")
+  .mockImplementation((config?: CreateAxiosDefaults) => {
     if (!config) {
       throw new Error("config can not be empty");
     }
@@ -65,6 +70,7 @@ const clientSpy = jest
     expect(config.timeout).toBe(TelegramApi.timeout);
     expect(config.method).toBe("POST");
     expect(config.responseType).toBe("json");
+    // @ts-expect-error Some mess with header types
     expect(config.headers?.Accept).toBe("application/json");
     expect(config.headers?.["Content-Type"]).toBe("application/json");
     return testClient;

@@ -70,13 +70,13 @@ export class WithAiProvider extends VoiceConverter {
       return Promise.reject(new Error("The auth token is not provided"));
     }
 
-    const url = new URL(`${WithAiProvider.url}/${path}`);
-    url.searchParams.set("v", WithAiProvider.apiVersion);
-
     return axios
       .request<string>({
         method: "POST",
-        url: url.toString(),
+        url: `${WithAiProvider.url}/${path}`,
+        params: {
+          v: WithAiProvider.apiVersion,
+        },
         headers: {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",

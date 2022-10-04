@@ -20,11 +20,11 @@ import { parseDonationPayload } from "../../src/telegram/helpers";
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
 
-export function sendTelegramMessage(
+export const sendTelegramMessage = (
   host: request.SuperTest<request.Test>,
   bot: TelegramBotModel,
   msg: TelegramMessageModel
-): Promise<void> {
+): Promise<void> => {
   return host
     .post(bot.getPath())
     .send({
@@ -34,13 +34,13 @@ export function sendTelegramMessage(
       expect(res.status).toBe(200);
       expect(res.body).toEqual({});
     });
-}
+};
 
-export function sendTelegramCallbackMessage(
+export const sendTelegramCallbackMessage = (
   host: request.SuperTest<request.Test>,
   bot: TelegramBotModel,
   msg: TelegramMessageModel
-): Promise<void> {
+): Promise<void> => {
   return host
     .post(bot.getPath())
     .send({
@@ -50,9 +50,9 @@ export function sendTelegramCallbackMessage(
       expect(res.status).toBe(200);
       expect(res.body).toEqual({});
     });
-}
+};
 
-export function mockTgSetCommands(host: nock.Scope): void {
+export const mockTgSetCommands = (host: nock.Scope): void => {
   host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
     const answer = typeof body === "string" ? parse(body) : body;
     expect(answer.commands).toBeDefined();
@@ -65,41 +65,44 @@ export function mockTgSetCommands(host: nock.Scope): void {
     });
     return [200, telegramApiResponseOk];
   });
-}
+};
 
-export function mockTgSetWebHook(host: nock.Scope, hookUrl: string): void {
+export const mockTgSetWebHook = (host: nock.Scope, hookUrl: string): void => {
   host.post("/bottelegram-api-token/setWebHook").reply(200, (uri, body) => {
     const answer = typeof body === "string" ? parse(body) : body;
     expect(answer.url).toBe(hookUrl);
     return telegramApiResponseOk;
   });
-}
+};
 
-export function mockTgGetWebHook(host: nock.Scope, hookUrl: string): void {
+export const mockTgGetWebHook = (host: nock.Scope, hookUrl: string): void => {
   host
     .post("/bottelegram-api-token/getWebhookInfo")
     .reply(200, JSON.stringify({ ok: true, result: { url: hookUrl } }));
-}
+};
 
-export function mockTgGetWebHookError(host: nock.Scope): void {
+export const mockTgGetWebHookError = (host: nock.Scope): void => {
   host.post("/bottelegram-api-token/getWebhookInfo").replyWithError({
     status: 503,
     message: "Telegram webhook is off",
   });
-}
+};
 
-export function mockTgReceiveUnexpectedMessage(host: nock.Scope, done): void {
+export const mockTgReceiveUnexpectedMessage = (
+  host: nock.Scope,
+  done
+): void => {
   host
     .post("/bottelegram-api-token/sendMessage")
     .reply(500, () => done.fail(new Error("The message is not expected")));
-}
+};
 
-export function mockTgReceiveRawMessage(
+export const mockTgReceiveRawMessage = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
   message: string
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
       const answer = typeof body === "string" ? parse(body) : body;
@@ -109,15 +112,15 @@ export function mockTgReceiveRawMessage(
       return telegramApiResponseOk;
     });
   });
-}
+};
 
-export function mockTgReceiveMessage(
+export const mockTgReceiveMessage = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
   textId: LabelId,
   expectedMarkup: TelegramMessageMetaItem[][] = []
-): Promise<string> {
+): Promise<string> => {
   return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
       const answer = typeof body === "string" ? parse(body) : body;
@@ -170,20 +173,20 @@ export function mockTgReceiveMessage(
       return telegramApiResponseOk;
     });
   });
-}
+};
 
-export function mockTgReceiveMessages(
+export const mockTgReceiveMessages = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
   textIds: LabelId[]
-): Promise<void> {
+): Promise<void> => {
   return Promise.all(
     textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId))
   ).then(flattenPromise);
-}
+};
 
-export function mockTgGetFileUrl(host: nock.Scope, fileId: string): void {
+export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
   const pathToFile = `super/path/to/file/${fileId}`;
   const fullPathToFile = `/file/bottelegram-api-token/${pathToFile}`;
 
@@ -202,16 +205,16 @@ export function mockTgGetFileUrl(host: nock.Scope, fileId: string): void {
         "Content-Type": "audio/ogg",
       }
     );
-}
+};
 
-export function mockTgReceiveCallbackMessage(
+export const mockTgReceiveCallbackMessage = (
   host: nock.Scope,
   chatId: number,
   messageId: number,
   langId: LanguageCode,
   textId: LabelId,
   expectedMarkup: TelegramMessageMetaItem[][] = []
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve) => {
     host
       .post("/bottelegram-api-token/editMessageText")
@@ -265,9 +268,9 @@ export function mockTgReceiveCallbackMessage(
         return telegramApiResponseOk;
       });
   });
-}
+};
 
-export function mockTgReceiveInvoiceMessage(
+export const mockTgReceiveInvoiceMessage = (
   host: nock.Scope,
   chatId: number,
   messageId: number,
@@ -275,7 +278,7 @@ export function mockTgReceiveInvoiceMessage(
   paymentToken: string,
   donationId: number,
   price: number
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendInvoice").reply(200, (uri, body) => {
       const answer = typeof body === "string" ? parse(body) : body;
@@ -303,4 +306,4 @@ export function mockTgReceiveInvoiceMessage(
       return telegramApiResponseOk;
     });
   });
-}
+};

@@ -218,10 +218,10 @@ export class BotStatRecordModel {
   }
 }
 
-export function getMockCertificate(): string {
+export const getMockCertificate = (): string => {
   const path = resolvePath(__dirname, "mockData", "googleapps_mock.key");
   return readFileSync(path, { encoding: "utf-8" });
-}
+};
 
 export const getFundButtons = (): TelegramMessageMetaItem[][] => {
   const buttons: TelegramMessageMetaItem[][] = [];

@@ -1,6 +1,6 @@
 import nock from "nock";
 
-export function mockGoogleAuth(): nock.Scope {
+export const mockGoogleAuth = (): nock.Scope => {
   const scope = nock("https://www.googleapis.com");
   scope.post("/oauth2/v4/token").reply(
     200,
@@ -12,9 +12,9 @@ export function mockGoogleAuth(): nock.Scope {
     { "Content-Type": "application/json" }
   );
   return scope;
-}
+};
 
-export function mockSpeechRecognition(text: string): nock.Scope {
+export const mockSpeechRecognition = (text: string): nock.Scope => {
   // TODO replace with real test data. This protobuf === gzipped 'supergroup'
   const response = text
     ? [
@@ -41,4 +41,4 @@ export function mockSpeechRecognition(text: string): nock.Scope {
       "Content-Encoding": "gzip",
     });
   return scope;
-}
+};
