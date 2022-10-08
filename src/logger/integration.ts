@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
-import { selfUrl, logApi, appVersion } from "../env";
+import { selfUrl, logApi, appVersion, isDebug } from "../env";
 
 export enum LogType {
   Info = "info",
@@ -59,7 +59,9 @@ const logglyTransport = isLoggingEnabled()
 const { combine, json, errors } = format;
 const bulkLogger = createLogger({
   format: combine(errors({ stack: true }), json()),
-  transports: [new transports.Console(), ...logglyTransport],
+  transports: isDebug
+    ? [new transports.Console(), ...logglyTransport]
+    : logglyTransport,
 });
 
 export const sendLogs = (
