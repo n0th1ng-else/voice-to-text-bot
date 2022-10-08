@@ -1,6 +1,7 @@
 import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
+import axios from "axios";
 import { selfUrl, logApi, appVersion, isDebug } from "../env";
 
 export enum LogType {
@@ -69,11 +70,12 @@ export const sendLogs = (
   id: string,
   prefix: string,
   message: string,
-  data: unknown
+  rawData: unknown
 ): void => {
   if (!isLoggingEnabled()) {
     return;
   }
+  const data = axios.isAxiosError(rawData) ? rawData.toJSON() : rawData;
 
   const logData = Array.isArray(data)
     ? data.reduce((res, prop, index) => {
