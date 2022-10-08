@@ -7,12 +7,12 @@ import {
   DonationStatus,
 } from "../../../src/db/sql/donations";
 
-export function mockCreateDonationRow(
+export const mockCreateDonationRow = (
   pool: MockPool,
   item: BotStatRecordModel,
   price: number,
   donationId: number
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(DonationsSql.insertRow, (values) => {
       expect(values).toHaveLength(5);
@@ -36,7 +36,7 @@ export function mockCreateDonationRow(
       });
     });
   });
-}
+};
 
 const getDbDto = (
   chatId: string,

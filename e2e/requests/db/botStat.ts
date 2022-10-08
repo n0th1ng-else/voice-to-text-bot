@@ -6,12 +6,12 @@ import { Pool as MockPool } from "../../../src/db/__mocks__/pg";
 import { UsagesSql } from "../../../src/db/sql/usages.sql";
 import { UsageRowScheme } from "../../../src/db/sql/usages";
 
-export function mockGetBotStatItem(
+export const mockGetBotStatItem = (
   pool: MockPool,
   chatId: number,
   lang: LanguageCode,
   item?: BotStatRecordModel
-): BotStatRecordModel {
+): BotStatRecordModel => {
   if (!item) {
     mockBotStatFind(pool, chatId);
     const stat = mockBotStatCreate(pool, chatId, "", lang);
@@ -20,43 +20,43 @@ export function mockGetBotStatItem(
 
   mockBotStatFind(pool, chatId, [item]);
   return item;
-}
+};
 
-export function mockUpdateBotStatUsage(
+export const mockUpdateBotStatUsage = (
   pool: MockPool,
   item: BotStatRecordModel
-): Promise<void> {
+): Promise<void> => {
   mockBotStatFind(pool, item.chatId, [item]);
   return mockBotStatUpdateUsage(pool, item);
-}
+};
 
-export function mockUpdateBotStatLang(
+export const mockUpdateBotStatLang = (
   pool: MockPool,
   item: BotStatRecordModel,
   langId: LanguageCode
-): Promise<void> {
+): Promise<void> => {
   mockBotStatFind(pool, item.chatId, [item]);
   return mockBotStatUpdateLang(pool, item, langId);
-}
+};
 
-function mockBotStatFind(
+const mockBotStatFind = (
   pool: MockPool,
   chatId: number,
   items: BotStatRecordModel[] = []
-): void {
+): void => {
   pool.mockQuery(UsagesSql.getRows, (values) => {
     expect(values).toHaveLength(1);
     expect(values[0]).toBe(chatId);
     return Promise.resolve({ rows: items.map((stat) => getDbDto(stat)) });
   });
-}
+};
 
-function mockBotStatCreate(
+const mockBotStatCreate = (
   pool: MockPool,
   chatId: number,
   userName: string,
   lang: LanguageCode
-): BotStatRecordModel {
+): BotStatRecordModel => {
   const stat = new BotStatRecordModel(chatId, lang);
   const objectId = randomIntFromInterval(1, 100000);
   stat.setObjectId(objectId).setUserName(userName);
@@ -76,12 +76,12 @@ function mockBotStatCreate(
   });
 
   return stat;
-}
+};
 
-function mockBotStatUpdateUsage(
+const mockBotStatUpdateUsage = (
   pool: MockPool,
   item: BotStatRecordModel
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(UsagesSql.updateRow, (values) => {
       expect(values).toHaveLength(5);
@@ -95,13 +95,13 @@ function mockBotStatUpdateUsage(
       return Promise.resolve({ rows: [getDbDto(item)] });
     });
   });
-}
+};
 
-function mockBotStatUpdateLang(
+const mockBotStatUpdateLang = (
   pool: MockPool,
   item: BotStatRecordModel,
   langId: LanguageCode
-): Promise<void> {
+): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(UsagesSql.updateRow, (values) => {
       expect(values).toHaveLength(5);
@@ -117,7 +117,7 @@ function mockBotStatUpdateLang(
       return Promise.resolve({ rows: [getDbDto(item)] });
     });
   });
-}
+};
 
 const getDbDto = (item: BotStatRecordModel): UsageRowScheme => {
   return {

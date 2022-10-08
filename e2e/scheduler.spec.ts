@@ -6,7 +6,7 @@ import {
   it,
   describe,
 } from "@jest/globals";
-import axios, { AxiosRequestConfig, AxiosStatic } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { ExpressServer } from "../src/server/express";
 import { appVersion } from "../src/env";
 import { localhostUrl } from "../src/const";
@@ -28,7 +28,7 @@ const hostUrl = `${localhostUrl}:${appPort}`;
 const nextUrl = `http://nexthost:${appPort + 1}`;
 
 const clientSpy = jest
-  .spyOn<AxiosStatic, "request">(axios, "request")
+  .spyOn(axios, "request")
   .mockImplementation((config?: AxiosRequestConfig) => {
     if (!config) {
       throw new Error("config can not be empty");

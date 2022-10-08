@@ -1,10 +1,11 @@
 config:
-  target: "https://localhost:3100"
+  target: "https://localhost:3000"
   plugins:
     expect: {}
   phases:
     - duration: 20
       arrivalRate: 20
+      name: First load
 scenarios:
   - flow:
       - get:
@@ -16,5 +17,5 @@ scenarios:
             - statusCode: 200
             - contentType: json
             - equals:
-                - 1
+                - 0
                 - "{{ threadId }}"

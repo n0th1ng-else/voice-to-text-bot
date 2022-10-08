@@ -18,9 +18,6 @@ export const collectEvents = (
   }
 
   const timeout = 10_000;
-  const url = new URL("https://www.google-analytics.com/mp/collect");
-  url.searchParams.set("api_secret", analytics.apiSecret);
-  url.searchParams.set("measurement_id", analytics.measurementId);
 
   const isTooManyEvents = events.length > EVENTS_LIMIT_GA;
   if (isTooManyEvents) {
@@ -30,7 +27,11 @@ export const collectEvents = (
   return axios
     .request({
       method: "POST",
-      url: url.toString(),
+      url: "https://www.google-analytics.com/mp/collect",
+      params: {
+        api_secret: analytics.apiSecret,
+        measurement_id: analytics.measurementId,
+      },
       headers: {
         Accept: "application/json",
         "User-Agent":

@@ -17,15 +17,11 @@ export const collectEvents = (data: AnalyticsDataDto): Promise<void> => {
   const timeout = 10_000;
   const logged = { ul: data.ul, cid: data.cid, uid: data.uid, t: data.t };
 
-  const url = new URL("https://www.google-analytics.com/collect");
-  Object.keys(data).forEach((key) => {
-    url.searchParams.set(key, data[key]);
-  });
-
   return axios
     .request({
       method: "GET",
-      url: url.toString(),
+      url: "https://www.google-analytics.com/collect",
+      params: data,
       headers: {
         Accept: "application/json",
         "User-Agent":
