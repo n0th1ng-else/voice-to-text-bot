@@ -1,0 +1,81 @@
+name: cmd
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  commands:
+    if: |
+      github.event.issue.pull_request &&
+      (github.event.comment.body == '/sandbox')
+    runs-on: ubuntu-latest
+    name: Trigger command
+    env:
+      CMD_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Reaction in progress
+        uses: dkershner6/reaction-action@v1
+        with:
+          token: ${{ env.CMD_TOKEN }}
+          reaction: "eyes"
+
+      - name: Fetch the last commit in the PR
+        id: sha
+        uses: actions/github-script@v4
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo, number } = context.issue;
+            const pr = await github.pulls.get({
+              owner,
+              repo,
+              pull_number: number,
+            });
+            return pr.data.head.sha
+
+      - name: Show what commit hash we put in the mix
+        run: echo Working on the commit hash ${{ steps.sha.outputs.result }}
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2.3.4
+        with:
+          ref: ${{ steps.sha.outputs.result }}
+
+      - name: Read NodeJS version from .nvmrc
+        id: node-version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.nvmrc
+          trim: true
+
+      - name: Setup NodeJS using the obtained nvm version
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.node-version.outputs.content }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Railway CLI
+        if: github.event.comment.body == '/sandbox'
+        run: npm i -g @railway/cli
+
+      - name: Publish to sandbox
+        if: github.event.comment.body == '/sandbox'
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_SANDBOX_TOKEN }}
+
+      - name: Send a rocket for success
+        uses: dkershner6/reaction-action@v1
+        with:
+          token: ${{ env.CMD_TOKEN }}
+          reaction: "rocket"
+
+      - name: Send a thumbs down when failed
+        if: ${{ failure() }}
+        uses: dkershner6/reaction-action@v1
+        with:
+          token: ${{ env.CMD_TOKEN }}
+          reaction: "-1"
