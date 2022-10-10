@@ -125,3 +125,30 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_ACTION: release
           D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
+
+  production:
+    runs-on: ubuntu-latest
+    name: Deploy to Railway.app production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Read NodeJS version from .nvmrc
+        id: node-version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.nvmrc
+          trim: true
+
+      - name: Setup NodeJS using the obtained nvm version
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.node-version.outputs.content }}
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy Dockerfile to PRODUCTION
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PRODUCTION_TOKEN }}
