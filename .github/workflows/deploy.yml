@@ -91,7 +91,7 @@ jobs:
   heroku-secondary:
     runs-on: ubuntu-latest
     name: Deploy to Heroku Secondary account
-    needs: heroku-master
+    needs: heroku-primary
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
