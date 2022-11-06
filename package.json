@@ -1,4 +1,7 @@
 {
+  "name": "audio-mess-bot",
+  "description": "Telegram Bot Converts Voice Messages Into Text",
+  "version": "1.0.0",
   "scripts": {
     "import": "node src/scripts/runTs.js import ts",
     "chart": "node src/scripts/runTs.js chart ts",
@@ -94,6 +97,11 @@
     "bot",
     "speech-to-text",
     "recognition",
-    "express"
+    "express",
+    "speech",
+    "voice",
+    "text",
+    "transcribe",
+    "cognitive"
   ]
 }
