@@ -1,8 +1,9 @@
 import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
+import Logsene from "winston-logsene";
 import axios from "axios";
-import { selfUrl, logApi, appVersion, isDebug } from "../env";
+import { selfUrl, logApi, logApiTokenV2, appVersion, isDebug } from "../env";
 
 export enum LogType {
   Info = "info",
@@ -46,16 +47,24 @@ const plainHost = selfUrl
   ? selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-")
   : "localhost";
 
-const logglyTransport = isLoggingEnabled()
-  ? [
-      new Loggly({
-        token: logApi.apiToken,
-        subdomain: logApi.projectId,
-        tags: [`app.${appVersion}`, `host.${plainHost}`],
-        json: true,
-      }),
-    ]
-  : [];
+const logTags = [`app.${appVersion}`, `host.${plainHost}`];
+
+const logglyTransport = [
+  isLoggingEnabled() &&
+    new Loggly({
+      token: logApi.apiToken,
+      subdomain: logApi.projectId,
+      tags: logTags,
+      json: true,
+    }),
+  logApiTokenV2 &&
+    new Logsene({
+      token: logApiTokenV2,
+      level: "info",
+      type: "application-logs",
+      url: "https://logsene-receiver.eu.sematext.com/_bulk",
+    }),
+].filter(Boolean);
 
 const { combine, json, errors } = format;
 const bulkLogger = createLogger({
@@ -72,7 +81,7 @@ export const sendLogs = (
   message: string,
   rawData: unknown
 ): void => {
-  if (!isLoggingEnabled()) {
+  if (!logglyTransport.length) {
     return;
   }
   const data = axios.isAxiosError(rawData) ? rawData.toJSON() : rawData;
@@ -94,6 +103,7 @@ export const sendLogs = (
     id,
     prefix: prefix || "no",
     raw: data,
+    tags: logTags,
     ...logData,
   };
 

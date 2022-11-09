@@ -11,7 +11,7 @@ export class Pool extends EventEmitter implements PGPool {
 
   private mockQueue: MockSql[] = [];
 
-  constructor(config: PoolConfig) {
+  constructor(_config: PoolConfig) {
     super();
   }
 

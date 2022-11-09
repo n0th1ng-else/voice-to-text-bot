@@ -38,13 +38,23 @@ export class ExpressServer {
     this.app.use("/static", express.static("assets/v2"));
 
     const statusHandler = (
-      _req: express.Request,
+      db: DbClient | null,
       res: express.Response<HealthDto>
     ): void => {
       const status = new HealthModel(this.version, this.isHttps, this.threadId);
       if (this.isIdle) {
+        status.setMessage("App is not connected to the Telegram server");
         res.status(400).send(status.getDto());
         return;
+      }
+
+      if (!db?.isReady()) {
+        // TODO fix behavior
+        // const errMessage = "Database is not ready";
+        // logger.error(errMessage, new Error(errMessage));
+        // status.setMessage("Database is not ready");
+        // res.status(400).send(status.getDto());
+        // return;
       }
 
       Promise.all(this.bots.map((bot) => bot.getHostLocation()))
@@ -55,23 +65,22 @@ export class ExpressServer {
         .catch((err) => {
           const errMessage = "Unable to get bot urls";
           logger.error(errMessage, err);
-          status.setError(errMessage);
+          status.setMessage(errMessage, true);
           res.status(400).send(status.getDto());
         });
     };
 
-    this.app.get(
-      "/health",
-      (req: express.Request, res: express.Response<HealthDto>) =>
-        statusHandler(req, res)
-    );
-    this.app.post(
-      "/lifecycle",
-      (req: express.Request, res: express.Response<HealthDto>) => {
-        logger.warn("Received app:restart hook from the buddy node", req.body);
-        statusHandler(req, res);
-      }
-    );
+    this.app.get("/health", (_req, res: express.Response<HealthDto>) => {
+      statusHandler(this.stat, res);
+    });
+    this.app.get("/", (_req, res: express.Response<string>) => {
+      logger.info("Received app root request");
+      res.status(200).send("The app is running");
+    });
+    this.app.post("/lifecycle", (req, res: express.Response<HealthDto>) => {
+      logger.warn("Received app:restart hook from the buddy node", req.body);
+      statusHandler(this.stat, res);
+    });
   }
 
   public setStat(stat: DbClient): this {
@@ -101,6 +110,7 @@ export class ExpressServer {
           this.selfUrl,
           this.threadId
         );
+        // TODO validate req.body
         bot.handleApiMessage(req.body, analytics);
         res.sendStatus(200);
       });

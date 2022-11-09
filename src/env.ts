@@ -40,6 +40,8 @@ export const logApi = {
   projectId: process.env.LOG_PROJECT_ID || "",
 };
 
+export const logApiTokenV2 = process.env.LOG_API_TOKEN_V2 || "";
+
 export const memoryLimit = Number(process.env.MEMORY_LIMIT_MB) || 0;
 
 export const clusterSize = Number(process.env.CLUSTER_SIZE) || 2;

@@ -38,9 +38,11 @@ export class HealthModel {
     this.urls = [...urls];
   }
 
-  public setError(errMessage: string): void {
-    this.status = HealthStatus.Error;
-    this.message = errMessage;
+  public setMessage(message: string, isError = false): void {
+    this.message = message;
+    if (isError) {
+      this.status = HealthStatus.Error;
+    }
   }
 
   public getDto(): HealthDto {

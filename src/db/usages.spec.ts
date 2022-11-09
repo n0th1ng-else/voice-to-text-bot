@@ -631,7 +631,7 @@ describe("Usages DB", () => {
         );
         testPool.mockQuery(UsagesSql.updateRow, (values) => {
           expect(values).toHaveLength(5);
-          const [rUser, rUsageCount, rLangId, rUpdated, rUsageId] = values;
+          const [rUser, rUsageCount, rLangId, _rUpdated, rUsageId] = values;
 
           expect(rUsageId).toBe(usageId);
           expect(rUser).toBe(userName);
