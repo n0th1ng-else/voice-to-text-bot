@@ -2,7 +2,6 @@ import { Pool, types as PGTypes, defaults as PGDefaults } from "pg";
 import { NodesClient } from "./nodes";
 import { UsagesClient } from "./usages";
 import { Logger } from "../logger";
-import { flattenPromise } from "../common/helpers";
 import { DonationsClient } from "./donations";
 import { UsedEmailClient } from "./emails";
 
@@ -23,6 +22,7 @@ export class DbClient {
   public readonly emails: UsedEmailClient;
 
   private readonly initialized: boolean;
+  private ready = false;
 
   private static getPool(config: DbConnectionConfig): Pool {
     return new Pool({
@@ -63,7 +63,13 @@ export class DbClient {
       this.nodes.init(),
       this.donations.init(),
       this.emails.init(),
-    ]).then(flattenPromise);
+    ]).then(() => {
+      this.ready = true;
+    });
+  }
+
+  public isReady(): boolean {
+    return this.ready;
   }
 
   public setClientName(threadId: number): this {

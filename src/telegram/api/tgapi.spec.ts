@@ -1,7 +1,6 @@
 import axios, {
   AxiosError,
   AxiosRequestConfig,
-  AxiosStatic,
   CreateAxiosDefaults,
 } from "axios";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";

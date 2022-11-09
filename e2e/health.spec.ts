@@ -106,6 +106,9 @@ describe("[health]", () => {
       expect(res.body.status).toBe(HealthStatus.InProgress);
       expect(res.body.urls).toEqual([]);
       expect(res.body.version).toBe(appVersion);
+      expect(res.body.message).toBe(
+        "App is not connected to the Telegram server"
+      );
     });
   });
 
