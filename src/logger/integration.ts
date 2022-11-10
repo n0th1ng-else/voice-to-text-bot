@@ -102,8 +102,9 @@ export const sendLogs = (
     title: stripAnsi(message),
     id,
     prefix: prefix || "no",
-    raw: data,
-    tags: logTags,
+    // raw: data,
+    appVersion: logTags[0],
+    appHost: logTags[1],
     ...logData,
   };
 
