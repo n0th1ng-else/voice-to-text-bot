@@ -30,6 +30,12 @@ const convertDataItem = (data: any, ind: number): Record<string, string> => {
     };
   }
 
+  if (data === null || data === undefined) {
+    return {
+      [`${recordKey}-0`]: data,
+    };
+  }
+
   if (Array.isArray(data)) {
     return data.reduce((res, item, index) => {
       res[`${recordKey}-${index}`] = item;
