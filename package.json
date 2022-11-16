@@ -10,7 +10,7 @@
     "chart": "node src/scripts/runTs.js chart ts",
     "start": "node src/scripts/runTs.js start ts",
     "dev": "dotenv node src/scripts/runTs.js dev ts",
-    "cluster": "node src/scripts/runTs.js cluster ts",
+    "cluster": "dotenv node src/scripts/runTs.js cluster ts",
     "start:js": "node dist/src/scripts/runJs.js start js",
     "dev:js": "dotenv node dist/src/scripts/runJs.js dev js",
     "cluster:js": "node dist/src/scripts/runJs.js cluster js",

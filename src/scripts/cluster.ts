@@ -1,4 +1,4 @@
-import cluster from "cluster";
+import cluster from "node:cluster";
 import { appPort, clusterSize, ngRokToken, selfUrl } from "../env";
 import { Logger } from "../logger";
 import { run as runServer } from "./start";
@@ -8,6 +8,14 @@ const logger = new Logger("cluster");
 
 export const run = (): void => {
   const launchTime = new Date().getTime();
+
+  const spawnInstance = (host: string, time: number) => {
+    logger.info("Spawning a new thread", { host, time });
+    cluster.fork({
+      SELF_URL: host,
+      LAUNCH_TIME: time,
+    });
+  };
 
   getHostName(appPort, selfUrl, ngRokToken).then((host) => {
     if (cluster.isMaster) {
@@ -22,23 +30,21 @@ export const run = (): void => {
 
       Array(size)
         .fill(null)
-        .forEach(() =>
-          cluster.fork({
-            SELF_URL: host,
-            LAUNCH_TIME: launchTime,
-          })
-        );
+        .forEach(() => {
+          spawnInstance(host, launchTime);
+        });
+
+      cluster.on("exit", (worker, code, signal) => {
+        logger.warn(`One thread has died. Spawning a new one`, {
+          code,
+          signal,
+          threadId: worker.id,
+        });
+        spawnInstance(host, launchTime);
+      });
     } else {
-      // @ts-expect-error We are inside worker, worker is defind
+      // @ts-expect-error We are inside worker, worker is defined
       runServer(cluster.worker.id);
     }
-
-    cluster.on("exit", (worker) => {
-      logger.warn(`Thread ${worker.id} has died. Spawning a new one`);
-      cluster.fork({
-        SELF_URL: host,
-        LAUNCH_TIME: launchTime,
-      });
-    });
   });
 };

@@ -91,9 +91,6 @@ export class ExpressServer {
 
   public setThreadId(threadId = 0): this {
     this.threadId = threadId;
-    if (this.threadId) {
-      logger.setAdditionalPrefix(`thread-${this.threadId}`);
-    }
     return this;
   }
 
