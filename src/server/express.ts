@@ -100,7 +100,17 @@ export class ExpressServer {
 
     bots.forEach((bot) => {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
-      this.app.post(bot.getPath(), (req, res) => {
+      this.app.post(bot.getPath(":id"), (req, res) => {
+        if (req.params.id !== bot.getId()) {
+          logger.warn(
+            "Wrong route id! Perhaps because of the cache on Telegram side.",
+            {
+              routeId: req.params.id,
+              botId: bot.getId(),
+            }
+          );
+        }
+
         logger.info("Incoming message");
         const analytics = new AnalyticsData(
           this.version,
@@ -112,7 +122,17 @@ export class ExpressServer {
         res.sendStatus(200);
       });
 
-      this.app.get(bot.getPath(), (_req, _res, next) => {
+      this.app.get(bot.getPath(":id"), (req, _res, next) => {
+        if (req.params.id !== bot.getId()) {
+          logger.warn(
+            "Wrong route id! Perhaps because of the cache on Telegram side.",
+            {
+              routeId: req.params.id,
+              botId: bot.getId(),
+            }
+          );
+        }
+
         logger.info("Route is enabled");
         next();
       });
