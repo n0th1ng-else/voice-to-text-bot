@@ -1,3 +1,4 @@
+import cluster from "node:cluster";
 import { green, red, yellow } from "colorette";
 import { LogType, sendLogs } from "./integration";
 
@@ -37,12 +38,12 @@ export class Logger {
       .replace("T", " ");
   }
 
-  private additionalPrefix = "";
+  private readonly additionalPrefix: string;
 
-  constructor(private readonly id: string = "") {}
-
-  public setAdditionalPrefix(prefix: string): void {
-    this.additionalPrefix = prefix;
+  constructor(private readonly id: string = "") {
+    // @ts-expect-error We are inside worker, worker is defined
+    const threadId = cluster.isMaster ? 0 : cluster.worker.id;
+    this.additionalPrefix = `thread-${threadId}`;
   }
 
   public info(msg: string, ...data: unknown[]): void {

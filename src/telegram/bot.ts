@@ -38,6 +38,10 @@ export class TelegramBotModel {
     this.actions.voice.setConverter(converter);
   }
 
+  public getId(): string {
+    return this.id;
+  }
+
   public setHostLocation(
     host: string,
     launchTime = new Date().getTime(),
@@ -92,8 +96,8 @@ export class TelegramBotModel {
     return this;
   }
 
-  public getPath(): string {
-    return `${this.path}/${this.id}`;
+  public getPath(id = this.id): string {
+    return `${this.path}/${id}`;
   }
 
   public handleApiMessage(
