@@ -71,12 +71,17 @@ export class TelegramApi {
     options: {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
-    } = {}
+    } = {},
+    forumThreadId?: number
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
       chat_id: chatId,
     };
+
+    if (forumThreadId) {
+      data.message_thread_id = forumThreadId;
+    }
 
     if (!options.disableMarkup) {
       data.parse_mode = "HTML";
@@ -147,7 +152,8 @@ export class TelegramApi {
       url: string;
       height: number;
       width: number;
-    }
+    },
+    forumThreadId?: number
   ): Promise<TgMessage> {
     const data: InvoiceDto = {
       chat_id: chatId,
@@ -167,6 +173,10 @@ export class TelegramApi {
       photo_width: photo.width,
       photo_height: photo.height,
     };
+
+    if (forumThreadId) {
+      data.message_thread_id = forumThreadId;
+    }
 
     return this.request<TgMessage, InvoiceDto>("sendInvoice", data);
   }

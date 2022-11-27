@@ -201,7 +201,8 @@ export class TelegramBotModel {
           model.chatId,
           LabelId.NoContent,
           { lang },
-          prefix
+          prefix,
+          model.forumThreadId
         )
       )
       .catch((err) => {

@@ -40,7 +40,8 @@ export class StartAction extends GenericAction {
             LabelId.DonateMessage,
           ],
           { lang },
-          prefix
+          prefix,
+          model.forumThreadId
         )
       )
       .then(() => logger.info(`${prefix.getPrefix()} Hello message sent`))

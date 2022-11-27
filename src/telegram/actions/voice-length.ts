@@ -60,7 +60,8 @@ export class VoiceLengthAction extends GenericAction {
           {
             lang,
           },
-          prefix
+          prefix,
+          model.forumThreadId
         )
       )
       .then(() =>

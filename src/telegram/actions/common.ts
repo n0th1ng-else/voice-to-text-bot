@@ -54,7 +54,8 @@ export abstract class GenericAction {
     chatId: number,
     ids: LabelId | LabelId[],
     meta: MessageOptions,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
+    forumThreadId?: number
   ): Promise<void> {
     const msgs = Array.isArray(ids) ? ids : [ids];
     if (!msgs.length) {
@@ -67,10 +68,17 @@ export abstract class GenericAction {
     }
 
     logger.info(`${prefix.getPrefix()} Sending the message`);
-    return this.sendRawMessage(chatId, this.text.t(part, meta.lang), {
-      buttons: meta.options,
-    })
-      .then(() => this.sendMessage(messageId, chatId, msgs, meta, prefix))
+    return this.sendRawMessage(
+      chatId,
+      this.text.t(part, meta.lang),
+      {
+        buttons: meta.options,
+      },
+      forumThreadId
+    )
+      .then(() =>
+        this.sendMessage(messageId, chatId, msgs, meta, prefix, forumThreadId)
+      )
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to send the message`, err);
         throw err;
@@ -101,9 +109,12 @@ export abstract class GenericAction {
     options: {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
-    } = {}
+    } = {},
+    forumThreadId?: number
   ): Promise<void> {
-    return this.bot.sendMessage(chatId, message, options).then(flattenPromise);
+    return this.bot
+      .sendMessage(chatId, message, options, forumThreadId)
+      .then(flattenPromise);
   }
 }
 

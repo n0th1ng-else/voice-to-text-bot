@@ -91,16 +91,22 @@ export class VoiceAction extends GenericAction {
             {
               lang,
             },
-            prefix
+            prefix,
+            model.forumThreadId
           );
         }
 
         model.analytics.v4.addTime("voice-to-text-time", time.getMs());
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
-        return this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`, {
-          disableMarkup: true,
-        });
+        return this.sendRawMessage(
+          model.chatId,
+          `${msgPrefix}🗣 ${text}`,
+          {
+            disableMarkup: true,
+          },
+          model.forumThreadId
+        );
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
@@ -132,7 +138,8 @@ export class VoiceAction extends GenericAction {
           {
             lang,
           },
-          prefix
+          prefix,
+          model.forumThreadId
         );
       })
       .catch((err) => {
@@ -179,7 +186,8 @@ export class VoiceAction extends GenericAction {
       {
         lang,
       },
-      prefix
+      prefix,
+      model.forumThreadId
     ).catch((err) => {
       const errorMessage = "Unable to send in progress message";
       logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);

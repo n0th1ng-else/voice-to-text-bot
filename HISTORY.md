@@ -227,3 +227,17 @@ of capacity to extend the functionality at the moment. But what I do is I keep t
 working (which is important) and also trying to get the opportunities when something is
 happening around. I love these news that I can enable longer voice messages to be transformed
 into text. Who knows what is next?
+
+### Forum groups support
+
+Recently Telegram introduced a concept of forum (or thread) groups. You can turn your group into
+the list of threads, each thread represents a channel on its own. For Forum groups Telegram
+introduced more metadata in the Message object. Now we have isTopicMessage flag that shows if we
+are in such thread group. And also messageThreadId is the anchor for the particular thread in the
+group. To support this we need to supply API payload with the threadId every time we want to answer
+in the thread. I usually barely follow the API documentation updates and found the related exception
+thanks to logs! Fo those who are (like me) did not have a clue what is changed, you might find
+yourself catching the errors like "Bad Request: TOPIC_DELETED" which is a clear indicator someone
+tries to use the bot in the forum group, but without the messageThreadId identifier Telegram fails
+to distinguish the particular thread to answer.
+We also celebrate 38000+ installs and 1000+ weekly active users! Omg this escalates quickly.
