@@ -11,7 +11,7 @@ import { LabelId } from "../../text/labels";
 import { LanguageCode, VoiceConverter } from "../../recognition/types";
 import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 import { TimeMeasure } from "../../common/timer";
-import { hasNoRightsToSendMessage } from "../errors";
+import { hasNoRightsToSendMessage, isBlockedByUser } from "../errors";
 
 const logger = new Logger("telegram-bot");
 
@@ -108,11 +108,12 @@ export class VoiceAction extends GenericAction {
       })
       .catch((err) => {
         const hasNoRights = hasNoRightsToSendMessage(err);
+        const isBlocked = isBlockedByUser(err);
         const errorMessage = "Unable to recognize the file";
         const logError = `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
           model.voiceFileId
         )}`;
-        if (hasNoRights) {
+        if (hasNoRights || isBlocked) {
           logger.warn(logError, err);
         } else {
           logger.error(logError, err);

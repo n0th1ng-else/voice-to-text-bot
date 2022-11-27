@@ -224,7 +224,7 @@ describe("Nodes DB", () => {
 
       testPool.mockQuery(NodesSql.updateRow, (values) => {
         expect(values).toHaveLength(4);
-        const [rActive, rVersion, _rUpdated, rNodeId] = values;
+        const [rActive, rVersion, , rNodeId] = values;
 
         expect(rNodeId).toBe(nodeId);
         expect(rActive).toBe(active);

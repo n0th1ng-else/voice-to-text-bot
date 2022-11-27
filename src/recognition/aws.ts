@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
+import { VoiceConverter, VoiceConverterOptions } from "./types";
 import { getWav } from "../ffmpeg";
 import { Logger } from "../logger";
 
@@ -32,8 +32,7 @@ export class AWSProvider extends VoiceConverter {
   public transformToText(
     fileLink: string,
     fileId: string,
-    isVideo: boolean,
-    lang: LanguageCode
+    isVideo: boolean
   ): Promise<string> {
     const name = `${fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
