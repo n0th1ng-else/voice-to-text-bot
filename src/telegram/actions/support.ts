@@ -64,7 +64,8 @@ export class SupportAction extends GenericAction {
             lang,
             options: buttons,
           },
-          prefix
+          prefix,
+          model.forumThreadId
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Support message sent`))

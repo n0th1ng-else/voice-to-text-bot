@@ -38,6 +38,8 @@ export interface TgMessage {
   audio?: TgMedia;
   video_note?: TgMedia;
   successful_payment?: SuccessfulPayment;
+  is_topic_message?: boolean;
+  message_thread_id?: number;
 }
 
 export interface TgChat {
@@ -117,6 +119,7 @@ export interface MessageDto {
   reply_markup?: {
     inline_keyboard: TgInlineKeyboardButton[][];
   };
+  message_thread_id?: number;
 }
 
 interface LabeledPrice {
@@ -132,10 +135,11 @@ export interface InvoiceDto {
   provider_token: string; // Provider token
   currency: string; // EUR
   prices: LabeledPrice[];
-  start_parameter: string; // donation id
+  start_parameter: string; // Donation id
   photo_url: string;
   photo_width: number;
   photo_height: number;
+  message_thread_id?: number; // Forum thread id
 }
 
 export interface PreCheckoutQueryDto {

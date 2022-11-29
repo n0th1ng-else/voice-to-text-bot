@@ -11,3 +11,15 @@ export const hasNoRightsToSendMessage = (err: unknown): boolean => {
   }
   return false;
 };
+
+export const isBlockedByUser = (err: unknown): boolean => {
+  if (err instanceof TgError) {
+    const isErr = !err?.response?.ok;
+    const isForbidden = err?.response?.error_code === 403;
+    const isBlocked =
+      err?.response?.description?.toLowerCase() ===
+      "Forbidden: bot was blocked by the user".toLowerCase();
+    return isErr && isForbidden && isBlocked;
+  }
+  return false;
+};

@@ -54,10 +54,16 @@ export class LangAction extends GenericAction {
   ): Promise<void> {
     const messageId = message.message_id;
     const chatId = message.chat.id;
+    let forumThreadId: number | undefined;
+    if (message.is_topic_message && message.message_thread_id) {
+      forumThreadId = message.message_thread_id;
+    }
     analytics.setId(chatId).setLang(getRawUserLanguage(msg));
 
     return this.getLangData(chatId, button)
-      .then((opts) => this.updateLanguage(opts, chatId, messageId, analytics))
+      .then((opts) =>
+        this.updateLanguage(opts, chatId, messageId, analytics, forumThreadId)
+      )
       .catch((err) => {
         const errorMessage = "Unable to handle language change";
         logger.error(errorMessage, err);
@@ -78,7 +84,8 @@ export class LangAction extends GenericAction {
     opts: BotLangData,
     chatId: number,
     messageId: number,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
+    forumThreadId?: number
   ): Promise<void> {
     const lang = opts.langId;
     const prefix = opts.prefix;
@@ -100,7 +107,8 @@ export class LangAction extends GenericAction {
             chatId,
             LabelId.UpdateLanguageError,
             { lang },
-            prefix
+            prefix,
+            forumThreadId
           );
         }
       )
@@ -187,7 +195,8 @@ export class LangAction extends GenericAction {
               ],
             ],
           },
-          prefix
+          prefix,
+          model.forumThreadId
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Language selector sent`))

@@ -54,6 +54,7 @@ export class BotMessageModel {
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
   public readonly donationId: number;
+  public readonly forumThreadId?: number;
 
   constructor(msg: TgMessage, analytics: AnalyticsData) {
     this.id = msg.message_id;
@@ -69,6 +70,9 @@ export class BotMessageModel {
     this.donationId = parseDonationPayload(
       msg.successful_payment?.invoice_payload
     ).donationId;
+    if (msg.is_topic_message && msg.message_thread_id) {
+      this.forumThreadId = msg.message_thread_id;
+    }
     this.analytics = analytics
       .setId(this.chatId)
       .setLang(getRawUserLanguage(msg));

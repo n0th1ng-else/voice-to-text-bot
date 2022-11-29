@@ -11,7 +11,7 @@ import { LabelId } from "../../text/labels";
 import { LanguageCode, VoiceConverter } from "../../recognition/types";
 import { collectAnalytics, collectPageAnalytics } from "../../analytics";
 import { TimeMeasure } from "../../common/timer";
-import { hasNoRightsToSendMessage } from "../errors";
+import { hasNoRightsToSendMessage, isBlockedByUser } from "../errors";
 
 const logger = new Logger("telegram-bot");
 
@@ -91,16 +91,22 @@ export class VoiceAction extends GenericAction {
             {
               lang,
             },
-            prefix
+            prefix,
+            model.forumThreadId
           );
         }
 
         model.analytics.v4.addTime("voice-to-text-time", time.getMs());
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
-        return this.sendRawMessage(model.chatId, `${msgPrefix}🗣 ${text}`, {
-          disableMarkup: true,
-        });
+        return this.sendRawMessage(
+          model.chatId,
+          `${msgPrefix}🗣 ${text}`,
+          {
+            disableMarkup: true,
+          },
+          model.forumThreadId
+        );
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
@@ -108,11 +114,12 @@ export class VoiceAction extends GenericAction {
       })
       .catch((err) => {
         const hasNoRights = hasNoRightsToSendMessage(err);
+        const isBlocked = isBlockedByUser(err);
         const errorMessage = "Unable to recognize the file";
         const logError = `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
           model.voiceFileId
         )}`;
-        if (hasNoRights) {
+        if (hasNoRights || isBlocked) {
           logger.warn(logError, err);
         } else {
           logger.error(logError, err);
@@ -131,7 +138,8 @@ export class VoiceAction extends GenericAction {
           {
             lang,
           },
-          prefix
+          prefix,
+          model.forumThreadId
         );
       })
       .catch((err) => {
@@ -178,7 +186,8 @@ export class VoiceAction extends GenericAction {
       {
         lang,
       },
-      prefix
+      prefix,
+      model.forumThreadId
     ).catch((err) => {
       const errorMessage = "Unable to send in progress message";
       logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);

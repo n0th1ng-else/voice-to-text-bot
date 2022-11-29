@@ -76,7 +76,8 @@ export class FundAction extends GenericAction {
             lang,
             options: buttons,
           },
-          prefix
+          prefix,
+          model.forumThreadId
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Fund message sent`))
@@ -146,7 +147,8 @@ export class FundAction extends GenericAction {
           donationId,
           token,
           lang,
-          prefix
+          prefix,
+          model.forumThreadId
         );
       })
       .catch((err) => {
@@ -194,7 +196,8 @@ export class FundAction extends GenericAction {
     donationId: number,
     token: string,
     lang: LanguageCode,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
+    forumThreadId?: number
   ): Promise<void> {
     const title = this.text.t(LabelId.DonationTitle, lang);
     const description = this.text.t(LabelId.DonationDescription, lang);
@@ -214,7 +217,8 @@ export class FundAction extends GenericAction {
         description,
         label,
         getDonationDtoString(donationId, chatId, prefix.id),
-        photo
+        photo,
+        forumThreadId
       )
       .then(() => logger.info(`${prefix.getPrefix()} Invoice sent`))
       .catch((err) => {
