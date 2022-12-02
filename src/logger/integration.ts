@@ -2,7 +2,7 @@ import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
 import Logsene from "winston-logsene";
-import axios from "axios";
+import { isAxiosError, AxiosError } from "axios";
 import { selfUrl, logApi, logApiTokenV2, appVersion, isDebug } from "../env";
 
 export enum LogType {
@@ -10,6 +10,8 @@ export enum LogType {
   Warn = "warn",
   Error = "error",
 }
+
+const SANITIZE_CHARACTER = ":cleared:";
 
 const isLoggingEnabled = (): boolean =>
   Boolean(logApi.apiToken && logApi.projectId);
@@ -80,6 +82,21 @@ const bulkLogger = createLogger({
     : logglyTransport,
 });
 
+const sanitizeError = (rawData: unknown): unknown => {
+  if (!isAxiosError(rawData)) {
+    return rawData;
+  }
+
+  // Axios .toJSON() returns object, not AxiosError :sad:
+  const data = rawData.toJSON() as AxiosError;
+
+  if (data?.config?.headers?.Authorization) {
+    data.config.headers.Authorization = SANITIZE_CHARACTER;
+  }
+
+  return data;
+};
+
 export const sendLogs = (
   type: LogType,
   id: string,
@@ -90,7 +107,7 @@ export const sendLogs = (
   if (!logglyTransport.length) {
     return;
   }
-  const data = axios.isAxiosError(rawData) ? rawData.toJSON() : rawData;
+  const data = sanitizeError(rawData);
 
   const logData = Array.isArray(data)
     ? data.reduce((res, prop, index) => {
