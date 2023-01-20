@@ -15,6 +15,8 @@ import {
   TgWebHook,
 } from "./types";
 
+export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
+
 export class TelegramApi {
   public static readonly url = "https://api.telegram.org";
   public static readonly timeout = 60_000;

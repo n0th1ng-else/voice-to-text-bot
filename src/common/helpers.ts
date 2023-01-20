@@ -1,5 +1,6 @@
 import { Logger } from "../logger";
 import { sleepFor } from "./timer";
+import { LanguageCode } from "../recognition/types";
 
 const logger = new Logger("run-retry");
 
@@ -29,4 +30,35 @@ export const runPromiseWithRetry = <D>(
 
 export const flattenPromise = () => {
   // Flatten promise
+};
+
+export const splitTextIntoParts = (
+  text: string,
+  lang: LanguageCode,
+  maxLength: number
+): string[] => {
+  if (text.length <= maxLength) {
+    return [text];
+  }
+
+  const segmenter = new Intl.Segmenter(lang, { granularity: "word" });
+  const segments = segmenter.segment(text);
+
+  const parts: string[] = [];
+
+  let part = "";
+  for (const { segment } of segments) {
+    if (part.length + segment.length > maxLength) {
+      parts.push(part.trim());
+      part = "";
+    }
+    part = `${part}${segment}`;
+  }
+
+  part = part.trim();
+  if (part) {
+    parts.push(part);
+  }
+
+  return parts;
 };

@@ -241,3 +241,14 @@ yourself catching the errors like "Bad Request: TOPIC_DELETED" which is a clear 
 tries to use the bot in the forum group, but without the messageThreadId identifier Telegram fails
 to distinguish the particular thread to answer.
 We also celebrate 38000+ installs and 1000+ weekly active users! Omg this escalates quickly.
+
+### Telegram message max length is 4096 chars
+
+You could expect the messages in the social media platform have the length limit. Thi sis also true
+for Telegram. It has the 4096 chars limit for a single message content. Why care? Back in the days
+the voice message length was limited by 20 seconds, which is rather small. In the meantime, it means
+we can never hit the text limit per message. Now we have a voice duration limit equal to 1,5 minutes!
+It is still not that long, but I was able to catch the error in the logs that some message hit the
+limit. With this commit, it should be fixed. We now split messages longer than 4096 characters into
+chunks and send each chunk separately one by one.
+As for the metrics, we went beyond 40000+ installs and floating around the 1200 WAU.
