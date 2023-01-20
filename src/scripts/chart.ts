@@ -3,7 +3,7 @@ import { createServer as createHttps } from "https";
 import { createServer as createHttp } from "http";
 import { resolve as resolvePath } from "path";
 import { Logger } from "../logger";
-import { appPort, enableSSL } from "../env";
+import * as envy from "../env";
 import { sSuffix } from "../text";
 import { httpsOptions } from "../../certs";
 import { DbClient } from "../db";
@@ -85,11 +85,13 @@ export const run = (): void => {
       });
   });
 
-  logger.info(`Starting ${Logger.y(sSuffix("http", enableSSL))} server`);
+  logger.info(`Starting ${Logger.y(sSuffix("http", envy.enableSSL))} server`);
 
-  const server = enableSSL ? createHttps(httpsOptions, app) : createHttp(app);
+  const server = envy.enableSSL
+    ? createHttps(httpsOptions, app)
+    : createHttp(app);
 
-  server.listen(appPort, () => {
-    logger.info(`Express server is listening on ${Logger.y(appPort)}`);
+  server.listen(envy.appPort, () => {
+    logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
   });
 };
