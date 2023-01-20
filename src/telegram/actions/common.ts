@@ -8,9 +8,9 @@ import { LanguageCode } from "../../recognition/types";
 import { Logger } from "../../logger";
 import { TextModel } from "../../text";
 import { LabelId } from "../../text/labels";
-import { TelegramApi } from "../api";
+import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api";
 import { DbClient } from "../../db";
-import { flattenPromise } from "../../common/helpers";
+import { splitTextIntoParts } from "../../common/helpers";
 
 const logger = new Logger("telegram-bot");
 
@@ -71,6 +71,7 @@ export abstract class GenericAction {
     return this.sendRawMessage(
       chatId,
       this.text.t(part, meta.lang),
+      meta.lang,
       {
         buttons: meta.options,
       },
@@ -106,15 +107,45 @@ export abstract class GenericAction {
   protected sendRawMessage(
     chatId: number,
     message: string,
+    lang: LanguageCode,
     options: {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
     } = {},
     forumThreadId?: number
   ): Promise<void> {
+    const messageParts = splitTextIntoParts(
+      message,
+      lang,
+      TELEGRAM_API_MAX_MESSAGE_SIZE
+    );
+    return this.sendRawMessageParts(
+      chatId,
+      messageParts,
+      options,
+      forumThreadId
+    );
+  }
+
+  private sendRawMessageParts(
+    chatId: number,
+    messageParts: string[],
+    options: {
+      buttons?: TgInlineKeyboardButton[][];
+      disableMarkup?: boolean;
+    } = {},
+    forumThreadId?: number
+  ): Promise<void> {
+    const message = messageParts.shift();
+    if (!message) {
+      return Promise.resolve();
+    }
+
     return this.bot
       .sendMessage(chatId, message, options, forumThreadId)
-      .then(flattenPromise);
+      .then(() =>
+        this.sendRawMessageParts(chatId, messageParts, options, forumThreadId)
+      );
   }
 }
 

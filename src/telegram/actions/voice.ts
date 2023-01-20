@@ -102,6 +102,7 @@ export class VoiceAction extends GenericAction {
         return this.sendRawMessage(
           model.chatId,
           `${msgPrefix}🗣 ${text}`,
+          lang,
           {
             disableMarkup: true,
           },
