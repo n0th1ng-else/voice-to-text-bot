@@ -1,5 +1,5 @@
 import cluster from "node:cluster";
-import { green, red, yellow } from "colorette";
+import { green, red, yellow } from "picocolors";
 import { LogType, sendLogs } from "./integration";
 
 export class Logger {
@@ -41,8 +41,7 @@ export class Logger {
   private readonly additionalPrefix: string;
 
   constructor(private readonly id: string = "") {
-    // @ts-expect-error We are inside worker, worker is defined
-    const threadId = cluster.isMaster ? 0 : cluster.worker.id;
+    const threadId = cluster.isMaster ? 0 : cluster?.worker?.id || 0;
     this.additionalPrefix = `thread-${threadId}`;
   }
 

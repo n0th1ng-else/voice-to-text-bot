@@ -1,5 +1,5 @@
 import cluster from "node:cluster";
-import { appPort, clusterSize, ngRokToken, selfUrl } from "../env";
+import * as envy from "../env";
 import { Logger } from "../logger";
 import { run as runServer } from "./start";
 import { getHostName } from "../server/tunnel";
@@ -17,16 +17,16 @@ export const run = (): void => {
     });
   };
 
-  getHostName(appPort, selfUrl, ngRokToken).then((host) => {
+  getHostName(envy.appPort, envy.selfUrl, envy.ngRokToken).then((host) => {
     if (cluster.isMaster) {
-      const isCLusterSizeValid = clusterSize && clusterSize > 0;
+      const isCLusterSizeValid = envy.clusterSize && envy.clusterSize > 0;
       if (!isCLusterSizeValid) {
         logger.error(
-          `Cluster size is not valid. Falling back to size=1. cLusterSize=${clusterSize}`,
+          `Cluster size is not valid. Falling back to size=1. cLusterSize=${envy.clusterSize}`,
           new Error("Cluster size is not valid")
         );
       }
-      const size = isCLusterSizeValid ? clusterSize : 1;
+      const size = isCLusterSizeValid ? envy.clusterSize : 1;
 
       Array(size)
         .fill(null)

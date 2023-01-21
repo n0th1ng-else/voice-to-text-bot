@@ -7,7 +7,7 @@ const logger = new Logger("media-to-wav");
 
 const generateFileName = (): string => `${nanoid()}.tmp`;
 
-const isFileExist = (fileName: string): Promise<boolean> =>
+export const isFileExist = (fileName: string): Promise<boolean> =>
   promises.access(fileName).then(
     () => true,
     () => false

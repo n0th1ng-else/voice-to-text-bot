@@ -74,3 +74,8 @@ export const isDebug = process.env.DEBUG === "true";
 export const stripeToken = process.env.STRIPE_TOKEN || "";
 
 export const amplitudeToken = process.env.AMPLITUDE_TOKEN || "";
+
+export const monitoring = {
+  token: process.env.MON_MONITORING_TOKEN || "",
+  infra: process.env.MON_INFRA_TOKEN || "",
+};

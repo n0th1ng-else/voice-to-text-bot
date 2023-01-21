@@ -1,19 +1,4 @@
-import {
-  appPort,
-  enableSSL,
-  googleApi,
-  provider,
-  selfUrl,
-  telegramBotApi,
-  ngRokToken,
-  authorTelegramAccount,
-  appVersion,
-  launchTime,
-  memoryLimit,
-  dbPostgres,
-  witAiApi,
-  stripeToken,
-} from "../env";
+import * as envy from "../env";
 import { Logger } from "../logger";
 import { VoiceConverterOptions } from "../recognition/types";
 import {
@@ -31,6 +16,7 @@ import { DbClient } from "../db";
 import { StripePayment } from "../donate/stripe";
 import { getLaunchDelay } from "./init";
 import { printCurrentStorageUsage } from "../storage";
+import { launchMonitoringAgent } from "../monitoring";
 
 const logger = new Logger("dev-script");
 
@@ -38,41 +24,43 @@ export const run = (threadId = 0): void => {
   const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
-    appPort,
-    enableSSL,
-    appVersion,
+    envy.appPort,
+    envy.enableSSL,
+    envy.appVersion,
     httpsOptions
   );
 
   const converterOptions: VoiceConverterOptions = {
-    googlePrivateKey: googleApi.privateKey,
-    googleProjectId: googleApi.projectId,
-    googleClientEmail: googleApi.clientEmail,
-    witAiTokenEn: witAiApi.tokenEn,
-    witAiTokenRu: witAiApi.tokenRu,
+    googlePrivateKey: envy.googleApi.privateKey,
+    googleProjectId: envy.googleApi.projectId,
+    googleClientEmail: envy.googleApi.clientEmail,
+    witAiTokenEn: envy.witAiApi.tokenEn,
+    witAiTokenRu: envy.witAiApi.tokenRu,
   };
 
   const converter = getVoiceConverterInstance(
-    getVoiceConverterProvider(provider),
+    getVoiceConverterProvider(envy.provider),
     converterOptions
   );
 
   const db = new DbClient({
-    user: dbPostgres.user,
-    password: dbPostgres.password,
-    host: dbPostgres.host,
-    database: dbPostgres.database,
-    port: dbPostgres.port,
+    user: envy.dbPostgres.user,
+    password: envy.dbPostgres.password,
+    host: envy.dbPostgres.host,
+    database: envy.dbPostgres.database,
+    port: envy.dbPostgres.port,
   }).setClientName(threadId);
 
-  const paymentProvider = new StripePayment(stripeToken);
+  const paymentProvider = new StripePayment(envy.stripeToken);
 
-  const bot = new TelegramBotModel(telegramBotApi, converter, db).setAuthor(
-    authorTelegramAccount
-  );
+  const bot = new TelegramBotModel(
+    envy.telegramBotApi,
+    converter,
+    db
+  ).setAuthor(envy.authorTelegramAccount);
 
   const memoryDaemon = new ScheduleDaemon("memory", () =>
-    printCurrentMemoryStat(memoryLimit)
+    printCurrentMemoryStat(envy.memoryLimit)
   ).start();
   const storageDaemon = new ScheduleDaemon("storage", () =>
     printCurrentStorageUsage("video-temp")
@@ -82,11 +70,12 @@ export const run = (threadId = 0): void => {
     storageDaemon.stop();
   });
 
-  db.init()
-    .then(() => getHostName(appPort, selfUrl, ngRokToken))
+  launchMonitoringAgent(envy.monitoring.token, envy.monitoring.infra)
+    .then(() => db.init())
+    .then(() => getHostName(envy.appPort, envy.selfUrl, envy.ngRokToken))
     .then((host) => {
       logger.info(`Telling telegram our location is ${Logger.y(host)}`);
-      bot.setHostLocation(host, launchTime).setPayment(paymentProvider);
+      bot.setHostLocation(host, envy.launchTime).setPayment(paymentProvider);
 
       return server
         .setSelfUrl(host)

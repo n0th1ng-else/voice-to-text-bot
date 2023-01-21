@@ -3,7 +3,7 @@ import { createServer as createHttps } from "https";
 import { createServer as createHttp } from "http";
 import { resolve as resolvePath } from "path";
 import { Logger } from "../logger";
-import { appPort, dbPostgres, enableSSL } from "../env";
+import * as envy from "../env";
 import { sSuffix } from "../text";
 import { httpsOptions } from "../../certs";
 import { DbClient } from "../db";
@@ -21,11 +21,11 @@ export const run = (): void => {
   });
 
   const db = new DbClient({
-    user: dbPostgres.user,
-    password: dbPostgres.password,
-    host: dbPostgres.host,
-    database: dbPostgres.database,
-    port: dbPostgres.port,
+    user: envy.dbPostgres.user,
+    password: envy.dbPostgres.password,
+    host: envy.dbPostgres.host,
+    database: envy.dbPostgres.database,
+    port: envy.dbPostgres.port,
   });
 
   let inProgress = false;
@@ -82,13 +82,15 @@ export const run = (): void => {
     });
   });
 
-  logger.info(`Starting ${Logger.y(sSuffix("http", enableSSL))} server`);
+  logger.info(`Starting ${Logger.y(sSuffix("http", envy.enableSSL))} server`);
 
-  const server = enableSSL ? createHttps(httpsOptions, app) : createHttp(app);
+  const server = envy.enableSSL
+    ? createHttps(httpsOptions, app)
+    : createHttp(app);
 
   db.init().then(() =>
-    server.listen(appPort, () => {
-      logger.info(`Express server is listening on ${Logger.y(appPort)}`);
+    server.listen(envy.appPort, () => {
+      logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
     })
   );
 };
