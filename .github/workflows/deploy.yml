@@ -13,19 +13,12 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v2.3.4
-
-      - name: Read NodeJS version from .nvmrc
-        id: node-version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.nvmrc
-          trim: true
+        uses: actions/checkout@v3
 
       - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.node-version.outputs.content }}
+          node-version-file: ".nvmrc"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -52,19 +45,12 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v2.3.4
-
-      - name: Read NodeJS version from .nvmrc
-        id: node-version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.nvmrc
-          trim: true
+        uses: actions/checkout@v3
 
       - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.node-version.outputs.content }}
+          node-version-file: ".nvmrc"
 
       - name: Docker login
         run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
@@ -97,19 +83,12 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v2.3.4
-
-      - name: Read NodeJS version from .nvmrc
-        id: node-version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.nvmrc
-          trim: true
+        uses: actions/checkout@v3
 
       - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.node-version.outputs.content }}
+          node-version-file: ".nvmrc"
 
       - name: Docker login
         run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
@@ -138,19 +117,12 @@ jobs:
     name: Deploy to Railway.app production
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Read NodeJS version from .nvmrc
-        id: node-version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.nvmrc
-          trim: true
+        uses: actions/checkout@v3
 
       - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.node-version.outputs.content }}
+          node-version-file: ".nvmrc"
 
       - name: Install Railway CLI
         run: npm i -g @railway/cli

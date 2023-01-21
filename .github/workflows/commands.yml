@@ -38,21 +38,14 @@ jobs:
         run: echo Working on the commit hash ${{ steps.sha.outputs.result }}
 
       - name: Checkout the repository
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           ref: ${{ steps.sha.outputs.result }}
 
-      - name: Read NodeJS version from .nvmrc
-        id: node-version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.nvmrc
-          trim: true
-
       - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ steps.node-version.outputs.content }}
+          node-version-file: ".nvmrc"
 
       - name: Install dependencies
         run: npm install
