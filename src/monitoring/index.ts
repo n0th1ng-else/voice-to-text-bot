@@ -6,8 +6,20 @@ import { isFileExist } from "../files";
 
 const logger = new Logger("monitoring");
 
-export const launchMonitoringAgent = (token: string, infra: string) => {
+export const launchMonitoringAgent = (
+  region: string,
+  token: string,
+  infra: string
+): Promise<void> => {
   logger.info("Generating monitoring config");
+
+  if (!region) {
+    logger.error(
+      "No monitoring region specified. Skipping the monitoring agent initialization...",
+      new Error("No monitoring region specified")
+    );
+    return Promise.resolve();
+  }
 
   if (!token) {
     logger.error(
@@ -57,6 +69,9 @@ export const launchMonitoringAgent = (token: string, infra: string) => {
     .then(() => {
       logger.info("Monitoring config saved successfully");
       return import("spm-agent-nodejs");
+    })
+    .then(() => {
+      logger.info("SPM agent is running successfully");
     })
     .catch((err) => {
       logger.error("Failed to run the spm agent", err);
