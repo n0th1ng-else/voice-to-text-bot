@@ -1,9 +1,14 @@
-node_modules
 .git
+.github
+.husky
 .idea
-e2e
-k8s
 assets
 coverage-e2e
 coverage-unit
+e2e
+k8s
+node_modules
+spmdb
+spmlogs
+HISTORY.md
 /**/*/*.spec.ts

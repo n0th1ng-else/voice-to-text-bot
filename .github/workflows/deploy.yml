@@ -35,7 +35,7 @@ jobs:
           tags: |
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:latest
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ github.sha }}
-          build-args: APP_VERSION=${{ github.sha }}
+          build-args: APP_VERSION=${{ github.sha }},INFRA_TOKEN=${{ secrets.INFRA_TOKEN }}
 
   heroku-primary:
     runs-on: ubuntu-latest
@@ -52,26 +52,25 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      - name: Docker login
-        run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
-        env:
-          D_LOGIN: ${{ secrets.HEROKU_EMAIL }}
-          D_PWD: ${{ secrets.HEROKU_API_KEY }}
-          D_REGISTRY: registry.heroku.com
+      - name: Login to Heroku Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: registry.heroku.com
+          username: ${{ secrets.HEROKU_EMAIL }}
+          password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }} --arg=${{ env.D_INFRA_TOKEN }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          D_ACTION: push
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
           D_VERSION: ${{ github.sha }}
+          D_INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
 
       - name: Release docker image
-        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }}
+        run: heroku container:release web --app ${{ env.D_NAME }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          D_ACTION: release
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
 
   heroku-secondary:
@@ -90,26 +89,25 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      - name: Docker login
-        run: echo ${{ env.D_PWD }} | docker login --username=${{ env.D_LOGIN }} ${{ env.D_REGISTRY }} --password-stdin
-        env:
-          D_LOGIN: ${{ secrets.HEROKU_EMAIL }}
-          D_PWD: ${{ secrets.HEROKU_API_KEY }}
-          D_REGISTRY: registry.heroku.com
+      - name: Login to Heroku Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: registry.heroku.com
+          username: ${{ secrets.HEROKU_EMAIL }}
+          password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }} --arg=${{ env.D_INFRA_TOKEN }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          D_ACTION: push
           D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
           D_VERSION: ${{ github.sha }}
+          D_INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
 
       - name: Release docker image
-        run: heroku container:${{ env.D_ACTION }} web --app ${{ env.D_NAME }}
+        run: heroku container:release web --app ${{ env.D_NAME }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          D_ACTION: release
           D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
 
   production:
