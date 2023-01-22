@@ -35,7 +35,7 @@ jobs:
           tags: |
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:latest
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ github.sha }}
-          build-args: APP_VERSION=${{ github.sha }},INFRA_TOKEN=${{ secrets.INFRA_TOKEN }}
+          build-args: APP_VERSION=${{ github.sha }}
 
   heroku-primary:
     runs-on: ubuntu-latest
@@ -60,12 +60,11 @@ jobs:
           password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }},INFRA_TOKEN=${{ env.D_INFRA_TOKEN }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
           D_VERSION: ${{ github.sha }}
-          D_INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
 
       - name: Release docker image
         run: heroku container:release web --app ${{ env.D_NAME }}
@@ -97,12 +96,11 @@ jobs:
           password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }},INFRA_TOKEN=${{ env.D_INFRA_TOKEN }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
           D_VERSION: ${{ github.sha }}
-          D_INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
 
       - name: Release docker image
         run: heroku container:release web --app ${{ env.D_NAME }}
