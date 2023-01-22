@@ -8,6 +8,7 @@ ARG APP_VERSION=local
 ENV APP_VERSION ${APP_VERSION}
 
 RUN echo ${APP_VERSION}
+RUN echo ${INFRA_TOKEN}
 
 # Launch monitoring agent
 RUN echo "deb http://pub-repo.sematext.com/ubuntu sematext main" | tee /etc/apt/sources.list.d/sematext.list > /dev/null
@@ -34,7 +35,7 @@ RUN mkdir -p $APP_DIR
 WORKDIR $APP_DIR
 
 COPY package.json package-lock.json $APP_DIR
-RUN npm set-script prepare ""
+RUN npm pkg set prepare=""
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY . $APP_DIR
