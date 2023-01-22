@@ -60,7 +60,7 @@ jobs:
           password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }} --arg=${{ env.D_INFRA_TOKEN }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }},INFRA_TOKEN=${{ env.D_INFRA_TOKEN }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
@@ -73,42 +73,42 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
 
-  #  heroku-secondary:
-  #    runs-on: ubuntu-latest
-  #    name: Deploy to Heroku Secondary account
-  #    needs: heroku-primary
-  #    steps:
-  #      - name: App version
-  #        run: echo "Picked the app version ${GITHUB_SHA}"
-  #
-  #      - name: Checkout
-  #        uses: actions/checkout@v3
-  #
-  #      - name: Setup NodeJS using the obtained nvm version
-  #        uses: actions/setup-node@v3
-  #        with:
-  #          node-version-file: ".nvmrc"
-  #
-  #      - name: Login to Heroku Container Registry
-  #        uses: docker/login-action@v2
-  #        with:
-  #          registry: registry.heroku.com
-  #          username: ${{ secrets.HEROKU_EMAIL }}
-  #          password: ${{ secrets.HEROKU_API_KEY }}
-  #
-  #      - name: Push docker image
-  #        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }} --arg=${{ env.D_INFRA_TOKEN }}
-  #        env:
-  #          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  #          D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
-  #          D_VERSION: ${{ github.sha }}
-  #          D_INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
-  #
-  #      - name: Release docker image
-  #        run: heroku container:release web --app ${{ env.D_NAME }}
-  #        env:
-  #          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-  #          D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
+    heroku-secondary:
+      runs-on: ubuntu-latest
+      name: Deploy to Heroku Secondary account
+      needs: heroku-primary
+      steps:
+        - name: App version
+          run: echo "Picked the app version ${GITHUB_SHA}"
+
+        - name: Checkout
+          uses: actions/checkout@v3
+
+        - name: Setup NodeJS using the obtained nvm version
+          uses: actions/setup-node@v3
+          with:
+            node-version-file: ".nvmrc"
+
+        - name: Login to Heroku Container Registry
+          uses: docker/login-action@v2
+          with:
+            registry: registry.heroku.com
+            username: ${{ secrets.HEROKU_EMAIL }}
+            password: ${{ secrets.HEROKU_API_KEY }}
+
+        - name: Push docker image
+          run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }},INFRA_TOKEN=${{ env.D_INFRA_TOKEN }}
+          env:
+            HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+            D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
+            D_VERSION: ${{ github.sha }}
+            D_INFRA_TOKEN: ${{ secrets.INFRA_TOKEN }}
+
+        - name: Release docker image
+          run: heroku container:release web --app ${{ env.D_NAME }}
+          env:
+            HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+            D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}
 
   production:
     runs-on: ubuntu-latest
