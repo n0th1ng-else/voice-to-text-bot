@@ -60,7 +60,7 @@ jobs:
           password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }},NEW_RELIC_APP_NAME=voicetotext-primary
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_NAME: ${{ secrets.HEROKU_APP_MASTER }}
@@ -96,7 +96,7 @@ jobs:
           password: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Push docker image
-        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }}
+        run: heroku container:push web --app ${{ env.D_NAME }} --arg APP_VERSION=${{ env.D_VERSION }},NEW_RELIC_APP_NAME=voicetotext-secondary
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           D_NAME: ${{ secrets.HEROKU_APP_SLAVE }}

@@ -3,10 +3,11 @@ import { resolve as resolvePath } from "path";
 import { platform } from "os";
 import { Logger } from "../logger";
 import { isFileExist } from "../files";
+import { flattenPromise } from "../common/helpers";
 
 const logger = new Logger("monitoring");
 
-export const launchMonitoringAgent = (
+const launchMonitoringAgentSematext = (
   region: string,
   token: string,
   infra: string
@@ -76,4 +77,19 @@ export const launchMonitoringAgent = (
     .catch((err) => {
       logger.error("Failed to run the spm agent", err);
     });
+};
+
+const launchMonitoringAgentNewrelic = (): Promise<void> => {
+  return Promise.resolve().then(() => import("newrelic"));
+};
+
+export const launchMonitoringAgent = (
+  region: string,
+  token: string,
+  infra: string
+): Promise<void> => {
+  return Promise.all([
+    launchMonitoringAgentSematext(region, token, infra),
+    launchMonitoringAgentNewrelic(),
+  ]).then(flattenPromise);
 };

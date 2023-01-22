@@ -4,6 +4,10 @@ EXPOSE 8080
 
 ENV NODE_ENV production
 
+ARG NEW_RELIC_APP_NAME=voicetotext-main
+ENV NEW_RELIC_APP_NAME ${NEW_RELIC_APP_NAME}
+ENV NEW_RELIC_NO_CONFIG_FILE true
+
 ARG APP_DIR=/usr/src/app/
 
 RUN mkdir -p $APP_DIR
