@@ -70,11 +70,7 @@ export const run = (threadId = 0): void => {
     storageDaemon.stop();
   });
 
-  launchMonitoringAgent(
-    envy.monitoring.region,
-    envy.monitoring.token,
-    envy.monitoring.infra
-  )
+  launchMonitoringAgent()
     .then(() => db.init())
     .then(() => getHostName(envy.appPort, envy.selfUrl, envy.ngRokToken))
     .then((host) => {

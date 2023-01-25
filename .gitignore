@@ -113,8 +113,3 @@ coverage-unit
 
 # keep temp folder clear
 video-temp/*.tmp
-
-# monitoring temp files
-spmdb
-spmlogs
-.spmagentrc
