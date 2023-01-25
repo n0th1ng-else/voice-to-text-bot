@@ -41,6 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Heroku
     strategy:
+      max-parallel: 1
       matrix:
         app: [HEROKU_APP_MASTER, HEROKU_APP_SLAVE]
     env:
