@@ -1,95 +1,14 @@
-import { promises } from "fs";
-import { resolve as resolvePath } from "path";
-import { platform } from "os";
-import { Logger } from "../logger";
-import { isFileExist } from "../files";
+import pg from "pg";
+import newrelic from "newrelic";
 import { flattenPromise } from "../common/helpers";
 
-const logger = new Logger("monitoring");
-
-const launchMonitoringAgentSematext = (
-  region: string,
-  token: string,
-  infra: string
-): Promise<void> => {
-  logger.info("Generating monitoring config");
-
-  if (!region) {
-    logger.error(
-      "No monitoring region specified. Skipping the monitoring agent initialization...",
-      new Error("No monitoring region specified")
-    );
-    return Promise.resolve();
-  }
-
-  if (!token) {
-    logger.error(
-      "No monitoring token specified. Skipping the monitoring agent initialization...",
-      new Error("No monitoring token specified")
-    );
-    return Promise.resolve();
-  }
-
-  if (!infra) {
-    logger.error(
-      "No infra token specified. Skipping the monitoring agent initialization...",
-      new Error("No infra token specified")
-    );
-    return Promise.resolve();
-  }
-
-  const rootDir = process.cwd();
-  const dbDir = resolvePath(rootDir, "spmdb");
-  const logsDir = resolvePath(rootDir, "spmlogs");
-  const cfgFile = resolvePath(rootDir, ".spmagentrc");
-
-  const isLinux = platform() === "linux";
-  const cfg = [
-    `dbDir: ${dbDir}`,
-    `useLinuxAgent: ${isLinux ? "true" : "false"}`,
-    "",
-    "tokens:",
-    `  monitoring: ${token}`,
-    `  infra: ${infra}`,
-    "",
-    "logger:",
-    `  dir: ${logsDir}`,
-    "  silent: true",
-    "",
-  ].join("\n");
-
-  return isFileExist(cfgFile)
-    .then((isExists) => {
-      if (isExists) {
-        logger.warn("Using the existing monitoring config file...");
-        return;
-      }
-
-      return promises.writeFile(cfgFile, cfg);
-    })
-    .then(() => {
-      logger.info("Monitoring config saved successfully");
-      return import("spm-agent-nodejs");
-    })
-    .then(() => {
-      logger.info("SPM agent is running successfully");
-    })
-    .catch((err) => {
-      logger.error("Failed to run the spm agent", err);
-    });
-};
-
 const launchMonitoringAgentNewrelic = (): Promise<void> => {
-  return Promise.resolve().then(() => import("newrelic"));
+  newrelic.instrumentLoadedModule("pg", pg);
+  return Promise.resolve();
+  // .then(() => import("newrelic"))
+  // .then(flattenPromise)
 };
 
-export const launchMonitoringAgent = (
-  region: string,
-  token: string,
-  infra: string
-): Promise<void> => {
-  return Promise.all([
-    launchMonitoringAgentSematext(region, token, infra),
-    launchMonitoringAgentNewrelic(),
-  ]).then(flattenPromise);
+export const launchMonitoringAgent = (): Promise<void> => {
+  return Promise.all([launchMonitoringAgentNewrelic()]).then(flattenPromise);
 };
