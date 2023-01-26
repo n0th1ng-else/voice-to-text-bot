@@ -1,3 +1,4 @@
+import "newrelic";
 import * as envy from "../env";
 import {
   getVoiceConverterInstance,
@@ -16,7 +17,6 @@ import { DbClient } from "../db";
 import { StripePayment } from "../donate/stripe";
 import { getLaunchDelay } from "./init";
 import { printCurrentStorageUsage } from "../storage";
-import { launchMonitoringAgent } from "../monitoring";
 
 const logger = new Logger("start-script");
 
@@ -70,8 +70,7 @@ export const run = (threadId = 0): void => {
     storageDaemon.stop();
   });
 
-  launchMonitoringAgent()
-    .then(() => db.init())
+  db.init()
     .then(() => getHostName(envy.appPort, envy.selfUrl, envy.ngRokToken))
     .then((host) => {
       logger.info(
