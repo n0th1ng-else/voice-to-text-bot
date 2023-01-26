@@ -74,7 +74,9 @@ export const run = (threadId = 0): void => {
   });
 
   db.init()
-    .then(() => getHostName(envy.appPort, envy.selfUrl, envy.ngRokToken))
+    .then(() =>
+      getHostName(envy.appPort, envy.enableSSL, envy.selfUrl, envy.ngRokToken)
+    )
     .then((host) => {
       logger.info(
         `Telling telegram our location is ${Logger.y(

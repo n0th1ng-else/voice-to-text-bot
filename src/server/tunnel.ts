@@ -1,11 +1,16 @@
 import { connect } from "ngrok";
 import { Logger } from "../logger";
+import { sSuffix } from "../text";
 
 const logger = new Logger("tunnel");
 
-const createTunnel = (port: number, token?: string): Promise<string> => {
+const createTunnel = (
+  port: number,
+  enableSSL: boolean,
+  token?: string
+): Promise<string> => {
   logger.info("Creating tunnel");
-  const localHost = `https://localhost:${port}`;
+  const localHost = `${sSuffix("http", enableSSL)}://localhost:${port}`;
   return connect({ authtoken: token, addr: localHost }).then((host) => {
     logger.info(
       `Started tunnel from ${Logger.y(host)} to ${Logger.y(localHost)}`
@@ -17,13 +22,14 @@ const createTunnel = (port: number, token?: string): Promise<string> => {
 
 export const getHostName = (
   port: number,
-  selfUrl?: string,
-  ngRokToken?: string
+  enableSSL: boolean,
+  selfUrl = "",
+  ngRokToken = ""
 ): Promise<string> => {
   if (selfUrl) {
     logger.info(`Using the host ${Logger.y(selfUrl)}`);
     return Promise.resolve(selfUrl);
   }
 
-  return createTunnel(port, ngRokToken);
+  return createTunnel(port, enableSSL, ngRokToken);
 };
