@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { DonationsSql } from "./donations.sql.js";
 
 export enum DonationStatus {

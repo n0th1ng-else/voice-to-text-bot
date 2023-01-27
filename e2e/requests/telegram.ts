@@ -1,5 +1,6 @@
+import { resolve as resolvePath } from "node:path";
+import { fileURLToPath } from "node:url";
 import { expect } from "@jest/globals";
-import { resolve as resolvePath } from "path";
 import request from "supertest";
 import nock from "nock";
 import { parse } from "query-string";
@@ -196,11 +197,12 @@ export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
     return JSON.stringify({ ok: true, result: { file_path: pathToFile } });
   });
 
+  const currentDir = fileURLToPath(new URL(".", import.meta.url));
   host
     .get(fullPathToFile)
     .replyWithFile(
       200,
-      resolvePath(__dirname, "..", "mockData", "sample_file.oga"),
+      resolvePath(currentDir, "..", "mockData", "sample_file.oga"),
       {
         "Content-Type": "audio/ogg",
       }

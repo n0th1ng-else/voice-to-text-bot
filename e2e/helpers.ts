@@ -1,5 +1,6 @@
-import { readFileSync } from "fs";
-import { resolve as resolvePath } from "path";
+import { readFileSync } from "node:fs";
+import { resolve as resolvePath } from "node:path";
+import { fileURLToPath } from "node:url";
 import { LanguageCode } from "../src/recognition/types.js";
 import { LabelId } from "../src/text/labels.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
@@ -222,7 +223,8 @@ export class BotStatRecordModel {
 }
 
 export const getMockCertificate = (): string => {
-  const path = resolvePath(__dirname, "mockData", "googleapps_mock.key");
+  const currentDir = fileURLToPath(new URL(".", import.meta.url));
+  const path = resolvePath(currentDir, "mockData", "googleapps_mock.key");
   return readFileSync(path, { encoding: "utf-8" });
 };
 

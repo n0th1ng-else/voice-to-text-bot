@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FFmpeg } from "prism-media";
+import prism from "prism-media";
 import { IncomingMessage } from "http";
 import { Logger } from "../logger/index.js";
 import { isDebug } from "../env.js";
@@ -9,6 +9,8 @@ import {
   saveBufferToFile,
   saveStreamToFile,
 } from "../files/index.js";
+
+const { FFmpeg } = prism;
 
 const logger = new Logger("media-to-wav");
 
@@ -84,7 +86,7 @@ const getMpegDecoderArgs = (fileName?: string): string[] => {
   ];
 };
 
-const getMpegDecoderStream = (fileName?: string): FFmpeg =>
+const getMpegDecoderStream = (fileName?: string): prism.FFmpeg =>
   new FFmpeg({
     args: getMpegDecoderArgs(fileName),
   });

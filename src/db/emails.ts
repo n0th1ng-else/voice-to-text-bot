@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
 import { UsedEmailDb, UsedEmailRowScheme } from "./sql/emails.js";
 

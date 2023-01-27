@@ -1,6 +1,6 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
+import type { LanguageCode } from "../recognition/types.js";
 import { Logger } from "../logger/index.js";
-import { LanguageCode } from "../recognition/types.js";
 import { UsageRowScheme, UsagesDb } from "./sql/usages.js";
 import { getLanguageByText } from "../telegram/helpers.js";
 
