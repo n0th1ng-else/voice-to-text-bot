@@ -1,16 +1,19 @@
 import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
-import { LanguageCode } from "../src/recognition/types";
-import { LabelId } from "../src/text/labels";
-import { randomIntFromInterval } from "../src/common/timer";
+import { LanguageCode } from "../src/recognition/types.js";
+import { LabelId } from "../src/text/labels.js";
+import { randomIntFromInterval } from "../src/common/timer.js";
 import {
   TgCallbackQuery,
   TgChatType,
   TgMessage,
-} from "../src/telegram/api/types";
-import { TelegramButtonModel, TelegramButtonType } from "../src/telegram/types";
-import { donationLevels } from "../src/const";
-import { TextModel } from "../src/text";
+} from "../src/telegram/api/types.js";
+import {
+  TelegramButtonModel,
+  TelegramButtonType,
+} from "../src/telegram/types.js";
+import { donationLevels } from "../src/const.js";
+import { TextModel } from "../src/text/index.js";
 
 interface UserNameOptions {
   userName?: string;

@@ -1,5 +1,5 @@
-import { TgCallbackQuery, TgMessage } from "../api/types";
-import { GenericAction } from "./common";
+import { TgCallbackQuery, TgMessage } from "../api/types.js";
+import { GenericAction } from "./common.js";
 import {
   BotCommand,
   BotLangData,
@@ -7,17 +7,20 @@ import {
   TelegramButtonModel,
   TelegramButtonType,
   TelegramMessagePrefix,
-} from "../types";
+} from "../types.js";
 import {
   getLanguageByText,
   getRawUserLanguage,
   isLangMessage,
-} from "../helpers";
-import { LabelId } from "../../text/labels";
-import { LanguageCode } from "../../recognition/types";
-import { Logger } from "../../logger";
-import { AnalyticsData } from "../../analytics/legacy/types";
-import { collectAnalytics, collectPageAnalytics } from "../../analytics";
+} from "../helpers.js";
+import { LabelId } from "../../text/labels.js";
+import { LanguageCode } from "../../recognition/types.js";
+import { Logger } from "../../logger/index.js";
+import { AnalyticsData } from "../../analytics/legacy/types.js";
+import {
+  collectAnalytics,
+  collectPageAnalytics,
+} from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");
 

@@ -10,19 +10,23 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import { ExpressServer } from "../src/server/express";
-import { appVersion, launchTime } from "../src/env";
+import { ExpressServer } from "../src/server/express.js";
+import { appVersion, launchTime } from "../src/env.js";
 import {
   LanguageCode,
   VoiceConverterOptions,
   VoiceConverterProvider,
-} from "../src/recognition/types";
+} from "../src/recognition/types.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
-} from "../src/recognition";
-import { TelegramBotModel } from "../src/telegram/bot";
-import { githubUrl, localhostUrl, officialChannelAccount } from "../src/const";
+} from "../src/recognition/index.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import {
+  githubUrl,
+  localhostUrl,
+  officialChannelAccount,
+} from "../src/const.js";
 import {
   BotStatRecordModel,
   getFundButtons,
@@ -31,8 +35,8 @@ import {
   TelegramMessageMetaItem,
   TelegramMessageMetaType,
   TelegramMessageModel,
-} from "./helpers";
-import { LabelId } from "../src/text/labels";
+} from "./helpers.js";
+import { LabelId } from "../src/text/labels.js";
 import {
   mockTgGetFileUrl,
   mockTgGetWebHook,
@@ -44,27 +48,27 @@ import {
   mockTgSetWebHook,
   sendTelegramCallbackMessage,
   sendTelegramMessage,
-} from "./requests/telegram";
+} from "./requests/telegram.js";
 import {
   mockGetBotStatItem,
   mockUpdateBotStatLang,
   mockUpdateBotStatUsage,
-} from "./requests/db/botStat";
-import { randomIntFromInterval } from "../src/common/timer";
-import { BotCommand } from "../src/telegram/types";
-import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google";
-import { TgChatType } from "../src/telegram/api/types";
-import { TelegramApi } from "../src/telegram/api";
-import { httpsOptions } from "../certs";
-import { Pool as MockPool } from "../src/db/__mocks__/pg";
-import { DbClient } from "../src/db";
-import { NodesSql } from "../src/db/sql/nodes.sql";
-import { UsagesSql } from "../src/db/sql/usages.sql";
-import { DonationsSql } from "../src/db/sql/donations.sql";
-import { UsedEmailsSql } from "../src/db/sql/emails.sql";
+} from "./requests/db/botStat.js";
+import { randomIntFromInterval } from "../src/common/timer.js";
+import { BotCommand } from "../src/telegram/types.js";
+import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google.js";
+import { TgChatType } from "../src/telegram/api/types.js";
+import { TelegramApi } from "../src/telegram/api/index.js";
+import { httpsOptions } from "../certs/index.js";
+import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { DbClient } from "../src/db/index.js";
+import { NodesSql } from "../src/db/sql/nodes.sql.js";
+import { UsagesSql } from "../src/db/sql/usages.sql.js";
+import { DonationsSql } from "../src/db/sql/donations.sql.js";
+import { UsedEmailsSql } from "../src/db/sql/emails.sql.js";
 
 jest.mock("../src/logger");
-jest.mock("../src/env");
+jest.mock("../src/env.js");
 jest.mock("../src/analytics/amplitude", () => ({
   collectEvents: () => Promise.resolve(),
 }));

@@ -1,14 +1,17 @@
-import { TgMessage } from "../api/types";
-import { GenericAction } from "./common";
+import { TgMessage } from "../api/types.js";
+import { GenericAction } from "./common.js";
 import {
   BotMessageModel,
   TelegramMessagePrefix,
   VoiceContentReason,
-} from "../types";
-import { isVoiceMessage } from "../helpers";
-import { Logger } from "../../logger";
-import { LabelId } from "../../text/labels";
-import { collectAnalytics, collectPageAnalytics } from "../../analytics";
+} from "../types.js";
+import { isVoiceMessage } from "../helpers.js";
+import { Logger } from "../../logger/index.js";
+import { LabelId } from "../../text/labels.js";
+import {
+  collectAnalytics,
+  collectPageAnalytics,
+} from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");
 

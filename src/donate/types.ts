@@ -1,4 +1,4 @@
-import { LanguageCode } from "../recognition/types";
+import { LanguageCode } from "../recognition/types.js";
 
 export interface PaymentService {
   readonly isReady: boolean;

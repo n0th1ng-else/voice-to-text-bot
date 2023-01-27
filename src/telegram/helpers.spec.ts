@@ -1,7 +1,7 @@
 import { describe, it, expect } from "@jest/globals";
-import { TgChatType, TgMessage } from "./api/types";
-import { getUserLanguage } from "./helpers";
-import { LanguageCode } from "../recognition/types";
+import { TgChatType, TgMessage } from "./api/types.js";
+import { getUserLanguage } from "./helpers.js";
+import { LanguageCode } from "../recognition/types.js";
 
 const getMessage = (name?: string, lang?: string): TgMessage => {
   return {

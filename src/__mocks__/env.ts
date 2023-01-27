@@ -1,4 +1,4 @@
-import { randomIntFromInterval } from "../common/timer";
+import { randomIntFromInterval } from "../common/timer.js";
 
 process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegram-bot-api" package
 

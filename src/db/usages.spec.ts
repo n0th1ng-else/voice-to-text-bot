@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "@jest/globals";
-import { Pool as MockPool } from "./__mocks__/pg";
-import { UsagesClient } from "./usages";
-import { LanguageCode } from "../recognition/types";
-import { UsagesSql } from "./sql/usages.sql";
+import { Pool as MockPool } from "./__mocks__/pg.js";
+import { UsagesClient } from "./usages.js";
+import { LanguageCode } from "../recognition/types.js";
+import { UsagesSql } from "./sql/usages.sql.js";
 
 const dbConfig = {
   user: "spy-user",

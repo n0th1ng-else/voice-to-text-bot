@@ -6,10 +6,10 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import { Pool as MockPool } from "./__mocks__/pg";
-import { DonationsClient } from "./donations";
-import { DonationsSql } from "./sql/donations.sql";
-import { DonationStatus } from "./sql/donations";
+import { Pool as MockPool } from "./__mocks__/pg.js";
+import { DonationsClient } from "./donations.js";
+import { DonationsSql } from "./sql/donations.sql.js";
+import { DonationStatus } from "./sql/donations.js";
 
 jest.mock("../logger");
 

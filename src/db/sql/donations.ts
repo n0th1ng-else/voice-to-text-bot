@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { DonationsSql } from "./donations.sql";
+import { DonationsSql } from "./donations.sql.js";
 
 export enum DonationStatus {
   Initialized = "INITIALIZED",

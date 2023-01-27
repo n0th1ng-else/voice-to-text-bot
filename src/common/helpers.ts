@@ -1,6 +1,6 @@
-import { Logger } from "../logger";
-import { sleepFor } from "./timer";
-import { LanguageCode } from "../recognition/types";
+import { Logger } from "../logger/index.js";
+import { sleepFor } from "./timer.js";
+import { LanguageCode } from "../recognition/types.js";
 
 const logger = new Logger("run-retry");
 

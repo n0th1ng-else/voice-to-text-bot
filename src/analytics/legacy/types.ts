@@ -1,7 +1,7 @@
-import { TimeMeasure } from "../../common/timer";
-import { BotCommand } from "../../telegram/types";
-import { TelegramApi } from "../../telegram/api";
-import { AnalyticsDataV4 } from "../v4/types";
+import { TimeMeasure } from "../../common/timer.js";
+import { BotCommand } from "../../telegram/types.js";
+import { TelegramApi } from "../../telegram/api/index.js";
+import { AnalyticsDataV4 } from "../v4/types.js";
 
 const defaultLang = "not provided";
 

@@ -1,11 +1,11 @@
-import { AnalyticsData } from "./legacy/types";
-import { collectEvents as collectLegacy } from "./legacy";
-import { analyticsId } from "../env";
-import { Logger } from "../logger";
-import { flattenPromise } from "../common/helpers";
-import { BotCommand } from "../telegram/types";
-import { collectEvents as collectV4 } from "./v4";
-import { collectEvents as collectAmplitude } from "./amplitude";
+import { AnalyticsData } from "./legacy/types.js";
+import { collectEvents as collectLegacy } from "./legacy/index.js";
+import { analyticsId } from "../env.js";
+import { Logger } from "../logger/index.js";
+import { flattenPromise } from "../common/helpers.js";
+import { BotCommand } from "../telegram/types.js";
+import { collectEvents as collectV4 } from "./v4/index.js";
+import { collectEvents as collectAmplitude } from "./amplitude/index.js";
 
 const logger = new Logger("analytics");
 

@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ScheduleDaemon } from "../scheduler";
-import { Logger } from "../logger";
-import { HealthDto, HealthStatus } from "./types";
-import { sSuffix } from "../text";
-import { getHealthUrl } from "./helpers";
-import { DbClient } from "../db";
-import { flattenPromise } from "../common/helpers";
+import { ScheduleDaemon } from "../scheduler/index.js";
+import { Logger } from "../logger/index.js";
+import { HealthDto, HealthStatus } from "./types.js";
+import { sSuffix } from "../text/index.js";
+import { getHealthUrl } from "./helpers.js";
+import { DbClient } from "../db/index.js";
+import { flattenPromise } from "../common/helpers.js";
 
 const logger = new Logger("uptime");
 

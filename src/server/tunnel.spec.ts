@@ -1,5 +1,5 @@
 import { it, describe, expect } from "@jest/globals";
-import { getHostName } from "./tunnel";
+import { getHostName } from "./tunnel.js";
 
 describe("Tunnel handling", () => {
   it("Do nothing if self url provided", () => {

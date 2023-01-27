@@ -1,24 +1,24 @@
 import "newrelic";
 import pg from "pg";
 import newrelic from "newrelic";
-import * as envy from "../env";
-import { Logger } from "../logger";
-import { VoiceConverterOptions } from "../recognition/types";
+import * as envy from "../env.js";
+import { Logger } from "../logger/index.js";
+import { VoiceConverterOptions } from "../recognition/types.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
-} from "../recognition";
-import { getHostName } from "../server/tunnel";
-import { TelegramBotModel } from "../telegram/bot";
-import { ExpressServer } from "../server/express";
-import { StopListener } from "../process";
-import { httpsOptions } from "../../certs";
-import { ScheduleDaemon } from "../scheduler";
-import { printCurrentMemoryStat } from "../memory";
-import { DbClient } from "../db";
-import { StripePayment } from "../donate/stripe";
-import { getLaunchDelay } from "./init";
-import { printCurrentStorageUsage } from "../storage";
+} from "../recognition/index.js";
+import { getHostName } from "../server/tunnel.js";
+import { TelegramBotModel } from "../telegram/bot.js";
+import { ExpressServer } from "../server/express.js";
+import { StopListener } from "../process/index.js";
+import { httpsOptions } from "../../certs/index.js";
+import { ScheduleDaemon } from "../scheduler/index.js";
+import { printCurrentMemoryStat } from "../memory/index.js";
+import { DbClient } from "../db/index.js";
+import { StripePayment } from "../donate/stripe.js";
+import { getLaunchDelay } from "./init.js";
+import { printCurrentStorageUsage } from "../storage/index.js";
 
 const logger = new Logger("dev-script");
 

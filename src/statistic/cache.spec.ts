@@ -1,5 +1,5 @@
 import { expect, describe, it, jest } from "@jest/globals";
-import { CacheProvider } from "./cache";
+import { CacheProvider } from "./cache.js";
 
 jest.mock("../logger");
 

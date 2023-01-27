@@ -1,9 +1,9 @@
 import { init as initAmplitude } from "@amplitude/node";
 import { customAlphabet } from "nanoid";
 
-import { AnalyticsEventExt } from "../v4/types";
-import { Logger } from "../../logger";
-import { amplitudeToken } from "../../env";
+import { AnalyticsEventExt } from "../v4/types.js";
+import { Logger } from "../../logger/index.js";
+import { amplitudeToken } from "../../env.js";
 
 const logger = new Logger("analytics:amplitude");
 

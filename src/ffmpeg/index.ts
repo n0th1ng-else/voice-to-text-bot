@@ -1,14 +1,14 @@
 import axios from "axios";
 import { FFmpeg } from "prism-media";
 import { IncomingMessage } from "http";
-import { Logger } from "../logger";
-import { isDebug } from "../env";
-import { wavSampleRate as sampleRate } from "../const";
+import { Logger } from "../logger/index.js";
+import { isDebug } from "../env.js";
+import { wavSampleRate as sampleRate } from "../const.js";
 import {
   deleteFileIfExists,
   saveBufferToFile,
   saveStreamToFile,
-} from "../files";
+} from "../files/index.js";
 
 const logger = new Logger("media-to-wav");
 

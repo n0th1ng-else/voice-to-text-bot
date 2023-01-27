@@ -3,21 +3,21 @@ import {
   TgCheckoutQuery,
   TgMessage,
   TgUpdate,
-} from "./api/types";
-import { Logger } from "../logger";
-import { VoiceConverter } from "../recognition/types";
-import { LabelId } from "../text/labels";
-import { BotMessageModel, TelegramMessagePrefix } from "./types";
-import { isMessageSupported } from "./helpers";
-import { runPromiseWithRetry } from "../common/helpers";
-import { getMd5Hash } from "../common/hash";
-import { BotActions } from "./actions";
-import { botCommands } from "./data";
-import { TelegramApi } from "./api";
-import { collectAnalytics } from "../analytics";
-import { DbClient } from "../db";
-import { AnalyticsData } from "../analytics/legacy/types";
-import { PaymentService } from "../donate/types";
+} from "./api/types.js";
+import { Logger } from "../logger/index.js";
+import { VoiceConverter } from "../recognition/types.js";
+import { LabelId } from "../text/labels.js";
+import { BotMessageModel, TelegramMessagePrefix } from "./types.js";
+import { isMessageSupported } from "./helpers.js";
+import { runPromiseWithRetry } from "../common/helpers.js";
+import { getMd5Hash } from "../common/hash.js";
+import { BotActions } from "./actions/index.js";
+import { botCommands } from "./data.js";
+import { TelegramApi } from "./api/index.js";
+import { collectAnalytics } from "../analytics/index.js";
+import { DbClient } from "../db/index.js";
+import { AnalyticsData } from "../analytics/legacy/types.js";
+import { PaymentService } from "../donate/types.js";
 
 const logger = new Logger("telegram-bot");
 

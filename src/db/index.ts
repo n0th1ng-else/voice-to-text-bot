@@ -1,9 +1,9 @@
 import { Pool, types as PGTypes, defaults as PGDefaults } from "pg";
-import { NodesClient } from "./nodes";
-import { UsagesClient } from "./usages";
-import { Logger } from "../logger";
-import { DonationsClient } from "./donations";
-import { UsedEmailClient } from "./emails";
+import { NodesClient } from "./nodes.js";
+import { UsagesClient } from "./usages.js";
+import { Logger } from "../logger/index.js";
+import { DonationsClient } from "./donations.js";
+import { UsedEmailClient } from "./emails.js";
 
 const logger = new Logger("postgres-client");
 

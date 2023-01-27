@@ -7,35 +7,35 @@ import {
   it,
   describe,
 } from "@jest/globals";
-import { ExpressServer } from "../src/server/express";
-import { HealthSsl, HealthStatus } from "../src/server/types";
-import { appVersion, launchTime } from "../src/env";
-import { localhostUrl } from "../src/const";
-import { TelegramBotModel } from "../src/telegram/bot";
-import { mockGoogleAuth } from "./requests/google";
+import { ExpressServer } from "../src/server/express.js";
+import { HealthSsl, HealthStatus } from "../src/server/types.js";
+import { appVersion, launchTime } from "../src/env.js";
+import { localhostUrl } from "../src/const.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import { mockGoogleAuth } from "./requests/google.js";
 import {
   VoiceConverterOptions,
   VoiceConverterProvider,
-} from "../src/recognition/types";
-import { getMockCertificate } from "./helpers";
+} from "../src/recognition/types.js";
+import { getMockCertificate } from "./helpers.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
-} from "../src/recognition";
+} from "../src/recognition/index.js";
 import {
   mockTgGetWebHook,
   mockTgGetWebHookError,
   mockTgSetCommands,
   mockTgSetWebHook,
-} from "./requests/telegram";
+} from "./requests/telegram.js";
 import nock from "nock";
-import { TelegramApi } from "../src/telegram/api";
-import { httpsOptions } from "../certs";
-import { Pool as MockPool } from "../src/db/__mocks__/pg";
-import { DbClient } from "../src/db";
+import { TelegramApi } from "../src/telegram/api/index.js";
+import { httpsOptions } from "../certs/index.js";
+import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { DbClient } from "../src/db/index.js";
 
 jest.mock("../src/logger");
-jest.mock("../src/env");
+jest.mock("../src/env.js");
 jest.mock("../src/analytics/amplitude", () => ({
   collectEvents: () => Promise.resolve(),
 }));
@@ -82,7 +82,7 @@ let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
 jest.mock("../src/logger");
-jest.mock("../src/env");
+jest.mock("../src/env.js");
 
 let server: ExpressServer;
 

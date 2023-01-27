@@ -7,8 +7,8 @@ import {
   afterEach,
 } from "@jest/globals";
 import { nanoid } from "nanoid";
-import { ScheduleDaemon } from "./index";
-import { WaiterForCalls } from "../../e2e/helpers/waitFor";
+import { ScheduleDaemon } from "./index.js";
+import { WaiterForCalls } from "../../e2e/helpers/waitFor.js";
 
 jest.mock("../logger");
 

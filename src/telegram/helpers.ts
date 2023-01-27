@@ -6,11 +6,16 @@ import {
   TelegramButtonType,
   VoiceContentReason,
   VoiceContentReasonModel,
-} from "./types";
-import { telegramBotName } from "../env";
-import { TgCallbackQuery, TgChatType, TgMedia, TgMessage } from "./api/types";
-import { LanguageCode } from "../recognition/types";
-import { durationLimitSec, supportedAudioFormats } from "../const";
+} from "./types.js";
+import { telegramBotName } from "../env.js";
+import {
+  TgCallbackQuery,
+  TgChatType,
+  TgMedia,
+  TgMessage,
+} from "./api/types.js";
+import { LanguageCode } from "../recognition/types.js";
+import { durationLimitSec, supportedAudioFormats } from "../const.js";
 
 export const isLangMessage = (
   model: BotMessageModel,

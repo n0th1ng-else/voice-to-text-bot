@@ -1,9 +1,13 @@
 import axios from "axios";
-import { Logger } from "../logger";
-import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
-import { getWav } from "../ffmpeg";
-import { parseChunkedResponse } from "../common/request";
-import { wavSampleRate } from "../const";
+import { Logger } from "../logger/index.js";
+import {
+  LanguageCode,
+  VoiceConverter,
+  VoiceConverterOptions,
+} from "./types.js";
+import { getWav } from "../ffmpeg/index.js";
+import { parseChunkedResponse } from "../common/request.js";
+import { wavSampleRate } from "../const.js";
 
 const logger = new Logger("wit-ai-recognition");
 

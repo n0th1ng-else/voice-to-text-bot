@@ -1,7 +1,7 @@
 import axios from "axios";
-import { VoiceConverter, VoiceConverterOptions } from "./types";
-import { getWav } from "../ffmpeg";
-import { Logger } from "../logger";
+import { VoiceConverter, VoiceConverterOptions } from "./types.js";
+import { getWav } from "../ffmpeg/index.js";
+import { Logger } from "../logger/index.js";
 
 const AWS = require("aws-sdk");
 

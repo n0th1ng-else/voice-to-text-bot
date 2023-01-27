@@ -7,18 +7,18 @@ import {
   describe,
 } from "@jest/globals";
 import axios, { AxiosRequestConfig } from "axios";
-import { ExpressServer } from "../src/server/express";
-import { appVersion } from "../src/env";
-import { localhostUrl } from "../src/const";
-import { getHealthUrl } from "../src/server/helpers";
-import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types";
-import { WaiterForCalls } from "./helpers/waitFor";
-import { httpsOptions } from "../certs";
+import { ExpressServer } from "../src/server/express.js";
+import { appVersion } from "../src/env.js";
+import { localhostUrl } from "../src/const.js";
+import { getHealthUrl } from "../src/server/helpers.js";
+import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
+import { WaiterForCalls } from "./helpers/waitFor.js";
+import { httpsOptions } from "../certs/index.js";
 
 const waiter = new WaiterForCalls();
 
 jest.mock("../src/logger");
-jest.mock("../src/env");
+jest.mock("../src/env.js");
 jest.mock("../src/analytics/amplitude", () => ({
   collectEvents: () => Promise.resolve(),
 }));

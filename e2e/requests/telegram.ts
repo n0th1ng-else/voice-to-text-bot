@@ -3,19 +3,19 @@ import { resolve as resolvePath } from "path";
 import request from "supertest";
 import nock from "nock";
 import { parse } from "query-string";
-import { TelegramBotModel } from "../../src/telegram/bot";
+import { TelegramBotModel } from "../../src/telegram/bot.js";
 import {
   TelegramMessageMetaItem,
   TelegramMessageMetaType,
   TelegramMessageModel,
-} from "../helpers";
-import { TextModel } from "../../src/text";
-import { LanguageCode } from "../../src/recognition/types";
-import { LabelId } from "../../src/text/labels";
-import { botCommands } from "../../src/telegram/data";
-import { flattenPromise } from "../../src/common/helpers";
-import { TelegramButtonModel } from "../../src/telegram/types";
-import { parseDonationPayload } from "../../src/telegram/helpers";
+} from "../helpers.js";
+import { TextModel } from "../../src/text/index.js";
+import { LanguageCode } from "../../src/recognition/types.js";
+import { LabelId } from "../../src/text/labels.js";
+import { botCommands } from "../../src/telegram/data.js";
+import { flattenPromise } from "../../src/common/helpers.js";
+import { TelegramButtonModel } from "../../src/telegram/types.js";
+import { parseDonationPayload } from "../../src/telegram/helpers.js";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });

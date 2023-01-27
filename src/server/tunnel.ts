@@ -1,5 +1,5 @@
 import { connect } from "ngrok";
-import { Logger } from "../logger";
+import { Logger } from "../logger/index.js";
 
 const logger = new Logger("tunnel");
 

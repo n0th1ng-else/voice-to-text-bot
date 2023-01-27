@@ -6,9 +6,9 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import { Pool as MockPool } from "./__mocks__/pg";
-import { NodesClient } from "./nodes";
-import { NodesSql } from "./sql/nodes.sql";
+import { Pool as MockPool } from "./__mocks__/pg.js";
+import { NodesClient } from "./nodes.js";
+import { NodesSql } from "./sql/nodes.sql.js";
 
 jest.mock("../logger");
 

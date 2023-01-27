@@ -4,7 +4,7 @@ import axios, {
   CreateAxiosDefaults,
 } from "axios";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { TelegramApi } from "./index";
+import { TelegramApi } from "./index.js";
 import { nanoid } from "nanoid";
 import {
   BotCommandDto,
@@ -15,7 +15,7 @@ import {
   TgInlineKeyboardButton,
   TgMessage,
   TgWebHook,
-} from "./types";
+} from "./types.js";
 
 const getApiResponse = <Response>(
   ok: boolean,

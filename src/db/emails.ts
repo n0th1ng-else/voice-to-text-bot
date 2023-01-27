@@ -1,6 +1,6 @@
 import { Pool } from "pg";
-import { Logger } from "../logger";
-import { UsedEmailDb, UsedEmailRowScheme } from "./sql/emails";
+import { Logger } from "../logger/index.js";
+import { UsedEmailDb, UsedEmailRowScheme } from "./sql/emails.js";
 
 const logger = new Logger("postgres-emails");
 

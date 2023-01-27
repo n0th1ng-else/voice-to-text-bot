@@ -9,32 +9,32 @@ import {
   beforeAll,
   afterAll,
 } from "@jest/globals";
-import { ExpressServer } from "../src/server/express";
-import { appVersion, launchTime } from "../src/env";
+import { ExpressServer } from "../src/server/express.js";
+import { appVersion, launchTime } from "../src/env.js";
 import {
   VoiceConverterOptions,
   VoiceConverterProvider,
-} from "../src/recognition/types";
+} from "../src/recognition/types.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
-} from "../src/recognition";
-import { TelegramBotModel } from "../src/telegram/bot";
-import { localhostUrl } from "../src/const";
-import { getMockCertificate } from "./helpers";
+} from "../src/recognition/index.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import { localhostUrl } from "../src/const.js";
+import { getMockCertificate } from "./helpers.js";
 import {
   mockTgGetWebHook,
   mockTgSetCommands,
   mockTgSetWebHook,
-} from "./requests/telegram";
-import { mockGoogleAuth } from "./requests/google";
-import { TelegramApi } from "../src/telegram/api";
-import { httpsOptions } from "../certs";
-import { Pool as MockPool } from "../src/db/__mocks__/pg";
-import { DbClient } from "../src/db";
+} from "./requests/telegram.js";
+import { mockGoogleAuth } from "./requests/google.js";
+import { TelegramApi } from "../src/telegram/api/index.js";
+import { httpsOptions } from "../certs/index.js";
+import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { DbClient } from "../src/db/index.js";
 
 jest.mock("../src/logger");
-jest.mock("../src/env");
+jest.mock("../src/env.js");
 jest.mock("../src/analytics/amplitude", () => ({
   collectEvents: () => Promise.resolve(),
 }));

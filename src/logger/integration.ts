@@ -3,7 +3,7 @@ import stripAnsi from "strip-ansi";
 import { Loggly } from "winston-loggly-bulk";
 import Logsene from "winston-logsene";
 import { isAxiosError, AxiosError } from "axios";
-import { selfUrl, logApi, logApiTokenV2, appVersion, isDebug } from "../env";
+import { selfUrl, logApi, logApiTokenV2, appVersion, isDebug } from "../env.js";
 
 export enum LogType {
   Info = "info",

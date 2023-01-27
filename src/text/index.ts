@@ -1,5 +1,5 @@
-import { LanguageCode } from "../recognition/types";
-import { LabelId, labels, MenuLabel, menuLabels } from "./labels";
+import { LanguageCode } from "../recognition/types.js";
+import { LabelId, labels, MenuLabel, menuLabels } from "./labels.js";
 
 export const sSuffix = (word: string, count: number | boolean): string => {
   const isNumber = typeof count === "number";

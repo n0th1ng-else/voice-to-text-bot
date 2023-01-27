@@ -2,11 +2,11 @@ import express from "express";
 import { createServer as createHttps } from "https";
 import { createServer as createHttp } from "http";
 import { resolve as resolvePath } from "path";
-import { Logger } from "../logger";
-import * as envy from "../env";
-import { sSuffix } from "../text";
-import { httpsOptions } from "../../certs";
-import { DbClient } from "../db";
+import { Logger } from "../logger/index.js";
+import * as envy from "../env.js";
+import { sSuffix } from "../text/index.js";
+import { httpsOptions } from "../../certs/index.js";
+import { DbClient } from "../db/index.js";
 
 const logger = new Logger("chart-script");
 

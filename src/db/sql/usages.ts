@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { nanoid } from "nanoid";
-import { UsagesSql } from "./usages.sql";
+import { UsagesSql } from "./usages.sql.js";
 
 export interface UsageRowScheme {
   usage_id: string;

@@ -1,16 +1,16 @@
 import express from "express";
 import { createServer as createHttp } from "http";
 import { createServer as createHttps } from "https";
-import { Logger } from "../logger";
-import { TelegramBotModel } from "../telegram/bot";
-import { HttpsOptions } from "../../certs";
-import { HealthDto, HealthModel } from "./types";
-import { sSuffix } from "../text";
-import { UptimeDaemon } from "./uptime";
-import { DbClient } from "../db";
-import { flattenPromise } from "../common/helpers";
-import { AnalyticsData } from "../analytics/legacy/types";
-import { collectAnalytics } from "../analytics";
+import { Logger } from "../logger/index.js";
+import { TelegramBotModel } from "../telegram/bot.js";
+import { HttpsOptions } from "../../certs/index.js";
+import { HealthDto, HealthModel } from "./types.js";
+import { sSuffix } from "../text/index.js";
+import { UptimeDaemon } from "./uptime.js";
+import { DbClient } from "../db/index.js";
+import { flattenPromise } from "../common/helpers.js";
+import { AnalyticsData } from "../analytics/legacy/types.js";
+import { collectAnalytics } from "../analytics/index.js";
 
 const logger = new Logger("server");
 
