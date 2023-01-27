@@ -1,6 +1,3 @@
-import "newrelic";
-import pg from "pg";
-import newrelic from "newrelic";
 import * as envy from "../env.js";
 import {
   getVoiceConverterInstance,
@@ -23,7 +20,6 @@ import { printCurrentStorageUsage } from "../storage/index.js";
 const logger = new Logger("start-script");
 
 export const run = (threadId = 0): void => {
-  newrelic.instrumentLoadedModule("pg", pg);
   const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
