@@ -1,8 +1,12 @@
 import { v1 } from "@google-cloud/speech";
-import { LanguageCode, VoiceConverter, VoiceConverterOptions } from "./types";
-import { Logger } from "../logger";
-import { google } from "@google-cloud/speech/build/protos/protos";
-import { getWav } from "../ffmpeg";
+import {
+  LanguageCode,
+  VoiceConverter,
+  VoiceConverterOptions,
+} from "./types.js";
+import { Logger } from "../logger/index.js";
+import { google } from "@google-cloud/speech/build/protos/protos.js";
+import { getWav } from "../ffmpeg/index.js";
 
 const logger = new Logger("google-recognition");
 

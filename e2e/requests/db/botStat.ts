@@ -1,10 +1,10 @@
 import { expect } from "@jest/globals";
-import { LanguageCode } from "../../../src/recognition/types";
-import { BotStatRecordModel } from "../../helpers";
-import { randomIntFromInterval } from "../../../src/common/timer";
-import { Pool as MockPool } from "../../../src/db/__mocks__/pg";
-import { UsagesSql } from "../../../src/db/sql/usages.sql";
-import { UsageRowScheme } from "../../../src/db/sql/usages";
+import { LanguageCode } from "../../../src/recognition/types.js";
+import { BotStatRecordModel } from "../../helpers.js";
+import { randomIntFromInterval } from "../../../src/common/timer.js";
+import { Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
+import { UsagesSql } from "../../../src/db/sql/usages.sql.js";
+import { UsageRowScheme } from "../../../src/db/sql/usages.js";
 
 export const mockGetBotStatItem = (
   pool: MockPool,

@@ -1,16 +1,16 @@
-import { TgInlineKeyboardButton, TgMessage } from "../api/types";
+import { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import {
   BotMessageModel,
   MessageOptions,
   TelegramMessagePrefix,
-} from "../types";
-import { LanguageCode } from "../../recognition/types";
-import { Logger } from "../../logger";
-import { TextModel } from "../../text";
-import { LabelId } from "../../text/labels";
-import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api";
-import { DbClient } from "../../db";
-import { splitTextIntoParts } from "../../common/helpers";
+} from "../types.js";
+import { LanguageCode } from "../../recognition/types.js";
+import { Logger } from "../../logger/index.js";
+import { TextModel } from "../../text/index.js";
+import { LabelId } from "../../text/labels.js";
+import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api/index.js";
+import { DbClient } from "../../db/index.js";
+import { splitTextIntoParts } from "../../common/helpers.js";
 
 const logger = new Logger("telegram-bot");
 

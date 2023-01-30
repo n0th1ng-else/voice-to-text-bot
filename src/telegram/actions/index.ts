@@ -1,20 +1,20 @@
-import { TelegramApi } from "../api";
-import { StartAction } from "./start";
-import { LangAction } from "./lang";
-import { SupportAction } from "./support";
-import { VoiceAction } from "./voice";
-import { CoreAction } from "./common";
-import { FundAction } from "./fund";
-import { VoiceFormatAction } from "./voice-format";
-import { VoiceLengthAction } from "./voice-length";
-import { DbClient } from "../../db";
-import { PaymentService } from "../../donate/types";
-import { TgCallbackQuery, TgCheckoutQuery } from "../api/types";
-import { AnalyticsData } from "../../analytics/legacy/types";
-import { TelegramButtonModel, TelegramButtonType } from "../types";
-import { Logger } from "../../logger";
-import { collectAnalytics } from "../../analytics";
-import { CheckoutAction } from "./checkout";
+import { TelegramApi } from "../api/index.js";
+import { StartAction } from "./start.js";
+import { LangAction } from "./lang.js";
+import { SupportAction } from "./support.js";
+import { VoiceAction } from "./voice.js";
+import { CoreAction } from "./common.js";
+import { FundAction } from "./fund.js";
+import { VoiceFormatAction } from "./voice-format.js";
+import { VoiceLengthAction } from "./voice-length.js";
+import { DbClient } from "../../db/index.js";
+import { PaymentService } from "../../donate/types.js";
+import { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
+import { AnalyticsData } from "../../analytics/legacy/types.js";
+import { TelegramButtonModel, TelegramButtonType } from "../types.js";
+import { Logger } from "../../logger/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
+import { CheckoutAction } from "./checkout.js";
 
 const logger = new Logger("telegram-bot");
 

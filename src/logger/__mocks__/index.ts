@@ -21,7 +21,7 @@ export class Logger {
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   public info(...messages: any[]): void {
-    // this.output(...messages);
+    this.output(...messages);
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -34,13 +34,15 @@ export class Logger {
     this.output(...messages);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   public output(...message: any[]): void {
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     const prefix = `[${this.id}]`;
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     const additionalPrefix = this.additionalPrefix
       ? `[${this.additionalPrefix}]`
       : "";
     // eslint-disable-next-line no-console
-    console.log(prefix, additionalPrefix, ...message);
+    // console.log(prefix, additionalPrefix, ...message);
   }
 }

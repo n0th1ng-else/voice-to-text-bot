@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
-import { splitTextIntoParts } from "./helpers";
-import { LanguageCode } from "../recognition/types";
+import { splitTextIntoParts } from "./helpers.js";
+import { LanguageCode } from "../recognition/types.js";
 
 describe("common helpers", () => {
   describe("splitTextIntoParts", () => {

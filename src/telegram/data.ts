@@ -1,5 +1,5 @@
-import { BotCommand, BotCommandOption } from "./types";
-import { LabelId } from "../text/labels";
+import { BotCommand, BotCommandOption } from "./types.js";
+import { LabelId } from "../text/labels.js";
 
 export const botCommands: BotCommandOption[] = [
   new BotCommandOption(BotCommand.Support, LabelId.SupportCommandDescription),

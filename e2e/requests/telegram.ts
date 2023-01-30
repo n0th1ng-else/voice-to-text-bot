@@ -1,21 +1,22 @@
+import { resolve as resolvePath } from "node:path";
+import { fileURLToPath } from "node:url";
 import { expect } from "@jest/globals";
-import { resolve as resolvePath } from "path";
 import request from "supertest";
 import nock from "nock";
-import { parse } from "query-string";
-import { TelegramBotModel } from "../../src/telegram/bot";
+import querystring from "query-string";
+import { TelegramBotModel } from "../../src/telegram/bot.js";
 import {
   TelegramMessageMetaItem,
   TelegramMessageMetaType,
   TelegramMessageModel,
-} from "../helpers";
-import { TextModel } from "../../src/text";
-import { LanguageCode } from "../../src/recognition/types";
-import { LabelId } from "../../src/text/labels";
-import { botCommands } from "../../src/telegram/data";
-import { flattenPromise } from "../../src/common/helpers";
-import { TelegramButtonModel } from "../../src/telegram/types";
-import { parseDonationPayload } from "../../src/telegram/helpers";
+} from "../helpers.js";
+import { TextModel } from "../../src/text/index.js";
+import { LanguageCode } from "../../src/recognition/types.js";
+import { LabelId } from "../../src/text/labels.js";
+import { botCommands } from "../../src/telegram/data.js";
+import { flattenPromise } from "../../src/common/helpers.js";
+import { TelegramButtonModel } from "../../src/telegram/types.js";
+import { parseDonationPayload } from "../../src/telegram/helpers.js";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -54,7 +55,7 @@ export const sendTelegramCallbackMessage = (
 
 export const mockTgSetCommands = (host: nock.Scope): void => {
   host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
-    const answer = typeof body === "string" ? parse(body) : body;
+    const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.commands).toBeDefined();
     const commands = answer.commands;
     expect(commands).toHaveLength(botCommands.length);
@@ -69,7 +70,7 @@ export const mockTgSetCommands = (host: nock.Scope): void => {
 
 export const mockTgSetWebHook = (host: nock.Scope, hookUrl: string): void => {
   host.post("/bottelegram-api-token/setWebHook").reply(200, (uri, body) => {
-    const answer = typeof body === "string" ? parse(body) : body;
+    const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.url).toBe(hookUrl);
     return telegramApiResponseOk;
   });
@@ -105,7 +106,7 @@ export const mockTgReceiveRawMessage = (
 ): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
-      const answer = typeof body === "string" ? parse(body) : body;
+      const answer = typeof body === "string" ? querystring.parse(body) : body;
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(message);
       resolve();
@@ -123,7 +124,7 @@ export const mockTgReceiveMessage = (
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
-      const answer = typeof body === "string" ? parse(body) : body;
+      const answer = typeof body === "string" ? querystring.parse(body) : body;
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(text.t(textId, lang));
       let prefixId = "";
@@ -191,16 +192,17 @@ export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
   const fullPathToFile = `/file/bottelegram-api-token/${pathToFile}`;
 
   host.post("/bottelegram-api-token/getFile").reply(200, (uri, body) => {
-    const answer = typeof body === "string" ? parse(body) : body;
+    const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.file_id).toBe(fileId);
     return JSON.stringify({ ok: true, result: { file_path: pathToFile } });
   });
 
+  const currentDir = fileURLToPath(new URL(".", import.meta.url));
   host
     .get(fullPathToFile)
     .replyWithFile(
       200,
-      resolvePath(__dirname, "..", "mockData", "sample_file.oga"),
+      resolvePath(currentDir, "..", "mockData", "sample_file.oga"),
       {
         "Content-Type": "audio/ogg",
       }
@@ -219,7 +221,8 @@ export const mockTgReceiveCallbackMessage = (
     host
       .post("/bottelegram-api-token/editMessageText")
       .reply(200, (uri, body) => {
-        const answer = typeof body === "string" ? parse(body) : body;
+        const answer =
+          typeof body === "string" ? querystring.parse(body) : body;
         expect(answer.chat_id).toBe(chatId);
         expect(answer.text).toBe(text.t(textId, langId));
         expect(answer.message_id).toBe(messageId);
@@ -281,7 +284,7 @@ export const mockTgReceiveInvoiceMessage = (
 ): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendInvoice").reply(200, (uri, body) => {
-      const answer = typeof body === "string" ? parse(body) : body;
+      const answer = typeof body === "string" ? querystring.parse(body) : body;
 
       expect(answer.chat_id).toBe(chatId);
       expect(answer.currency).toBe("EUR");

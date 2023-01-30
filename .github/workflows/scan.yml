@@ -11,6 +11,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run test suite
+    strategy:
+      matrix:
+        type: [unit, e2e]
+    env:
+      COVERAGE_OUTPUT: coverage-${{ matrix.type }}
+      TEST_COMMAND: test:${{ matrix.type }}
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -27,21 +33,13 @@ jobs:
         run: npm install
 
       - name: Run tests
-        run: npm test
-        env:
-          CI: true
+        run: npm run ${{ env.TEST_COMMAND }}
 
-      - name: Store Unit-tests coverage
+      - name: Store test coverage
         uses: actions/upload-artifact@v1
         with:
-          name: coverage-unit
-          path: coverage-unit
-
-      - name: Store e2e-tests coverage
-        uses: actions/upload-artifact@v1
-        with:
-          name: coverage-e2e
-          path: coverage-e2e
+          name: ${{ env.COVERAGE_OUTPUT }}
+          path: ${{ env.COVERAGE_OUTPUT }}
 
   sonar-cloud:
     runs-on: ubuntu-latest

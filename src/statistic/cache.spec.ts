@@ -1,7 +1,10 @@
-import { expect, describe, it, jest } from "@jest/globals";
-import { CacheProvider } from "./cache";
+import { expect, describe, it, jest, beforeAll } from "@jest/globals";
+import { injectDependencies } from "../testUtils/dependencies.js";
 
-jest.mock("../logger");
+jest.unstable_mockModule(
+  "../logger/index",
+  () => import("../logger/__mocks__/index.js")
+);
 
 interface TestCacheData {
   testId: string;
@@ -21,9 +24,15 @@ const testData3 = "some-test-data-3";
 const item3: TestCacheData = { testId: testId3, testData: testData3 };
 
 let cacheSize = 0;
-let cache = new CacheProvider<TestCacheData, "testId">(0, "testId");
+let CacheProvider: Awaited<typeof import("./cache.js").CacheProvider>;
+let cache;
 
 describe("[cache]", () => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    CacheProvider = init.CacheProvider;
+  });
+
   it("does nothing when cache size is 0", () => {
     cacheSize = 0;
     cache = new CacheProvider<TestCacheData, "testId">(cacheSize, "testId");

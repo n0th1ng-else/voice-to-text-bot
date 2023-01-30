@@ -1,17 +1,19 @@
 import {
   afterEach,
+  beforeAll,
   beforeEach,
   describe,
   expect,
   it,
   jest,
 } from "@jest/globals";
-import { Pool as MockPool } from "./__mocks__/pg";
-import { DonationsClient } from "./donations";
-import { DonationsSql } from "./sql/donations.sql";
-import { DonationStatus } from "./sql/donations";
+import { Pool as MockPool } from "./__mocks__/pg.js";
+import { injectDependencies } from "../testUtils/dependencies.js";
 
-jest.mock("../logger");
+jest.unstable_mockModule(
+  "../logger/index",
+  () => import("../logger/__mocks__/index.js")
+);
 
 const dbConfig = {
   user: "spy-user",
@@ -21,8 +23,11 @@ const dbConfig = {
   port: 5432,
 };
 
+let DonationsSql;
+let DonationsClient;
+let DonationStatus;
 let testPool = new MockPool(dbConfig);
-let client = new DonationsClient(testPool);
+let client;
 
 const runFail = (doneFn, reason = "should not be there"): void => {
   if (!doneFn) {
@@ -39,6 +44,13 @@ const runDone = (doneFn) => {
 };
 
 describe("Donations DB", () => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    DonationsSql = init.DonationsSql;
+    DonationsClient = init.DonationsClient;
+    DonationStatus = init.DonationStatus;
+  });
+
   beforeEach(() => {
     testPool = new MockPool(dbConfig);
     client = new DonationsClient(testPool);

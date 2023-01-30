@@ -1,5 +1,5 @@
-import { Pool } from "pg";
-import { UsedEmailsSql } from "./emails.sql";
+import type { Pool } from "pg";
+import { UsedEmailsSql } from "./emails.sql.js";
 
 export interface UsedEmailRowScheme {
   email_id: number;

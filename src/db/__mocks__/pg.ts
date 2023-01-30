@@ -1,22 +1,22 @@
-import { Pool as PGPool, PoolConfig, PoolClient } from "pg";
+import pg from "pg";
 import { EventEmitter } from "events";
 import { nanoid } from "nanoid";
 
 type AnyTypeForMock = any;
 
-export class Pool extends EventEmitter implements PGPool {
+export class Pool extends EventEmitter implements pg.Pool {
   public readonly idleCount = 0;
   public readonly totalCount = 0;
   public readonly waitingCount = 0;
 
   private mockQueue: MockSql[] = [];
 
-  constructor(_config: PoolConfig) {
+  constructor(_config: pg.PoolConfig) {
     super();
   }
 
-  public connect(): Promise<PoolClient>;
-  public connect(): Promise<PoolClient> | void {
+  public connect(): Promise<pg.PoolClient>;
+  public connect(): Promise<pg.PoolClient> | void {
     return;
   }
 

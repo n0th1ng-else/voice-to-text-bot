@@ -1,4 +1,4 @@
-import { VoiceConverterProvider } from "./recognition/types";
+import { VoiceConverterProvider } from "./recognition/types.js";
 
 process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegram-bot-api" package
 

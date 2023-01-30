@@ -1,16 +1,20 @@
-import { readFileSync } from "fs";
-import { resolve as resolvePath } from "path";
-import { LanguageCode } from "../src/recognition/types";
-import { LabelId } from "../src/text/labels";
-import { randomIntFromInterval } from "../src/common/timer";
+import { readFileSync } from "node:fs";
+import { resolve as resolvePath } from "node:path";
+import { fileURLToPath } from "node:url";
+import { LanguageCode } from "../src/recognition/types.js";
+import { LabelId } from "../src/text/labels.js";
+import { randomIntFromInterval } from "../src/common/timer.js";
 import {
   TgCallbackQuery,
   TgChatType,
   TgMessage,
-} from "../src/telegram/api/types";
-import { TelegramButtonModel, TelegramButtonType } from "../src/telegram/types";
-import { donationLevels } from "../src/const";
-import { TextModel } from "../src/text";
+} from "../src/telegram/api/types.js";
+import {
+  TelegramButtonModel,
+  TelegramButtonType,
+} from "../src/telegram/types.js";
+import { donationLevels } from "../src/const.js";
+import { TextModel } from "../src/text/index.js";
 
 interface UserNameOptions {
   userName?: string;
@@ -219,7 +223,8 @@ export class BotStatRecordModel {
 }
 
 export const getMockCertificate = (): string => {
-  const path = resolvePath(__dirname, "mockData", "googleapps_mock.key");
+  const currentDir = fileURLToPath(new URL(".", import.meta.url));
+  const path = resolvePath(currentDir, "mockData", "googleapps_mock.key");
   return readFileSync(path, { encoding: "utf-8" });
 };
 

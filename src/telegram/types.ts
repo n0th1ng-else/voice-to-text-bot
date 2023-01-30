@@ -11,14 +11,14 @@ import {
   getVoiceFile,
   isChatGroup,
   isVideoMessage,
-} from "./helpers";
-import { LanguageCode } from "../recognition/types";
+} from "./helpers.js";
+import { LanguageCode } from "../recognition/types.js";
 import { nanoid } from "nanoid";
-import { Logger } from "../logger";
-import { MenuLabel } from "../text/labels";
-import { TextModel } from "../text";
-import { TgInlineKeyboardButton, TgMessage } from "./api/types";
-import { AnalyticsData } from "../analytics/legacy/types";
+import { Logger } from "../logger/index.js";
+import { MenuLabel } from "../text/labels.js";
+import { TextModel } from "../text/index.js";
+import { TgInlineKeyboardButton, TgMessage } from "./api/types.js";
+import { AnalyticsData } from "../analytics/legacy/types.js";
 
 export enum VoiceContentReason {
   Ok = "Ok",

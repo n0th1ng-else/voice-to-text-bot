@@ -1,4 +1,4 @@
-import { PaymentService } from "./types";
+import { PaymentService } from "./types.js";
 
 export class StripePayment implements PaymentService {
   public readonly isReady: boolean = false;

@@ -8,76 +8,24 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import { mockGoogleAuth } from "./requests/google";
-import {
-  LanguageCode,
-  VoiceConverterOptions,
-  VoiceConverterProvider,
-} from "../src/recognition/types";
-import {
-  BotStatRecordModel,
-  getFundButtons,
-  getMockCertificate,
-  TelegramMessageModel,
-} from "./helpers";
-import {
-  getVoiceConverterInstance,
-  getVoiceConverterProvider,
-} from "../src/recognition";
-import { localhostUrl } from "../src/const";
-import { Pool as MockPool } from "../src/db/__mocks__/pg";
-import { DbClient } from "../src/db";
-import { TelegramBotModel } from "../src/telegram/bot";
-import { appVersion } from "../src/env";
 import nock from "nock";
-import { TelegramApi } from "../src/telegram/api";
 import request from "supertest";
-import { TgChatType } from "../src/telegram/api/types";
-import {
-  mockTgGetWebHook,
-  mockTgReceiveInvoiceMessage,
-  mockTgReceiveMessage,
-  sendTelegramCallbackMessage,
-  sendTelegramMessage,
-} from "./requests/telegram";
-import { ExpressServer } from "../src/server/express";
-import { httpsOptions } from "../certs";
-import { NodesSql } from "../src/db/sql/nodes.sql";
-import { UsagesSql } from "../src/db/sql/usages.sql";
-import { DonationsSql } from "../src/db/sql/donations.sql";
-import { UsedEmailsSql } from "../src/db/sql/emails.sql";
-import { randomIntFromInterval } from "../src/common/timer";
-import { BotCommand } from "../src/telegram/types";
-import { mockGetBotStatItem } from "./requests/db/botStat";
-import { LabelId } from "../src/text/labels";
-import { mockCreateDonationRow } from "./requests/db/donationStat";
-import { StripePayment } from "../src/donate/stripe";
+import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
 
-jest.mock("../src/logger");
-jest.mock("../src/env");
-jest.mock("../src/analytics/amplitude", () => ({
-  collectEvents: () => Promise.resolve(),
-}));
-
-mockGoogleAuth();
-
-const converterOptions: VoiceConverterOptions = {
-  isTestEnv: true,
-  googlePrivateKey: getMockCertificate(),
-  googleProjectId: "some-project",
-  googleClientEmail: "some-email",
-};
-
-const converter = getVoiceConverterInstance(
-  getVoiceConverterProvider(VoiceConverterProvider.Google),
-  converterOptions
+jest.unstable_mockModule(
+  "../src/logger/index",
+  () => import("../src/logger/__mocks__/index.js")
+);
+jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
+jest.unstable_mockModule(
+  "../src/analytics/amplitude/index",
+  () => import("../src/analytics/amplitude/__mocks__/index.js")
 );
 
 const appPort = 3900;
 const dbPort = appPort + 1;
-
-const hostUrl = `${localhostUrl}:${appPort}`;
-
 const enableSSL = false;
 
 const dbConfig = {
@@ -87,35 +35,100 @@ const dbConfig = {
   database: "test-db",
   port: dbPort,
 };
+
+const paymentToken = "stripe-token";
 const testPool = new MockPool(dbConfig);
-const db = new DbClient(dbConfig, testPool);
-
-const bot = new TelegramBotModel("telegram-api-token", converter, db);
-bot.setHostLocation(hostUrl);
-
-const telegramServer = nock(TelegramApi.url);
-const host = request(hostUrl);
 
 let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
-
-let chatType: TgChatType = TgChatType.Private;
+let chatType;
 let testMessageId = 0;
 let testChatId = 0;
-let tgMessage: TelegramMessageModel = new TelegramMessageModel(
-  testChatId,
-  chatType
-);
 
-const paymentToken = "stripe-token";
-const paymentProvider = new StripePayment(paymentToken);
-
-bot.setPayment(paymentProvider);
-
-let testLang = LanguageCode.En;
+let tgMessage;
+let testLang;
+let host;
+let bot;
+let TgChatType;
+let randomIntFromInterval;
+let telegramServer;
+let LanguageCode;
+let TelegramMessageModel;
+let BotCommand;
+let mockGetBotStatItem;
+let sendTelegramMessage;
+let mockTgReceiveMessage;
+let LabelId;
+let getFundButtons;
+let sendTelegramCallbackMessage;
+let mockTgReceiveInvoiceMessage;
+let mockCreateDonationRow;
+let BotStatRecordModel;
 
 describe("[default language - english] fund", () => {
-  beforeAll(() => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    const initTest = await injectTestDependencies();
+
+    TgChatType = init.TgChatType;
+    randomIntFromInterval = init.randomIntFromInterval;
+    LanguageCode = init.LanguageCode;
+    TelegramMessageModel = initTest.TelegramMessageModel;
+    BotCommand = init.BotCommand;
+    mockGetBotStatItem = initTest.mockGetBotStatItem;
+    sendTelegramMessage = initTest.sendTelegramMessage;
+    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
+    LabelId = init.LabelId;
+    getFundButtons = initTest.getFundButtons;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
+    mockTgReceiveInvoiceMessage = initTest.mockTgReceiveInvoiceMessage;
+    mockCreateDonationRow = initTest.mockCreateDonationRow;
+    BotStatRecordModel = initTest.BotStatRecordModel;
+
+    const mockGoogleAuth = initTest.mockGoogleAuth;
+    const getMockCertificate = initTest.getMockCertificate;
+    const getVoiceConverterInstance = init.getVoiceConverterInstance;
+    const getVoiceConverterProvider = init.getVoiceConverterProvider;
+    const VoiceConverterProvider = init.VoiceConverterProvider;
+    const DbClient = init.DbClient;
+    const localhostUrl = init.localhostUrl;
+    const TelegramBotModel = init.TelegramBotModel;
+    const TelegramApi = init.TelegramApi;
+    const StripePayment = init.StripePayment;
+    const mockTgGetWebHook = initTest.mockTgGetWebHook;
+    const ExpressServer = init.ExpressServer;
+    const appVersion = init.appVersion;
+    const httpsOptions = init.httpsOptions;
+    const NodesSql = init.NodesSql;
+    const UsagesSql = init.UsagesSql;
+    const DonationsSql = init.DonationsSql;
+    const UsedEmailsSql = init.UsedEmailsSql;
+
+    mockGoogleAuth();
+
+    const converterOptions = {
+      isTestEnv: true,
+      googlePrivateKey: getMockCertificate(),
+      googleProjectId: "some-project",
+      googleClientEmail: "some-email",
+    };
+    const converter = getVoiceConverterInstance(
+      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      converterOptions
+    );
+    const db = new DbClient(dbConfig, testPool);
+    const hostUrl = `${localhostUrl}:${appPort}`;
+    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot.setHostLocation(hostUrl);
+    telegramServer = nock(TelegramApi.url);
+    host = request(hostUrl);
+
+    chatType = TgChatType.Private;
+    testLang = LanguageCode.En;
+    tgMessage = new TelegramMessageModel(testChatId, chatType);
+    const paymentProvider = new StripePayment(paymentToken);
+    bot.setPayment(paymentProvider);
+
     mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
 
     const server = new ExpressServer(

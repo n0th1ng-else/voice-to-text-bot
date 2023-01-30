@@ -1,10 +1,10 @@
-import { Pool } from "pg";
-import { Logger } from "../logger";
+import type { Pool } from "pg";
+import { Logger } from "../logger/index.js";
 import {
   DonationRowScheme,
   DonationsDb,
   DonationStatus,
-} from "./sql/donations";
+} from "./sql/donations.js";
 
 const logger = new Logger("postgres-donations");
 

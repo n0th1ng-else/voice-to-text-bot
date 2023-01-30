@@ -5,44 +5,62 @@ import {
   describe,
   expect,
   afterEach,
+  beforeAll,
 } from "@jest/globals";
 import { nanoid } from "nanoid";
-import { ScheduleDaemon } from "./index";
-import { WaiterForCalls } from "../../e2e/helpers/waitFor";
+import { injectDependencies } from "../testUtils/dependencies.js";
 
-jest.mock("../logger");
+jest.unstable_mockModule(
+  "../logger/index",
+  () => import("../logger/__mocks__/index.js")
+);
 
 jest.useFakeTimers();
 
 const oneMinute = 60_000;
 
 let finishResult = Promise.resolve();
-const finishWatcher = new WaiterForCalls();
-const finishFn = jest.fn<() => Promise<void>>().mockImplementation(() => {
-  finishWatcher.tick();
-  return finishResult;
-});
+let finishWatcher;
+let finishFn;
 
 let shouldFinishResult = false;
-const shouldFinishWatcher = new WaiterForCalls();
-const shouldFinishFn = jest.fn<() => boolean>().mockImplementation(() => {
-  shouldFinishWatcher.tick();
-  return shouldFinishResult;
-});
+let shouldFinishWatcher;
+let shouldFinishFn;
 
 let tickResult = Promise.resolve("");
-const tickWatcher = new WaiterForCalls();
-const tickFn = jest.fn<() => Promise<string>>().mockImplementation(() => {
-  tickWatcher.tick();
-  return tickResult;
-});
+let tickWatcher;
+let tickFn;
 
+let ScheduleDaemon: Awaited<typeof import("./index.js").ScheduleDaemon>;
+let WaiterForCalls;
 let testId = nanoid(10);
-let scheduler = new ScheduleDaemon<string>(testId, () =>
-  Promise.reject(new Error("not set"))
-);
+let scheduler;
 
 describe("Scheduler", () => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    ScheduleDaemon = init.ScheduleDaemon;
+    WaiterForCalls = init.WaiterForCalls;
+
+    finishWatcher = new WaiterForCalls();
+    finishFn = jest.fn<() => Promise<void>>().mockImplementation(() => {
+      finishWatcher.tick();
+      return finishResult;
+    });
+
+    shouldFinishWatcher = new WaiterForCalls();
+    shouldFinishFn = jest.fn<() => boolean>().mockImplementation(() => {
+      shouldFinishWatcher.tick();
+      return shouldFinishResult;
+    });
+
+    tickWatcher = new WaiterForCalls();
+    tickFn = jest.fn<() => Promise<string>>().mockImplementation(() => {
+      tickWatcher.tick();
+      return tickResult;
+    });
+  });
+
   beforeEach(() => {
     finishResult = Promise.resolve();
     testId = nanoid(10);

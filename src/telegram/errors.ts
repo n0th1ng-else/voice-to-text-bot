@@ -1,4 +1,4 @@
-import { TgError } from "./api/types";
+import { TgError } from "./api/types.js";
 
 export const hasNoRightsToSendMessage = (err: unknown): boolean => {
   if (err instanceof TgError) {

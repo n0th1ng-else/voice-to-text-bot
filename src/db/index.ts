@@ -1,9 +1,9 @@
-import { Pool, types as PGTypes, defaults as PGDefaults } from "pg";
-import { NodesClient } from "./nodes";
-import { UsagesClient } from "./usages";
-import { Logger } from "../logger";
-import { DonationsClient } from "./donations";
-import { UsedEmailClient } from "./emails";
+import pg from "pg";
+import { NodesClient } from "./nodes.js";
+import { UsagesClient } from "./usages.js";
+import { Logger } from "../logger/index.js";
+import { DonationsClient } from "./donations.js";
+import { UsedEmailClient } from "./emails.js";
 
 const logger = new Logger("postgres-client");
 
@@ -24,8 +24,8 @@ export class DbClient {
   private readonly initialized: boolean;
   private ready = false;
 
-  private static getPool(config: DbConnectionConfig): Pool {
-    return new Pool({
+  private static getPool(config: DbConnectionConfig): pg.Pool {
+    return new pg.Pool({
       host: config.host,
       user: config.user,
       password: config.password,
@@ -73,15 +73,15 @@ export class DbClient {
   }
 
   public setClientName(threadId: number): this {
-    PGDefaults.application_name = `bot sql stream for replica ${threadId}`;
+    pg.defaults.application_name = `bot sql stream for replica ${threadId}`;
     return this;
   }
 
   private setParsers(): void {
-    PGTypes.setTypeParser(PGTypes.builtins.INT8, (val) => parseInt(val));
+    pg.types.setTypeParser(pg.types.builtins.INT8, (val) => parseInt(val));
   }
 
   private setDefaults(): void {
-    PGDefaults.poolSize = 1;
+    pg.defaults.poolSize = 1;
   }
 }

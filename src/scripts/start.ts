@@ -1,29 +1,25 @@
-import "newrelic";
-import pg from "pg";
-import newrelic from "newrelic";
-import * as envy from "../env";
+import * as envy from "../env.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
-} from "../recognition";
-import { VoiceConverterOptions } from "../recognition/types";
-import { Logger } from "../logger";
-import { TelegramBotModel } from "../telegram/bot";
-import { ExpressServer } from "../server/express";
-import { getHostName } from "../server/tunnel";
-import { ScheduleDaemon } from "../scheduler";
-import { printCurrentMemoryStat } from "../memory";
-import { StopListener } from "../process";
-import { httpsOptions } from "../../certs";
-import { DbClient } from "../db";
-import { StripePayment } from "../donate/stripe";
-import { getLaunchDelay } from "./init";
-import { printCurrentStorageUsage } from "../storage";
+} from "../recognition/index.js";
+import { VoiceConverterOptions } from "../recognition/types.js";
+import { Logger } from "../logger/index.js";
+import { TelegramBotModel } from "../telegram/bot.js";
+import { ExpressServer } from "../server/express.js";
+import { getHostName } from "../server/tunnel.js";
+import { ScheduleDaemon } from "../scheduler/index.js";
+import { printCurrentMemoryStat } from "../memory/index.js";
+import { StopListener } from "../process/index.js";
+import { httpsOptions } from "../../certs/index.js";
+import { DbClient } from "../db/index.js";
+import { StripePayment } from "../donate/stripe.js";
+import { getLaunchDelay } from "./init.js";
+import { printCurrentStorageUsage } from "../storage/index.js";
 
 const logger = new Logger("start-script");
 
 export const run = (threadId = 0): void => {
-  newrelic.instrumentLoadedModule("pg", pg);
   const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
@@ -74,7 +70,9 @@ export const run = (threadId = 0): void => {
   });
 
   db.init()
-    .then(() => getHostName(envy.appPort, envy.selfUrl, envy.ngRokToken))
+    .then(() =>
+      getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken)
+    )
     .then((host) => {
       logger.info(
         `Telling telegram our location is ${Logger.y(

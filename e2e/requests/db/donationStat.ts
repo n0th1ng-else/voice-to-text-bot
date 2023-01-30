@@ -1,11 +1,11 @@
-import { Pool as MockPool } from "../../../src/db/__mocks__/pg";
-import { BotStatRecordModel } from "../../helpers";
-import { DonationsSql } from "../../../src/db/sql/donations.sql";
+import { Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
+import { BotStatRecordModel } from "../../helpers.js";
+import { DonationsSql } from "../../../src/db/sql/donations.sql.js";
 import { expect } from "@jest/globals";
 import {
   DonationRowScheme,
   DonationStatus,
-} from "../../../src/db/sql/donations";
+} from "../../../src/db/sql/donations.js";
 
 export const mockCreateDonationRow = (
   pool: MockPool,

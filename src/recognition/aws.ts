@@ -1,9 +1,8 @@
 import axios from "axios";
-import { VoiceConverter, VoiceConverterOptions } from "./types";
-import { getWav } from "../ffmpeg";
-import { Logger } from "../logger";
-
-const AWS = require("aws-sdk");
+import AWS from "aws-sdk";
+import { VoiceConverter, VoiceConverterOptions } from "./types.js";
+import { getWav } from "../ffmpeg/index.js";
+import { Logger } from "../logger/index.js";
 
 const logger = new Logger("aws-recognition");
 

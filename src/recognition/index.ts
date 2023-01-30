@@ -2,10 +2,10 @@ import {
   VoiceConverter,
   VoiceConverterOptions,
   VoiceConverterProvider,
-} from "./types";
-import { GoogleProvider } from "./google";
-import { WithAiProvider } from "./wit.ai";
-import { AWSProvider } from "./aws";
+} from "./types.js";
+import { GoogleProvider } from "./google.js";
+import { WithAiProvider } from "./wit.ai.js";
+import { AWSProvider } from "./aws.js";
 
 export const getVoiceConverterProvider = (
   provider: string

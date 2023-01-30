@@ -1,4 +1,4 @@
-module.exports = () => {
+export default () => {
   process.env.TZ = "UTC";
   const testType = process.env.TEST_PACKAGE || "unit";
   const isE2E = testType === "e2e";
@@ -14,11 +14,21 @@ module.exports = () => {
   };
 
   const commonConfig = {
+    extensionsToTreatAsEsm: [".ts"],
+    preset: "ts-jest/presets/default-esm",
+    moduleNameMapper: {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+    },
+    modulePathIgnorePatterns: ["<rootDir>/.*/__mocks__"],
     rootDir: ".",
     testEnvironment: "node",
     coveragePathIgnorePatterns: ["/node_modules/"],
     reporters: ["default", "jest-sonar"],
   };
 
-  return Object.assign({}, commonConfig, isE2E ? e2eConfig : unitConfig);
+  const envConfig = isE2E ? e2eConfig : unitConfig;
+  return {
+    ...commonConfig,
+    ...envConfig,
+  };
 };

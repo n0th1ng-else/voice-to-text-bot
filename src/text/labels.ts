@@ -1,9 +1,9 @@
-import { LanguageCode } from "../recognition/types";
+import { LanguageCode } from "../recognition/types.js";
 import {
   durationLimitSec,
   secondsInOneMinute,
   supportedAudioFormats,
-} from "../const";
+} from "../const.js";
 
 const getMaxDuration = (minutes: string, seconds: string): string => {
   if (durationLimitSec < secondsInOneMinute) {

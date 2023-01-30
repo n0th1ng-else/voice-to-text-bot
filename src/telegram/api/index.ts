@@ -13,7 +13,7 @@ import {
   TgInlineKeyboardButton,
   TgMessage,
   TgWebHook,
-} from "./types";
+} from "./types.js";
 
 export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
 

@@ -1,5 +1,3 @@
-import request from "supertest";
-import nock from "nock";
 import {
   afterAll,
   afterEach,
@@ -10,117 +8,153 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import { ExpressServer } from "../src/server/express";
-import { appVersion, launchTime } from "../src/env";
-import {
-  LanguageCode,
-  VoiceConverterOptions,
-  VoiceConverterProvider,
-} from "../src/recognition/types";
-import {
-  getVoiceConverterInstance,
-  getVoiceConverterProvider,
-} from "../src/recognition";
-import { TelegramBotModel } from "../src/telegram/bot";
-import { githubUrl, localhostUrl, officialChannelAccount } from "../src/const";
-import {
-  BotStatRecordModel,
-  getFundButtons,
-  getLangButtons,
-  getMockCertificate,
-  TelegramMessageMetaItem,
-  TelegramMessageMetaType,
-  TelegramMessageModel,
-} from "./helpers";
-import { LabelId } from "../src/text/labels";
-import {
-  mockTgGetFileUrl,
-  mockTgGetWebHook,
-  mockTgReceiveCallbackMessage,
-  mockTgReceiveMessage,
-  mockTgReceiveMessages,
-  mockTgReceiveRawMessage,
-  mockTgSetCommands,
-  mockTgSetWebHook,
-  sendTelegramCallbackMessage,
-  sendTelegramMessage,
-} from "./requests/telegram";
-import {
-  mockGetBotStatItem,
-  mockUpdateBotStatLang,
-  mockUpdateBotStatUsage,
-} from "./requests/db/botStat";
-import { randomIntFromInterval } from "../src/common/timer";
-import { BotCommand } from "../src/telegram/types";
-import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google";
-import { TgChatType } from "../src/telegram/api/types";
-import { TelegramApi } from "../src/telegram/api";
-import { httpsOptions } from "../certs";
-import { Pool as MockPool } from "../src/db/__mocks__/pg";
-import { DbClient } from "../src/db";
-import { NodesSql } from "../src/db/sql/nodes.sql";
-import { UsagesSql } from "../src/db/sql/usages.sql";
-import { DonationsSql } from "../src/db/sql/donations.sql";
-import { UsedEmailsSql } from "../src/db/sql/emails.sql";
+import request from "supertest";
+import nock from "nock";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
+import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 
-jest.mock("../src/logger");
-jest.mock("../src/env");
-jest.mock("../src/analytics/amplitude", () => ({
-  collectEvents: () => Promise.resolve(),
-}));
-
-mockGoogleAuth();
-
-const converterOptions: VoiceConverterOptions = {
-  isTestEnv: true,
-  googlePrivateKey: getMockCertificate(),
-  googleProjectId: "some-project",
-  googleClientEmail: "some-email",
-};
-
-const converter = getVoiceConverterInstance(
-  getVoiceConverterProvider(VoiceConverterProvider.Google),
-  converterOptions
+jest.unstable_mockModule(
+  "../src/logger/index",
+  () => import("../src/logger/__mocks__/index.js")
+);
+jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
+jest.unstable_mockModule(
+  "../src/analytics/amplitude/index",
+  () => import("../src/analytics/amplitude/__mocks__/index.js")
 );
 
+const enableSSL = false;
 const appPort = 3200;
 const dbPort = appPort + 1;
-
-const hostUrl = `${localhostUrl}:${appPort}`;
-
-const enableSSL = false;
-
-const dbConfig = {
-  user: "spy-user",
-  password: "not-me",
-  host: "localhost",
-  database: "test-db",
-  port: dbPort,
-};
-const testPool = new MockPool(dbConfig);
-const db = new DbClient(dbConfig, testPool);
-
-const bot = new TelegramBotModel("telegram-api-token", converter, db);
-bot.setHostLocation(hostUrl, launchTime);
-
-const telegramServer = nock(TelegramApi.url);
-const host = request(hostUrl);
 
 let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
-const testLangId = LanguageCode.Ru;
-let chatType: TgChatType = TgChatType.Private;
+let testLangId;
+let chatType;
 let testMessageId = 0;
 let testChatId = 0;
-let tgMessage: TelegramMessageModel = new TelegramMessageModel(
-  testChatId,
-  chatType
-);
-let botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
+let tgMessage;
+let botStat;
+let bot;
+let host;
+let TgChatType;
+let randomIntFromInterval;
+let telegramServer;
+let testPool;
+let TelegramMessageModel;
+let BotStatRecordModel;
+let mockGetBotStatItem;
+let sendTelegramMessage;
+let mockTgReceiveMessage;
+let LabelId;
+let LanguageCode;
+let BotCommand;
+let mockTgReceiveMessages;
+let TelegramMessageMetaItem;
+let TelegramMessageMetaType;
+let sendTelegramCallbackMessage;
+let officialChannelAccount;
+let githubUrl;
+let getLangButtons;
+let mockTgReceiveCallbackMessage;
+let mockUpdateBotStatLang;
+let mockSpeechRecognition;
+let getFundButtons;
+let mockTgReceiveRawMessage;
+let mockTgGetFileUrl;
+let mockUpdateBotStatUsage;
 
 describe("[russian language]", () => {
-  beforeAll(() => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    const initTest = await injectTestDependencies();
+
+    TgChatType = init.TgChatType;
+    randomIntFromInterval = init.randomIntFromInterval;
+    LanguageCode = init.LanguageCode;
+    TelegramMessageModel = initTest.TelegramMessageModel;
+    BotCommand = init.BotCommand;
+    mockGetBotStatItem = initTest.mockGetBotStatItem;
+    sendTelegramMessage = initTest.sendTelegramMessage;
+    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
+    LabelId = init.LabelId;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
+    BotStatRecordModel = initTest.BotStatRecordModel;
+    randomIntFromInterval = init.randomIntFromInterval;
+    mockTgReceiveMessages = initTest.mockTgReceiveMessages;
+    TelegramMessageMetaItem = initTest.TelegramMessageMetaItem;
+    TelegramMessageMetaType = initTest.TelegramMessageMetaType;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
+    officialChannelAccount = init.officialChannelAccount;
+    githubUrl = init.githubUrl;
+    getLangButtons = initTest.getLangButtons;
+    mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
+    mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
+    mockSpeechRecognition = initTest.mockSpeechRecognition;
+    getFundButtons = initTest.getFundButtons;
+    mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
+    mockTgGetFileUrl = initTest.mockTgGetFileUrl;
+    mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
+
+    const mockGoogleAuth = initTest.mockGoogleAuth;
+    const getMockCertificate = initTest.getMockCertificate;
+    const getVoiceConverterInstance = init.getVoiceConverterInstance;
+    const getVoiceConverterProvider = init.getVoiceConverterProvider;
+    const VoiceConverterProvider = init.VoiceConverterProvider;
+    const DbClient = init.DbClient;
+    const localhostUrl = init.localhostUrl;
+    const TelegramBotModel = init.TelegramBotModel;
+    const TelegramApi = init.TelegramApi;
+    const mockTgGetWebHook = initTest.mockTgGetWebHook;
+    const mockTgSetWebHook = initTest.mockTgSetWebHook;
+    const mockTgSetCommands = initTest.mockTgSetCommands;
+    const ExpressServer = init.ExpressServer;
+    const appVersion = init.appVersion;
+    const httpsOptions = init.httpsOptions;
+    const NodesSql = init.NodesSql;
+    const UsagesSql = init.UsagesSql;
+    const DonationsSql = init.DonationsSql;
+    const UsedEmailsSql = init.UsedEmailsSql;
+    const launchTime = init.launchTime;
+
+    mockGoogleAuth();
+
+    const converterOptions = {
+      isTestEnv: true,
+      googlePrivateKey: getMockCertificate(),
+      googleProjectId: "some-project",
+      googleClientEmail: "some-email",
+    };
+
+    const converter = getVoiceConverterInstance(
+      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      converterOptions
+    );
+    const hostUrl = `${localhostUrl}:${appPort}`;
+
+    const dbConfig = {
+      user: "spy-user",
+      password: "not-me",
+      host: "localhost",
+      database: "test-db",
+      port: dbPort,
+    };
+    testPool = new MockPool(dbConfig);
+    const db = new DbClient(dbConfig, testPool);
+
+    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot.setHostLocation(hostUrl, launchTime);
+
+    telegramServer = nock(TelegramApi.url);
+    host = request(hostUrl);
+
+    testLangId = LanguageCode.Ru;
+    chatType = TgChatType.Private;
+    tgMessage = new TelegramMessageModel(testChatId, chatType);
+    botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
+
     mockTgGetWebHook(telegramServer, "https://unknown.url");
     mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
     mockTgSetCommands(telegramServer);

@@ -1,7 +1,7 @@
 import { promises, createWriteStream } from "fs";
 import { IncomingMessage } from "http";
 import { nanoid } from "nanoid";
-import { Logger } from "../logger";
+import { Logger } from "../logger/index.js";
 
 const logger = new Logger("media-to-wav");
 

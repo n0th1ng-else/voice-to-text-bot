@@ -1,7 +1,10 @@
-import { resolve as resolvePath } from "path";
-import { readFileSync, existsSync } from "fs";
+import { resolve as resolvePath } from "node:path";
+import { readFileSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
-const cert = resolvePath(__dirname, "./selfsigned");
+const currentDir = fileURLToPath(new URL(".", import.meta.url));
+
+const cert = resolvePath(currentDir, "./selfsigned");
 const certPath = `${cert}.crt`;
 const keyPath = `${cert}.key`;
 

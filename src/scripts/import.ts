@@ -1,17 +1,19 @@
+import { createServer as createHttps } from "node:https";
+import { createServer as createHttp } from "node:http";
+import { resolve as resolvePath } from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
-import { createServer as createHttps } from "https";
-import { createServer as createHttp } from "http";
-import { resolve as resolvePath } from "path";
-import { Logger } from "../logger";
-import * as envy from "../env";
-import { sSuffix } from "../text";
-import { httpsOptions } from "../../certs";
-import { DbClient } from "../db";
+import { Logger } from "../logger/index.js";
+import * as envy from "../env.js";
+import { sSuffix } from "../text/index.js";
+import { httpsOptions } from "../../certs/index.js";
+import { DbClient } from "../db/index.js";
 
 const logger = new Logger("import-script");
 
 export const run = (): void => {
-  const chartHtml = resolvePath(__dirname, "../import/index.html");
+  const currentDir = fileURLToPath(new URL(".", import.meta.url));
+  const chartHtml = resolvePath(currentDir, "../import/index.html");
 
   const app = express();
   app.use(express.json({ limit: "10240kb" }));

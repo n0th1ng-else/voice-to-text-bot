@@ -1,6 +1,8 @@
 import cluster from "node:cluster";
-import { green, red, yellow } from "picocolors";
-import { LogType, sendLogs } from "./integration";
+import picocolors from "picocolors";
+import { LogType, sendLogs } from "./integration.js";
+
+const { green, red, yellow } = picocolors;
 
 export class Logger {
   public static g(message: string | number): string {

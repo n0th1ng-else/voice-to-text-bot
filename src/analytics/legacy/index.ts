@@ -1,7 +1,7 @@
 import axios from "axios";
-import { Logger } from "../../logger";
-import { AnalyticsDataDto } from "./types";
-import { analyticsId } from "../../env";
+import { Logger } from "../../logger/index.js";
+import { AnalyticsDataDto } from "./types.js";
+import { analyticsId } from "../../env.js";
 
 const logger = new Logger("analytics:ga");
 
