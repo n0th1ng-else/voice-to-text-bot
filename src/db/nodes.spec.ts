@@ -5,12 +5,15 @@ import {
   expect,
   it,
   jest,
+  beforeAll,
 } from "@jest/globals";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { NodesClient } from "./nodes.js";
-import { NodesSql } from "./sql/nodes.sql.js";
+import { injectDependencies } from "../../e2e/helpers/dependencies.js";
 
-jest.mock("../logger");
+jest.unstable_mockModule(
+  "../logger/index",
+  () => import("../logger/__mocks__/index.js")
+);
 
 const dbConfig = {
   user: "spy-user",
@@ -20,8 +23,10 @@ const dbConfig = {
   port: 5432,
 };
 
+let NodesSql;
+let NodesClient;
 let testPool = new MockPool(dbConfig);
-let client = new NodesClient(testPool);
+let client;
 
 const runFail = (doneFn, reason = "should not be there"): void => {
   if (!doneFn) {
@@ -38,6 +43,12 @@ const runDone = (doneFn) => {
 };
 
 describe("Nodes DB", () => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    NodesSql = init.NodesSql;
+    NodesClient = init.NodesClient;
+  });
+
   beforeEach(() => {
     testPool = new MockPool(dbConfig);
     client = new NodesClient(testPool);

@@ -1,8 +1,19 @@
-import { afterEach, beforeEach, describe, expect, it } from "@jest/globals";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { UsagesClient } from "./usages.js";
-import { LanguageCode } from "../recognition/types.js";
-import { UsagesSql } from "./sql/usages.sql.js";
+import { injectDependencies } from "../../e2e/helpers/dependencies.js";
+
+jest.unstable_mockModule(
+  "../logger/index",
+  () => import("../logger/__mocks__/index.js")
+);
 
 const dbConfig = {
   user: "spy-user",
@@ -12,8 +23,11 @@ const dbConfig = {
   port: 5432,
 };
 
+let UsagesClient;
+let UsagesSql;
+let LanguageCode;
 let testPool = new MockPool(dbConfig);
-let client = new UsagesClient(testPool);
+let client;
 
 const runFail = (doneFn, reason = "should not be there"): void => {
   if (!doneFn) {
@@ -30,6 +44,13 @@ const runDone = (doneFn) => {
 };
 
 describe("Usages DB", () => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    UsagesClient = init.UsagesClient;
+    LanguageCode = init.LanguageCode;
+    UsagesSql = init.UsagesSql;
+  });
+
   beforeEach(() => {
     testPool = new MockPool(dbConfig);
     client = new UsagesClient(testPool);
