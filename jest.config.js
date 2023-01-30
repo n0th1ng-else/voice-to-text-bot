@@ -15,22 +15,15 @@ export default () => {
 
   const commonConfig = {
     extensionsToTreatAsEsm: [".ts"],
-    preset: "ts-jest",
+    preset: "ts-jest/presets/default-esm",
     moduleNameMapper: {
       "^(\\.{1,2}/.*)\\.js$": "$1",
     },
+    modulePathIgnorePatterns: ["<rootDir>/.*/__mocks__"],
     rootDir: ".",
     testEnvironment: "node",
     coveragePathIgnorePatterns: ["/node_modules/"],
     reporters: ["default", "jest-sonar"],
-    transform: {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          useESM: true,
-        },
-      ],
-    },
   };
 
   const envConfig = isE2E ? e2eConfig : unitConfig;

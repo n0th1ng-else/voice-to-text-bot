@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { expect } from "@jest/globals";
 import request from "supertest";
 import nock from "nock";
-import { parse } from "query-string";
+import querystring from "query-string";
 import { TelegramBotModel } from "../../src/telegram/bot.js";
 import {
   TelegramMessageMetaItem,
@@ -55,7 +55,7 @@ export const sendTelegramCallbackMessage = (
 
 export const mockTgSetCommands = (host: nock.Scope): void => {
   host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
-    const answer = typeof body === "string" ? parse(body) : body;
+    const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.commands).toBeDefined();
     const commands = answer.commands;
     expect(commands).toHaveLength(botCommands.length);
@@ -70,7 +70,7 @@ export const mockTgSetCommands = (host: nock.Scope): void => {
 
 export const mockTgSetWebHook = (host: nock.Scope, hookUrl: string): void => {
   host.post("/bottelegram-api-token/setWebHook").reply(200, (uri, body) => {
-    const answer = typeof body === "string" ? parse(body) : body;
+    const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.url).toBe(hookUrl);
     return telegramApiResponseOk;
   });
@@ -106,7 +106,7 @@ export const mockTgReceiveRawMessage = (
 ): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
-      const answer = typeof body === "string" ? parse(body) : body;
+      const answer = typeof body === "string" ? querystring.parse(body) : body;
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(message);
       resolve();
@@ -124,7 +124,7 @@ export const mockTgReceiveMessage = (
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
-      const answer = typeof body === "string" ? parse(body) : body;
+      const answer = typeof body === "string" ? querystring.parse(body) : body;
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(text.t(textId, lang));
       let prefixId = "";
@@ -192,7 +192,7 @@ export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
   const fullPathToFile = `/file/bottelegram-api-token/${pathToFile}`;
 
   host.post("/bottelegram-api-token/getFile").reply(200, (uri, body) => {
-    const answer = typeof body === "string" ? parse(body) : body;
+    const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.file_id).toBe(fileId);
     return JSON.stringify({ ok: true, result: { file_path: pathToFile } });
   });
@@ -221,7 +221,8 @@ export const mockTgReceiveCallbackMessage = (
     host
       .post("/bottelegram-api-token/editMessageText")
       .reply(200, (uri, body) => {
-        const answer = typeof body === "string" ? parse(body) : body;
+        const answer =
+          typeof body === "string" ? querystring.parse(body) : body;
         expect(answer.chat_id).toBe(chatId);
         expect(answer.text).toBe(text.t(textId, langId));
         expect(answer.message_id).toBe(messageId);
@@ -283,7 +284,7 @@ export const mockTgReceiveInvoiceMessage = (
 ): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendInvoice").reply(200, (uri, body) => {
-      const answer = typeof body === "string" ? parse(body) : body;
+      const answer = typeof body === "string" ? querystring.parse(body) : body;
 
       expect(answer.chat_id).toBe(chatId);
       expect(answer.currency).toBe("EUR");

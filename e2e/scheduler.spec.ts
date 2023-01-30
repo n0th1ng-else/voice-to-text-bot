@@ -5,26 +5,23 @@ import {
   afterEach,
   it,
   describe,
+  beforeAll,
 } from "@jest/globals";
+import { injectDependencies } from "./helpers/dependencies.js";
 import axios, { AxiosRequestConfig } from "axios";
-import { ExpressServer } from "../src/server/express.js";
-import { appVersion } from "../src/env.js";
-import { localhostUrl } from "../src/const.js";
-import { getHealthUrl } from "../src/server/helpers.js";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
-import { WaiterForCalls } from "./helpers/waitFor.js";
-import { httpsOptions } from "../certs/index.js";
 
-const waiter = new WaiterForCalls();
-
-jest.mock("../src/logger");
-jest.mock("../src/env.js");
-jest.mock("../src/analytics/amplitude", () => ({
-  collectEvents: () => Promise.resolve(),
-}));
+jest.unstable_mockModule(
+  "../src/logger/index",
+  () => import("../src/logger/__mocks__/index.js")
+);
+jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
+jest.unstable_mockModule(
+  "../src/analytics/amplitude/index",
+  () => import("../src/analytics/amplitude/__mocks__/index.js")
+);
 
 const appPort = 3700;
-const hostUrl = `${localhostUrl}:${appPort}`;
 const nextUrl = `http://nexthost:${appPort + 1}`;
 
 const clientSpy = jest
@@ -60,13 +57,33 @@ let clearIntervalSpy = jest
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
-let server: ExpressServer;
+let server;
+let getHealthUrl;
+let ExpressServer;
+let appVersion;
+let httpsOptions;
+let waiter;
+let hostUrl;
 const enableSSL = false;
 
 let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
 describe("[uptime daemon]", () => {
+  beforeAll(async () => {
+    const init = await injectDependencies();
+    getHealthUrl = init.getHealthUrl;
+    ExpressServer = init.ExpressServer;
+    appVersion = init.appVersion;
+    httpsOptions = init.httpsOptions;
+
+    const localhostUrl = init.localhostUrl;
+    const WaiterForCalls = init.WaiterForCalls;
+
+    hostUrl = `${localhostUrl}:${appPort}`;
+    waiter = new WaiterForCalls();
+  });
+
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date().setHours(23, 58, 0, 0));
