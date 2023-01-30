@@ -9,7 +9,8 @@ import {
 } from "@jest/globals";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies } from "./helpers/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 
 jest.unstable_mockModule(
@@ -38,9 +39,10 @@ describe("error cases", () => {
   describe("server routes", () => {
     beforeAll(async () => {
       const init = await injectDependencies();
+      const initTest = await injectTestDependencies();
 
-      const mockGoogleAuth = init.mockGoogleAuth;
-      const getMockCertificate = init.getMockCertificate;
+      const mockGoogleAuth = initTest.mockGoogleAuth;
+      const getMockCertificate = initTest.getMockCertificate;
       const getVoiceConverterInstance = init.getVoiceConverterInstance;
       const getVoiceConverterProvider = init.getVoiceConverterProvider;
       const VoiceConverterProvider = init.VoiceConverterProvider;
@@ -48,9 +50,9 @@ describe("error cases", () => {
       const localhostUrl = init.localhostUrl;
       const TelegramBotModel = init.TelegramBotModel;
       const TelegramApi = init.TelegramApi;
-      const mockTgGetWebHook = init.mockTgGetWebHook;
-      const mockTgSetWebHook = init.mockTgSetWebHook;
-      const mockTgSetCommands = init.mockTgSetCommands;
+      const mockTgGetWebHook = initTest.mockTgGetWebHook;
+      const mockTgSetWebHook = initTest.mockTgSetWebHook;
+      const mockTgSetCommands = initTest.mockTgSetCommands;
       const ExpressServer = init.ExpressServer;
       const appVersion = init.appVersion;
       const httpsOptions = init.httpsOptions;

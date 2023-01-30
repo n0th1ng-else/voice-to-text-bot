@@ -7,7 +7,7 @@ import {
   describe,
   beforeAll,
 } from "@jest/globals";
-import { injectDependencies } from "./helpers/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
 import axios, { AxiosRequestConfig } from "axios";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
 

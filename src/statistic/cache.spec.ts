@@ -1,5 +1,5 @@
 import { expect, describe, it, jest, beforeAll } from "@jest/globals";
-import { injectDependencies } from "../../e2e/helpers/dependencies.js";
+import { injectDependencies } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",

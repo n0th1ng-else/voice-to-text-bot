@@ -11,7 +11,8 @@ import {
 import nock from "nock";
 import request from "supertest";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { injectDependencies } from "./helpers/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -67,23 +68,25 @@ let BotStatRecordModel;
 describe("[default language - english] fund", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
+    const initTest = await injectTestDependencies();
+
     TgChatType = init.TgChatType;
     randomIntFromInterval = init.randomIntFromInterval;
     LanguageCode = init.LanguageCode;
-    TelegramMessageModel = init.TelegramMessageModel;
+    TelegramMessageModel = initTest.TelegramMessageModel;
     BotCommand = init.BotCommand;
-    mockGetBotStatItem = init.mockGetBotStatItem;
-    sendTelegramMessage = init.sendTelegramMessage;
-    mockTgReceiveMessage = init.mockTgReceiveMessage;
+    mockGetBotStatItem = initTest.mockGetBotStatItem;
+    sendTelegramMessage = initTest.sendTelegramMessage;
+    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
     LabelId = init.LabelId;
-    getFundButtons = init.getFundButtons;
-    sendTelegramCallbackMessage = init.sendTelegramCallbackMessage;
-    mockTgReceiveInvoiceMessage = init.mockTgReceiveInvoiceMessage;
-    mockCreateDonationRow = init.mockCreateDonationRow;
-    BotStatRecordModel = init.BotStatRecordModel;
+    getFundButtons = initTest.getFundButtons;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
+    mockTgReceiveInvoiceMessage = initTest.mockTgReceiveInvoiceMessage;
+    mockCreateDonationRow = initTest.mockCreateDonationRow;
+    BotStatRecordModel = initTest.BotStatRecordModel;
 
-    const mockGoogleAuth = init.mockGoogleAuth;
-    const getMockCertificate = init.getMockCertificate;
+    const mockGoogleAuth = initTest.mockGoogleAuth;
+    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const VoiceConverterProvider = init.VoiceConverterProvider;
@@ -92,7 +95,7 @@ describe("[default language - english] fund", () => {
     const TelegramBotModel = init.TelegramBotModel;
     const TelegramApi = init.TelegramApi;
     const StripePayment = init.StripePayment;
-    const mockTgGetWebHook = init.mockTgGetWebHook;
+    const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const ExpressServer = init.ExpressServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;

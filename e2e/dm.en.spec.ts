@@ -10,7 +10,8 @@ import {
 } from "@jest/globals";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies } from "./helpers/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 
 jest.unstable_mockModule(
@@ -65,34 +66,35 @@ let mockUpdateBotStatUsage;
 describe("[default language - english]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
+    const initTest = await injectTestDependencies();
     TgChatType = init.TgChatType;
     randomIntFromInterval = init.randomIntFromInterval;
     LanguageCode = init.LanguageCode;
-    TelegramMessageModel = init.TelegramMessageModel;
+    TelegramMessageModel = initTest.TelegramMessageModel;
     BotCommand = init.BotCommand;
-    mockGetBotStatItem = init.mockGetBotStatItem;
-    sendTelegramMessage = init.sendTelegramMessage;
-    mockTgReceiveMessage = init.mockTgReceiveMessage;
+    mockGetBotStatItem = initTest.mockGetBotStatItem;
+    sendTelegramMessage = initTest.sendTelegramMessage;
+    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
     LabelId = init.LabelId;
-    sendTelegramCallbackMessage = init.sendTelegramCallbackMessage;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     randomIntFromInterval = init.randomIntFromInterval;
-    mockTgReceiveMessages = init.mockTgReceiveMessages;
-    TelegramMessageMetaItem = init.TelegramMessageMetaItem;
-    TelegramMessageMetaType = init.TelegramMessageMetaType;
-    sendTelegramCallbackMessage = init.sendTelegramCallbackMessage;
+    mockTgReceiveMessages = initTest.mockTgReceiveMessages;
+    TelegramMessageMetaItem = initTest.TelegramMessageMetaItem;
+    TelegramMessageMetaType = initTest.TelegramMessageMetaType;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     officialChannelAccount = init.officialChannelAccount;
     githubUrl = init.githubUrl;
-    getLangButtons = init.getLangButtons;
-    mockTgReceiveCallbackMessage = init.mockTgReceiveCallbackMessage;
-    mockUpdateBotStatLang = init.mockUpdateBotStatLang;
-    mockSpeechRecognition = init.mockSpeechRecognition;
-    getFundButtons = init.getFundButtons;
-    mockTgReceiveRawMessage = init.mockTgReceiveRawMessage;
-    mockTgGetFileUrl = init.mockTgGetFileUrl;
-    mockUpdateBotStatUsage = init.mockUpdateBotStatUsage;
+    getLangButtons = initTest.getLangButtons;
+    mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
+    mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
+    mockSpeechRecognition = initTest.mockSpeechRecognition;
+    getFundButtons = initTest.getFundButtons;
+    mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
+    mockTgGetFileUrl = initTest.mockTgGetFileUrl;
+    mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
 
-    const mockGoogleAuth = init.mockGoogleAuth;
-    const getMockCertificate = init.getMockCertificate;
+    const mockGoogleAuth = initTest.mockGoogleAuth;
+    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const VoiceConverterProvider = init.VoiceConverterProvider;
@@ -100,7 +102,7 @@ describe("[default language - english]", () => {
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
     const TelegramApi = init.TelegramApi;
-    const mockTgGetWebHook = init.mockTgGetWebHook;
+    const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const ExpressServer = init.ExpressServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;

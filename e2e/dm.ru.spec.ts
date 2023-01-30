@@ -10,7 +10,8 @@ import {
 } from "@jest/globals";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies } from "./helpers/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 
 jest.unstable_mockModule(
@@ -68,35 +69,37 @@ let mockUpdateBotStatUsage;
 describe("[russian language]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
+    const initTest = await injectTestDependencies();
+
     TgChatType = init.TgChatType;
     randomIntFromInterval = init.randomIntFromInterval;
     LanguageCode = init.LanguageCode;
-    TelegramMessageModel = init.TelegramMessageModel;
+    TelegramMessageModel = initTest.TelegramMessageModel;
     BotCommand = init.BotCommand;
-    mockGetBotStatItem = init.mockGetBotStatItem;
-    sendTelegramMessage = init.sendTelegramMessage;
-    mockTgReceiveMessage = init.mockTgReceiveMessage;
+    mockGetBotStatItem = initTest.mockGetBotStatItem;
+    sendTelegramMessage = initTest.sendTelegramMessage;
+    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
     LabelId = init.LabelId;
-    sendTelegramCallbackMessage = init.sendTelegramCallbackMessage;
-    BotStatRecordModel = init.BotStatRecordModel;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
+    BotStatRecordModel = initTest.BotStatRecordModel;
     randomIntFromInterval = init.randomIntFromInterval;
-    mockTgReceiveMessages = init.mockTgReceiveMessages;
-    TelegramMessageMetaItem = init.TelegramMessageMetaItem;
-    TelegramMessageMetaType = init.TelegramMessageMetaType;
-    sendTelegramCallbackMessage = init.sendTelegramCallbackMessage;
+    mockTgReceiveMessages = initTest.mockTgReceiveMessages;
+    TelegramMessageMetaItem = initTest.TelegramMessageMetaItem;
+    TelegramMessageMetaType = initTest.TelegramMessageMetaType;
+    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     officialChannelAccount = init.officialChannelAccount;
     githubUrl = init.githubUrl;
-    getLangButtons = init.getLangButtons;
-    mockTgReceiveCallbackMessage = init.mockTgReceiveCallbackMessage;
-    mockUpdateBotStatLang = init.mockUpdateBotStatLang;
-    mockSpeechRecognition = init.mockSpeechRecognition;
-    getFundButtons = init.getFundButtons;
-    mockTgReceiveRawMessage = init.mockTgReceiveRawMessage;
-    mockTgGetFileUrl = init.mockTgGetFileUrl;
-    mockUpdateBotStatUsage = init.mockUpdateBotStatUsage;
+    getLangButtons = initTest.getLangButtons;
+    mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
+    mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
+    mockSpeechRecognition = initTest.mockSpeechRecognition;
+    getFundButtons = initTest.getFundButtons;
+    mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
+    mockTgGetFileUrl = initTest.mockTgGetFileUrl;
+    mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
 
-    const mockGoogleAuth = init.mockGoogleAuth;
-    const getMockCertificate = init.getMockCertificate;
+    const mockGoogleAuth = initTest.mockGoogleAuth;
+    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const VoiceConverterProvider = init.VoiceConverterProvider;
@@ -104,9 +107,9 @@ describe("[russian language]", () => {
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
     const TelegramApi = init.TelegramApi;
-    const mockTgGetWebHook = init.mockTgGetWebHook;
-    const mockTgSetWebHook = init.mockTgSetWebHook;
-    const mockTgSetCommands = init.mockTgSetCommands;
+    const mockTgGetWebHook = initTest.mockTgGetWebHook;
+    const mockTgSetWebHook = initTest.mockTgSetWebHook;
+    const mockTgSetCommands = initTest.mockTgSetCommands;
     const ExpressServer = init.ExpressServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;

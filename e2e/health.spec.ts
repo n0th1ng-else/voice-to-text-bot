@@ -11,7 +11,8 @@ import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
-import { injectDependencies } from "./helpers/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies } from "./helpers/dependencies.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -50,18 +51,19 @@ let stopHandler: () => Promise<void> = () =>
 describe("[health]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
+    const initTest = await injectTestDependencies();
 
     ExpressServer = init.ExpressServer;
     appVersion = init.appVersion;
     httpsOptions = init.httpsOptions;
-    mockTgGetWebHook = init.mockTgGetWebHook;
-    mockTgSetWebHook = init.mockTgSetWebHook;
-    mockTgSetCommands = init.mockTgSetCommands;
-    mockTgGetWebHookError = init.mockTgGetWebHookError;
+    mockTgGetWebHook = initTest.mockTgGetWebHook;
+    mockTgSetWebHook = initTest.mockTgSetWebHook;
+    mockTgSetCommands = initTest.mockTgSetCommands;
+    mockTgGetWebHookError = initTest.mockTgGetWebHookError;
     localhostUrl = init.localhostUrl;
 
-    const mockGoogleAuth = init.mockGoogleAuth;
-    const getMockCertificate = init.getMockCertificate;
+    const mockGoogleAuth = initTest.mockGoogleAuth;
+    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const VoiceConverterProvider = init.VoiceConverterProvider;
