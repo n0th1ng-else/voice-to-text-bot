@@ -32,11 +32,6 @@ export const googleApi = {
   privateKey: "",
 };
 
-export const logApi = {
-  apiToken: "",
-  projectId: "",
-};
-
 export const logApiTokenV2 = "";
 
 export const memoryLimit = 0;
