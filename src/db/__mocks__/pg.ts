@@ -1,5 +1,5 @@
+import { EventEmitter } from "node:events";
 import pg from "pg";
-import { EventEmitter } from "events";
 import { nanoid } from "nanoid";
 
 type AnyTypeForMock = any;

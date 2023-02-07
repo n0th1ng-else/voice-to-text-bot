@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 
 export const randomIntFromInterval = (min: number, max: number): number => {
   const byteLimit = 256;
