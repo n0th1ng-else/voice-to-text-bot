@@ -20,9 +20,9 @@
     "build": "tsc",
     "test:runner": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:load": "artillery run load.yml --insecure",
-    "test:unit": "npm run test:runner --coverage",
-    "test:e2e": "TEST_PACKAGE=e2e npm run test:runner --coverage",
-    "test:unit:watch": "npm run test:runner --watch",
+    "test:unit": "TEST_PACKAGE=unit npm run test:runner -- --coverage",
+    "test:e2e": "TEST_PACKAGE=e2e npm run test:runner -- --coverage",
+    "test:unit:watch": "TEST_PACKAGE=unit npm run test:runner --watch",
     "test:e2e:watch": "TEST_PACKAGE=e2e npm run test:runner --watch",
     "test": "concurrently \"npm:test:unit\" \"npm:test:e2e\"",
     "prepare": "husky install"
