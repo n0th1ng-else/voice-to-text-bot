@@ -116,7 +116,7 @@ describe("[default language - english] fund", () => {
       getVoiceConverterProvider(VoiceConverterProvider.Google),
       converterOptions
     );
-    const db = new DbClient(dbConfig, testPool);
+    const db = new DbClient(dbConfig, 0, testPool);
     const hostUrl = `${localhostUrl}:${appPort}`;
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl);
