@@ -6,6 +6,7 @@ export default () => {
   const e2eConfig = {
     coverageDirectory: "<rootDir>/coverage-e2e",
     testMatch: ["<rootDir>/e2e/**/?(*.)+(spec|test).[jt]s?(x)"],
+    maxConcurrency: 1,
   };
 
   const unitConfig = {
