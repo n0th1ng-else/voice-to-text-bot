@@ -1,9 +1,8 @@
 import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
-import { Loggly } from "winston-loggly-bulk";
 import Logsene from "winston-logsene";
 import { isAxiosError, AxiosError } from "axios";
-import { selfUrl, logApi, logApiTokenV2, appVersion, isDebug } from "../env.js";
+import { selfUrl, logApiTokenV2, appVersion, isDebug } from "../env.js";
 
 export enum LogType {
   Info = "info",
@@ -12,9 +11,6 @@ export enum LogType {
 }
 
 const SANITIZE_CHARACTER = ":cleared:";
-
-const isLoggingEnabled = (): boolean =>
-  Boolean(logApi.apiToken && logApi.projectId);
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const convertDataItem = (data: any, ind: number): Record<string, string> => {
@@ -57,14 +53,7 @@ const plainHost = selfUrl
 
 const logTags = [`app.${appVersion}`, `host.${plainHost}`];
 
-const logglyTransport = [
-  isLoggingEnabled() &&
-    new Loggly({
-      token: logApi.apiToken,
-      subdomain: logApi.projectId,
-      tags: logTags,
-      json: true,
-    }),
+const logTransports = [
   logApiTokenV2 &&
     new Logsene({
       token: logApiTokenV2,
@@ -78,8 +67,8 @@ const { combine, json, errors } = format;
 const bulkLogger = createLogger({
   format: combine(errors({ stack: true }), json()),
   transports: isDebug
-    ? [new transports.Console(), ...logglyTransport]
-    : logglyTransport,
+    ? [new transports.Console(), ...logTransports]
+    : logTransports,
 });
 
 const sanitizeError = (rawData: unknown): unknown => {
@@ -104,7 +93,7 @@ export const sendLogs = (
   message: string,
   rawData: unknown
 ): void => {
-  if (!logglyTransport.length) {
+  if (!logTransports.length) {
     return;
   }
   const data = sanitizeError(rawData);

@@ -9,7 +9,7 @@ export const appVersion: string = process.env.APP_VERSION || "dev";
 export const enableSSL = process.env.ENABLE_SSL === "true";
 
 export const provider: string =
-  process.env.PROVIDER || VoiceConverterProvider.Google;
+  process.env.PROVIDER || VoiceConverterProvider.WitAi;
 
 export const selfUrl: string = process.env.SELF_URL || "";
 
@@ -33,11 +33,6 @@ export const googleApi = {
   projectId: process.env.GOOGLE_PROJECT_ID || "",
   clientEmail: process.env.GOOGLE_CLIENT_EMAIL || "",
   privateKey: process.env.GOOGLE_PRIVATE_KEY || "",
-};
-
-export const logApi = {
-  apiToken: process.env.LOG_API_TOKEN || "",
-  projectId: process.env.LOG_PROJECT_ID || "",
 };
 
 export const logApiTokenV2 = process.env.LOG_API_TOKEN_V2 || "";
