@@ -24,13 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: Install dependencies
-        run: npm install
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
 
       - name: Run tests
         run: npm run ${{ env.TEST_COMMAND }}
@@ -41,10 +36,31 @@ jobs:
           name: ${{ env.COVERAGE_OUTPUT }}
           path: ${{ env.COVERAGE_OUTPUT }}
 
+  validate:
+    runs-on: ubuntu-latest
+    name: Run validations
+    strategy:
+      matrix:
+        command: [typecheck, "lint:all"]
+    env:
+      COMMAND: ${{ matrix.command }}
+    steps:
+      - name: App version
+        run: echo "Picked the app version ${GITHUB_SHA}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
+
+      - name: Run validation
+        run: npm run ${{ env.COMMAND }}
+
   sonar-cloud:
     runs-on: ubuntu-latest
     name: Run SonarCloud security audit
-    needs: test
+    needs: [test, validate]
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
