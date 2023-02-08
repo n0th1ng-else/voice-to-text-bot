@@ -20,12 +20,13 @@
     "lint:all": "eslint .",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "test:runner": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\" jest",
     "test:load": "artillery run load.yml --insecure",
-    "test:unit": "TEST_PACKAGE=unit npm run test:runner -- --coverage",
-    "test:e2e": "TEST_PACKAGE=e2e npm run test:runner -- --coverage",
-    "test:unit:watch": "TEST_PACKAGE=unit npm run test:runner --watch",
-    "test:e2e:watch": "TEST_PACKAGE=e2e npm run test:runner --watch",
+    "test:unit": "npm run test:runner -- --coverage --selectProjects=unit",
+    "test:e2e": "npm run test:runner -- --coverage --runInBand --selectProjects=e2e",
+    "test:unit:watch": "npm run test:runner --watch --selectProjects=unit",
+    "test:e2e:watch": "npm run test:runner --watch --selectProjects=e2e",
+    "test": "npm run test:runner -- --coverage --runInBand",
     "prepare": "husky install"
   },
   "dependencies": {

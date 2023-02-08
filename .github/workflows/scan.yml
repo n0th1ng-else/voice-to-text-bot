@@ -11,12 +11,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run test suite
-    strategy:
-      matrix:
-        type: [unit, e2e]
-    env:
-      COVERAGE_OUTPUT: coverage-${{ matrix.type }}
-      TEST_COMMAND: test:${{ matrix.type }}
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -28,13 +22,13 @@ jobs:
         uses: ./.github/actions/npm
 
       - name: Run tests
-        run: npm run ${{ env.TEST_COMMAND }}
+        run: npm test
 
-      - name: Store test coverage
+      - name: Store test coverage results
         uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.COVERAGE_OUTPUT }}
-          path: ${{ env.COVERAGE_OUTPUT }}
+          name: coverage
+          path: coverage
 
   validate:
     runs-on: ubuntu-latest
@@ -70,15 +64,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Unit-tests coverage
+      - name: Download test coverage results
         uses: actions/download-artifact@v1
         with:
-          name: coverage-unit
-
-      - name: Download e2e-tests coverage
-        uses: actions/download-artifact@v1
-        with:
-          name: coverage-e2e
+          name: coverage
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
