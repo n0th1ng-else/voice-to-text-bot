@@ -143,7 +143,7 @@ describe("[default language - english]", () => {
       converterOptions
     );
     hostUrl = `${localhostUrl}:${appPort}`;
-    db = new DbClient(dbConfig, testPool);
+    db = new DbClient(dbConfig, 0, testPool);
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramApi.url);

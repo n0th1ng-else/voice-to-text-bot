@@ -42,13 +42,16 @@ export const run = (threadId = 0): void => {
     converterOptions
   );
 
-  const db = new DbClient({
-    user: envy.dbPostgres.user,
-    password: envy.dbPostgres.password,
-    host: envy.dbPostgres.host,
-    database: envy.dbPostgres.database,
-    port: envy.dbPostgres.port,
-  }).setClientName(threadId);
+  const db = new DbClient(
+    {
+      user: envy.dbPostgres.user,
+      password: envy.dbPostgres.password,
+      host: envy.dbPostgres.host,
+      database: envy.dbPostgres.database,
+      port: envy.dbPostgres.port,
+    },
+    threadId
+  );
 
   const paymentProvider = new StripePayment(envy.stripeToken);
 

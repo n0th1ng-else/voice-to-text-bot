@@ -94,7 +94,7 @@ describe("[health]", () => {
       port: dbPort,
     };
     testPool = new MockPool(dbConfig);
-    const db = new DbClient(dbConfig, testPool);
+    const db = new DbClient(dbConfig, 0, testPool);
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramApi.url);

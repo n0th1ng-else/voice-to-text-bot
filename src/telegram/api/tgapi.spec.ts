@@ -1,4 +1,5 @@
 import axios, {
+  AxiosHeaders,
   AxiosError,
   AxiosRequestConfig,
   CreateAxiosDefaults,
@@ -621,13 +622,17 @@ describe("[telegram api client]", () => {
             status: errCode,
             statusText: "cool co co cool",
             data: errData,
-            config: {},
+            config: {
+              headers: new AxiosHeaders(),
+            },
             headers: {},
             request: {},
           },
           isAxiosError: true,
           request: {},
-          config: {},
+          config: {
+            headers: new AxiosHeaders(),
+          },
           toJSON: () => ({}),
         };
         return Promise.reject(networkErr);

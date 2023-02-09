@@ -5,7 +5,20 @@ import { Logger } from "../logger/index.js";
 import { DonationsClient } from "./donations.js";
 import { UsedEmailClient } from "./emails.js";
 
+const { Pool } = pg;
 const logger = new Logger("postgres-client");
+
+const getPool = (config: DbConnectionConfig, threadId: number): pg.Pool => {
+  return new Pool({
+    host: config.host,
+    user: config.user,
+    password: config.password,
+    database: config.database,
+    port: config.port,
+    max: 1,
+    application_name: `sql-stream-replica-${threadId}`,
+  });
+};
 
 interface DbConnectionConfig {
   user: string;
@@ -24,18 +37,7 @@ export class DbClient {
   private readonly initialized: boolean;
   private ready = false;
 
-  private static getPool(config: DbConnectionConfig): pg.Pool {
-    return new pg.Pool({
-      host: config.host,
-      user: config.user,
-      password: config.password,
-      database: config.database,
-      port: config.port,
-      max: 1,
-    });
-  }
-
-  constructor(config: DbConnectionConfig, pool = DbClient.getPool(config)) {
+  constructor(config: DbConnectionConfig, threadId = 0, p?: pg.Pool) {
     this.initialized = Object.values(config).every((val) => val);
     if (!this.initialized) {
       logger.error(
@@ -45,6 +47,7 @@ export class DbClient {
     }
 
     this.setDefaults();
+    const pool = p ?? getPool(config, threadId);
     this.setParsers();
 
     this.nodes = new NodesClient(pool);
@@ -70,11 +73,6 @@ export class DbClient {
 
   public isReady(): boolean {
     return this.ready;
-  }
-
-  public setClientName(threadId: number): this {
-    pg.defaults.application_name = `bot sql stream for replica ${threadId}`;
-    return this;
   }
 
   private setParsers(): void {

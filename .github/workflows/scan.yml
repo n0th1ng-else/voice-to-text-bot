@@ -11,12 +11,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run test suite
-    strategy:
-      matrix:
-        type: [unit, e2e]
-    env:
-      COVERAGE_OUTPUT: coverage-${{ matrix.type }}
-      TEST_COMMAND: test:${{ matrix.type }}
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -24,27 +18,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: Install dependencies
-        run: npm install
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
 
       - name: Run tests
-        run: npm run ${{ env.TEST_COMMAND }}
+        run: npm test
 
-      - name: Store test coverage
+      - name: Store test coverage results
         uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.COVERAGE_OUTPUT }}
-          path: ${{ env.COVERAGE_OUTPUT }}
+          name: coverage
+          path: coverage
+
+  validate:
+    runs-on: ubuntu-latest
+    name: Run validations
+    strategy:
+      matrix:
+        command: [typecheck, "lint:all"]
+    env:
+      COMMAND: ${{ matrix.command }}
+    steps:
+      - name: App version
+        run: echo "Picked the app version ${GITHUB_SHA}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
+
+      - name: Run validation
+        run: npm run ${{ env.COMMAND }}
 
   sonar-cloud:
     runs-on: ubuntu-latest
     name: Run SonarCloud security audit
-    needs: test
+    needs: [test, validate]
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -54,18 +64,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Unit-tests coverage
+      - name: Download test coverage results
         uses: actions/download-artifact@v1
         with:
-          name: coverage-unit
-
-      - name: Download e2e-tests coverage
-        uses: actions/download-artifact@v1
-        with:
-          name: coverage-e2e
+          name: coverage
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  tag-version:
+    if: github.ref == 'refs/heads/master'
+    needs: [test, validate]
+    uses: ./.github/workflows/release.yml
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: [test, validate]
+    uses: ./.github/workflows/deploy.yml

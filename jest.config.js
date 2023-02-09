@@ -1,20 +1,8 @@
 export default () => {
   process.env.TZ = "UTC";
-  const testType = process.env.TEST_PACKAGE || "unit";
-  const isE2E = testType === "e2e";
 
-  const e2eConfig = {
-    coverageDirectory: "<rootDir>/coverage-e2e",
-    testMatch: ["<rootDir>/e2e/**/?(*.)+(spec|test).[jt]s?(x)"],
-    maxConcurrency: 1,
-  };
-
-  const unitConfig = {
-    coverageDirectory: "<rootDir>/coverage-unit",
-    testMatch: ["<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)"],
-  };
-
-  const commonConfig = {
+  /** @type {import('jest').Config} */
+  const commonCfg = {
     extensionsToTreatAsEsm: [".ts"],
     preset: "ts-jest/presets/default-esm",
     moduleNameMapper: {
@@ -24,12 +12,23 @@ export default () => {
     rootDir: ".",
     testEnvironment: "node",
     coveragePathIgnorePatterns: ["/node_modules/"],
-    reporters: ["default", "jest-sonar"],
   };
 
-  const envConfig = isE2E ? e2eConfig : unitConfig;
+  /** @type {import('jest').Config} */
   return {
-    ...commonConfig,
-    ...envConfig,
+    reporters: ["default", "jest-sonar"],
+    ...commonCfg,
+    projects: [
+      {
+        displayName: "unit",
+        testMatch: ["<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)"],
+        ...commonCfg,
+      },
+      {
+        displayName: "e2e",
+        testMatch: ["<rootDir>/e2e/**/?(*.)+(spec|test).[jt]s?(x)"],
+        ...commonCfg,
+      },
+    ],
   };
 };

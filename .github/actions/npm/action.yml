@@ -1,0 +1,13 @@
+name: Install NodeJS and NPM modules
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup NodeJS using the obtained nvm version
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: ".nvmrc"
+
+    - name: Install npm dependencies
+      shell: bash
+      run: npm ci

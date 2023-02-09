@@ -1,6 +1,6 @@
+import { createServer as createHttp } from "node:http";
+import { createServer as createHttps } from "node:https";
 import express from "express";
-import { createServer as createHttp } from "http";
-import { createServer as createHttps } from "https";
 import { Logger } from "../logger/index.js";
 import { TelegramBotModel } from "../telegram/bot.js";
 import { HttpsOptions } from "../../certs/index.js";
