@@ -79,8 +79,10 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs: [test, validate]
     uses: ./.github/workflows/release.yml
+    secrets: inherit
 
   deploy:
     if: github.ref == 'refs/heads/master'
     needs: [test, validate]
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
