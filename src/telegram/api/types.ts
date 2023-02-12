@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { Prettify } from "../../common/types.js";
+
 export interface TgCore<Response> {
   /**
    * Highlights if the request was successful
@@ -17,84 +20,128 @@ export interface TgErrorParameters {
   retry_after?: number;
 }
 
-export interface TgWebHook {
-  url: string;
-}
+const TgMediaSchema = z
+  .object({
+    file_id: z.string(),
+    duration: z.number(),
+    mime_type: z.optional(z.string()),
+  })
+  .describe("Telegram media file schema validator");
 
-export interface TgUpdate {
-  update_id: number;
-  message?: TgMessage;
-  callback_query?: TgCallbackQuery;
-  pre_checkout_query?: TgCheckoutQuery;
-}
+const TgUserSchema = z
+  .object({
+    id: z.number(),
+    is_bot: z.boolean(),
+    first_name: z.string(),
+    last_name: z.optional(z.string()),
+    username: z.optional(z.string()),
+    language_code: z.optional(z.string()),
+  })
+  .describe("Telegram user object schema validator");
 
-export interface TgMessage {
-  message_id: number;
-  date: number;
-  chat: TgChat;
-  text?: string;
-  from?: TgUser;
-  voice?: TgMedia;
-  audio?: TgMedia;
-  video_note?: TgMedia;
-  successful_payment?: SuccessfulPayment;
-  is_topic_message?: boolean;
-  message_thread_id?: number;
-}
+const TgPaymentSchema = z
+  .object({
+    currency: z.string(),
+    total_amount: z.number(),
+    invoice_payload: z.string(),
+  })
+  .describe("Telegram payment schema validator");
 
-export interface TgChat {
-  id: number;
-  type: TgChatType;
-  title?: string;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-}
+const TgCheckoutQuerySchema = z
+  .intersection(
+    TgPaymentSchema,
+    z.object({
+      id: z.string(),
+      from: TgUserSchema,
+    })
+  )
+  .describe("Telegram checkout query schema validator");
 
-export interface TgMedia {
-  file_id: string;
-  duration: number;
-  mime_type?: string;
-}
+const TgSuccessfulPaymentSchema = z
+  .intersection(
+    TgPaymentSchema,
+    z.object({
+      telegram_payment_charge_id: z.string(),
+      provider_payment_charge_id: z.string(),
+    })
+  )
+  .describe("Telegram successful payment schema validator");
 
-export enum TgChatType {
-  Private = "private",
-  Group = "group",
-  SuperGroup = "supergroup",
-  Channel = "channel",
-}
+const TgChatTypeSchema = z
+  .union([
+    z.literal("private"),
+    z.literal("group"),
+    z.literal("supergroup"),
+    z.literal("channel"),
+  ])
+  .describe("Telegram chat type schema validator");
 
-export interface TgCallbackQuery {
-  id: string;
-  from: TgUser;
-  message?: TgMessage;
-  data?: string;
-}
+const TgChatSchema = z
+  .object({
+    id: z.number(),
+    type: TgChatTypeSchema,
+    title: z.optional(z.string()),
+    username: z.optional(z.string()),
+    first_name: z.optional(z.string()),
+    last_name: z.optional(z.string()),
+  })
+  .describe("Telegram chat schema validator");
 
-interface Payment {
-  currency: string;
-  total_amount: number;
-  invoice_payload: string;
-}
+const TgMessageSchema = z
+  .object({
+    message_id: z.number(),
+    date: z.number(),
+    chat: TgChatSchema,
+    text: z.optional(z.string()),
+    from: z.optional(TgUserSchema),
+    voice: z.optional(TgMediaSchema),
+    audio: z.optional(TgMediaSchema),
+    video_note: z.optional(TgMediaSchema),
+    successful_payment: z.optional(TgSuccessfulPaymentSchema),
+    is_topic_message: z.optional(z.boolean()),
+    message_thread_id: z.optional(z.number()),
+  })
+  .describe("Telegram chat message schema validator");
 
-export interface TgCheckoutQuery extends Payment {
-  id: string;
-  from: TgUser;
-}
+const TgCallbackQuerySchema = z
+  .object({
+    id: z.string(),
+    from: TgUserSchema,
+    message: z.optional(TgMessageSchema),
+    data: z.optional(z.string()),
+  })
+  .describe("Telegram callback query schema validator");
 
-export interface SuccessfulPayment extends Payment {
-  telegram_payment_charge_id: string;
-  provider_payment_charge_id: string;
-}
+export const TgUpdateSchema = z
+  .object({
+    update_id: z.number(),
+    message: z.optional(TgMessageSchema),
+    callback_query: z.optional(TgCallbackQuerySchema),
+    pre_checkout_query: z.optional(TgCheckoutQuerySchema),
+  })
+  .describe("Telegram incoming message schema validator");
 
-export interface TgUser {
-  id: number;
-  is_bot: boolean;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-}
+export const TgSetWebHookSchema = z
+  .boolean()
+  .describe("Telegram webhook api response schema validator");
+
+export const TgWebHookSchema = z.object({
+  url: z.string(),
+});
+
+export type TgUpdate = z.infer<typeof TgUpdateSchema>;
+
+export type TgMessage = z.infer<typeof TgMessageSchema>;
+
+export type TgMedia = z.infer<typeof TgMediaSchema>;
+
+export type TgChatType = z.infer<typeof TgChatTypeSchema>;
+
+export type TgCallbackQuery = z.infer<typeof TgCallbackQuerySchema>;
+
+export type TgCheckoutQuery = Prettify<z.infer<typeof TgCheckoutQuerySchema>>;
+
+export type TgWebHook = Prettify<z.infer<typeof TgWebHookSchema>>;
 
 export interface TgInlineKeyboardButton {
   text: string;

@@ -11,6 +11,7 @@ import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
 import { AnalyticsData } from "../analytics/legacy/types.js";
 import { collectAnalytics } from "../analytics/index.js";
+import { TgUpdateSchema } from "../telegram/api/types.js";
 
 const logger = new Logger("server");
 
@@ -111,13 +112,19 @@ export class ExpressServer {
           );
         }
 
-        logger.info("Incoming message");
         const analytics = new AnalyticsData(
           this.version,
           this.selfUrl,
           this.threadId
         );
-        // TODO validate req.body
+
+        try {
+          // TODO enforce req.body validation
+          TgUpdateSchema.parse(req.body);
+          logger.info("Incoming message validated");
+        } catch (e) {
+          logger.error("Incoming message failed validation", e);
+        }
         bot.handleApiMessage(req.body, analytics);
         res.sendStatus(200);
       });

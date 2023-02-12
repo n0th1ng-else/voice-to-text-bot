@@ -49,7 +49,6 @@ let tgMessage;
 let testLang;
 let host;
 let bot;
-let TgChatType;
 let randomIntFromInterval;
 let telegramServer;
 let LanguageCode;
@@ -70,7 +69,6 @@ describe("[default language - english] fund", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    TgChatType = init.TgChatType;
     randomIntFromInterval = init.randomIntFromInterval;
     LanguageCode = init.LanguageCode;
     TelegramMessageModel = initTest.TelegramMessageModel;
@@ -89,7 +87,6 @@ describe("[default language - english] fund", () => {
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
-    const VoiceConverterProvider = init.VoiceConverterProvider;
     const DbClient = init.DbClient;
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
@@ -113,7 +110,7 @@ describe("[default language - english] fund", () => {
       googleClientEmail: "some-email",
     };
     const converter = getVoiceConverterInstance(
-      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      getVoiceConverterProvider("GOOGLE"),
       converterOptions
     );
     const db = new DbClient(dbConfig, 0, testPool);
@@ -123,7 +120,7 @@ describe("[default language - english] fund", () => {
     telegramServer = nock(TelegramApi.url);
     host = request(hostUrl);
 
-    chatType = TgChatType.Private;
+    chatType = "private";
     testLang = LanguageCode.En;
     tgMessage = new TelegramMessageModel(testChatId, chatType);
     const paymentProvider = new StripePayment(paymentToken);
@@ -156,7 +153,7 @@ describe("[default language - english] fund", () => {
 
   beforeEach(() => {
     bot.setAuthor("");
-    chatType = TgChatType.Private;
+    chatType = "private";
     testMessageId = randomIntFromInterval(1, 100000);
   });
 

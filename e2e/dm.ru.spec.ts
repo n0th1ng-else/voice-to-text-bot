@@ -39,7 +39,6 @@ let tgMessage;
 let botStat;
 let bot;
 let host;
-let TgChatType;
 let randomIntFromInterval;
 let telegramServer;
 let testPool;
@@ -71,7 +70,6 @@ describe("[russian language]", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    TgChatType = init.TgChatType;
     randomIntFromInterval = init.randomIntFromInterval;
     LanguageCode = init.LanguageCode;
     TelegramMessageModel = initTest.TelegramMessageModel;
@@ -102,7 +100,6 @@ describe("[russian language]", () => {
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
-    const VoiceConverterProvider = init.VoiceConverterProvider;
     const DbClient = init.DbClient;
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
@@ -129,7 +126,7 @@ describe("[russian language]", () => {
     };
 
     const converter = getVoiceConverterInstance(
-      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      getVoiceConverterProvider("GOOGLE"),
       converterOptions
     );
     const hostUrl = `${localhostUrl}:${appPort}`;
@@ -151,7 +148,7 @@ describe("[russian language]", () => {
     host = request(hostUrl);
 
     testLangId = LanguageCode.Ru;
-    chatType = TgChatType.Private;
+    chatType = "private";
     tgMessage = new TelegramMessageModel(testChatId, chatType);
     botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
 
@@ -184,7 +181,7 @@ describe("[russian language]", () => {
 
   beforeEach(() => {
     bot.setAuthor("");
-    chatType = TgChatType.Private;
+    chatType = "private";
     testMessageId = randomIntFromInterval(1, 100000);
     testChatId = randomIntFromInterval(1, 100000);
   });

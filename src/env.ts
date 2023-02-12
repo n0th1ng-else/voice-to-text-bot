@@ -8,8 +8,8 @@ export const appVersion: string = process.env.APP_VERSION || "dev";
 
 export const enableSSL = process.env.ENABLE_SSL === "true";
 
-export const provider: string =
-  process.env.PROVIDER || VoiceConverterProvider.WitAi;
+export const provider: string | VoiceConverterProvider =
+  process.env.PROVIDER || "WITAI";
 
 export const selfUrl: string = process.env.SELF_URL || "";
 

@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
+import { z } from "zod";
 import {
   BotCommandDto,
   BotCommandListDto,
@@ -12,7 +13,9 @@ import {
   TgFile,
   TgInlineKeyboardButton,
   TgMessage,
+  TgSetWebHookSchema,
   TgWebHook,
+  TgWebHookSchema,
 } from "./types.js";
 
 export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
@@ -39,7 +42,9 @@ export class TelegramApi {
   }
 
   public setWebHook(hookUrl: string): Promise<boolean> {
-    return this.request<boolean, TgWebHook>("setWebHook", { url: hookUrl });
+    return this.requestValidate("setWebHook", TgSetWebHookSchema, {
+      url: hookUrl,
+    });
   }
 
   public setMyCommands(commands: BotCommandDto[]): Promise<boolean> {
@@ -49,7 +54,7 @@ export class TelegramApi {
   }
 
   public getWebHookInfo(): Promise<TgWebHook> {
-    return this.request<TgWebHook, void>("getWebhookInfo");
+    return this.requestValidate("getWebhookInfo", TgWebHookSchema);
   }
 
   public getFileLink(fileId: string): Promise<string> {
@@ -181,6 +186,16 @@ export class TelegramApi {
     }
 
     return this.request<TgMessage, InvoiceDto>("sendInvoice", data);
+  }
+
+  private requestValidate<Schema extends z.ZodTypeAny, Data>(
+    methodName: string,
+    schema: Schema,
+    data?: Data
+  ): Promise<z.infer<Schema>> {
+    return this.request(methodName, data).then((result) => {
+      return schema.parse(result);
+    });
   }
 
   private request<Response, Data>(

@@ -20,7 +20,11 @@ ENV APP_VERSION ${APP_VERSION}
 
 RUN echo ${APP_VERSION}
 
-COPY . $APP_DIR
+COPY ./certs $APP_DIR/certs
+COPY ./src $APP_DIR/src
+COPY ./video-temp $APP_DIR/video-temp
+COPY ./init.cjs $APP_DIR
+COPY ./tsconfig.json $APP_DIR
 
 RUN npm run build
 

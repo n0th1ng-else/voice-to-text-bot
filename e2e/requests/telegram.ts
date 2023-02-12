@@ -21,6 +21,10 @@ import { parseDonationPayload } from "../../src/telegram/helpers.js";
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
 
+const makeTelegramResponse = <D>(result: D) => {
+  return [200, JSON.stringify({ ok: true, result })];
+};
+
 export const sendTelegramMessage = (
   host: request.SuperTest<request.Test>,
   bot: TelegramBotModel,
@@ -69,17 +73,17 @@ export const mockTgSetCommands = (host: nock.Scope): void => {
 };
 
 export const mockTgSetWebHook = (host: nock.Scope, hookUrl: string): void => {
-  host.post("/bottelegram-api-token/setWebHook").reply(200, (uri, body) => {
+  host.post("/bottelegram-api-token/setWebHook").reply((uri, body) => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.url).toBe(hookUrl);
-    return telegramApiResponseOk;
+    return makeTelegramResponse(true);
   });
 };
 
 export const mockTgGetWebHook = (host: nock.Scope, hookUrl: string): void => {
-  host
-    .post("/bottelegram-api-token/getWebhookInfo")
-    .reply(200, JSON.stringify({ ok: true, result: { url: hookUrl } }));
+  host.post("/bottelegram-api-token/getWebhookInfo").reply(() => {
+    return makeTelegramResponse({ url: hookUrl });
+  });
 };
 
 export const mockTgGetWebHookError = (host: nock.Scope): void => {

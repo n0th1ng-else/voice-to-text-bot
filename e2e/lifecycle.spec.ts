@@ -62,7 +62,6 @@ describe("[lifecycle]", () => {
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
-    const VoiceConverterProvider = init.VoiceConverterProvider;
     const DbClient = init.DbClient;
     const TelegramBotModel = init.TelegramBotModel;
     const launchTime = init.launchTime;
@@ -78,7 +77,7 @@ describe("[lifecycle]", () => {
     };
 
     const converter = getVoiceConverterInstance(
-      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      getVoiceConverterProvider("GOOGLE"),
       converterOptions
     );
 
