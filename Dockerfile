@@ -1,4 +1,4 @@
-FROM node:16.16.0
+FROM node:18.14.0
 
 EXPOSE 8080
 
@@ -25,5 +25,7 @@ COPY . $APP_DIR
 RUN npm run build
 
 RUN find $APP_DIR/src -type f | xargs -L1 rm -f
+
+USER node
 
 CMD ["npm", "run", "cluster:js"]
