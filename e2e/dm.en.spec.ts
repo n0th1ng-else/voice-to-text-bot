@@ -35,7 +35,6 @@ let chatType;
 let testMessageId = 0;
 let testChatId = 0;
 let tgMessage;
-let TgChatType;
 let TelegramMessageModel;
 let bot;
 let testPool;
@@ -67,7 +66,6 @@ describe("[default language - english]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
-    TgChatType = init.TgChatType;
     randomIntFromInterval = init.randomIntFromInterval;
     LanguageCode = init.LanguageCode;
     TelegramMessageModel = initTest.TelegramMessageModel;
@@ -97,7 +95,6 @@ describe("[default language - english]", () => {
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
-    const VoiceConverterProvider = init.VoiceConverterProvider;
     const DbClient = init.DbClient;
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
@@ -122,7 +119,7 @@ describe("[default language - english]", () => {
     };
 
     const converter = getVoiceConverterInstance(
-      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      getVoiceConverterProvider("GOOGLE"),
       converterOptions
     );
 
@@ -144,7 +141,7 @@ describe("[default language - english]", () => {
     telegramServer = nock(TelegramApi.url);
     host = request(hostUrl);
 
-    chatType = TgChatType.Private;
+    chatType = "private";
     tgMessage = new TelegramMessageModel(testChatId, chatType);
 
     mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
@@ -174,7 +171,7 @@ describe("[default language - english]", () => {
 
   beforeEach(() => {
     bot.setAuthor("");
-    chatType = TgChatType.Private;
+    chatType = "private";
     testMessageId = randomIntFromInterval(1, 100000);
     testChatId = randomIntFromInterval(1, 100000);
   });

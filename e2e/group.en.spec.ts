@@ -60,7 +60,6 @@ let mockSpeechRecognition;
 let mockGetBotStatItem;
 let LanguageCode;
 let randomIntFromInterval;
-let TgChatType;
 let TelegramMessageModel;
 let BotCommand;
 let LabelId;
@@ -93,7 +92,6 @@ describe("[default language - english]", () => {
     mockSpeechRecognition = initTest.mockSpeechRecognition;
     LanguageCode = init.LanguageCode;
     randomIntFromInterval = init.randomIntFromInterval;
-    TgChatType = init.TgChatType;
     TelegramMessageModel = initTest.TelegramMessageModel;
     BotCommand = init.BotCommand;
     LabelId = init.LabelId;
@@ -118,7 +116,6 @@ describe("[default language - english]", () => {
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
-    const VoiceConverterProvider = init.VoiceConverterProvider;
     const ExpressServer = init.ExpressServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;
@@ -139,7 +136,7 @@ describe("[default language - english]", () => {
       googleClientEmail: "some-email",
     };
     converter = getVoiceConverterInstance(
-      getVoiceConverterProvider(VoiceConverterProvider.Google),
+      getVoiceConverterProvider("GOOGLE"),
       converterOptions
     );
     hostUrl = `${localhostUrl}:${appPort}`;
@@ -148,7 +145,7 @@ describe("[default language - english]", () => {
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramApi.url);
     host = request(hostUrl);
-    chatType = TgChatType.Group;
+    chatType = "group";
     tgMessage = new TelegramMessageModel(testChatId, chatType);
     // *EndOf Init dependencies
 
@@ -181,7 +178,7 @@ describe("[default language - english]", () => {
 
   beforeEach(() => {
     bot.setAuthor("");
-    chatType = TgChatType.Group;
+    chatType = "group";
     testMessageId = randomIntFromInterval(1, 100000);
     testChatId = 0 - randomIntFromInterval(1, 100000);
   });

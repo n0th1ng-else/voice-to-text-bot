@@ -113,7 +113,7 @@ export const isMessageSupported = (msg: TgMessage): boolean => {
 export const getChatId = (msg: TgMessage): number => msg.chat.id;
 
 export const isChatGroup = (msg: TgMessage): boolean =>
-  msg.chat.type !== TgChatType.Private;
+  msg.chat.type !== "private";
 
 export const getUserName = (msg: TgMessage): string => {
   const fromUserName = msg.from && msg.from.username;

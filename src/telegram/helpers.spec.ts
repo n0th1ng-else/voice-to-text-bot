@@ -8,7 +8,7 @@ const getMessage = (name?: string, lang?: string): TgMessage => {
     message_id: 4324,
     date: new Date().getTime(),
     chat: {
-      type: TgChatType.Private,
+      type: "private",
       id: 23324,
     },
     from: name

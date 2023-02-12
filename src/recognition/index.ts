@@ -2,6 +2,7 @@ import {
   VoiceConverter,
   VoiceConverterOptions,
   VoiceConverterProvider,
+  VoiceConverterProviderSchema,
 } from "./types.js";
 import { GoogleProvider } from "./google.js";
 import { WithAiProvider } from "./wit.ai.js";
@@ -10,16 +11,7 @@ import { AWSProvider } from "./aws.js";
 export const getVoiceConverterProvider = (
   provider: string
 ): VoiceConverterProvider => {
-  switch (provider) {
-    case VoiceConverterProvider.Aws:
-      return VoiceConverterProvider.Aws;
-    case VoiceConverterProvider.WitAi:
-      return VoiceConverterProvider.WitAi;
-    case VoiceConverterProvider.Google:
-      return VoiceConverterProvider.Google;
-    default:
-      return VoiceConverterProvider.Google;
-  }
+  return VoiceConverterProviderSchema.parse(provider);
 };
 
 export const getVoiceConverterInstance = (
@@ -27,11 +19,11 @@ export const getVoiceConverterInstance = (
   options: VoiceConverterOptions
 ): VoiceConverter => {
   switch (provider) {
-    case VoiceConverterProvider.Google:
+    case "GOOGLE":
       return new GoogleProvider(options);
-    case VoiceConverterProvider.Aws:
+    case "AWS":
       return new AWSProvider(options);
-    case VoiceConverterProvider.WitAi:
+    case "WITAI":
       return new WithAiProvider(options);
     default:
       throw new Error("Voice recognition provider is not specified");

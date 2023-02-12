@@ -45,7 +45,6 @@ describe("error cases", () => {
       const getMockCertificate = initTest.getMockCertificate;
       const getVoiceConverterInstance = init.getVoiceConverterInstance;
       const getVoiceConverterProvider = init.getVoiceConverterProvider;
-      const VoiceConverterProvider = init.VoiceConverterProvider;
       const DbClient = init.DbClient;
       const localhostUrl = init.localhostUrl;
       const TelegramBotModel = init.TelegramBotModel;
@@ -68,7 +67,7 @@ describe("error cases", () => {
       };
 
       const converter = getVoiceConverterInstance(
-        getVoiceConverterProvider(VoiceConverterProvider.Google),
+        getVoiceConverterProvider("GOOGLE"),
         converterOptions
       );
 

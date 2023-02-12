@@ -178,7 +178,7 @@ describe("[telegram api client]", () => {
         const testChatId = 323426;
         const testMessageId = 657887689;
         const testText = "text-for-edit lalala";
-        const testChatType = TgChatType.Private;
+        const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
           message_id: testMessageId,
@@ -210,7 +210,7 @@ describe("[telegram api client]", () => {
       it("sendMessage no params", () => {
         const testChatId = 323426;
         const testText = "text-for-edit lalala";
-        const testChatType = TgChatType.Private;
+        const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
           message_id: 32411244,
@@ -238,7 +238,7 @@ describe("[telegram api client]", () => {
       it("sendMessage with button", () => {
         const testChatId = 323426;
         const testText = "text-for-edit lalala";
-        const testChatType = TgChatType.Private;
+        const testChatType = "private";
 
         const testButton: TgInlineKeyboardButton = {
           text: "cool btn",
@@ -279,7 +279,7 @@ describe("[telegram api client]", () => {
       it("sendMessage without markup", () => {
         const testChatId = 323426;
         const testText = "<|~foo_bar~|>";
-        const testChatType = TgChatType.Private;
+        const testChatType = "private";
 
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
@@ -311,7 +311,7 @@ describe("[telegram api client]", () => {
       it("sendMessage with button and without markup", () => {
         const testChatId = 323426;
         const testText = "<|~foo_bar~|>";
-        const testChatType = TgChatType.Private;
+        const testChatType = "private";
 
         const testButton: TgInlineKeyboardButton = {
           text: "cool btn",
@@ -355,7 +355,7 @@ describe("[telegram api client]", () => {
       it("sendMessage with link", () => {
         const testChatId = 323426;
         const testText = "text-for-edit lalala";
-        const testChatType = TgChatType.Private;
+        const testChatType = "private";
 
         const testButton: TgInlineKeyboardButton = {
           text: "new link",
@@ -576,7 +576,7 @@ describe("[telegram api client]", () => {
       const testChatId = 3453453;
       const testMessageId = 2345566;
       const testText = "text text text";
-      const testChatType = TgChatType.Channel;
+      const testChatType = "channel";
       testApiResponse = getApiResponse<TgMessage>(true, {
         date: new Date().getTime(),
         message_id: testMessageId,
@@ -640,7 +640,7 @@ describe("[telegram api client]", () => {
 
       const testChatId = 32422;
       const testText = "op op op";
-      const testChatType = TgChatType.SuperGroup;
+      const testChatType = "supergroup";
       testApiResponse = getApiResponse<TgMessage>(true, {
         date: new Date().getTime(),
         message_id: 4353411,
