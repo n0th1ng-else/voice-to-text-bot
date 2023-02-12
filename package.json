@@ -3,7 +3,7 @@
   "description": "Telegram Bot Converts Voice Messages Into Text",
   "version": "1.0.0",
   "engines": {
-    "node": ">=16.16.0"
+    "node": ">=18.14.0"
   },
   "type": "module",
   "scripts": {
