@@ -35,7 +35,7 @@ jobs:
     name: Run validations
     strategy:
       matrix:
-        command: [typecheck, "lint:all"]
+        command: [typecheck, "lint:all", "format:check"]
     env:
       COMMAND: ${{ matrix.command }}
     steps:

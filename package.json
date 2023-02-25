@@ -16,6 +16,7 @@
     "dev:js": "node -r ./init.cjs --experimental-loader newrelic/esm-loader.mjs dist/src/scripts/run.js dev js",
     "cluster:js": "node -r ./init.cjs --experimental-loader newrelic/esm-loader.mjs dist/src/scripts/run.js cluster js",
     "format": "prettier --write",
+    "format:check": "prettier --check .",
     "lint": "eslint",
     "lint:all": "eslint .",
     "typecheck": "tsc --noEmit",

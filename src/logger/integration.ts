@@ -79,8 +79,14 @@ const sanitizeError = (rawData: unknown): unknown => {
   // Axios .toJSON() returns object, not AxiosError :sad:
   const data = rawData.toJSON() as AxiosError;
 
+  // Sanitize the authorization token to keep secrets safe
   if (data?.config?.headers?.Authorization) {
     data.config.headers.Authorization = SANITIZE_CHARACTER;
+  }
+
+  // Sanitize the incoming buffer to keep user data safe and the log small
+  if (data.config?.data) {
+    data.config.data = SANITIZE_CHARACTER;
   }
 
   return data;
