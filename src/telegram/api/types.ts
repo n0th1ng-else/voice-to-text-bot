@@ -12,13 +12,30 @@ export interface TgCore<Response> {
   parameters?: TgErrorParameters;
 }
 
-export interface TgErrorParameters {
-  migrate_to_chat_id?: number;
-  /**
-   * If present, tell us when we can retry the request, in seconds
-   */
-  retry_after?: number;
-}
+const TgErrorParametersSchema = z
+  .object({
+    migrate_to_chat_id: z.optional(z.number()),
+    /**
+     * If present, tell us when we can retry the request, in seconds
+     */
+    retry_after: z.optional(z.number()),
+  })
+  .describe("Telegram error parameters schema");
+
+export type TgErrorParameters = z.infer<typeof TgErrorParametersSchema>;
+
+export const TgCoreSchema = <Schema extends z.ZodTypeAny>(schema: Schema) => {
+  return z.object({
+    /**
+     * Highlights if the request was successful
+     */
+    ok: z.boolean(),
+    result: schema,
+    description: z.optional(z.string()),
+    error_code: z.optional(z.number()),
+    parameters: z.optional(TgErrorParametersSchema),
+  });
+};
 
 const TgMediaSchema = z
   .object({
@@ -27,6 +44,8 @@ const TgMediaSchema = z
     mime_type: z.optional(z.string()),
   })
   .describe("Telegram media file schema validator");
+
+export type TgMedia = z.infer<typeof TgMediaSchema>;
 
 const TgUserSchema = z
   .object({
@@ -57,6 +76,8 @@ const TgCheckoutQuerySchema = z
   )
   .describe("Telegram checkout query schema validator");
 
+export type TgCheckoutQuery = Prettify<z.infer<typeof TgCheckoutQuerySchema>>;
+
 const TgSuccessfulPaymentSchema = z
   .intersection(
     TgPaymentSchema,
@@ -75,6 +96,8 @@ const TgChatTypeSchema = z
     z.literal("channel"),
   ])
   .describe("Telegram chat type schema validator");
+
+export type TgChatType = z.infer<typeof TgChatTypeSchema>;
 
 const TgChatSchema = z
   .object({
@@ -103,6 +126,8 @@ const TgMessageSchema = z
   })
   .describe("Telegram chat message schema validator");
 
+export type TgMessage = z.infer<typeof TgMessageSchema>;
+
 const TgCallbackQuerySchema = z
   .object({
     id: z.string(),
@@ -111,6 +136,8 @@ const TgCallbackQuerySchema = z
     data: z.optional(z.string()),
   })
   .describe("Telegram callback query schema validator");
+
+export type TgCallbackQuery = z.infer<typeof TgCallbackQuerySchema>;
 
 export const TgUpdateSchema = z
   .object({
@@ -121,96 +148,136 @@ export const TgUpdateSchema = z
   })
   .describe("Telegram incoming message schema validator");
 
+export type TgUpdate = z.infer<typeof TgUpdateSchema>;
+
 export const TgSetWebHookSchema = z
   .boolean()
   .describe("Telegram webhook api response schema validator");
 
-export const TgWebHookSchema = z.object({
-  url: z.string(),
-});
-
-export type TgUpdate = z.infer<typeof TgUpdateSchema>;
-
-export type TgMessage = z.infer<typeof TgMessageSchema>;
-
-export type TgMedia = z.infer<typeof TgMediaSchema>;
-
-export type TgChatType = z.infer<typeof TgChatTypeSchema>;
-
-export type TgCallbackQuery = z.infer<typeof TgCallbackQuerySchema>;
-
-export type TgCheckoutQuery = Prettify<z.infer<typeof TgCheckoutQuerySchema>>;
+export const TgWebHookSchema = z
+  .object({
+    url: z.string(),
+  })
+  .describe("Telegram web hook schema");
 
 export type TgWebHook = Prettify<z.infer<typeof TgWebHookSchema>>;
 
-export interface TgInlineKeyboardButton {
-  text: string;
-  callback_data?: string;
-  url?: string;
-}
+const TgInlineKeyboardButtonSchema = z
+  .object({
+    text: z.string(),
+    callback_data: z.optional(z.string()),
+    url: z.optional(z.string()),
+  })
+  .describe("Telegram inline keyboard button schema");
 
-export interface BotCommandListDto {
-  commands: BotCommandDto[];
-}
+export type TgInlineKeyboardButton = z.infer<
+  typeof TgInlineKeyboardButtonSchema
+>;
 
-export interface BotCommandDto {
-  command: string;
-  description: string;
-}
+const BotCommandSchema = z
+  .object({
+    command: z.string(),
+    description: z.string(),
+  })
+  .describe("Telegram bot command schema");
 
-export interface MessageDto {
-  chat_id: number;
-  text: string;
-  message_id?: number;
-  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
-  reply_markup?: {
-    inline_keyboard: TgInlineKeyboardButton[][];
-  };
-  message_thread_id?: number;
-}
+export type BotCommandDto = z.infer<typeof BotCommandSchema>;
 
-interface LabeledPrice {
-  label: string;
-  amount: number; // Integer cents
-}
+const BotCommandListSchema = z
+  .object({
+    commands: z.array(BotCommandSchema),
+  })
+  .describe("Telegram bot command list schema");
 
-export interface InvoiceDto {
-  chat_id: number;
-  title: string; // Product name
-  description: string; // Product description
-  payload: string; // Internal data
-  provider_token: string; // Provider token
-  currency: string; // EUR
-  prices: LabeledPrice[];
-  start_parameter: string; // Donation id
-  photo_url: string;
-  photo_width: number;
-  photo_height: number;
-  message_thread_id?: number; // Forum thread id
-}
+export type BotCommandListDto = z.infer<typeof BotCommandListSchema>;
 
-export interface PreCheckoutQueryDto {
-  pre_checkout_query_id: string;
-  ok: boolean;
-  error_message?: string;
-}
+const MessageSchema = z
+  .object({
+    chat_id: z.number(),
+    text: z.string(),
+    message_id: z.optional(z.number()),
+    parse_mode: z.optional(
+      z.union([
+        z.literal("HTML"),
+        z.literal("Markdown"),
+        z.literal("MarkdownV2"),
+      ])
+    ),
+    reply_markup: z.optional(
+      z.object({
+        inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
+      })
+    ),
+    message_thread_id: z.optional(z.number()),
+  })
+  .describe("Telegram message schema");
 
-export interface EditMessageDto {
-  chat_id?: number | string;
-  message_id?: number;
-  text: string;
-}
+export type MessageDto = z.infer<typeof MessageSchema>;
 
-export interface FileDto {
-  file_id: string;
-}
+const LabeledPriceSchema = z
+  .object({
+    label: z.string(),
+    amount: z.number(), // Integer cents
+  })
+  .describe("Telegram price schema");
 
-export interface TgFile {
-  file_id: string;
-  file_unique_id: string;
-  file_size?: number;
-  file_path?: string;
-}
+const InvoiceSchema = z
+  .object({
+    chat_id: z.number(),
+    title: z.string(), // Product name
+    description: z.string(), // Product description
+    payload: z.string(), // Internal data
+    provider_token: z.string(), // Provider token
+    currency: z.string(), // EUR
+    prices: z.array(LabeledPriceSchema),
+    start_parameter: z.string(), // Donation id
+    photo_url: z.string(),
+    photo_width: z.number(),
+    photo_height: z.number(),
+    message_thread_id: z.optional(z.number()), // Forum thread id
+  })
+  .describe("Telegram invoice schema");
+
+export type InvoiceDto = z.infer<typeof InvoiceSchema>;
+
+const PreCheckoutQuerySchema = z
+  .object({
+    pre_checkout_query_id: z.string(),
+    ok: z.boolean(),
+    error_message: z.optional(z.string()),
+  })
+  .describe("Telegram pre-checkout query schema");
+
+export type PreCheckoutQueryDto = z.infer<typeof PreCheckoutQuerySchema>;
+
+const EditMessageSchema = z
+  .object({
+    chat_id: z.optional(z.union([z.number(), z.string()])),
+    message_id: z.optional(z.number()),
+    text: z.string(),
+  })
+  .describe("Telegram edit message schema");
+
+export type EditMessageDto = z.infer<typeof EditMessageSchema>;
+
+const FileSchema = z
+  .object({
+    file_id: z.string(),
+  })
+  .describe("Telegram file link schema");
+
+export type FileDto = z.infer<typeof FileSchema>;
+
+const TgFileSchema = z
+  .object({
+    file_id: z.string(),
+    file_unique_id: z.string(),
+    file_size: z.optional(z.number()),
+    file_path: z.optional(z.string()),
+  })
+  .describe("Telegram file schema");
+
+export type TgFile = z.infer<typeof TgFileSchema>;
 
 export class TgError extends Error {
   public code = 0;
