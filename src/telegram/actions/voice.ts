@@ -120,9 +120,9 @@ export class VoiceAction extends GenericAction {
         const hasNoRights = hasNoRightsToSendMessage(err);
         const isBlocked = isBlockedByUser(err);
         const errorMessage = "Unable to recognize the file";
-        const logError = `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
-          model.voiceFileId
-        )}`;
+        const duration = Logger.y(`${model.voiceDuration}sec`);
+        const voiceFileId = Logger.y(model.voiceFileId);
+        const logError = `${prefix.getPrefix()} ${errorMessage} ${voiceFileId} with duration ${duration}`;
         if (hasNoRights || isBlocked) {
           logger.warn(logError, err);
         } else {
