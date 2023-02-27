@@ -14,7 +14,7 @@ const logger = new Logger("wit-ai-recognition");
 export class WithAiProvider extends VoiceConverter {
   public static readonly url = "https://api.wit.ai";
   public static readonly timeout = 30_000;
-  private static readonly apiVersion = "20220622";
+  private static readonly apiVersion = "20230215";
   private readonly tokenEn: string;
   private readonly tokenRu: string;
 
