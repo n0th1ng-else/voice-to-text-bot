@@ -17,3 +17,5 @@ jobs:
 
       - name: Type
         run: echo "${EV_TYPE}"
+
+      - uses: hmarr/debug-action@v2
