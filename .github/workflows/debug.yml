@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Debug
     env:
-      EV_TYPE: ${{ github.event_type }}
+      EV_TYPE: ${{ github.event_name }}
     steps:
       - name: Branch
         run: echo "${GITHUB_REF}"
