@@ -1,0 +1,19 @@
+name: Debug
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Debug
+    env:
+      EV_TYPE: ${{ github.event_type }}
+    steps:
+      - name: Branch
+        run: echo "${GITHUB_REF}"
+
+      - name: Type
+        run: echo "${EV_TYPE}"
