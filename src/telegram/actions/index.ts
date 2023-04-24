@@ -1,4 +1,4 @@
-import { TelegramApi } from "../api/index.js";
+import { TelegramApi } from "../api/tgapi.js";
 import { StartAction } from "./start.js";
 import { LangAction } from "./lang.js";
 import { SupportAction } from "./support.js";

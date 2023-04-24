@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { z } from "zod";
 import {
+  ApiErrorReflector,
   BotCommandDto,
   BotCommandListDto,
   EditMessageDto,
@@ -9,14 +10,15 @@ import {
   MessageDto,
   PreCheckoutQueryDto,
   TgCore,
-  TgError,
   TgFile,
   TgInlineKeyboardButton,
+  TgLeaveChatSchema,
   TgMessage,
   TgSetWebHookSchema,
   TgWebHook,
   TgWebHookSchema,
 } from "./types.js";
+import { TgError } from "./tgerror.js";
 
 export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
 
@@ -28,7 +30,10 @@ export class TelegramApi {
 
   private readonly client: AxiosInstance;
 
-  constructor(private readonly apiToken: string) {
+  constructor(
+    private readonly apiToken: string,
+    private readonly errorReflector?: ApiErrorReflector
+  ) {
     this.client = axios.create({
       method: "POST",
       baseURL: TelegramApi.url,
@@ -100,7 +105,7 @@ export class TelegramApi {
       };
     }
 
-    return this.request<TgMessage, MessageDto>("sendMessage", data);
+    return this.request<TgMessage, MessageDto>("sendMessage", data, chatId);
   }
 
   public editMessageText(
@@ -128,9 +133,14 @@ export class TelegramApi {
       };
     }
 
-    return this.request<TgMessage, EditMessageDto>("editMessageText", data);
+    return this.request<TgMessage, EditMessageDto>(
+      "editMessageText",
+      data,
+      chatId
+    );
   }
 
+  // TODO add tests
   public answerPreCheckoutQuery(
     queryId: string,
     error?: string
@@ -146,6 +156,7 @@ export class TelegramApi {
     );
   }
 
+  // TODO add tests
   public sendInvoice(
     chatId: number,
     amount: number,
@@ -185,44 +196,66 @@ export class TelegramApi {
       data.message_thread_id = forumThreadId;
     }
 
-    return this.request<TgMessage, InvoiceDto>("sendInvoice", data);
+    return this.request<TgMessage, InvoiceDto>("sendInvoice", data, chatId);
+  }
+
+  public leaveChat(chatId: number) {
+    return this.requestValidate(
+      "leaveChat",
+      TgLeaveChatSchema,
+      {
+        chat_id: chatId,
+      },
+      chatId
+    );
   }
 
   private requestValidate<Schema extends z.ZodTypeAny, Data>(
     methodName: string,
     schema: Schema,
-    data?: Data
+    data?: Data,
+    chatId?: number
   ): Promise<z.infer<Schema>> {
-    return this.request(methodName, data).then((result) => {
+    return this.request(methodName, data, chatId).then((result) => {
       return schema.parse(result);
     });
   }
 
   private request<Response, Data>(
     methodName: string,
-    data?: Data
+    data?: Data,
+    chatId?: number
   ): Promise<Response> {
     const url = this.getApiUrl(methodName);
     return this.client.request<TgCore<Response>>({ url, data }).then(
       (response) => {
         const answer = response.data;
         if (!answer.ok) {
-          return Promise.reject(
-            new TgError(answer.description)
-              .setUrl(url)
-              .setErrorCode(answer.error_code)
-              .setRetryAfter(answer?.parameters?.retry_after)
-              .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
-          );
+          const tgError = new TgError(
+            answer.description,
+            new Error(answer.description)
+          )
+            .setUrl(url)
+            .setErrorCode(answer.error_code)
+            .setRetryAfter(answer?.parameters?.retry_after)
+            .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
+            .setChatId(chatId);
+
+          this.errorReflector?.(tgError);
+          return Promise.reject(tgError);
         }
 
         return answer.result;
       },
       (err: AxiosError<TgCore<void>>) => {
-        throw new TgError(err.message, err.stack)
+        const tgError = new TgError(err.message, err)
           .setUrl(url)
           .setErrorCode(err?.response?.status)
-          .setResponse(err?.response?.data);
+          .setResponse(err?.response?.data)
+          .setChatId(chatId);
+
+        this.errorReflector?.(tgError);
+        throw tgError;
       }
     );
   }

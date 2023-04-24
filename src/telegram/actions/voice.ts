@@ -14,7 +14,7 @@ import {
   collectPageAnalytics,
 } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
-import { hasNoRightsToSendMessage, isBlockedByUser } from "../errors.js";
+import { isBlockedByUser } from "../api/tgerror.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -117,13 +117,13 @@ export class VoiceAction extends GenericAction {
         return this.updateUsageCount(model, prefix);
       })
       .catch((err) => {
-        const hasNoRights = hasNoRightsToSendMessage(err);
         const isBlocked = isBlockedByUser(err);
         const errorMessage = "Unable to recognize the file";
         const duration = Logger.y(`${model.voiceDuration}sec`);
         const voiceFileId = Logger.y(model.voiceFileId);
         const logError = `${prefix.getPrefix()} ${errorMessage} ${voiceFileId} with duration ${duration}`;
-        if (hasNoRights || isBlocked) {
+        if (isBlocked) {
+          // TODO remove faking errors into warnings
           logger.warn(logError, err);
         } else {
           logger.error(logError, err);
