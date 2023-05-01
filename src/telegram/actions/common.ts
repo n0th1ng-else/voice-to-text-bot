@@ -8,7 +8,7 @@ import { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
 import { TextModel } from "../../text/index.js";
 import { LabelId } from "../../text/labels.js";
-import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api/index.js";
+import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api/tgapi.js";
 import { DbClient } from "../../db/index.js";
 import { splitTextIntoParts } from "../../common/helpers.js";
 

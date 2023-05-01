@@ -13,11 +13,12 @@ import { runPromiseWithRetry } from "../common/helpers.js";
 import { getMd5Hash } from "../common/hash.js";
 import { BotActions } from "./actions/index.js";
 import { botCommands } from "./data.js";
-import { TelegramApi } from "./api/index.js";
+import { TelegramApi } from "./api/tgapi.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { DbClient } from "../db/index.js";
 import { AnalyticsData } from "../analytics/legacy/types.js";
 import { PaymentService } from "../donate/types.js";
+import { initTgReflector } from "./reflector.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -33,7 +34,8 @@ export class TelegramBotModel {
     converter: VoiceConverter,
     stat: DbClient
   ) {
-    this.bot = new TelegramApi(this.token);
+    const reflector = initTgReflector(this.token);
+    this.bot = new TelegramApi(this.token, reflector);
     this.actions = new BotActions(stat, this.bot);
     this.actions.voice.setConverter(converter);
   }

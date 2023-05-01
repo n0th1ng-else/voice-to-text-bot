@@ -5,18 +5,18 @@ import axios, {
   CreateAxiosDefaults,
 } from "axios";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { TelegramApi } from "./index.js";
 import { nanoid } from "nanoid";
 import {
   BotCommandDto,
-  TgChatType,
   TgCore,
-  TgError,
   TgFile,
   TgInlineKeyboardButton,
+  TgLeaveChatSchema,
   TgMessage,
   TgWebHook,
 } from "./types.js";
+import { TelegramApi } from "./tgapi.js";
+import { TgError } from "./tgerror.js";
 
 const getApiResponse = <Response>(
   ok: boolean,
@@ -205,6 +205,46 @@ describe("[telegram api client]", () => {
             expect(data.chat.id).toBe(testChatId);
             expect(data.chat.type).toBe(testChatType);
           });
+      });
+
+      describe("leaveChat", () => {
+        it("should return proper result", () => {
+          const testChatId = 323426;
+          testApiResponse = getApiResponse<TgLeaveChatSchema>(true, true);
+
+          checkApiData = (config) => {
+            expect(config.url).toBe(`/bot${testApiToken}/leaveChat`);
+            expect(config.data.chat_id).toBe(testChatId);
+          };
+
+          return api.leaveChat(testChatId).then((data) => {
+            expect(data).toBe(true);
+          });
+        });
+
+        it("should return proper result?", () => {
+          const testChatId = 323426;
+          testApiResponse = getApiResponse(true, "broken response");
+
+          checkApiData = (config) => {
+            expect(config.url).toBe(`/bot${testApiToken}/leaveChat`);
+            expect(config.data.chat_id).toBe(testChatId);
+          };
+
+          return api.leaveChat(testChatId).then(
+            () => {
+              throw new Error(
+                "should not resolve, should receive validation error"
+              );
+            },
+            (err) => {
+              expect(err.issues[0].code).toBe("invalid_type");
+              expect(err.issues[0].message).toBe(
+                "Expected boolean, received string"
+              );
+            }
+          );
+        });
       });
 
       it("sendMessage no params", () => {

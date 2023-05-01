@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Prettify } from "../../common/types.js";
 
+export type ApiErrorReflector = (err: unknown) => Promise<void>;
+
 export interface TgCore<Response> {
   /**
    * Highlights if the request was successful
@@ -279,42 +281,8 @@ const TgFileSchema = z
 
 export type TgFile = z.infer<typeof TgFileSchema>;
 
-export class TgError extends Error {
-  public code = 0;
-  public response?: TgCore<void>;
-  public migrateToChatId = 0;
-  public retryAfter = 0;
-  public url = "";
+export const TgLeaveChatSchema = z
+  .boolean()
+  .describe("Telegram leave chat schema");
 
-  constructor(message = "Telegram request was unsuccessful", stack?: string) {
-    super(`ETELEGRAM ${message}`);
-    if (stack) {
-      this.stack = `${this.stack}\n${stack}`;
-    }
-  }
-
-  public setErrorCode(code = 0): this {
-    this.code = code;
-    return this;
-  }
-
-  public setResponse(response?: TgCore<void>): this {
-    this.response = response;
-    return this;
-  }
-
-  public setRetryAfter(retryAfter = 0): this {
-    this.retryAfter = retryAfter;
-    return this;
-  }
-
-  public setMigrateToChatId(migrateToChatId = 0): this {
-    this.migrateToChatId = migrateToChatId;
-    return this;
-  }
-
-  public setUrl(url: string): this {
-    this.url = url;
-    return this;
-  }
-}
+export type TgLeaveChatSchema = z.infer<typeof TgLeaveChatSchema>;

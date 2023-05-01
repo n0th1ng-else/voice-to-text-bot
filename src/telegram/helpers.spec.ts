@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { TgChatType, TgMessage } from "./api/types.js";
+import { TgMessage } from "./api/types.js";
 import { getUserLanguage } from "./helpers.js";
 import { LanguageCode } from "../recognition/types.js";
 
