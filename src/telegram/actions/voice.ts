@@ -187,8 +187,16 @@ export class VoiceAction extends GenericAction {
       prefix,
       model.forumThreadId
     ).catch((err) => {
+      const isBlocked = isBlockedByUser(err);
       const errorMessage = "Unable to send in progress message";
-      logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+      const logError = `${prefix.getPrefix()} ${errorMessage}`;
+      if (isBlocked) {
+        // TODO remove faking errors into warnings
+        logger.warn(logError, err);
+      } else {
+        logger.error(logError, err);
+      }
+
       model.analytics.setError(errorMessage);
     });
   }
