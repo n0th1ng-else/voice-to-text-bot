@@ -1,13 +1,14 @@
 import axios from "axios";
-import { Logger } from "../logger/index.js";
+import { Logger } from "../../logger/index.js";
 import {
   LanguageCode,
   VoiceConverter,
   VoiceConverterOptions,
-} from "./types.js";
-import { getWav } from "../ffmpeg/index.js";
-import { parseChunkedResponse } from "../common/request.js";
-import { wavSampleRate } from "../const.js";
+} from "../types.js";
+import { getWav } from "../../ffmpeg/index.js";
+import { parseChunkedResponse } from "../../common/request.js";
+import { wavSampleRate } from "../../const.js";
+import { WitAiError } from "./wit.ai.error.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -74,10 +75,11 @@ export class WithAiProvider extends VoiceConverter {
       return Promise.reject(new Error("The auth token is not provided"));
     }
 
+    const url = `${WithAiProvider.url}/${path}`;
     return axios
       .request<string>({
         method: "POST",
-        url: `${WithAiProvider.url}/${path}`,
+        url,
         params: {
           v: WithAiProvider.apiVersion,
         },
@@ -111,6 +113,13 @@ export class WithAiProvider extends VoiceConverter {
           );
         }
         return finalizedChunks;
+      })
+      .catch((err) => {
+        const witAiError = new WitAiError(err.message, err)
+          .setUrl(url)
+          .setErrorCode(err?.response?.status)
+          .setResponse(err?.response?.data);
+        throw witAiError;
       });
   }
 }

@@ -5,7 +5,7 @@ import {
   VoiceConverterProviderSchema,
 } from "./types.js";
 import { GoogleProvider } from "./google.js";
-import { WithAiProvider } from "./wit.ai.js";
+import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
 
 export const getVoiceConverterProvider = (

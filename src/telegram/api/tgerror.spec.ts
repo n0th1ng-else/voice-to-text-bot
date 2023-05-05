@@ -5,6 +5,7 @@ import {
   isBlockedByUser,
 } from "./tgerror.js";
 import { TgCore } from "./types.js";
+import { SANITIZE_CHARACTER } from "../../logger/const.js";
 
 describe("tgerror", () => {
   describe("TgError", () => {
@@ -90,7 +91,7 @@ describe("tgerror", () => {
       const msg = "ooops";
       const err = new TgError(msg, errCause);
       const url = "http://google.com";
-      err.setUrl(url);
+      err.setUrl(url, "");
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
@@ -99,6 +100,25 @@ describe("tgerror", () => {
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe(url);
+    });
+
+    it("should sanitize the url", () => {
+      const errCause = new Error("original error");
+      const msg = "ooops";
+      const err = new TgError(msg, errCause);
+      const apiToken = "a$asdlml@%";
+      const url = `http://google.com/${apiToken}/sendMessage`;
+      err.setUrl(url, apiToken);
+      expect(err.cause).toBe(errCause);
+      expect(err.message).toBe(`ETELEGRAM ${msg}`);
+      expect(err.code).toBe(0);
+      expect(err.chatId).toBe(undefined);
+      expect(err.response).toBe(undefined);
+      expect(err.migrateToChatId).toBe(0);
+      expect(err.retryAfter).toBe(0);
+      expect(err.url).toBe(
+        `http://google.com/${SANITIZE_CHARACTER}/sendMessage`
+      );
     });
 
     it("should set the response", () => {

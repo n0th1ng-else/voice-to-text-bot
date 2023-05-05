@@ -120,8 +120,7 @@ export class VoiceAction extends GenericAction {
         const isBlocked = isBlockedByUser(err);
         const errorMessage = "Unable to recognize the file";
         const duration = Logger.y(`${model.voiceDuration}sec`);
-        const voiceFileId = Logger.y(model.voiceFileId);
-        const logError = `${prefix.getPrefix()} ${errorMessage} ${voiceFileId} with duration ${duration}`;
+        const logError = `${prefix.getPrefix()} ${errorMessage} with duration ${duration}`;
         if (isBlocked) {
           // TODO remove faking errors into warnings
           logger.warn(logError, err);
@@ -149,12 +148,7 @@ export class VoiceAction extends GenericAction {
       .catch((err) => {
         const errorMessage =
           "Unable to send a message that file is unable to recognize";
-        logger.error(
-          `${prefix.getPrefix()} ${errorMessage} ${Logger.y(
-            model.voiceFileId
-          )}`,
-          err
-        );
+        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.setError(errorMessage);
       });
   }

@@ -3,14 +3,7 @@ import stripAnsi from "strip-ansi";
 import Logsene from "winston-logsene";
 import { isAxiosError, AxiosError } from "axios";
 import { selfUrl, logApiTokenV2, appVersion, isDebug } from "../env.js";
-
-export enum LogType {
-  Info = "info",
-  Warn = "warn",
-  Error = "error",
-}
-
-const SANITIZE_CHARACTER = ":cleared:";
+import { LogType, SANITIZE_CHARACTER } from "./const.js";
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const convertDataItem = (data: any, ind: number): Record<string, string> => {

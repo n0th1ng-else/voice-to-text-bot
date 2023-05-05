@@ -17,6 +17,7 @@ import {
 } from "./types.js";
 import { TelegramApi } from "./tgapi.js";
 import { TgError } from "./tgerror.js";
+import { SANITIZE_CHARACTER } from "../../logger/const.js";
 
 const getApiResponse = <Response>(
   ok: boolean,
@@ -456,7 +457,7 @@ describe("[telegram api client]", () => {
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
-          expect(err.url).toBe(`/bot${testApiToken}/setWebHook`);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setWebHook`);
           expect(err.response).toBe(undefined);
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
@@ -501,7 +502,7 @@ describe("[telegram api client]", () => {
             expect(err.stack).toBeDefined();
             expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
             expect(err.code).toBe(testErrorCode);
-            expect(err.url).toBe(`/bot${testApiToken}/setMyCommands`);
+            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setMyCommands`);
             expect(err.response).toBe(undefined);
             expect(err.migrateToChatId).toBe(0);
             expect(err.retryAfter).toBe(testRetryAfter);
@@ -531,7 +532,7 @@ describe("[telegram api client]", () => {
             "ETELEGRAM Telegram request was unsuccessful"
           );
           expect(err.code).toBe(testErrorCode);
-          expect(err.url).toBe(`/bot${testApiToken}/getWebhookInfo`);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getWebhookInfo`);
           expect(err.response).toBe(undefined);
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
@@ -572,7 +573,7 @@ describe("[telegram api client]", () => {
             expect(err.stack).toBeDefined();
             expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
             expect(err.code).toBe(testErrorCode);
-            expect(err.url).toBe(`/bot${testApiToken}/getFile`);
+            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getFile`);
             expect(err.response).toBe(undefined);
             expect(err.migrateToChatId).toBe(testMigrateToChat);
             expect(err.retryAfter).toBe(testRetryAfter);
@@ -641,7 +642,7 @@ describe("[telegram api client]", () => {
         expect(err.stack).toBeDefined();
         expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
         expect(err.code).toBe(0);
-        expect(err.url).toBe(`/bot${testApiToken}/editMessageText`);
+        expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/editMessageText`);
         expect(err.response).toBe(undefined);
         expect(err.migrateToChatId).toBe(0);
         expect(err.retryAfter).toBe(0);
@@ -703,7 +704,7 @@ describe("[telegram api client]", () => {
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
           expect(err.code).toBe(errCode);
-          expect(err.url).toBe(`/bot${testApiToken}/sendMessage`);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/sendMessage`);
           expect(err.response).toBe(errData);
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);

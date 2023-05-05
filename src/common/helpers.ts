@@ -62,3 +62,14 @@ export const splitTextIntoParts = (
 
   return parts;
 };
+
+type RegExpFlag = "g" | "i";
+
+export const getRegExpFromString = (
+  str: string,
+  flags: RegExpFlag[]
+): RegExp => {
+  const escaped = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  const regExpFlags = flags.join("");
+  return new RegExp(escaped, regExpFlags || undefined);
+};

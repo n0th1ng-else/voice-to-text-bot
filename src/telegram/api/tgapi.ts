@@ -235,7 +235,7 @@ export class TelegramApi {
             answer.description,
             new Error(answer.description)
           )
-            .setUrl(url)
+            .setUrl(url, this.apiToken)
             .setErrorCode(answer.error_code)
             .setRetryAfter(answer?.parameters?.retry_after)
             .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
@@ -249,7 +249,7 @@ export class TelegramApi {
       },
       (err: AxiosError<TgCore<void>>) => {
         const tgError = new TgError(err.message, err)
-          .setUrl(url)
+          .setUrl(url, this.apiToken)
           .setErrorCode(err?.response?.status)
           .setResponse(err?.response?.data)
           .setChatId(chatId);
