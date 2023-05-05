@@ -1,4 +1,6 @@
 import { TgCore } from "./types.js";
+import { SANITIZE_CHARACTER } from "../../logger/const.js";
+import { getRegExpFromString } from "../../common/helpers.js";
 
 export class TgError extends Error {
   public code = 0;
@@ -37,8 +39,13 @@ export class TgError extends Error {
     return this;
   }
 
-  public setUrl(url: string): this {
-    this.url = url;
+  public setUrl(url: string, apiToken: string): this {
+    this.url = apiToken
+      ? url.replace(
+          getRegExpFromString(apiToken, ["g", "i"]),
+          SANITIZE_CHARACTER
+        )
+      : url;
     return this;
   }
 }

@@ -1,6 +1,6 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
-import { LogType, sendLogs } from "./integration.js";
+import { sendLogs } from "./integration.js";
 
 const { green, red, yellow } = picocolors;
 
@@ -50,18 +50,18 @@ export class Logger {
   public info(msg: string, ...data: unknown[]): void {
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), msg, ...data);
-    sendLogs(LogType.Info, this.id, this.additionalPrefix, msg, data);
+    sendLogs("info", this.id, this.additionalPrefix, msg, data);
   }
 
   public warn(msg: string, data?: unknown): void {
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.prefix), msg, data ?? "");
-    sendLogs(LogType.Warn, this.id, this.additionalPrefix, msg, data);
+    sendLogs("warn", this.id, this.additionalPrefix, msg, data);
   }
 
   public error(msg: string, data: unknown): void {
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
-    sendLogs(LogType.Error, this.id, this.additionalPrefix, msg, data);
+    sendLogs("error", this.id, this.additionalPrefix, msg, data);
   }
 }
