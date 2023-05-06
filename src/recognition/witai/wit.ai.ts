@@ -118,7 +118,8 @@ export class WithAiProvider extends VoiceConverter {
         const witAiError = new WitAiError(err.message, err)
           .setUrl(url)
           .setErrorCode(err?.response?.status)
-          .setResponse(err?.response?.data);
+          .setResponse(err?.response?.data)
+          .setBufferLength(data);
         throw witAiError;
       });
   }
