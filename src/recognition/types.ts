@@ -12,9 +12,9 @@ export type VoiceConverterProvider = z.infer<
 export abstract class VoiceConverter {
   public abstract transformToText(
     fileLink: string,
-    fileId: string,
     isVideo: boolean,
-    lang: LanguageCode
+    lang: LanguageCode,
+    opts: ConverterMeta
   ): Promise<string>;
 }
 
@@ -30,4 +30,9 @@ export interface VoiceConverterOptions {
 export enum LanguageCode {
   Ru = "ru-RU",
   En = "en-US",
+}
+
+export interface ConverterMeta {
+  fileId: string;
+  prefix: string;
 }

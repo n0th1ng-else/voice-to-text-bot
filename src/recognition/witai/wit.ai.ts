@@ -1,12 +1,14 @@
 import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import {
+  ConverterMeta,
   LanguageCode,
   VoiceConverter,
   VoiceConverterOptions,
 } from "../types.js";
 import { getWav } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
+import { TimeMeasure } from "../../common/timer.js";
 import { wavSampleRate } from "../../const.js";
 import { WitAiError } from "./wit.ai.error.js";
 
@@ -14,7 +16,7 @@ const logger = new Logger("wit-ai-recognition");
 
 export class WithAiProvider extends VoiceConverter {
   public static readonly url = "https://api.wit.ai";
-  public static readonly timeout = 30_000;
+  public static readonly timeout = 10_000;
   private static readonly apiVersion = "20230215";
   private readonly tokenEn: string;
   private readonly tokenRu: string;
@@ -29,47 +31,73 @@ export class WithAiProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
-    fileId: string,
     isVideo: boolean,
-    lang: LanguageCode
+    lang: LanguageCode,
+    logData: ConverterMeta
   ): Promise<string> {
-    const name = `${fileId}.ogg`;
-    logger.info(`Starting process for ${Logger.y(name)}`);
+    const name = `${logData.fileId}.ogg`;
+    logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
     return getWav(fileLink, isVideo)
       .then((bufferData) => {
-        logger.info(`Start converting ${Logger.y(name)}`);
+        logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
         const token = lang === LanguageCode.Ru ? this.tokenRu : this.tokenEn;
-        return WithAiProvider.recogniseDictation(bufferData, token);
+        return WithAiProvider.recognise(bufferData, token, logData.prefix);
       })
       .then((chunks) => chunks.map(({ text }) => text).join(" ") || "");
   }
 
+  private static recognise(
+    data: Buffer,
+    authToken: string,
+    logPrefix: string
+  ): Promise<WitAiBaseResponse[]> {
+    const duration = new TimeMeasure();
+    return WithAiProvider.recogniseDictation(data, authToken, logPrefix)
+      .catch((err) => {
+        logger.error(
+          `${logPrefix} Unable to resolve the dictation api. Retrying with speech api`,
+          err
+        );
+        return WithAiProvider.recogniseSpeech(data, authToken, logPrefix);
+      })
+      .finally(() => {
+        logger.info(
+          `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`
+        );
+      });
+  }
+
   private static recogniseSpeech(
     data: Buffer,
-    authToken = ""
+    authToken: string,
+    logPrefix: string
   ): Promise<WitAiSpeechResponse[]> {
     return WithAiProvider.runRequest<WitAiSpeechResponse>(
       data,
       "speech",
-      authToken
+      authToken,
+      logPrefix
     );
   }
 
   private static recogniseDictation(
     data: Buffer,
-    authToken = ""
+    authToken: string,
+    logPrefix: string
   ): Promise<WitAiDictationResponse[]> {
     return WithAiProvider.runRequest<WitAiDictationResponse>(
       data,
       "dictation",
-      authToken
+      authToken,
+      logPrefix
     );
   }
 
   private static runRequest<Dto extends WitAiBaseResponse>(
     data: Buffer,
     path: "speech" | "dictation",
-    authToken = ""
+    authToken: string,
+    logPrefix: string
   ): Promise<Dto[]> {
     if (!authToken) {
       return Promise.reject(new Error("The auth token is not provided"));
@@ -108,7 +136,7 @@ export class WithAiProvider extends VoiceConverter {
         );
         if (!finalizedChunks.length) {
           logger.warn(
-            "The final response chunk not found. Transcription is empty.",
+            `${logPrefix} The final response chunk not found. Transcription is empty.`,
             chunks.map(({ text }) => text)
           );
         }
