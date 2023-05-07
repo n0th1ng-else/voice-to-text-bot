@@ -8,12 +8,7 @@ import {
   VoiceContentReasonModel,
 } from "./types.js";
 import { telegramBotName } from "../env.js";
-import {
-  TgCallbackQuery,
-  TgChatType,
-  TgMedia,
-  TgMessage,
-} from "./api/types.js";
+import { TgCallbackQuery, TgMedia, TgMessage } from "./api/types.js";
 import { LanguageCode } from "../recognition/types.js";
 import { durationLimitSec, supportedAudioFormats } from "../const.js";
 

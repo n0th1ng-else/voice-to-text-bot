@@ -1,4 +1,4 @@
-import onExit from "signal-exit";
+import { onExit } from "signal-exit";
 import { Logger } from "../logger/index.js";
 
 const logger = new Logger("stop-listener");
