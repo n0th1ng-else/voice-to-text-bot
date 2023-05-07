@@ -1,5 +1,6 @@
 import { v1 } from "@google-cloud/speech";
 import {
+  ConverterMeta,
   LanguageCode,
   VoiceConverter,
   VoiceConverterOptions,
@@ -30,11 +31,11 @@ export class GoogleProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
-    fileId: string,
     isVideo: boolean,
-    lang: LanguageCode
+    lang: LanguageCode,
+    opts: ConverterMeta
   ): Promise<string> {
-    const name = `${fileId}.ogg`;
+    const name = `${opts.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
     return getWav(fileLink, isVideo)
       .then((bufferData) => {
