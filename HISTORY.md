@@ -252,3 +252,13 @@ It is still not that long, but I was able to catch the error in the logs that so
 limit. With this commit, it should be fixed. We now split messages longer than 4096 characters into
 chunks and send each chunk separately one by one.
 As for the metrics, we went beyond 40000+ installs and floating around the 1200 WAU.
+
+### Leave the group when the bot is blocked
+
+Recently I found out this pattern for bot users: they add the bot in the group. Then it does not work
+out (not bad feeling, shit happens) and instead of kicking the bot out of the group, they block it, so
+it keep receiving the messages, but can not answer. This is sort of okay, does not hurt anyone. Except logs.
+I saw messages that the bot is not allowed to send messages, so it is in the group, but blocked. Since
+it is not an error of the application itself, it should not overwhelm the logs. As a solution, not if the
+bot faces it is not allowed to send messages - it leave the group by itself. You can always re-add it to
+the group if you want to give us second chance. Cheers!

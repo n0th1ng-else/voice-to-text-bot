@@ -118,6 +118,8 @@ export class WithAiProvider extends VoiceConverter {
           "Transfer-Encoding": "chunked",
         },
         timeout: WithAiProvider.timeout,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
         responseType: "text",
         data,
         transformResponse: (d) => d,
