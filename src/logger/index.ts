@@ -1,6 +1,7 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
 import { sendLogs } from "./integration.js";
+import { captureError } from "../monitoring/sentry.js";
 
 const { green, red, yellow } = picocolors;
 
@@ -63,5 +64,6 @@ export class Logger {
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
     sendLogs("error", this.id, this.additionalPrefix, msg, data);
+    captureError(data);
   }
 }

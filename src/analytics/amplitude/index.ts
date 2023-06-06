@@ -4,15 +4,18 @@ import { customAlphabet } from "nanoid";
 import { AnalyticsEventExt } from "../v4/types.js";
 import { Logger } from "../../logger/index.js";
 import { amplitudeToken } from "../../env.js";
+import { isDevelopment } from "../../common/environment.js";
 
 const logger = new Logger("analytics:amplitude");
 
 export const collectEvents = (chatId: number, events: AnalyticsEventExt[]) => {
   if (!amplitudeToken) {
-    logger.error(
-      "Amplitude analytics token is not provided!",
-      new Error("Amplitude analytics token is not provided")
-    );
+    if (!isDevelopment()) {
+      logger.error(
+        "Amplitude analytics token is not provided!",
+        new Error("Amplitude analytics token is not provided")
+      );
+    }
     return Promise.resolve();
   }
 

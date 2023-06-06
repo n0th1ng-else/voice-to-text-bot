@@ -69,3 +69,7 @@ export const isDebug = process.env.DEBUG === "true";
 export const stripeToken = process.env.STRIPE_TOKEN || "";
 
 export const amplitudeToken = process.env.AMPLITUDE_TOKEN || "";
+
+export const nodeEnvironment = process.env.NODE_ENV || "production";
+
+export const sentryDsn = process.env.SENTRY_DSN || "";
