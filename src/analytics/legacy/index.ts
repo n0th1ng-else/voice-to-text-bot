@@ -2,15 +2,18 @@ import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import { AnalyticsDataDto } from "./types.js";
 import { analyticsId } from "../../env.js";
+import { isDevelopment } from "../../common/environment.js";
 
 const logger = new Logger("analytics:ga");
 
 export const collectEvents = (data: AnalyticsDataDto): Promise<void> => {
   if (!analyticsId) {
-    logger.error(
-      "Analytics Token is not provided!",
-      new Error("Analytics Token is not provided")
-    );
+    if (!isDevelopment()) {
+      logger.error(
+        "Analytics Token is not provided!",
+        new Error("Analytics Token is not provided")
+      );
+    }
     return Promise.resolve();
   }
 

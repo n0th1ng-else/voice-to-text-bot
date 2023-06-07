@@ -65,3 +65,7 @@ export const isDebug = false;
 export const stripeToken = "";
 
 export const amplitudeToken = "";
+
+export const nodeEnvironment = "production";
+
+export const sentryDsn = "";

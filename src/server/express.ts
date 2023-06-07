@@ -12,6 +12,7 @@ import { flattenPromise } from "../common/helpers.js";
 import { AnalyticsData } from "../analytics/legacy/types.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
+import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
 
 const logger = new Logger("server");
 
@@ -35,6 +36,8 @@ export class ExpressServer {
 
     this.uptimeDaemon = new UptimeDaemon(version);
 
+    initSentry(this.app);
+    trackAPIHandlers(this.app);
     this.app.use(express.json());
     this.app.use("/static", express.static("assets/v2"));
 
@@ -146,10 +149,8 @@ export class ExpressServer {
     });
 
     this.app.use((req, res) => {
-      logger.error(
-        `Unknown route ${Logger.y(req.originalUrl)}`,
-        new Error("Unknown route")
-      );
+      const err = new Error("Unknown route");
+      logger.error(`Unknown route ${Logger.y(req.originalUrl)}`, err);
       const analytics = new AnalyticsData(
         this.version,
         this.selfUrl,

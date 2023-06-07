@@ -2,6 +2,7 @@ import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import { AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
 import { analytics } from "../../env.js";
+import { isDevelopment } from "../../common/environment.js";
 
 const logger = new Logger("analytics:v4");
 
@@ -10,10 +11,12 @@ export const collectEvents = (
   events: AnalyticsEventExt[]
 ): Promise<void> => {
   if (!analytics.measurementId || !analytics.apiSecret) {
-    logger.error(
-      "v4 analytics Token is not provided!",
-      new Error("v4 analytics Token is not provided")
-    );
+    if (!isDevelopment()) {
+      logger.error(
+        "v4 analytics Token is not provided!",
+        new Error("v4 analytics Token is not provided")
+      );
+    }
     return Promise.resolve();
   }
 
