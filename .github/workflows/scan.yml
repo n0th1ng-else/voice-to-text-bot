@@ -1,11 +1,7 @@
 name: Scan
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_call:
 
 jobs:
   test:
@@ -74,15 +70,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  tag-version:
-    if: github.ref == 'refs/heads/master'
-    needs: [test, validate]
-    uses: ./.github/workflows/release.yml
-    secrets: inherit
-
-  deploy:
-    if: github.ref == 'refs/heads/master'
-    needs: [test, validate]
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
