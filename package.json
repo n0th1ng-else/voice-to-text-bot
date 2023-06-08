@@ -21,7 +21,6 @@
     "lint:all": "eslint .",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "build:ci": "tsc --p tsconfig-ci.json",
     "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\" jest",
     "test:load": "artillery run load.yml --insecure",
     "test:unit": "npm run test:runner -- --coverage --selectProjects=unit",

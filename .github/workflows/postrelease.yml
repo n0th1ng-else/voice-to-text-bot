@@ -1,0 +1,42 @@
+name: Post-release
+
+on:
+  workflow_call:
+
+jobs:
+  tag-release:
+    runs-on: ubuntu-latest
+    name: Tag release changes
+    steps:
+      - name: App version
+        run: echo "Picked the app version ${GITHUB_SHA}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
+
+      - name: Run semantic release
+        run: npx semantic-release@19.0.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sentry:
+    runs-on: ubuntu-latest
+    name: Send release info into sentry
+    steps:
+      - name: App version
+        run: echo "Picked the app version ${GITHUB_SHA}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production

@@ -1,0 +1,10 @@
+name: PR CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  scan:
+    uses: ./.github/workflows/scan.yml
+    secrets: inherit

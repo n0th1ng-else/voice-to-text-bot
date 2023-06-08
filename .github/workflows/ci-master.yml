@@ -1,0 +1,21 @@
+name: Main CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  scan:
+    uses: ./.github/workflows/scan.yml
+    secrets: inherit
+
+  deploy:
+    needs: [scan]
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  postrelease:
+    needs: [deploy]
+    uses: ./.github/workflows/postrelease.yml
+    secrets: inherit
