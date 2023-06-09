@@ -7,6 +7,8 @@ jobs:
   tag-release:
     runs-on: ubuntu-latest
     name: Tag release changes
+    outputs:
+      version: ${{ steps.reader.outputs.version }}
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -18,13 +20,18 @@ jobs:
         uses: ./.github/actions/npm
 
       - name: Run semantic release
-        run: npx semantic-release@19.0.5
+        run: npx semantic-release@21.0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read version into output
+        id: reader
+        run: echo "version=$(cat .VERSION)" >> $GITHUB_OUTPUT
 
   sentry:
     runs-on: ubuntu-latest
     name: Send release info into sentry
+    needs: [tag-release]
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -40,3 +47,4 @@ jobs:
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           environment: production
+          version: ${{ needs.tag-release.outputs.version }}
