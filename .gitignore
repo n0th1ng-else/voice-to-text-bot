@@ -113,3 +113,4 @@ coverage-unit
 
 # keep temp folder clear
 video-temp/*.tmp
+.VERSION
