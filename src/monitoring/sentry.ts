@@ -46,9 +46,12 @@ export const trackAPIHandlers = (app: Express): void => {
   app.use(sentry.Handlers.tracingHandler());
 };
 
-export const captureError = (err: unknown): void => {
+export const captureError = (
+  err: unknown,
+  extra?: Parameters<typeof sentry.captureException>[1]
+): void => {
   if (!isEnabled()) {
     return;
   }
-  sentry.captureException(err);
+  sentry.captureException(err, extra);
 };
