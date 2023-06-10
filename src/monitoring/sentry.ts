@@ -1,5 +1,6 @@
 import { Express } from "express";
 import * as sentry from "@sentry/node";
+import { ProfilingIntegration } from "@sentry/profiling-node";
 import { nodeEnvironment, sentryDsn } from "../env.js";
 import { isDevelopment } from "../common/environment.js";
 
@@ -21,12 +22,15 @@ export const initSentry = (app: Express): void => {
       new sentry.Integrations.Express({ app }),
       // Automatically instrument Node.js libraries and frameworks
       ...sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
+      // Add profiling
+      new ProfilingIntegration(),
     ],
 
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: isDevelopment() ? 1.0 : 0.2,
+    profilesSampleRate: 1.0,
   });
 };
 
