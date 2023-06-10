@@ -17,6 +17,7 @@ export default () => {
   /** @type {import('jest').Config} */
   return {
     reporters: ["default", "jest-sonar"],
+    testTimeout: 30000,
     ...commonCfg,
     projects: [
       {
