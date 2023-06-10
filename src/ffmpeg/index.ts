@@ -1,6 +1,6 @@
+import type { IncomingMessage } from "node:http";
 import axios from "axios";
 import prism from "prism-media";
-import { IncomingMessage } from "http";
 import { Logger } from "../logger/index.js";
 import { isDebug } from "../env.js";
 import { wavSampleRate as sampleRate } from "../const.js";

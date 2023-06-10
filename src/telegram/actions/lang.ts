@@ -21,6 +21,7 @@ import {
   collectAnalytics,
   collectPageAnalytics,
 } from "../../analytics/index.js";
+import { isMessageNotModified } from "../api/tgerror.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -67,11 +68,6 @@ export class LangAction extends GenericAction {
       .then((opts) =>
         this.updateLanguage(opts, chatId, messageId, analytics, forumThreadId)
       )
-      .catch((err) => {
-        const errorMessage = "Unable to handle language change";
-        logger.error(errorMessage, err);
-        analytics.setError(errorMessage);
-      })
       .then(() =>
         collectAnalytics(
           analytics.setCommand(
@@ -93,36 +89,39 @@ export class LangAction extends GenericAction {
     const lang = opts.langId;
     const prefix = opts.prefix;
 
-    return this.stat.usages
-      .updateLangId(chatId, lang)
-      .then(() => logger.info(`${prefix.getPrefix()} Language updated in DB`))
-      .then(
-        () => this.sendLangUpdatedMessage(chatId, lang, messageId, prefix),
-        (err) => {
-          const errorMessage = "Unable to set the language in DB";
+    return (
+      this.stat.usages
+        .updateLangId(chatId, lang)
+        .then(() => logger.info(`${prefix.getPrefix()} Language updated in DB`))
+        // TODO This is the only place where I use promise.then(resolveFn, rejectFn). Should refactor it.
+        .then(
+          () => this.sendLangUpdatedMessage(chatId, lang, messageId, prefix),
+          (err) => {
+            const errorMessage = "Unable to set the language in DB";
+            logger.error(
+              `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
+              err
+            );
+            analytics.setError(errorMessage);
+            return this.sendMessage(
+              messageId,
+              chatId,
+              LabelId.UpdateLanguageError,
+              { lang },
+              prefix,
+              forumThreadId
+            );
+          }
+        )
+        .catch((err) => {
+          const errorMessage = "Unable to set the language";
           logger.error(
             `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
             err
           );
           analytics.setError(errorMessage);
-          return this.sendMessage(
-            messageId,
-            chatId,
-            LabelId.UpdateLanguageError,
-            { lang },
-            prefix,
-            forumThreadId
-          );
-        }
-      )
-      .catch((err) => {
-        const errorMessage = "Unable to set the language";
-        logger.error(
-          `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-          err
-        );
-        analytics.setError(errorMessage);
-      });
+        })
+    );
   }
 
   private sendLangUpdatedMessage(
@@ -137,7 +136,17 @@ export class LangAction extends GenericAction {
       { lang },
       LabelId.ChangeLang,
       prefix
-    ).then(() => logger.info(`${prefix.getPrefix()} Language updated`));
+    )
+      .catch((err) => {
+        if (isMessageNotModified(err)) {
+          return logger.warn(
+            `${prefix.getPrefix()} Unable to edit language selector. Most likely it is already updated but the user clicked button multiple times`,
+            err
+          );
+        }
+        throw err;
+      })
+      .then(() => logger.info(`${prefix.getPrefix()} Language updated`));
   }
 
   private getLangData(

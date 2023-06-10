@@ -50,27 +50,37 @@ export class TgError extends Error {
   }
 }
 
-export const hasNoRightsToSendMessage = (err: unknown): boolean => {
+const assertErrCondition = (
+  err: unknown,
+  status: number,
+  text: string
+): boolean => {
   if (!(err instanceof TgError)) {
     return false;
   }
   const isErr = !err?.response?.ok;
-  const isBadRequest = err?.code === 400;
-  const hasNoRights =
-    err?.response?.description?.toLowerCase() ===
-    "Bad Request: not enough rights to send text messages to the chat".toLowerCase();
+  const isStatusExpected = err?.code === status;
+  const isTextExpected =
+    err?.response?.description?.toLowerCase() === text.toLowerCase();
+  return isErr && isStatusExpected && isTextExpected;
+};
 
-  return isErr && isBadRequest && hasNoRights;
+export const hasNoRightsToSendMessage = (err: unknown): boolean => {
+  return assertErrCondition(
+    err,
+    400,
+    "Bad Request: not enough rights to send text messages to the chat"
+  );
 };
 
 export const isBlockedByUser = (err: unknown): boolean => {
-  if (!(err instanceof TgError)) {
-    return false;
-  }
-  const isErr = !err?.response?.ok;
-  const isForbidden = err?.code === 403;
-  const isBlocked =
-    err?.response?.description?.toLowerCase() ===
-    "Forbidden: bot was blocked by the user".toLowerCase();
-  return isErr && isForbidden && isBlocked;
+  return assertErrCondition(err, 403, "Forbidden: bot was blocked by the user");
+};
+
+export const isMessageNotModified = (err: unknown): boolean => {
+  return assertErrCondition(
+    err,
+    400,
+    "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message"
+  );
 };
