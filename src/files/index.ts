@@ -1,5 +1,5 @@
-import { promises, createWriteStream } from "fs";
-import { IncomingMessage } from "http";
+import { promises, createWriteStream } from "node:fs";
+import type { IncomingMessage } from "node:http";
 import { nanoid } from "nanoid";
 import { Logger } from "../logger/index.js";
 
@@ -16,7 +16,7 @@ export const isFileExist = (fileName: string): Promise<boolean> =>
 export const deleteFileIfExists = (
   fileName: string,
   shouldThrowError = false,
-  err?: Error
+  parentErr?: Error
 ): Promise<string> => {
   logger.info(
     `Deleting a file from the filesystem. The file name is ${fileName}`
@@ -32,19 +32,16 @@ export const deleteFileIfExists = (
     })
     .then(() => {
       logger.info(`${fileName} was deleted from the filesystem`);
-      if (err) {
-        logger.error(`${fileName} comes with an error`, err);
-        return Promise.reject(err);
+      if (parentErr) {
+        logger.error(`${fileName} comes with an error`, parentErr);
+        return Promise.reject(parentErr);
       }
       return fileName;
     })
-    .catch((catchErr) => {
-      logger.error(
-        `${fileName} caused errors during the delete attempt`,
-        catchErr
-      );
+    .catch((err) => {
+      logger.error(`${fileName} caused errors during the delete attempt`, err);
       if (shouldThrowError) {
-        return Promise.reject(catchErr);
+        return Promise.reject(err);
       }
       return fileName;
     });

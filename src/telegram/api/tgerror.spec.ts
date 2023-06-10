@@ -3,6 +3,7 @@ import {
   TgError,
   hasNoRightsToSendMessage,
   isBlockedByUser,
+  isMessageNotModified,
 } from "./tgerror.js";
 import { TgCore } from "./types.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
@@ -233,6 +234,55 @@ describe("tgerror", () => {
           "Bad Request: not enough rights to send text messages to the chat",
       });
       expect(hasNoRightsToSendMessage(tgErr)).toBe(true);
+    });
+  });
+
+  describe("isMessageNotModified", () => {
+    it("should return false if the argument is non-tg error", () => {
+      expect(isMessageNotModified(new Error("just an error"))).toBe(false);
+    });
+
+    it("should return false if the error description is different", () => {
+      const tgErr = new TgError("ooops", new Error("ooops"));
+      tgErr.setErrorCode(400).setResponse({
+        ok: false,
+        result: undefined,
+        description: "Bad Request: another reason",
+      });
+      expect(isMessageNotModified(tgErr)).toBe(false);
+    });
+
+    it("should return false if the error code is different", () => {
+      const tgErr = new TgError("ooops", new Error("ooops"));
+      tgErr.setErrorCode(403).setResponse({
+        ok: false,
+        result: undefined,
+        description:
+          "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
+      });
+      expect(isMessageNotModified(tgErr)).toBe(false);
+    });
+
+    it("should return false if the error is ok", () => {
+      const tgErr = new TgError("ooops", new Error("ooops"));
+      tgErr.setErrorCode(400).setResponse({
+        ok: true,
+        result: undefined,
+        description:
+          "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
+      });
+      expect(isMessageNotModified(tgErr)).toBe(false);
+    });
+
+    it("should return true if the message is not modified", () => {
+      const tgErr = new TgError("ooops", new Error("ooops"));
+      tgErr.setErrorCode(400).setResponse({
+        ok: false,
+        result: undefined,
+        description:
+          "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
+      });
+      expect(isMessageNotModified(tgErr)).toBe(true);
     });
   });
 });

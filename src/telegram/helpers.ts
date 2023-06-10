@@ -190,7 +190,7 @@ export const getLanguageByText = (
         return LanguageCode.En;
       }
 
-      throw new Error("Language code is not recognized");
+      throw new Error(`Language code ${lang} is not recognized`);
     }
   }
 };

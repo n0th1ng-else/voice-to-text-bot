@@ -1,5 +1,5 @@
-import { resolve as resolvePath } from "path";
-import { readdirSync, statSync } from "fs";
+import { resolve as resolvePath } from "node:path";
+import { readdirSync, statSync } from "node:fs";
 import { Logger } from "../logger/index.js";
 
 const logger = new Logger("storage");

@@ -97,11 +97,7 @@ export abstract class GenericAction {
       .editMessageText(chatId, messageId, this.text.t(id, meta.lang), {
         buttons: meta.options,
       })
-      .then(() => logger.info(`${prefix.getPrefix()} Updated message`))
-      .catch((err) => {
-        logger.error(`${prefix.getPrefix()} Unable to update the message`, err);
-        throw err;
-      });
+      .then(() => logger.info(`${prefix.getPrefix()} Updated message`));
   }
 
   protected sendRawMessage(
