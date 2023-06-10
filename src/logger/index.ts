@@ -60,10 +60,14 @@ export class Logger {
     sendLogs("warn", this.id, this.additionalPrefix, msg, data);
   }
 
-  public error(msg: string, data: unknown): void {
+  public error(
+    msg: string,
+    data: unknown,
+    context: Parameters<typeof captureError>[1]
+  ): void {
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
     sendLogs("error", this.id, this.additionalPrefix, msg, data);
-    captureError(data);
+    captureError(data, context);
   }
 }
