@@ -140,7 +140,6 @@ export class TelegramApi {
     );
   }
 
-  // TODO add tests
   public answerPreCheckoutQuery(
     queryId: string,
     error?: string
@@ -232,8 +231,8 @@ export class TelegramApi {
         const answer = response.data;
         if (!answer.ok) {
           const tgError = new TgError(
-            answer.description,
-            new Error(answer.description)
+            new Error(answer.description),
+            answer.description
           )
             .setUrl(url, this.apiToken)
             .setErrorCode(answer.error_code)
@@ -248,7 +247,7 @@ export class TelegramApi {
         return answer.result;
       },
       (err: AxiosError<TgCore<void>>) => {
-        const tgError = new TgError(err.message, err)
+        const tgError = new TgError(err, err.message)
           .setUrl(url, this.apiToken)
           .setErrorCode(err?.response?.status)
           .setResponse(err?.response?.data)

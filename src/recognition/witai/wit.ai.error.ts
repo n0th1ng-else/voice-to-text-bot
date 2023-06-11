@@ -4,7 +4,7 @@ export class WitAiError extends Error {
   public url = "";
   public bufferLength = -1;
 
-  constructor(message = "WitAi request was unsuccessful", cause: Error) {
+  constructor(cause: Error, message = "WitAi request was unsuccessful") {
     super(`EWITAI ${message}`, { cause });
   }
 

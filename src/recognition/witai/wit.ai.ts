@@ -145,7 +145,7 @@ export class WithAiProvider extends VoiceConverter {
         return finalizedChunks;
       })
       .catch((err) => {
-        const witAiError = new WitAiError(err.message, err)
+        const witAiError = new WitAiError(err, err.message)
           .setUrl(url)
           .setErrorCode(err?.response?.status)
           .setResponse(err?.response?.data)

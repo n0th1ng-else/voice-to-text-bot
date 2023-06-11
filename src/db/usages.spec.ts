@@ -29,20 +29,6 @@ let LanguageCode;
 let testPool = new MockPool(dbConfig);
 let client;
 
-const runFail = (doneFn, reason = "should not be there"): void => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn.fail(reason);
-};
-
-const runDone = (doneFn) => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn();
-};
-
 describe("Usages DB", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
@@ -61,62 +47,42 @@ describe("Usages DB", () => {
   });
 
   describe("not initialized", () => {
-    it("can not import row", (done) => {
-      client
-        .importRow(1234, 3, LanguageCode.En, "t-user", new Date(), new Date())
-        .then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe("The table usages is not initialized yet");
-            runDone(done);
-          }
-        );
-    });
-
-    it("can not update language", (done) => {
-      client.updateLangId(45611, LanguageCode.Ru).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe("The table usages is not initialized yet");
-          runDone(done);
-        }
-      );
-    });
-
-    it("can not get the language", (done) => {
-      client.getLangId(-123123, "test-user", LanguageCode.En).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe("The table usages is not initialized yet");
-          runDone(done);
-        }
-      );
-    });
-
-    it("can not update usage count", (done) => {
-      client.updateUsageCount(-72722, "new-name", LanguageCode.Ru).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe("The table usages is not initialized yet");
-          runDone(done);
-        }
-      );
-    });
-
-    it("init error makes api unavailable", (done) => {
-      client
-        .init()
-        .then(
-          () => runFail(done),
-          () => client.getLangId(-123123, "test-user", LanguageCode.En)
+    it("can not import row", async () => {
+      await expect(
+        client.importRow(
+          1234,
+          3,
+          LanguageCode.En,
+          "t-user",
+          new Date(),
+          new Date()
         )
-        .then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe("The table usages is not initialized yet");
-            runDone(done);
-          }
-        );
+      ).rejects.toThrowError("The table usages is not initialized yet");
+    });
+
+    it("can not update language", async () => {
+      await expect(
+        client.updateLangId(45611, LanguageCode.Ru)
+      ).rejects.toThrowError("The table usages is not initialized yet");
+    });
+
+    it("can not get the language", async () => {
+      await expect(
+        client.getLangId(-123123, "test-user", LanguageCode.En)
+      ).rejects.toThrowError("The table usages is not initialized yet");
+    });
+
+    it("can not update usage count", async () => {
+      await expect(
+        client.updateUsageCount(-72722, "new-name", LanguageCode.Ru)
+      ).rejects.toThrowError("The table usages is not initialized yet");
+    });
+
+    it("init error makes api unavailable", async () => {
+      await expect(client.init()).rejects.toThrow();
+      await expect(
+        client.getLangId(-123123, "test-user", LanguageCode.En)
+      ).rejects.toThrowError("The table usages is not initialized yet");
     });
   });
 
@@ -587,7 +553,7 @@ describe("Usages DB", () => {
     });
 
     describe("unable to receive the result row", () => {
-      it("on create row", (done) => {
+      it("on create row", async () => {
         const chatId = 124522;
         const langId = LanguageCode.En;
         const userName = "some-super-user";
@@ -619,16 +585,12 @@ describe("Usages DB", () => {
           });
         });
 
-        client.getLangId(chatId, userName, langId).then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe("Unable to get created row info");
-            runDone(done);
-          }
-        );
+        await expect(
+          client.getLangId(chatId, userName, langId)
+        ).rejects.toThrowError("Unable to get created row info");
       });
 
-      it("on update row", (done) => {
+      it("on update row", async () => {
         const usageId = "asdgfddf";
         const chatId = 12552233;
         const userName = "superdave";
@@ -664,13 +626,9 @@ describe("Usages DB", () => {
           });
         });
 
-        client.updateUsageCount(chatId, userName, LanguageCode.En).then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe("Unable to get updated row info");
-            runDone(done);
-          }
-        );
+        await expect(
+          client.updateUsageCount(chatId, userName, LanguageCode.En)
+        ).rejects.toThrowError("Unable to get updated row info");
       });
     });
   });

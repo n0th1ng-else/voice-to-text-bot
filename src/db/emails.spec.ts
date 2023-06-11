@@ -28,20 +28,6 @@ let UsedEmailClient;
 let client;
 let testPool = new MockPool(dbConfig);
 
-const runFail = (doneFn, reason = "should not be there"): void => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn.fail(reason);
-};
-
-const runDone = (doneFn) => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn();
-};
-
 describe("Used Emails DB", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
@@ -59,58 +45,29 @@ describe("Used Emails DB", () => {
   });
 
   describe("not initialized", () => {
-    it("can not create row", (done) => {
-      client.createRow("test-email").then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe(
-            "The table usedemails is not initialized yet"
-          );
-          runDone(done);
-        }
+    it("can not create row", async () => {
+      await expect(client.createRow("test-email")).rejects.toThrowError(
+        "The table usedemails is not initialized yet"
       );
     });
 
-    it("can not update row", (done) => {
-      client.updateRow(12).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe(
-            "The table usedemails is not initialized yet"
-          );
-          runDone(done);
-        }
+    it("can not update row", async () => {
+      await expect(client.updateRow(12)).rejects.toThrowError(
+        "The table usedemails is not initialized yet"
       );
     });
 
-    it("can not iterate rows", (done) => {
-      client.getRows("test-email-2").then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe(
-            "The table usedemails is not initialized yet"
-          );
-          runDone(done);
-        }
+    it("can not iterate rows", async () => {
+      await expect(client.getRows("test-email-2")).rejects.toThrowError(
+        "The table usedemails is not initialized yet"
       );
     });
 
-    it("init error makes api unavailable", (done) => {
-      client
-        .init()
-        .then(
-          () => runFail(done),
-          () => client.createRow("test-email-3")
-        )
-        .then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe(
-              "The table usedemails is not initialized yet"
-            );
-            runDone(done);
-          }
-        );
+    it("init error makes api unavailable", async () => {
+      await expect(client.init()).rejects.toThrowError();
+      await expect(client.createRow("test-email-3")).rejects.toThrowError(
+        "The table usedemails is not initialized yet"
+      );
     });
   });
 

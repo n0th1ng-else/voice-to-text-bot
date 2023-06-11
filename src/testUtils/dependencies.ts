@@ -16,7 +16,7 @@ export const injectDependencies = async () => {
   const dbEmails = await import("../db/sql/emails.sql.js");
   const env = await import("../env.js");
   const express = await import("../server/express.js");
-  const expressHelpers = await import("../server/helpers.js");
+  const expressHelpers = await import("../server/api.js");
   const stripe = await import("../donate/stripe.js");
   const utils = await import("./waitFor.js");
   const emails = await import("../db/emails.js");
