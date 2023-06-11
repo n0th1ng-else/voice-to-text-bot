@@ -15,6 +15,10 @@ export const sleepForRandom = (): Promise<void> => {
   return sleepFor(ms);
 };
 
+export const getLaunchDelay = (threadId: number): number => {
+  return threadId ? (threadId - 1) * 10_000 : 0;
+};
+
 export class TimeMeasure {
   private readonly start: [number, number];
 

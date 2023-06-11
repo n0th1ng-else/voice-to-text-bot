@@ -14,12 +14,12 @@ import { StopListener } from "../process/index.js";
 import { httpsOptions } from "../../certs/index.js";
 import { DbClient } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
-import { getLaunchDelay } from "./init.js";
+import { getLaunchDelay } from "../common/timer.js";
 import { printCurrentStorageUsage } from "../storage/index.js";
 
 const logger = new Logger("start-script");
 
-export const run = (threadId = 0): void => {
+export const run = async (threadId = 0): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
 
   const server = new ExpressServer(
