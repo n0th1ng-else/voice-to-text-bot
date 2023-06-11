@@ -37,7 +37,7 @@ const isCommandMessage = (
   msg: TgMessage,
   command: BotCommand
 ): boolean => {
-  if (!msg || !msg.text) {
+  if (!msg?.text) {
     return false;
   }
 
@@ -101,7 +101,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
 };
 
 export const isMessageSupported = (msg: TgMessage): boolean => {
-  const isBot = Boolean(msg.from && msg.from.is_bot);
+  const isBot = Boolean(msg.from?.is_bot);
   return !isBot;
 };
 
@@ -111,7 +111,7 @@ export const isChatGroup = (msg: TgMessage): boolean =>
   msg.chat.type !== "private";
 
 export const getUserName = (msg: TgMessage): string => {
-  const fromUserName = msg.from && msg.from.username;
+  const fromUserName = msg.from?.username;
   return fromUserName || getFullUserName(msg) || getGroupName(msg) || "";
 };
 
@@ -173,7 +173,7 @@ export const getUserLanguage = (msg: TgMessage): LanguageCode => {
 export const getRawUserLanguage = (
   msg: TgMessage | TgCallbackQuery
 ): string => {
-  return (msg.from && msg.from.language_code) || "";
+  return msg.from?.language_code || "";
 };
 
 export const getLanguageByText = (
