@@ -48,7 +48,7 @@ export class AnalyticsData {
   ): this {
     this.category = category;
     this.action = action;
-    this.label = label || "";
+    this.label = label ?? "";
     this.v4.setCommand(category);
     this.v4.addFlow();
     return this;

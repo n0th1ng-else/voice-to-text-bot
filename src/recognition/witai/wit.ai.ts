@@ -25,8 +25,8 @@ export class WithAiProvider extends VoiceConverter {
     super();
 
     logger.info("Using Wit.ai");
-    this.tokenEn = options.witAiTokenEn || "";
-    this.tokenRu = options.witAiTokenRu || "";
+    this.tokenEn = options.witAiTokenEn ?? "";
+    this.tokenRu = options.witAiTokenRu ?? "";
   }
 
   public transformToText(
