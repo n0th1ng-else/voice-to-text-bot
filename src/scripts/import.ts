@@ -11,7 +11,7 @@ import { DbClient } from "../db/index.js";
 
 const logger = new Logger("import-script");
 
-export const run = (): void => {
+export const run = async (): Promise<void> => {
   const currentDir = fileURLToPath(new URL(".", import.meta.url));
   const chartHtml = resolvePath(currentDir, "../import/index.html");
 

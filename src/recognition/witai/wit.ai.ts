@@ -25,8 +25,8 @@ export class WithAiProvider extends VoiceConverter {
     super();
 
     logger.info("Using Wit.ai");
-    this.tokenEn = options.witAiTokenEn || "";
-    this.tokenRu = options.witAiTokenRu || "";
+    this.tokenEn = options.witAiTokenEn ?? "";
+    this.tokenRu = options.witAiTokenRu ?? "";
   }
 
   public transformToText(
@@ -145,7 +145,7 @@ export class WithAiProvider extends VoiceConverter {
         return finalizedChunks;
       })
       .catch((err) => {
-        const witAiError = new WitAiError(err.message, err)
+        const witAiError = new WitAiError(err, err.message)
           .setUrl(url)
           .setErrorCode(err?.response?.status)
           .setResponse(err?.response?.data)

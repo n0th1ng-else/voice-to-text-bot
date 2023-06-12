@@ -81,7 +81,7 @@ export class AWSProvider extends VoiceConverter {
 
   private unpackTranscription(translationData): Promise<any> {
     const transcripts = translationData.results.transcripts;
-    if (!transcripts || !transcripts.length) {
+    if (!transcripts?.length) {
       throw new Error("Unable to convert into text");
     }
 

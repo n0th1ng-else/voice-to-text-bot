@@ -13,7 +13,7 @@ describe("tgerror", () => {
     it("should construct the Telegram error wrapper", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
@@ -27,7 +27,7 @@ describe("tgerror", () => {
     it("should set the error code", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       err.setErrorCode(400);
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
@@ -42,7 +42,7 @@ describe("tgerror", () => {
     it("should set the chat id", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       const chatId = 1234555;
       err.setChatId(chatId);
       expect(err.cause).toBe(errCause);
@@ -58,7 +58,7 @@ describe("tgerror", () => {
     it("should set retry", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       const retry = 10;
       err.setRetryAfter(retry);
       expect(err.cause).toBe(errCause);
@@ -74,7 +74,7 @@ describe("tgerror", () => {
     it("should set migration chat", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       const chatId = 234353453;
       err.setMigrateToChatId(chatId);
       expect(err.cause).toBe(errCause);
@@ -90,7 +90,7 @@ describe("tgerror", () => {
     it("should set the url", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       const url = "http://google.com";
       err.setUrl(url, "");
       expect(err.cause).toBe(errCause);
@@ -106,7 +106,7 @@ describe("tgerror", () => {
     it("should sanitize the url", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       const apiToken = "a$asdlml@%";
       const url = `http://google.com/${apiToken}/sendMessage`;
       err.setUrl(url, apiToken);
@@ -125,7 +125,7 @@ describe("tgerror", () => {
     it("should set the response", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const err = new TgError(msg, errCause);
+      const err = new TgError(errCause, msg);
       const response: TgCore<void> = {
         ok: false,
         result: undefined,
@@ -148,7 +148,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error description is different", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(403).setResponse({
         ok: false,
         result: undefined,
@@ -158,7 +158,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error code is different", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: false,
         result: undefined,
@@ -168,7 +168,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error is ok", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(403).setResponse({
         ok: true,
         result: undefined,
@@ -178,7 +178,7 @@ describe("tgerror", () => {
     });
 
     it("should return true if bot was blocked by the user", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(403).setResponse({
         ok: false,
         result: undefined,
@@ -194,7 +194,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error description is different", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: false,
         result: undefined,
@@ -204,7 +204,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error code is different", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(403).setResponse({
         ok: false,
         result: undefined,
@@ -215,7 +215,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error is ok", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: true,
         result: undefined,
@@ -226,7 +226,7 @@ describe("tgerror", () => {
     });
 
     it("should return true if bot was blocked by the user", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: false,
         result: undefined,
@@ -243,7 +243,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error description is different", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: false,
         result: undefined,
@@ -253,7 +253,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error code is different", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(403).setResponse({
         ok: false,
         result: undefined,
@@ -264,7 +264,7 @@ describe("tgerror", () => {
     });
 
     it("should return false if the error is ok", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: true,
         result: undefined,
@@ -275,7 +275,7 @@ describe("tgerror", () => {
     });
 
     it("should return true if the message is not modified", () => {
-      const tgErr = new TgError("ooops", new Error("ooops"));
+      const tgErr = new TgError(new Error("ooops"), "ooops");
       tgErr.setErrorCode(400).setResponse({
         ok: false,
         result: undefined,

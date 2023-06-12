@@ -208,6 +208,45 @@ describe("[telegram api client]", () => {
           });
       });
 
+      describe("answerPreCheckoutQuery", () => {
+        it("should send data with no error", () => {
+          const queryId = "323426";
+          testApiResponse = getApiResponse(true, true);
+
+          checkApiData = (config) => {
+            expect(config.url).toBe(
+              `/bot${testApiToken}/answerPreCheckoutQuery`
+            );
+            expect(config.data).toStrictEqual({
+              pre_checkout_query_id: queryId,
+              ok: true,
+              error_message: undefined,
+            });
+          };
+
+          return api.answerPreCheckoutQuery(queryId);
+        });
+
+        it("should send proper error payload", () => {
+          const queryId = "3243412";
+          const errMessage = "some error message";
+          testApiResponse = getApiResponse(true, true);
+
+          checkApiData = (config) => {
+            expect(config.url).toBe(
+              `/bot${testApiToken}/answerPreCheckoutQuery`
+            );
+            expect(config.data).toStrictEqual({
+              pre_checkout_query_id: queryId,
+              ok: false,
+              error_message: errMessage,
+            });
+          };
+
+          return api.answerPreCheckoutQuery(queryId, errMessage);
+        });
+      });
+
       describe("leaveChat", () => {
         it("should return proper result", () => {
           const testChatId = 323426;

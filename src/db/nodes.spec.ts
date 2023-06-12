@@ -28,20 +28,6 @@ let NodesClient;
 let testPool = new MockPool(dbConfig);
 let client;
 
-const runFail = (doneFn, reason = "should not be there"): void => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn.fail(reason);
-};
-
-const runDone = (doneFn) => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn();
-};
-
 describe("Nodes DB", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
@@ -59,30 +45,17 @@ describe("Nodes DB", () => {
   });
 
   describe("not initialized", () => {
-    it("can not update state", (done) => {
-      client.updateState("test-url", true, "new-v").then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe("The table nodes is not initialized yet");
-          runDone(done);
-        }
-      );
+    it("can not update state", async () => {
+      await expect(
+        client.updateState("test-url", true, "new-v")
+      ).rejects.toThrowError("The table nodes is not initialized yet");
     });
 
-    it("init error makes api unavailable", (done) => {
-      client
-        .init()
-        .then(
-          () => runFail(done),
-          () => client.updateState("test-url", true, "new-v")
-        )
-        .then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe("The table nodes is not initialized yet");
-            runDone(done);
-          }
-        );
+    it("init error makes api unavailable", async () => {
+      await expect(client.init()).rejects.toThrow();
+      await expect(
+        client.updateState("test-url", true, "new-v")
+      ).rejects.toThrowError("The table nodes is not initialized yet");
     });
   });
 
@@ -131,7 +104,7 @@ describe("Nodes DB", () => {
       });
     });
 
-    it("fails to create the row if db did not return an item", (done) => {
+    it("fails to create the row if db did not return an item", async () => {
       const selfUrl = "some-self-url";
       const active = true;
       const version = "some-new-version";
@@ -151,13 +124,9 @@ describe("Nodes DB", () => {
         return Promise.resolve({ rows: [] });
       });
 
-      client.updateState(selfUrl, active, version).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe("Unable to get created row info");
-          runDone(done);
-        }
-      );
+      await expect(
+        client.updateState(selfUrl, active, version)
+      ).rejects.toThrowError("Unable to get created row info");
     });
 
     it("updates some existing row", () => {
@@ -211,7 +180,7 @@ describe("Nodes DB", () => {
       });
     });
 
-    it("fails to update the row if db did not return an item", (done) => {
+    it("fails to update the row if db did not return an item", async () => {
       const selfUrl = "some-self-url-2";
       const active = true;
       const prevActive = false;
@@ -246,13 +215,9 @@ describe("Nodes DB", () => {
         });
       });
 
-      client.updateState(selfUrl, active, version).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe("Unable to get updated row info");
-          runDone(done);
-        }
-      );
+      await expect(
+        client.updateState(selfUrl, active, version)
+      ).rejects.toThrowError("Unable to get updated row info");
     });
   });
 });

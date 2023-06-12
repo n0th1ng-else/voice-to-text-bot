@@ -1,11 +1,10 @@
-import axios from "axios";
 import { ScheduleDaemon } from "../scheduler/index.js";
 import { Logger } from "../logger/index.js";
-import { HealthDto, HealthStatus } from "./types.js";
+import { HealthStatus } from "./types.js";
 import { sSuffix } from "../text/index.js";
-import { getHealthUrl } from "./helpers.js";
 import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
+import { requestHealthData } from "./api.js";
 
 const logger = new Logger("uptime");
 
@@ -87,59 +86,22 @@ export class UptimeDaemon {
       )} and I have been running for (${Logger.y(daysRunning)}) already`
     );
 
-    return axios
-      .request<HealthDto>({
-        method: "GET",
-        url: getHealthUrl(this.currentUrl),
-        responseType: "json",
-      })
-      .then(({ data: health }) => {
-        if (health.status !== HealthStatus.Online) {
-          logger.error("Node status is not ok", health);
-          throw new Error("Node status is not ok");
-        }
+    return requestHealthData(this.currentUrl).then((health) => {
+      if (health.status !== HealthStatus.Online) {
+        logger.error("Node status is not ok", health);
+        throw new Error("Node status is not ok");
+      }
 
-        logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
+      logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
 
-        const isCallbackOwner = health.urls.every((url) =>
-          url.includes(this.currentUrl)
-        );
+      const isCallbackOwner = health.urls.every((url) =>
+        url.includes(this.currentUrl)
+      );
 
-        if (!isCallbackOwner && this.isRunning) {
-          this.stop();
+      if (!isCallbackOwner && this.isRunning) {
+        this.stop();
 
-          logger.warn(`Callback is not owned by ${Logger.y("this")} node`);
-
-          if (!this.stat) {
-            return;
-          }
-
-          const isActive = false;
-          return this.stat.nodes
-            .updateState(this.currentUrl, isActive, this.version)
-            .then(flattenPromise);
-        }
-      });
-  }
-
-  private onFinish(): Promise<void> {
-    return axios
-      .request<HealthDto>({
-        method: "GET",
-        url: getHealthUrl(this.nextUrl),
-        responseType: "json",
-      })
-      .then(({ data: health }) => {
-        if (health.status !== HealthStatus.Online) {
-          logger.error("Buddy node status is not ok", health);
-          throw new Error("Buddy node status is not ok");
-        }
-
-        logger.warn(
-          `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
-            this.nextUrl
-          )}`
-        );
+        logger.warn(`Callback is not owned by ${Logger.y("this")} node`);
 
         if (!this.stat) {
           return;
@@ -149,7 +111,32 @@ export class UptimeDaemon {
         return this.stat.nodes
           .updateState(this.currentUrl, isActive, this.version)
           .then(flattenPromise);
-      });
+      }
+    });
+  }
+
+  private onFinish(): Promise<void> {
+    return requestHealthData(this.nextUrl).then((health) => {
+      if (health.status !== HealthStatus.Online) {
+        logger.error("Buddy node status is not ok", health);
+        throw new Error("Buddy node status is not ok");
+      }
+
+      logger.warn(
+        `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
+          this.nextUrl
+        )}`
+      );
+
+      if (!this.stat) {
+        return;
+      }
+
+      const isActive = false;
+      return this.stat.nodes
+        .updateState(this.currentUrl, isActive, this.version)
+        .then(flattenPromise);
+    });
   }
 
   private shouldStop(): boolean {

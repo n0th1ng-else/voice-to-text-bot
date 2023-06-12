@@ -29,20 +29,6 @@ let DonationStatus;
 let testPool = new MockPool(dbConfig);
 let client;
 
-const runFail = (doneFn, reason = "should not be there"): void => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn.fail(reason);
-};
-
-const runDone = (doneFn) => {
-  if (!doneFn) {
-    throw new Error("done is not defined");
-  }
-  doneFn();
-};
-
 describe("Donations DB", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
@@ -61,62 +47,29 @@ describe("Donations DB", () => {
   });
 
   describe("not initialized", () => {
-    it("can not create row", (done) => {
-      const chatId = 23444;
-
-      client.createRow(chatId, 3).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe(
-            "The table donations is not initialized yet"
-          );
-          runDone(done);
-        }
+    it("can not create row", async () => {
+      await expect(client.createRow(23444, 3)).rejects.toThrowError(
+        "The table donations is not initialized yet"
       );
     });
 
-    it("can not update row", (done) => {
-      client.updateRow(23, DonationStatus.Pending).then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe(
-            "The table donations is not initialized yet"
-          );
-          runDone(done);
-        }
+    it("can not update row", async () => {
+      await expect(
+        client.updateRow(23, DonationStatus.Pending)
+      ).rejects.toThrowError("The table donations is not initialized yet");
+    });
+
+    it("can not iterate rows", async () => {
+      await expect(client.getPendingRows()).rejects.toThrowError(
+        "The table donations is not initialized yet"
       );
     });
 
-    it("can not iterate rows", (done) => {
-      client.getPendingRows().then(
-        () => runFail(done),
-        (err) => {
-          expect(err.message).toBe(
-            "The table donations is not initialized yet"
-          );
-          runDone(done);
-        }
+    it("init error makes api unavailable", async () => {
+      await expect(client.init()).rejects.toThrowError();
+      await expect(client.createRow(5231, 5)).rejects.toThrowError(
+        "The table donations is not initialized yet"
       );
-    });
-
-    it("init error makes api unavailable", (done) => {
-      const chatId = 5231;
-
-      client
-        .init()
-        .then(
-          () => runFail(done),
-          () => client.createRow(chatId, 5)
-        )
-        .then(
-          () => runFail(done),
-          (err) => {
-            expect(err.message).toBe(
-              "The table donations is not initialized yet"
-            );
-            runDone(done);
-          }
-        );
     });
   });
 

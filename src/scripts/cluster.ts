@@ -6,7 +6,7 @@ import { getHostName } from "../server/tunnel.js";
 
 const logger = new Logger("cluster");
 
-export const run = (): void => {
+export const run = async (): Promise<void> => {
   const launchTime = new Date().getTime();
 
   const spawnInstance = (host: string, time: number) => {

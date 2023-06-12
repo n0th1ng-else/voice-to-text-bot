@@ -52,7 +52,7 @@ export const saveBufferToFile = (
   dir: string,
   fileName?: string
 ): Promise<string> => {
-  const name = [".", dir, fileName || generateFileName()]
+  const name = [".", dir, fileName ?? generateFileName()]
     .filter(Boolean)
     .join("/");
   logger.info(`Saving the buffer into filesystem. The file name is ${name}`);
@@ -74,7 +74,9 @@ export const saveStreamToFile = (
   dir: string,
   fileName?: string
 ): Promise<string> => {
-  const name = `./${dir}/${fileName || generateFileName()}`;
+  const name = [".", dir, fileName ?? generateFileName()]
+    .filter(Boolean)
+    .join("/");
   logger.info(`Saving the stream into filesystem. The file name is ${name}`);
 
   return new Promise<string>((resolve, reject) => {
