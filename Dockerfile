@@ -13,7 +13,7 @@ WORKDIR $APP_DIR
 
 COPY package.json package-lock.json $APP_DIR
 RUN npm pkg delete scripts.prepare
-RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 ARG APP_VERSION=local
 ENV APP_VERSION ${APP_VERSION}
