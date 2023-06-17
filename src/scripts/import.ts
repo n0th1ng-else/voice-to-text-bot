@@ -62,10 +62,10 @@ export const run = async (): Promise<void> => {
     inProgress = false;
   };
 
-  app.post("/import", (req: express.Request, res: express.Response) => {
+  app.post("/import", async (req: express.Request, res: express.Response) => {
     try {
       const file = req.body;
-      importRows(file.results);
+      await importRows(file.results);
       res.status(200).send({});
     } catch (err) {
       logger.error("err", err);

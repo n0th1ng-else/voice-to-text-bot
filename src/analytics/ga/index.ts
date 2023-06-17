@@ -4,7 +4,7 @@ import { AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
 import { analytics } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
 
-const logger = new Logger("analytics:v4");
+const logger = new Logger("analytics:ga");
 
 export const collectEvents = (
   chatId: number,
@@ -13,8 +13,8 @@ export const collectEvents = (
   if (!analytics.measurementId || !analytics.apiSecret) {
     if (!isDevelopment()) {
       logger.error(
-        "v4 analytics Token is not provided!",
-        new Error("v4 analytics Token is not provided")
+        "ga analytics Token is not provided!",
+        new Error("ga analytics Token is not provided")
       );
     }
     return Promise.resolve();
@@ -50,6 +50,6 @@ export const collectEvents = (
         events,
       },
     })
-    .then(() => logger.info("Analytic data v4 has been collected"))
-    .catch((err) => logger.warn("Failed to collect analytic data v4", err));
+    .then(() => logger.info("Analytic data ga has been collected"))
+    .catch((err) => logger.warn("Failed to collect analytic data ga", err));
 };

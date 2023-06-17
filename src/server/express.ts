@@ -9,7 +9,7 @@ import { sSuffix } from "../text/index.js";
 import { UptimeDaemon } from "./uptime.js";
 import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
-import { AnalyticsData } from "../analytics/legacy/types.js";
+import { AnalyticsData } from "../analytics/ga/types.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
@@ -157,11 +157,17 @@ export class ExpressServer {
         this.threadId
       );
 
-      analytics.setError("Unknown route for the host");
-      collectAnalytics(analytics.setCommand("/app", "Server route not found"));
-      res
-        .status(404)
-        .send({ status: 404, message: "Route not found", error: "Not found" });
+      analytics.addError("Unknown route for the host");
+
+      return collectAnalytics(
+        analytics.setCommand("/app", "Server route not found")
+      ).then(() => {
+        res.status(404).send({
+          status: 404,
+          message: "Route not found",
+          error: "Not found",
+        });
+      });
     });
 
     return this;

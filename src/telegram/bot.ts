@@ -16,7 +16,7 @@ import { botCommands } from "./data.js";
 import { TelegramApi } from "./api/tgapi.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { DbClient } from "../db/index.js";
-import { AnalyticsData } from "../analytics/legacy/types.js";
+import { AnalyticsData } from "../analytics/ga/types.js";
 import { PaymentService } from "../donate/types.js";
 import { initTgReflector } from "./reflector.js";
 
@@ -210,7 +210,7 @@ export class TelegramBotModel {
       .catch((err) => {
         const errorMessage = "Unable to send no content";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(

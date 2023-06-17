@@ -1,7 +1,7 @@
 import { GenericAction } from "./common.js";
 import { TgCheckoutQuery, TgMessage } from "../api/types.js";
 import { BotMessageModel, TelegramMessagePrefix } from "../types.js";
-import { AnalyticsData } from "../../analytics/legacy/types.js";
+import { AnalyticsData } from "../../analytics/ga/types.js";
 import { DonationStatus } from "../../db/sql/donations.js";
 import { Logger } from "../../logger/index.js";
 import { parseDonationPayload } from "../helpers.js";
@@ -13,7 +13,7 @@ export class CheckoutAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     const donationId = mdl.donationId;
     if (!donationId) {
       logger.error(
@@ -33,7 +33,7 @@ export class CheckoutAction extends GenericAction {
     msg: TgCheckoutQuery,
     analytics: AnalyticsData
   ): Promise<void> {
-    analytics.v4.addPageVisit();
+    analytics.addPageVisit();
     const {
       donationId,
       chatId,

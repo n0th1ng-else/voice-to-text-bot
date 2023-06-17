@@ -11,6 +11,7 @@ interface AnalyticsEventBaseParams {
   page_title: string;
   page_referrer: typeof TelegramApi.url;
   screen_resolution: "1920x1080";
+  page_meta: string;
 }
 
 type AnalyticsError = {
@@ -62,12 +63,14 @@ const defaultLang = "not provided";
 
 type AnalyticsAction = BotCommand | "/voice" | "/app";
 
-export class AnalyticsDataV4 {
+export class AnalyticsData {
   private readonly timer: TimeMeasure;
   private events: AnalyticsEvent[] = [];
   private id = 0;
   private lang = defaultLang;
   private command: AnalyticsAction = "/app";
+  private commandTitle = "";
+  private commandMeta = "";
   private title = "Audio Message Bot";
 
   constructor(
@@ -93,12 +96,13 @@ export class AnalyticsDataV4 {
     const base: AnalyticsEventBaseParams = {
       app_version: this.appVersion,
       page_location: `${this.url}${this.command}`,
-      page_title: `${this.title} ${this.command}`,
+      page_title: `${this.title} ${this.commandTitle || this.command}`,
       thread_id: this.threadId,
       engagement_time_msec: time,
       language: this.lang,
       screen_resolution: "1920x1080",
       page_referrer: TelegramApi.url,
+      page_meta: this.commandMeta,
     };
 
     return this.events.map((event) => ({
@@ -115,8 +119,14 @@ export class AnalyticsDataV4 {
     return this;
   }
 
-  public setCommand(command: AnalyticsAction): this {
+  public setCommand(
+    command: AnalyticsAction,
+    commandTitle: string,
+    commandMeta = ""
+  ): this {
     this.command = command;
+    this.commandTitle = commandTitle;
+    this.commandMeta = commandMeta;
     return this;
   }
 

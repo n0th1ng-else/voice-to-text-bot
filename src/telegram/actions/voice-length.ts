@@ -8,10 +8,7 @@ import {
 import { isVoiceMessage, isVoiceMessageLong } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { LabelId } from "../../text/labels.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -20,8 +17,7 @@ export class VoiceLengthAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, "/voice");
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     return this.sendVoiceIsTooLongMessage(mdl, prefix);
   }
 
@@ -41,7 +37,7 @@ export class VoiceLengthAction extends GenericAction {
       }s`
     );
 
-    model.analytics.v4.addTime("voice-length", model.voiceDuration * 1_000);
+    model.analytics.addTime("voice-length", model.voiceDuration * 1_000);
 
     if (model.isGroup) {
       return collectAnalytics(
@@ -73,7 +69,7 @@ export class VoiceLengthAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to send voice is too long";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(

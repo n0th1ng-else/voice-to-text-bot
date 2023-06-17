@@ -8,10 +8,7 @@ import {
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { LabelId } from "../../text/labels.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -20,8 +17,7 @@ export class VoiceFormatAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, "/voice");
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     return this.sendWrongFormatMessage(mdl, prefix);
   }
 
@@ -79,7 +75,7 @@ export class VoiceFormatAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to send mime-type is not supported";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(

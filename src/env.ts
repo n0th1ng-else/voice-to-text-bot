@@ -52,8 +52,6 @@ export const dbPostgres = {
   port: Number(process.env.DB_PORT) || 5432,
 };
 
-export const analyticsId = process.env.GA_TRACKING_ID || "";
-
 export const analytics = {
   apiSecret: process.env.GA_V4_SECRET || "",
   measurementId: process.env.GA_V4_MEASUREMENT_ID || "",

@@ -10,7 +10,7 @@ import { VoiceLengthAction } from "./voice-length.js";
 import { DbClient } from "../../db/index.js";
 import { PaymentService } from "../../donate/types.js";
 import { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
-import { AnalyticsData } from "../../analytics/legacy/types.js";
+import { AnalyticsData } from "../../analytics/ga/types.js";
 import { TelegramButtonModel, TelegramButtonType } from "../types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -56,7 +56,7 @@ export class BotActions {
       const errorMessage = "No message passed in callback query";
       const msgError = new Error(errorMessage);
       logger.error(msgError.message, msgError);
-      analytics.setError(errorMessage);
+      analytics.addError(errorMessage);
       return collectAnalytics(
         analytics.setCommand("/app", "Callback query error", "No message")
       );
@@ -66,7 +66,7 @@ export class BotActions {
       const errorMessage = "No data passed in callback query";
       const msgError = new Error(errorMessage);
       logger.error(msgError.message, msgError);
-      analytics.setError(errorMessage);
+      analytics.addError(errorMessage);
       return collectAnalytics(
         analytics.setCommand("/app", "Callback query error", "No data")
       );
@@ -88,7 +88,7 @@ export class BotActions {
       .catch((err) => {
         const errorMessage = "Failed to execute callback query";
         logger.error(errorMessage, err);
-        analytics.setError(errorMessage);
+        analytics.addError(errorMessage);
         return collectAnalytics(
           analytics.setCommand("/app", "Callback query error", "Unknown")
         );

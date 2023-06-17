@@ -9,10 +9,7 @@ import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { LabelId } from "../../text/labels.js";
 import { LanguageCode, VoiceConverter } from "../../recognition/types.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";
 
@@ -25,8 +22,7 @@ export class VoiceAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, "/voice");
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     logger.info(`${prefix.getPrefix()} Voice message`);
     return this.getChatLanguage(mdl, prefix)
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
@@ -97,7 +93,7 @@ export class VoiceAction extends GenericAction {
           );
         }
 
-        model.analytics.v4.addTime("voice-to-text-time", time.getMs());
+        model.analytics.addTime("voice-to-text-time", time.getMs());
         const name = model.fullUserName || model.userName;
         const msgPrefix = model.isGroup && name ? `${name} ` : "";
         return this.sendRawMessage(
@@ -126,7 +122,7 @@ export class VoiceAction extends GenericAction {
           logger.error(logError, err);
         }
 
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
 
         if (model.isGroup) {
           return;
@@ -147,7 +143,7 @@ export class VoiceAction extends GenericAction {
         const errorMessage =
           "Unable to send a message that file is unable to recognize";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       });
   }
 
@@ -195,7 +191,7 @@ export class VoiceAction extends GenericAction {
         logger.error(logError, err);
       }
 
-      model.analytics.setError(errorMessage);
+      model.analytics.addError(errorMessage);
     });
   }
 
@@ -211,7 +207,7 @@ export class VoiceAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to update usage count";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       });
   }
 }
