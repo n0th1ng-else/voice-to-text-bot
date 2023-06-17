@@ -10,12 +10,9 @@ import {
 import { getDonationDtoString, isFundMessage } from "../helpers.js";
 import { LabelId } from "../../text/labels.js";
 import { Logger } from "../../logger/index.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
 import { PaymentService } from "../../donate/types.js";
-import { AnalyticsData } from "../../analytics/legacy/types.js";
+import { AnalyticsData } from "../../analytics/ga/types.js";
 import { LanguageCode } from "../../recognition/types.js";
 import { BOT_LOGO, donationLevels } from "../../const.js";
 import { TextModel } from "../../text/index.js";
@@ -29,8 +26,7 @@ export class FundAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, BotCommand.Fund);
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     return this.sendFundMessage(mdl, prefix);
   }
 
@@ -43,8 +39,7 @@ export class FundAction extends GenericAction {
     button: TelegramButtonModel,
     analytics: AnalyticsData
   ): Promise<void> {
-    collectPageAnalytics(analytics, BotCommand.Fund);
-    analytics.v4.addPageVisit();
+    analytics.addPageVisit();
     return this.formLinkButton(msg, button, analytics);
   }
 
@@ -87,7 +82,7 @@ export class FundAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to send fund message";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(
@@ -111,7 +106,7 @@ export class FundAction extends GenericAction {
         `${prefix.getPrefix()} ${errorMessage}`,
         new Error("Price is not a number")
       );
-      model.analytics.setError(errorMessage);
+      model.analytics.addError(errorMessage);
       return collectAnalytics(
         model.analytics.setCommand(
           BotCommand.Fund,
@@ -132,7 +127,7 @@ export class FundAction extends GenericAction {
             `${prefix.getPrefix()} ${errorMessage}`,
             new Error("Payment service is not set")
           );
-          model.analytics.setError(errorMessage);
+          model.analytics.addError(errorMessage);
           return collectAnalytics(
             model.analytics.setCommand(
               BotCommand.Fund,
@@ -188,7 +183,7 @@ export class FundAction extends GenericAction {
       .catch((err) => {
         const errorMessage = `Unable to create donationId for price=${price}`;
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
         throw err;
       });
   }

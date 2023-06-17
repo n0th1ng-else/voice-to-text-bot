@@ -9,10 +9,7 @@ import { isSupportMessage } from "../helpers.js";
 import { LabelId } from "../../text/labels.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -23,8 +20,7 @@ export class SupportAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, BotCommand.Support);
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     return this.sendSupportMessage(mdl, prefix);
   }
 
@@ -79,7 +75,7 @@ export class SupportAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to send support message";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(

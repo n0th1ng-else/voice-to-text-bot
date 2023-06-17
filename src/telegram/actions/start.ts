@@ -8,10 +8,7 @@ import {
 } from "../types.js";
 import { LabelId } from "../../text/labels.js";
 import { Logger } from "../../logger/index.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { collectAnalytics } from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -20,9 +17,8 @@ export class StartAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, BotCommand.Start);
-    mdl.analytics.v4.addFirstVisit();
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addFirstVisit();
+    mdl.analytics.addPageVisit();
     return this.sendHelloMessage(mdl, prefix);
   }
 
@@ -55,7 +51,7 @@ export class StartAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to send hello message";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(

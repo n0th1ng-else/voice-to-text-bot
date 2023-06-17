@@ -16,11 +16,8 @@ import {
 import { LabelId } from "../../text/labels.js";
 import { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
-import { AnalyticsData } from "../../analytics/legacy/types.js";
-import {
-  collectAnalytics,
-  collectPageAnalytics,
-} from "../../analytics/index.js";
+import { AnalyticsData } from "../../analytics/ga/types.js";
+import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
 
 const logger = new Logger("telegram-bot");
@@ -30,8 +27,7 @@ export class LangAction extends GenericAction {
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix
   ): Promise<void> {
-    collectPageAnalytics(mdl.analytics, BotCommand.Language);
-    mdl.analytics.v4.addPageVisit();
+    mdl.analytics.addPageVisit();
     return this.showLanguageSelection(mdl, prefix);
   }
 
@@ -45,8 +41,7 @@ export class LangAction extends GenericAction {
     analytics: AnalyticsData,
     query: TgCallbackQuery
   ): Promise<void> {
-    collectPageAnalytics(analytics, BotCommand.Language);
-    analytics.v4.addPageVisit();
+    analytics.addPageVisit();
     return this.handleLanguageChange(msg, button, analytics, query);
   }
 
@@ -102,7 +97,7 @@ export class LangAction extends GenericAction {
               `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
               err
             );
-            analytics.setError(errorMessage);
+            analytics.addError(errorMessage);
             return this.sendMessage(
               messageId,
               chatId,
@@ -119,7 +114,7 @@ export class LangAction extends GenericAction {
             `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
             err
           );
-          analytics.setError(errorMessage);
+          analytics.addError(errorMessage);
         })
     );
   }
@@ -215,7 +210,7 @@ export class LangAction extends GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to send language selector";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(

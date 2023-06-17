@@ -48,8 +48,6 @@ export const dbPostgres = {
   port: 5432,
 };
 
-export const analyticsId = `analytics-${randomIntFromInterval(1, 1000)}`;
-
 export const analytics = {
   apiSecret: `v4-secret-${randomIntFromInterval(1, 1000)}`,
   measurementId: `v4-${randomIntFromInterval(1, 1000)}`,

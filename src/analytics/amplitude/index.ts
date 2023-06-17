@@ -1,7 +1,7 @@
 import { init as initAmplitude } from "@amplitude/node";
 import { customAlphabet } from "nanoid";
 
-import { AnalyticsEventExt } from "../v4/types.js";
+import { AnalyticsEventExt } from "../ga/types.js";
 import { Logger } from "../../logger/index.js";
 import { amplitudeToken } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";

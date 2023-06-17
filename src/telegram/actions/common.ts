@@ -44,7 +44,7 @@ export abstract class GenericAction {
       .catch((err) => {
         const errorMessage = "Unable to get the lang";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.setError(errorMessage);
+        model.analytics.addError(errorMessage);
         return this.text.fallbackLanguage;
       });
   }

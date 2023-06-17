@@ -18,7 +18,7 @@ import { Logger } from "../logger/index.js";
 import { MenuLabel } from "../text/labels.js";
 import { TextModel } from "../text/index.js";
 import { TgInlineKeyboardButton, TgMessage } from "./api/types.js";
-import { AnalyticsData } from "../analytics/legacy/types.js";
+import { AnalyticsData } from "../analytics/ga/types.js";
 
 export enum VoiceContentReason {
   Ok = "Ok",
