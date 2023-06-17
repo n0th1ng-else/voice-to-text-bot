@@ -77,6 +77,9 @@ export class ExpressServer {
     this.app.get("/health", (_req, res: express.Response<HealthDto>) => {
       statusHandler(this.stat, res);
     });
+    this.app.get("/favicon.ico", (_req, res: express.Response<string>) => {
+      res.status(204).send("");
+    });
     this.app.get("/", (_req, res: express.Response<string>) => {
       logger.info("Received app root request");
       res.status(200).send("The app is running");
