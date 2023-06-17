@@ -2,6 +2,11 @@ name: App Deploy
 
 on:
   workflow_call:
+    inputs:
+      version:
+        type: string
+        description: "Version tag"
+        required: true
 
 jobs:
   docker:
@@ -32,7 +37,7 @@ jobs:
           tags: |
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:latest
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ github.sha }}
-          build-args: APP_VERSION=${{ github.sha }}
+          build-args: APP_VERSION=${{ github.event.inputs.version }}
 
   heroku:
     runs-on: ubuntu-latest
@@ -63,7 +68,7 @@ jobs:
         run: heroku container:push web --app ${{ vars.HEROKU_APP }} --arg APP_VERSION=${{ env.D_VERSION }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          D_VERSION: ${{ github.sha }}
+          D_VERSION: ${{ github.event.inputs.message }}
 
       - name: Release docker image
         run: heroku container:release web --app ${{ vars.HEROKU_APP }}

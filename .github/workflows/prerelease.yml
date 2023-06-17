@@ -1,7 +1,11 @@
-name: Post-release
+name: Pre-release
 
 on:
   workflow_call:
+    outputs:
+      version:
+        description: "Export version tag"
+        value: ${{ jobs.tag-release.outputs.version }}
 
 jobs:
   tag-release:
