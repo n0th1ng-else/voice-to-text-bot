@@ -1,7 +1,7 @@
 import { Express } from "express";
 import * as sentry from "@sentry/node";
 import { ProfilingIntegration } from "@sentry/profiling-node";
-import { nodeEnvironment, sentryDsn } from "../env.js";
+import { appVersion, nodeEnvironment, sentryDsn } from "../env.js";
 import { isDevelopment } from "../common/environment.js";
 
 const isEnabled = (): boolean => {
@@ -15,6 +15,7 @@ export const initSentry = (app: Express): void => {
   sentry.init({
     dsn: sentryDsn,
     environment: nodeEnvironment,
+    release: appVersion,
     integrations: [
       // enable HTTP calls tracing
       new sentry.Integrations.Http({ tracing: true }),

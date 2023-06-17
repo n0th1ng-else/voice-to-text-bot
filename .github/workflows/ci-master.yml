@@ -10,12 +10,14 @@ jobs:
     uses: ./.github/workflows/scan.yml
     secrets: inherit
 
-  deploy:
+  prerelease:
     needs: [scan]
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/prerelease.yml
     secrets: inherit
 
-  postrelease:
-    needs: [deploy]
-    uses: ./.github/workflows/postrelease.yml
+  deploy:
+    needs: [prerelease]
+    uses: ./.github/workflows/deploy.yml
     secrets: inherit
+    with:
+      version: ${{ needs.prerelease.outputs.version }}
