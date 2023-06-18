@@ -97,11 +97,7 @@ export class TelegramMessageModel {
     prefixId: string
   ): this {
     this.messageId = messageId;
-    const data = new TelegramButtonModel<LanguageCode>(
-      TelegramButtonType.Language,
-      langId,
-      prefixId
-    );
+    const data = new TelegramButtonModel<LanguageCode>("l", langId, prefixId);
 
     this.callbackData = data.getDtoString();
     return this;
@@ -113,11 +109,7 @@ export class TelegramMessageModel {
     prefixId: string
   ): this {
     this.messageId = messageId;
-    const data = new TelegramButtonModel(
-      TelegramButtonType.Donation,
-      String(price),
-      prefixId
-    );
+    const data = new TelegramButtonModel("d", String(price), prefixId);
 
     this.callbackData = data.getDtoString();
     return this;
@@ -195,7 +187,7 @@ export class TelegramMessageMetaItem {
     public readonly type: TelegramMessageMetaType,
     public readonly title: LabelId | string,
     public readonly data: string,
-    public readonly btnType = TelegramButtonType.Donation
+    public readonly btnType: TelegramButtonType = "d"
   ) {}
 }
 
@@ -251,7 +243,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
         TelegramMessageMetaType.Button,
         LabelId.BtnRussian,
         "ru-RU",
-        TelegramButtonType.Language
+        "l"
       ),
     ],
     [
@@ -259,7 +251,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
         TelegramMessageMetaType.Button,
         LabelId.BtnEnglish,
         "en-US",
-        TelegramButtonType.Language
+        "l"
       ),
     ],
   ];

@@ -4,7 +4,6 @@ import {
   BotCommand,
   BotMessageModel,
   TelegramButtonModel,
-  TelegramButtonType,
   TelegramMessagePrefix,
 } from "../types.js";
 import { getDonationDtoString, isFundMessage } from "../helpers.js";
@@ -165,7 +164,7 @@ export class FundAction extends GenericAction {
     return {
       text: TextModel.toCurrency(price, emoji),
       callback_data: new TelegramButtonModel(
-        TelegramButtonType.Donation,
+        "d",
         `${price}`,
         logId
       ).getDtoString(),
