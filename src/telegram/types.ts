@@ -121,7 +121,7 @@ export enum TelegramButtonType {
   Unknown = "u",
 }
 
-export class TelegramButtonModel {
+export class TelegramButtonModel<V extends string = string> {
   public static fromDto(dtoString: string): TelegramButtonModel {
     const dto: BotButtonDto = JSON.parse(dtoString);
     const type = getButtonTypeByText(dto.i);
@@ -130,7 +130,7 @@ export class TelegramButtonModel {
 
   constructor(
     public readonly id: TelegramButtonType,
-    public readonly value: string,
+    public readonly value: V,
     public readonly logPrefix: string
   ) {}
 

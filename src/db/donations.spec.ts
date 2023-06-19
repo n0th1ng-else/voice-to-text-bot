@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { injectDependencies } from "../testUtils/dependencies.js";
+import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
@@ -23,11 +23,11 @@ const dbConfig = {
   port: 5432,
 };
 
-let DonationsSql;
-let DonationsClient;
-let DonationStatus;
+let DonationsSql: InjectedFn["DonationsSql"];
+let DonationsClient: InjectedFn["DonationsClient"];
+let DonationStatus: InjectedFn["DonationStatus"];
 let testPool = new MockPool(dbConfig);
-let client;
+let client: InstanceType<InjectedFn["DonationsClient"]>;
 
 describe("Donations DB", () => {
   beforeAll(async () => {

@@ -8,7 +8,7 @@ import {
   beforeAll,
 } from "@jest/globals";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { injectDependencies } from "../testUtils/dependencies.js";
+import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
@@ -23,9 +23,9 @@ const dbConfig = {
   port: 5432,
 };
 
-let UsedEmailsSql;
-let UsedEmailClient;
-let client;
+let UsedEmailsSql: InjectedFn["UsedEmailsSql"];
+let UsedEmailClient: InjectedFn["UsedEmailClient"];
+let client: InstanceType<InjectedFn["UsedEmailClient"]>;
 let testPool = new MockPool(dbConfig);
 
 describe("Used Emails DB", () => {

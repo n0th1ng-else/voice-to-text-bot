@@ -10,9 +10,18 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import { injectDependencies } from "../src/testUtils/dependencies.js";
-import { injectTestDependencies } from "./helpers/dependencies.js";
+import {
+  injectDependencies,
+  InjectedFn,
+} from "../src/testUtils/dependencies.js";
+import {
+  InjectedTestFn,
+  injectTestDependencies,
+} from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { TgChatType } from "../src/telegram/api/types.js";
+import { VoiceConverterOptions } from "../src/recognition/types.js";
+import { LanguageCode } from "../src/recognition/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -40,44 +49,43 @@ let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
 // Define dependencies
-let converterOptions;
-let converter;
+let converterOptions: VoiceConverterOptions;
+let converter: InstanceType<InjectedFn["VoiceConverter"]>;
 let hostUrl: string;
-let db;
-let bot;
+let db: InstanceType<InjectedFn["DbClient"]>;
+let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let telegramServer: nock.Scope;
 let host: request.SuperTest<request.Test>;
-let chatType;
+let chatType: TgChatType;
 let testMessageId = 0;
 let testChatId = 0;
-let tgMessage;
-let mockTgReceiveUnexpectedMessage;
-let sendTelegramMessage;
-let mockUpdateBotStatUsage;
-let mockTgReceiveRawMessage;
-let mockTgGetFileUrl;
-let mockSpeechRecognition;
-let mockGetBotStatItem;
-let LanguageCode;
-let randomIntFromInterval;
-let TelegramMessageModel;
-let BotCommand;
-let LabelId;
-let mockTgReceiveMessages;
-let telegramBotName;
-let TelegramMessageMetaItem;
-let mockTgReceiveMessage;
-let TelegramMessageMetaType;
-let officialChannelAccount;
-let githubUrl;
-let getLangButtons;
-let sendTelegramCallbackMessage;
-let mockTgReceiveCallbackMessage;
-let mockUpdateBotStatLang;
-let getFundButtons;
-let botStat;
-let BotStatRecordModel;
-let testLangId;
+let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
+let mockTgReceiveUnexpectedMessage: InjectedTestFn["mockTgReceiveUnexpectedMessage"];
+let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
+let mockUpdateBotStatUsage: InjectedTestFn["mockUpdateBotStatUsage"];
+let mockTgReceiveRawMessage: InjectedTestFn["mockTgReceiveRawMessage"];
+let mockTgGetFileUrl: InjectedTestFn["mockTgGetFileUrl"];
+let mockSpeechRecognition: InjectedTestFn["mockSpeechRecognition"];
+let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
+let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
+let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
+let BotCommand: InjectedFn["BotCommand"];
+let LabelId: InjectedFn["LabelId"];
+let mockTgReceiveMessages: InjectedTestFn["mockTgReceiveMessages"];
+let telegramBotName: InjectedFn["telegramBotName"];
+let TelegramMessageMetaItem: InjectedTestFn["TelegramMessageMetaItem"];
+let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
+let TelegramMessageMetaType: InjectedTestFn["TelegramMessageMetaType"];
+let officialChannelAccount: InjectedFn["officialChannelAccount"];
+let githubUrl: InjectedFn["githubUrl"];
+let getLangButtons: InjectedTestFn["getLangButtons"];
+let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
+let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"];
+let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
+let getFundButtons: InjectedTestFn["getFundButtons"];
+let botStat: InstanceType<InjectedTestFn["BotStatRecordModel"]>;
+let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
+let testLangId: LanguageCode;
 // *EndOf Define dependencies
 
 describe("[russian language]", () => {
@@ -93,7 +101,6 @@ describe("[russian language]", () => {
     mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
     mockTgGetFileUrl = initTest.mockTgGetFileUrl;
     mockSpeechRecognition = initTest.mockSpeechRecognition;
-    LanguageCode = init.LanguageCode;
     randomIntFromInterval = init.randomIntFromInterval;
     TelegramMessageModel = initTest.TelegramMessageModel;
     BotCommand = init.BotCommand;
@@ -111,7 +118,7 @@ describe("[russian language]", () => {
     mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
     getFundButtons = initTest.getFundButtons;
     BotStatRecordModel = initTest.BotStatRecordModel;
-    testLangId = init.LanguageCode.Ru;
+    testLangId = "ru-RU";
 
     const mockGoogleAuth = initTest.mockGoogleAuth;
     const TelegramBotModel = init.TelegramBotModel;
@@ -493,7 +500,7 @@ describe("[russian language]", () => {
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
-        const newLangId = LanguageCode.Ru;
+        const newLangId: LanguageCode = "ru-RU";
         cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -532,7 +539,7 @@ describe("[russian language]", () => {
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
-        const newLangId = LanguageCode.En;
+        const newLangId: LanguageCode = "en-US";
         cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),

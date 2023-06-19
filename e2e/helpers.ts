@@ -97,7 +97,7 @@ export class TelegramMessageModel {
     prefixId: string
   ): this {
     this.messageId = messageId;
-    const data = new TelegramButtonModel(
+    const data = new TelegramButtonModel<LanguageCode>(
       TelegramButtonType.Language,
       langId,
       prefixId
@@ -204,7 +204,7 @@ export class BotStatRecordModel {
   public user = "";
   public usageCount = 0;
 
-  constructor(public chatId: number, public langId = LanguageCode.En) {}
+  constructor(public chatId: number, public langId: LanguageCode = "en-US") {}
 
   public setObjectId(objectId: number): this {
     this.objectId = String(objectId);
@@ -250,7 +250,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
         LabelId.BtnRussian,
-        LanguageCode.Ru,
+        "ru-RU",
         TelegramButtonType.Language
       ),
     ],
@@ -258,7 +258,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
         LabelId.BtnEnglish,
-        LanguageCode.En,
+        "en-US",
         TelegramButtonType.Language
       ),
     ],

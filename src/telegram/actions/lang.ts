@@ -172,12 +172,12 @@ export class LangAction extends GenericAction {
       .then((lang) => {
         const EnData = new TelegramButtonModel(
           TelegramButtonType.Language,
-          LanguageCode.En,
+          "en-US",
           prefix.id
         );
         const RuData = new TelegramButtonModel(
           TelegramButtonType.Language,
-          LanguageCode.Ru,
+          "ru-RU",
           prefix.id
         );
 

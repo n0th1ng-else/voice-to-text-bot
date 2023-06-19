@@ -1,5 +1,5 @@
 import { expect, describe, it, jest, beforeAll } from "@jest/globals";
-import { injectDependencies } from "../testUtils/dependencies.js";
+import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
@@ -25,7 +25,7 @@ const item3: TestCacheData = { testId: testId3, testData: testData3 };
 
 let cacheSize = 0;
 let CacheProvider: Awaited<typeof import("./cache.js").CacheProvider>;
-let cache;
+let cache: InstanceType<InjectedFn["CacheProvider"]>;
 
 describe("[cache]", () => {
   beforeAll(async () => {

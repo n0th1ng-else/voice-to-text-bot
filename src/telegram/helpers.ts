@@ -9,7 +9,11 @@ import {
 } from "./types.js";
 import { telegramBotName } from "../env.js";
 import { TgCallbackQuery, TgMedia, TgMessage } from "./api/types.js";
-import { LanguageCode } from "../recognition/types.js";
+import {
+  DEFAULT_LANGUAGE,
+  LanguageCode,
+  LanguageSchema,
+} from "../recognition/types.js";
 import { durationLimitSec, supportedAudioFormats } from "../const.js";
 
 export const isLangMessage = (
@@ -164,10 +168,10 @@ export const getUserLanguage = (msg: TgMessage): LanguageCode => {
   const globalPart = msgLang.slice(0, 2).toLowerCase();
 
   if (globalPart === "ru") {
-    return LanguageCode.Ru;
+    return "ru-RU";
   }
 
-  return LanguageCode.En;
+  return "en-US";
 };
 
 export const getRawUserLanguage = (
@@ -180,18 +184,15 @@ export const getLanguageByText = (
   lang: string,
   throwOnError = false
 ): LanguageCode => {
-  switch (lang) {
-    case LanguageCode.Ru:
-      return LanguageCode.Ru;
-    case LanguageCode.En:
-      return LanguageCode.En;
-    default: {
-      if (!throwOnError) {
-        return LanguageCode.En;
-      }
-
-      throw new Error(`Language code ${lang} is not recognized`);
+  try {
+    const lng = LanguageSchema.parse(lang);
+    return lng;
+  } catch (err) {
+    if (!throwOnError) {
+      return DEFAULT_LANGUAGE;
     }
+
+    throw new Error(`Language code ${lang} is not recognized`, { cause: err });
   }
 };
 

@@ -13,3 +13,5 @@ export const injectTestDependencies = async () => {
     ...donationStats,
   };
 };
+
+export type InjectedTestFn = Awaited<ReturnType<typeof injectTestDependencies>>;

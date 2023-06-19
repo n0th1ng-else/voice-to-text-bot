@@ -30,7 +30,7 @@ export const initSentry = (app: Express): void => {
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: isDevelopment() ? 1.0 : 0.2,
+    tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
     profilesSampleRate: 1.0,
   });
 };

@@ -1,12 +1,12 @@
 import { it, describe, expect, jest, beforeAll } from "@jest/globals";
-import { injectDependencies } from "../testUtils/dependencies.js";
+import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
   () => import("../logger/__mocks__/index.js")
 );
 
-let getHostName;
+let getHostName: InjectedFn["getHostName"];
 
 describe("Tunnel handling", () => {
   beforeAll(async () => {

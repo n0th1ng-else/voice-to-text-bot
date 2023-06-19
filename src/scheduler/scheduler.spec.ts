@@ -8,7 +8,8 @@ import {
   beforeAll,
 } from "@jest/globals";
 import { nanoid } from "nanoid";
-import { injectDependencies } from "../testUtils/dependencies.js";
+import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
+import { Mock } from "jest-mock";
 
 jest.unstable_mockModule(
   "../logger/index",
@@ -20,21 +21,21 @@ jest.useFakeTimers();
 const oneMinute = 60_000;
 
 let finishResult = Promise.resolve();
-let finishWatcher;
-let finishFn;
+let finishWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
+let finishFn: Mock<() => Promise<void>>;
 
 let shouldFinishResult = false;
-let shouldFinishWatcher;
-let shouldFinishFn;
+let shouldFinishWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
+let shouldFinishFn: Mock<() => boolean>;
 
 let tickResult = Promise.resolve("");
-let tickWatcher;
-let tickFn;
+let tickWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
+let tickFn: Mock<() => Promise<string>>;
 
-let ScheduleDaemon: Awaited<typeof import("./index.js").ScheduleDaemon>;
-let WaiterForCalls;
+let ScheduleDaemon: InjectedFn["ScheduleDaemon"];
+let WaiterForCalls: InjectedFn["WaiterForCalls"];
 let testId = nanoid(10);
-let scheduler;
+let scheduler: InstanceType<InjectedFn["ScheduleDaemon"]>;
 
 describe("Scheduler", () => {
   beforeAll(async () => {
@@ -64,7 +65,7 @@ describe("Scheduler", () => {
   beforeEach(() => {
     finishResult = Promise.resolve();
     testId = nanoid(10);
-    scheduler = new ScheduleDaemon<string>(testId, tickFn);
+    scheduler = new ScheduleDaemon<unknown>(testId, tickFn);
   });
 
   afterEach(() => {

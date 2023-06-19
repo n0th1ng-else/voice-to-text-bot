@@ -9,7 +9,10 @@ import {
 } from "@jest/globals";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies } from "../src/testUtils/dependencies.js";
+import {
+  injectDependencies,
+  InjectedFn,
+} from "../src/testUtils/dependencies.js";
 import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 
@@ -30,10 +33,10 @@ const dbPort = appPort + 1;
 let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
-let testPool;
-let telegramServer;
-let host;
-let bot;
+let testPool: MockPool;
+let telegramServer: nock.Scope;
+let host: request.SuperTest<request.Test>;
+let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 
 describe("error cases", () => {
   describe("server routes", () => {
