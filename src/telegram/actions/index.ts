@@ -11,7 +11,7 @@ import { DbClient } from "../../db/index.js";
 import { PaymentService } from "../../donate/types.js";
 import { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";
-import { TelegramButtonModel, TelegramButtonType } from "../types.js";
+import { TelegramButtonModel } from "../types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { CheckoutAction } from "./checkout.js";
@@ -77,9 +77,9 @@ export class BotActions {
         const button = TelegramButtonModel.fromDto(data);
 
         switch (button.id) {
-          case TelegramButtonType.Donation:
+          case "d":
             return this.fund.runCallback(message, button, analytics);
-          case TelegramButtonType.Language:
+          case "l":
             return this.lang.runCallback(message, button, analytics, msg);
           default:
             throw new Error("Unknown type passed in callback query");

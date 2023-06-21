@@ -1,5 +1,6 @@
+import { z } from "zod";
+import { nanoid } from "nanoid";
 import {
-  getButtonTypeByText,
   getChatId,
   parseDonationPayload,
   getFullUserName,
@@ -13,7 +14,6 @@ import {
   isVideoMessage,
 } from "./helpers.js";
 import { LanguageCode } from "../recognition/types.js";
-import { nanoid } from "nanoid";
 import { Logger } from "../logger/index.js";
 import { MenuLabel } from "../text/labels.js";
 import { TextModel } from "../text/index.js";
@@ -115,17 +115,32 @@ export class BotCommandOption {
   }
 }
 
-export enum TelegramButtonType {
-  Donation = "d",
-  Language = "l",
-  Unknown = "u",
-}
+const TelegramButtonTypeSchema = z
+  .union([z.literal("d"), z.literal("l"), z.literal("u")])
+  .describe("Button type schema. d is Donation, l is Language, u is Unknown");
+
+export type TelegramButtonType = z.infer<typeof TelegramButtonTypeSchema>;
+
+const ButtonSchema = z
+  .object({
+    i: TelegramButtonTypeSchema,
+    l: z.string(),
+    v: z.string(),
+  })
+  .describe(
+    "Button schema used in Telegram callback. i is Button Type, l is Log prefix, v is Value"
+  );
+
+export type BotButtonDto = z.infer<typeof ButtonSchema>;
 
 export class TelegramButtonModel<V extends string = string> {
   public static fromDto(dtoString: string): TelegramButtonModel {
-    const dto: BotButtonDto = JSON.parse(dtoString);
-    const type = getButtonTypeByText(dto.i);
-    return new TelegramButtonModel(type, dto.v, dto.l);
+    try {
+      const obj = ButtonSchema.parse(JSON.parse(dtoString));
+      return new TelegramButtonModel(obj.i, obj.v, obj.l);
+    } catch (err) {
+      return new TelegramButtonModel("u", "", "");
+    }
   }
 
   constructor(
@@ -145,20 +160,20 @@ export class TelegramButtonModel<V extends string = string> {
   }
 }
 
-interface BotButtonDto {
-  i: string; // type Identifier
-  l: string; // log prefix
-  v: string; // value
-}
-
 export interface DonationPayload {
   donationId: number;
   chatId: number;
   prefix: string;
 }
 
-export interface DonationDto {
-  d: number; // donationId
-  c: number; // chatId
-  l: string; // log prefix
-}
+export const DonationSchema = z
+  .object({
+    d: z.number(),
+    c: z.number(),
+    l: z.string(),
+  })
+  .describe(
+    "Donation schema used in Telegram callback. d is DonationId, c is ChatId, l is Log prefix"
+  );
+
+export type DonationDto = z.infer<typeof DonationSchema>;

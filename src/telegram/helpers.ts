@@ -3,7 +3,7 @@ import {
   BotMessageModel,
   DonationDto,
   DonationPayload,
-  TelegramButtonType,
+  DonationSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
 } from "./types.js";
@@ -196,17 +196,6 @@ export const getLanguageByText = (
   }
 };
 
-export const getButtonTypeByText = (type: string): TelegramButtonType => {
-  switch (type) {
-    case TelegramButtonType.Donation:
-      return TelegramButtonType.Donation;
-    case TelegramButtonType.Language:
-      return TelegramButtonType.Language;
-    default:
-      return TelegramButtonType.Unknown;
-  }
-};
-
 export const getDonationDtoString = (
   donationId: number,
   chatId: number,
@@ -221,9 +210,9 @@ export const getDonationDtoString = (
   return JSON.stringify(dto);
 };
 
-export const parseDonationPayload = (text = ""): DonationPayload => {
+export const parseDonationPayload = (dtoString = ""): DonationPayload => {
   try {
-    const obj: DonationDto = JSON.parse(text);
+    const obj = DonationSchema.parse(JSON.parse(dtoString));
     return {
       donationId: obj.d || 0,
       chatId: obj.c || 0,

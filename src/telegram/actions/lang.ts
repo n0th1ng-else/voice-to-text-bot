@@ -5,7 +5,6 @@ import {
   BotLangData,
   BotMessageModel,
   TelegramButtonModel,
-  TelegramButtonType,
   TelegramMessagePrefix,
 } from "../types.js";
 import {
@@ -170,16 +169,8 @@ export class LangAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const EnData = new TelegramButtonModel(
-          TelegramButtonType.Language,
-          "en-US",
-          prefix.id
-        );
-        const RuData = new TelegramButtonModel(
-          TelegramButtonType.Language,
-          "ru-RU",
-          prefix.id
-        );
+        const EnData = new TelegramButtonModel("l", "en-US", prefix.id);
+        const RuData = new TelegramButtonModel("l", "ru-RU", prefix.id);
 
         return this.sendMessage(
           model.id,
