@@ -10,8 +10,14 @@ import {
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { injectDependencies } from "../src/testUtils/dependencies.js";
-import { injectTestDependencies } from "./helpers/dependencies.js";
+import {
+  injectDependencies,
+  InjectedFn,
+} from "../src/testUtils/dependencies.js";
+import {
+  injectTestDependencies,
+  InjectedTestFn,
+} from "./helpers/dependencies.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
 
 jest.unstable_mockModule(
@@ -33,18 +39,18 @@ const path = "/lifecycle";
 let stopHandler: () => Promise<void> = () =>
   Promise.reject(new Error("Server did not start"));
 
-let server;
-let localhostUrl;
-let ExpressServer;
-let appVersion;
-let httpsOptions;
-let telegramServer;
-let testPool;
-let host;
-let mockTgGetWebHook;
-let hostUrl;
-let bot;
-let mockTgGetWebHookError;
+let server: InstanceType<InjectedFn["ExpressServer"]>;
+let localhostUrl: string;
+let ExpressServer: InjectedFn["ExpressServer"];
+let appVersion: InjectedFn["appVersion"];
+let httpsOptions: InjectedFn["httpsOptions"];
+let telegramServer: nock.Scope;
+let testPool: MockPool;
+let host: request.SuperTest<request.Test>;
+let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
+let hostUrl: string;
+let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let mockTgGetWebHookError: InjectedTestFn["mockTgGetWebHookError"];
 
 describe("[lifecycle]", () => {
   beforeAll(async () => {

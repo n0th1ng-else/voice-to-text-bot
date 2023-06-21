@@ -7,8 +7,12 @@ import {
   describe,
   beforeAll,
 } from "@jest/globals";
-import { injectDependencies } from "../src/testUtils/dependencies.js";
+import {
+  injectDependencies,
+  InjectedFn,
+} from "../src/testUtils/dependencies.js";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
+import { SpiedFunction } from "jest-mock";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -51,13 +55,13 @@ let clearIntervalSpy = jest
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
-let server;
-let requestHealthData;
-let ExpressServer;
-let appVersion;
-let httpsOptions;
-let waiter;
-let hostUrl;
+let server: InstanceType<InjectedFn["ExpressServer"]>;
+let requestHealthData: SpiedFunction<InjectedFn["requestHealthData"]>;
+let ExpressServer: InjectedFn["ExpressServer"];
+let appVersion: InjectedFn["appVersion"];
+let httpsOptions: InjectedFn["httpsOptions"];
+let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
+let hostUrl: string;
 const enableSSL = false;
 
 let stopHandler: () => Promise<void> = () =>
@@ -66,7 +70,7 @@ let stopHandler: () => Promise<void> = () =>
 describe("[uptime daemon]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
-    requestHealthData = init.requestHealthData;
+    requestHealthData = jest.spyOn(init, "requestHealthData");
     ExpressServer = init.ExpressServer;
     appVersion = init.appVersion;
     httpsOptions = init.httpsOptions;

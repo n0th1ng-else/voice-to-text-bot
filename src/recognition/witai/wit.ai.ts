@@ -40,7 +40,7 @@ export class WithAiProvider extends VoiceConverter {
     return getWav(fileLink, isVideo)
       .then((bufferData) => {
         logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
-        const token = lang === LanguageCode.Ru ? this.tokenRu : this.tokenEn;
+        const token = this.getApiToken(lang);
         return WithAiProvider.recognise(bufferData, token, logData.prefix);
       })
       .then((chunks) => chunks.map(({ text }) => text).join(" ") || "");
@@ -152,6 +152,15 @@ export class WithAiProvider extends VoiceConverter {
           .setBufferLength(data);
         throw witAiError;
       });
+  }
+
+  private getApiToken(lang: LanguageCode): string {
+    switch (lang) {
+      case "ru-RU":
+        return this.tokenRu;
+      default:
+        return this.tokenEn;
+    }
   }
 }
 

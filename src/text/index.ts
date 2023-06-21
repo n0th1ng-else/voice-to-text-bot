@@ -10,7 +10,7 @@ export const sSuffix = (word: string, count: number | boolean): string => {
 };
 
 export class TextModel {
-  private readonly cbLang = LanguageCode.En;
+  private readonly cbLang: LanguageCode = "en-US";
 
   public static toCurrency(amount: number, meta?: string): string {
     const amountStr = `${amount} €`;

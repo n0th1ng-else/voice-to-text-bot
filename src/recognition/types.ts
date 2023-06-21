@@ -27,10 +27,13 @@ export interface VoiceConverterOptions {
   witAiTokenRu?: string;
 }
 
-export enum LanguageCode {
-  Ru = "ru-RU",
-  En = "en-US",
-}
+export const LanguageSchema = z
+  .union([z.literal("en-US"), z.literal("ru-RU")])
+  .describe("Supported language codes");
+
+export type LanguageCode = z.infer<typeof LanguageSchema>;
+
+export const DEFAULT_LANGUAGE: LanguageCode = "en-US";
 
 export interface ConverterMeta {
   fileId: string;

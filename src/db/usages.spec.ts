@@ -8,7 +8,8 @@ import {
   jest,
 } from "@jest/globals";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { injectDependencies } from "../testUtils/dependencies.js";
+import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
+import { LanguageCode } from "../recognition/types.js";
 
 jest.unstable_mockModule(
   "../logger/index",
@@ -23,17 +24,15 @@ const dbConfig = {
   port: 5432,
 };
 
-let UsagesClient;
-let UsagesSql;
-let LanguageCode;
+let UsagesClient: InjectedFn["UsagesClient"];
+let UsagesSql: InjectedFn["UsagesSql"];
 let testPool = new MockPool(dbConfig);
-let client;
+let client: InstanceType<InjectedFn["UsagesClient"]>;
 
 describe("Usages DB", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
     UsagesClient = init.UsagesClient;
-    LanguageCode = init.LanguageCode;
     UsagesSql = init.UsagesSql;
   });
 
@@ -49,39 +48,32 @@ describe("Usages DB", () => {
   describe("not initialized", () => {
     it("can not import row", async () => {
       await expect(
-        client.importRow(
-          1234,
-          3,
-          LanguageCode.En,
-          "t-user",
-          new Date(),
-          new Date()
-        )
+        client.importRow(1234, 3, "en-US", "t-user", new Date(), new Date())
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("can not update language", async () => {
-      await expect(
-        client.updateLangId(45611, LanguageCode.Ru)
-      ).rejects.toThrowError("The table usages is not initialized yet");
+      await expect(client.updateLangId(45611, "ru-RU")).rejects.toThrowError(
+        "The table usages is not initialized yet"
+      );
     });
 
     it("can not get the language", async () => {
       await expect(
-        client.getLangId(-123123, "test-user", LanguageCode.En)
+        client.getLangId(-123123, "test-user", "en-US")
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("can not update usage count", async () => {
       await expect(
-        client.updateUsageCount(-72722, "new-name", LanguageCode.Ru)
+        client.updateUsageCount(-72722, "new-name", "ru-RU")
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrow();
       await expect(
-        client.getLangId(-123123, "test-user", LanguageCode.En)
+        client.getLangId(-123123, "test-user", "en-US")
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
   });
@@ -95,7 +87,7 @@ describe("Usages DB", () => {
     describe("creates a new row", () => {
       it("during the update language", () => {
         const chatId = 124522;
-        const langId = LanguageCode.Ru;
+        const langId: LanguageCode = "ru-RU";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
           Promise.resolve({ rows: [] })
@@ -144,7 +136,7 @@ describe("Usages DB", () => {
 
       it("during the get language", () => {
         const chatId = 124522;
-        const langId = LanguageCode.En;
+        const langId: LanguageCode = "en-US";
         const userName = "some-super-user";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
@@ -191,7 +183,7 @@ describe("Usages DB", () => {
 
       it("during the update usage count", () => {
         const chatId = 124522;
-        const langId = LanguageCode.En;
+        const langId: LanguageCode = "en-US";
         const userName = "some-super-user";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
@@ -242,7 +234,7 @@ describe("Usages DB", () => {
       it("during the row import", () => {
         const chatId = 25552342;
         const usageCount = 2114;
-        const langId = LanguageCode.Ru;
+        const langId: LanguageCode = "ru-RU";
         const userName = "alfa dude";
         const createdAt = new Date("2019-11-11");
         const updatedAt = new Date();
@@ -328,8 +320,8 @@ describe("Usages DB", () => {
         const chatId = 124522;
         const userName = "John Wo";
         const usageCount = 231;
-        const langId = LanguageCode.En;
-        const prevLangId = LanguageCode.Ru;
+        const langId: LanguageCode = "en-US";
+        const prevLangId: LanguageCode = "ru-RU";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
           Promise.resolve({
@@ -382,7 +374,7 @@ describe("Usages DB", () => {
         const chatId = -213555;
         const userName = "Spring Field";
         const usageCount = 111;
-        const langId = LanguageCode.En;
+        const langId: LanguageCode = "en-US";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
           Promise.resolve({
@@ -410,7 +402,7 @@ describe("Usages DB", () => {
         const chatId = -213555;
         const userName = "Spring Field";
         const usageCount = 111;
-        const langId = LanguageCode.En;
+        const langId: LanguageCode = "en-US";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
           Promise.resolve({
@@ -438,7 +430,7 @@ describe("Usages DB", () => {
         const chatId = 12552233;
         const userName = "superdave";
         const usageCount = 56112;
-        const langId = LanguageCode.Ru;
+        const langId: LanguageCode = "ru-RU";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
           Promise.resolve({
@@ -479,7 +471,7 @@ describe("Usages DB", () => {
         });
 
         return client
-          .updateUsageCount(chatId, userName, LanguageCode.En)
+          .updateUsageCount(chatId, userName, "en-US")
           .then((row) => {
             expect(row.usage_id).toBe(usageId);
             expect(row.chat_id).toBe(chatId);
@@ -493,7 +485,7 @@ describe("Usages DB", () => {
         const usageId = "asdgfdf=asdsada";
         const chatId = 25552342;
         const usageCount = 2114;
-        const langId = LanguageCode.Ru;
+        const langId: LanguageCode = "ru-RU";
         const userName = "alfa dude";
         const createdAt = new Date("2019-11-11");
         const updatedAt = new Date();
@@ -555,7 +547,7 @@ describe("Usages DB", () => {
     describe("unable to receive the result row", () => {
       it("on create row", async () => {
         const chatId = 124522;
-        const langId = LanguageCode.En;
+        const langId: LanguageCode = "en-US";
         const userName = "some-super-user";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
@@ -595,7 +587,7 @@ describe("Usages DB", () => {
         const chatId = 12552233;
         const userName = "superdave";
         const usageCount = 56112;
-        const langId = LanguageCode.Ru;
+        const langId: LanguageCode = "ru-RU";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
           Promise.resolve({
@@ -627,7 +619,7 @@ describe("Usages DB", () => {
         });
 
         await expect(
-          client.updateUsageCount(chatId, userName, LanguageCode.En)
+          client.updateUsageCount(chatId, userName, "en-US")
         ).rejects.toThrowError("Unable to get updated row info");
       });
     });

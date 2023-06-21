@@ -59,3 +59,5 @@ export const injectDependencies = async () => {
     ...usages,
   };
 };
+
+export type InjectedFn = Awaited<ReturnType<typeof injectDependencies>>;

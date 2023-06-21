@@ -73,7 +73,7 @@ export const menuLabels: Record<MenuLabel, string> = {
 
 export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
   // Russian
-  [LanguageCode.Ru]: {
+  ["ru-RU"]: {
     // "start" command
     [LabelId.WelcomeMessage]:
       "👋🏽 Привет! отправь мне голосовое сообщение и я распознаю его в текст",
@@ -137,7 +137,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.RecognitionEmpty]: "Я не смог найти текст в сообщении 🤔",
   },
   // English
-  [LanguageCode.En]: {
+  ["en-US"]: {
     // "start" command
     [LabelId.WelcomeMessage]:
       "👋🏽 Hey there! Send me a voice message and I will show what they are talking about in plain text",
