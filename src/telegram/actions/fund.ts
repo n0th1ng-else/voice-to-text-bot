@@ -199,24 +199,25 @@ export class FundAction extends GenericAction {
     const title = this.text.t(LabelId.DonationTitle, lang);
     const description = this.text.t(LabelId.DonationDescription, lang);
     const label = this.text.t(LabelId.DonationLabel, lang);
-    const photo = {
-      url: BOT_LOGO,
-      height: 1024,
-      width: 1024,
+
+    const invoice = {
+      chatId,
+      amount: amount * 100,
+      meta: String(donationId),
+      token,
+      title,
+      description,
+      label,
+      payload: getDonationDtoString(donationId, chatId, prefix.id),
+      photo: {
+        url: BOT_LOGO,
+        height: 1024,
+        width: 1024,
+      },
+      forumThreadId,
     };
     return this.bot
-      .sendInvoice(
-        chatId,
-        amount * 100,
-        String(donationId),
-        token,
-        title,
-        description,
-        label,
-        getDonationDtoString(donationId, chatId, prefix.id),
-        photo,
-        forumThreadId
-      )
+      .sendInvoice(invoice)
       .then(() => logger.info(`${prefix.getPrefix()} Invoice sent`))
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to send the invoice`, err);

@@ -12,6 +12,7 @@ import {
   TgCore,
   TgFile,
   TgInlineKeyboardButton,
+  TgInvoice,
   TgLeaveChatSchema,
   TgMessage,
   TgSetWebHookSchema,
@@ -156,46 +157,35 @@ export class TelegramApi {
   }
 
   // TODO add tests
-  public sendInvoice(
-    chatId: number,
-    amount: number,
-    meta: string,
-    token: string,
-    title: string,
-    description: string,
-    label: string,
-    payload: string,
-    photo: {
-      url: string;
-      height: number;
-      width: number;
-    },
-    forumThreadId?: number
-  ): Promise<TgMessage> {
+  public sendInvoice(opts: TgInvoice): Promise<TgMessage> {
     const data: InvoiceDto = {
-      chat_id: chatId,
+      chat_id: opts.chatId,
       currency: "EUR",
-      title,
-      description,
-      payload: payload,
+      title: opts.title,
+      description: opts.description,
+      payload: opts.payload,
       prices: [
         {
-          label: label,
-          amount: amount,
+          label: opts.label,
+          amount: opts.amount,
         },
       ],
-      provider_token: token,
-      start_parameter: meta,
-      photo_url: photo.url,
-      photo_width: photo.width,
-      photo_height: photo.height,
+      provider_token: opts.token,
+      start_parameter: opts.meta,
+      photo_url: opts.photo.url,
+      photo_width: opts.photo.width,
+      photo_height: opts.photo.height,
     };
 
-    if (forumThreadId) {
-      data.message_thread_id = forumThreadId;
+    if (opts.forumThreadId) {
+      data.message_thread_id = opts.forumThreadId;
     }
 
-    return this.request<TgMessage, InvoiceDto>("sendInvoice", data, chatId);
+    return this.request<TgMessage, InvoiceDto>(
+      "sendInvoice",
+      data,
+      opts.chatId
+    );
   }
 
   public leaveChat(chatId: number) {
