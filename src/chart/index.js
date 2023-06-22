@@ -401,8 +401,7 @@ const renderInstallsCumulativeChart = (drawer, rows) => {
     if (date === currentDate) {
       res[currentDayIndex].count++;
     } else {
-      const lastDayCount =
-        (res[currentDayIndex] && res[currentDayIndex].count) || 1;
+      const lastDayCount = res?.[currentDayIndex]?.count ?? 1;
       currentDayIndex++;
       currentDate = date;
 
