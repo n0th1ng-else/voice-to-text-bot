@@ -286,3 +286,32 @@ export const TgLeaveChatSchema = z
   .describe("Telegram leave chat schema");
 
 export type TgLeaveChatSchema = z.infer<typeof TgLeaveChatSchema>;
+
+const TgPhotoSchema = z
+  .object({
+    url: z.string(),
+    height: z.number(),
+    width: z.number(),
+  })
+  .describe("Telegram photo object schema");
+
+export type TgPhoto = z.infer<typeof TgPhotoSchema>;
+
+const TgInvoiceSchema = z
+  .intersection(
+    LabeledPriceSchema,
+    z.object({
+      chatId: z.number(),
+      meta: z.string(),
+      token: z.string(),
+      title: z.string(),
+      description: z.string(),
+      payload: z.string(),
+      photo: TgPhotoSchema,
+      forumThreadId: z.optional(z.number()),
+    })
+  )
+
+  .describe("Telegram invoice schema");
+
+export type TgInvoice = z.infer<typeof TgInvoiceSchema>;
