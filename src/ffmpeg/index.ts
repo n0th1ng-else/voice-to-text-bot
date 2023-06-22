@@ -54,9 +54,30 @@ const readWavBuffer = (wavStream: prism.FFmpeg): Promise<Buffer> => {
   });
 };
 
-const readWavBufferFromFile = (fileName: string): Promise<Buffer> => {
+const readWavBufferFromFileAndDelete = (
+  fileLink: string,
+  fileName: string
+): Promise<Buffer> => {
+  if (isDebug) {
+    logger.info(`The link is ${fileLink}`);
+    logger.info(`The file is ${fileName}`);
+  }
   const wavStream = getMpegDecoderStream(fileName);
-  return readWavBuffer(wavStream);
+  return readWavBuffer(wavStream)
+    .then((buff) =>
+      Promise.all([Promise.resolve(buff), deleteFileIfExists(fileName)])
+    )
+    .then(([buff]) => buff)
+    .catch((err) => deleteFileIfExists(fileName, err))
+    .then((buff) => {
+      if (typeof buff === "string") {
+        return Promise.reject(
+          new Error("wrong file output! expected Buffer received string")
+        );
+      }
+
+      return buff;
+    });
 };
 
 const readWavBufferFromStream = (stream: IncomingMessage): Promise<Buffer> => {
@@ -67,9 +88,9 @@ const readWavBufferFromStream = (stream: IncomingMessage): Promise<Buffer> => {
 const getWavBufferFromAudio = (fileLink: string): Promise<Buffer> => {
   logger.info("Converting 🎶 AUDIO into wav 💿");
 
-  return downloadAsStream(fileLink).then((stream) =>
-    // TODO refactor nested chain
-    readWavBufferFromStream(stream).then((buff) => {
+  return downloadAsStream(fileLink)
+    .then((stream) => readWavBufferFromStream(stream))
+    .then((buff) => {
       if (isDebug) {
         logger.info(`The link is ${fileLink}`);
         return saveBufferToFile(buff, "", "output.wav").then((fileName) => {
@@ -79,8 +100,7 @@ const getWavBufferFromAudio = (fileLink: string): Promise<Buffer> => {
       }
 
       return buff;
-    })
-  );
+    });
 };
 
 const getWavBufferFromVideo = (fileLink: string): Promise<Buffer> => {
@@ -88,18 +108,7 @@ const getWavBufferFromVideo = (fileLink: string): Promise<Buffer> => {
 
   return downloadAsStream(fileLink)
     .then((stream) => saveStreamToFile(stream, "video-temp"))
-    .then((fileName) =>
-      readWavBufferFromFile(fileName).finally(() => {
-        if (isDebug) {
-          logger.info(`The link is ${fileLink}`);
-          logger.info(`The file is ${fileName}`);
-          return;
-        }
-
-        // TODO refactor nested chain and .finally: does not accept Promise as a return value
-        return deleteFileIfExists(fileName);
-      })
-    );
+    .then((fileName) => readWavBufferFromFileAndDelete(fileLink, fileName));
 };
 
 export const getWav = (fileLink: string, isVideo: boolean): Promise<Buffer> =>

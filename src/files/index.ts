@@ -7,16 +7,35 @@ const logger = new Logger("media-to-wav");
 
 const generateFileName = (): string => `${nanoid()}.tmp`;
 
-export const isFileExist = (fileName: string): Promise<boolean> =>
+/**
+ * Safe, never throws
+ * @param fileName  file path to be checked
+ */
+const isFileExist = (fileName: string): Promise<boolean> =>
   promises.access(fileName).then(
     () => true,
     () => false
   );
 
+/**
+ * Safe, never throws
+ * @param fileName  file path to be deleted
+ */
+// Safe, never throws
+const deleteFile = (fileName: string): Promise<void> => {
+  return promises
+    .unlink(fileName)
+    .then(() => {
+      logger.info(`${fileName} was deleted from the filesystem`);
+    })
+    .catch((err) => {
+      logger.error(`${fileName} caused errors during the delete attempt`, err);
+    });
+};
+
 export const deleteFileIfExists = (
   fileName: string,
-  shouldThrowError = false,
-  parentErr?: Error
+  err?: Error
 ): Promise<string> => {
   logger.info(
     `Deleting a file from the filesystem. The file name is ${fileName}`
@@ -26,21 +45,13 @@ export const deleteFileIfExists = (
     .then((isExist) => {
       if (isExist) {
         logger.info(`${fileName} found on the filesystem. Trying to delete...`);
-        return promises.unlink(fileName);
+        return deleteFile(fileName);
       }
       logger.info(`${fileName} does not exists`);
     })
     .then(() => {
-      logger.info(`${fileName} was deleted from the filesystem`);
-      if (parentErr) {
-        logger.error(`${fileName} comes with an error`, parentErr);
-        return Promise.reject(parentErr);
-      }
-      return fileName;
-    })
-    .catch((err) => {
-      logger.error(`${fileName} caused errors during the delete attempt`, err);
-      if (shouldThrowError) {
+      if (err) {
+        logger.error(`${fileName} comes with an error`, err);
         return Promise.reject(err);
       }
       return fileName;
@@ -93,5 +104,5 @@ export const saveStreamToFile = (
       });
 
     stream.pipe(fileStream);
-  }).catch((err) => deleteFileIfExists(name, true, err));
+  }).catch((err) => deleteFileIfExists(name, err));
 };
