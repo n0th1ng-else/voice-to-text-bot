@@ -11,7 +11,7 @@ import {
   TelegramMessageModel,
 } from "../helpers.js";
 import { TextModel } from "../../src/text/index.js";
-import { LanguageCode } from "../../src/recognition/types.js";
+import type { LanguageCode } from "../../src/recognition/types.js";
 import { LabelId } from "../../src/text/labels.js";
 import { botCommands } from "../../src/telegram/data.js";
 import { flattenPromise } from "../../src/common/helpers.js";

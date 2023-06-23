@@ -13,6 +13,7 @@ import { AnalyticsData } from "../analytics/ga/types.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
+import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("server");
 
@@ -181,7 +182,7 @@ export class ExpressServer {
     return this;
   }
 
-  public start(): Promise<() => Promise<void>> {
+  public start(): Promise<VoidPromise> {
     logger.info(`Starting ${Logger.y(sSuffix("http", this.isHttps))} server`);
 
     const server = this.isHttps

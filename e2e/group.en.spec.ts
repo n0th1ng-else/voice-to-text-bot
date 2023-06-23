@@ -19,9 +19,10 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { TgChatType } from "../src/telegram/api/types.js";
+import type { TgChatType } from "../src/telegram/api/types.js";
 import { VoiceConverterOptions } from "../src/recognition/types.js";
-import { LanguageCode } from "../src/recognition/types.js";
+import type { LanguageCode } from "../src/recognition/types.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -45,7 +46,7 @@ const dbConfig = {
 };
 const testPool = new MockPool(dbConfig);
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 // Define dependencies

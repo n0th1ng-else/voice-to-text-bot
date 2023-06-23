@@ -13,7 +13,7 @@ import {
   isLangMessage,
 } from "../helpers.js";
 import { LabelId } from "../../text/labels.js";
-import { LanguageCode } from "../../recognition/types.js";
+import type { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";
 import { collectAnalytics } from "../../analytics/index.js";

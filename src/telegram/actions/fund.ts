@@ -12,7 +12,7 @@ import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { PaymentService } from "../../donate/types.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";
-import { LanguageCode } from "../../recognition/types.js";
+import type { LanguageCode } from "../../recognition/types.js";
 import { BOT_LOGO, donationLevels } from "../../const.js";
 import { TextModel } from "../../text/index.js";
 

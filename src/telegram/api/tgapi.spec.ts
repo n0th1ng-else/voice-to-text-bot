@@ -58,8 +58,7 @@ let checkApiData = (config: AxiosRequestConfig): void => {
   throw new Error(`Initialize check api data ${config}`);
 };
 
-// TODO fix type definition
-let testApiResponse;
+let testApiResponse: TgCore<unknown>;
 
 const clientSpy = jest
   .spyOn(axios, "create")

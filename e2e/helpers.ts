@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
-import { LanguageCode } from "../src/recognition/types.js";
+import type { LanguageCode } from "../src/recognition/types.js";
 import { LabelId } from "../src/text/labels.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
-import {
+import type {
   TgCallbackQuery,
   TgChatType,
   TgMessage,

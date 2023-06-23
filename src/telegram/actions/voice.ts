@@ -8,7 +8,7 @@ import {
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { LabelId } from "../../text/labels.js";
-import { LanguageCode, VoiceConverter } from "../../recognition/types.js";
+import { type LanguageCode, VoiceConverter } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";

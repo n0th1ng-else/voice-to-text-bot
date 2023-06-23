@@ -10,6 +10,7 @@ import {
 import { nanoid } from "nanoid";
 import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 import { Mock } from "jest-mock";
+import type { VoidPromise } from "../common/types.js";
 
 jest.unstable_mockModule(
   "../logger/index",
@@ -22,7 +23,7 @@ const oneMinute = 60_000;
 
 let finishResult = Promise.resolve();
 let finishWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
-let finishFn: Mock<() => Promise<void>>;
+let finishFn: Mock<VoidPromise>;
 
 let shouldFinishResult = false;
 let shouldFinishWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
@@ -44,7 +45,7 @@ describe("Scheduler", () => {
     WaiterForCalls = init.WaiterForCalls;
 
     finishWatcher = new WaiterForCalls();
-    finishFn = jest.fn<() => Promise<void>>().mockImplementation(() => {
+    finishFn = jest.fn<VoidPromise>().mockImplementation(() => {
       finishWatcher.tick();
       return finishResult;
     });

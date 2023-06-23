@@ -11,7 +11,7 @@ import { telegramBotName } from "../env.js";
 import { TgCallbackQuery, TgMedia, TgMessage } from "./api/types.js";
 import {
   DEFAULT_LANGUAGE,
-  LanguageCode,
+  type LanguageCode,
   LanguageSchema,
 } from "../recognition/types.js";
 import { durationLimitSec, supportedAudioFormats } from "../const.js";

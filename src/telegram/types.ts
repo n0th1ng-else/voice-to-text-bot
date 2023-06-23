@@ -13,7 +13,7 @@ import {
   isChatGroup,
   isVideoMessage,
 } from "./helpers.js";
-import { LanguageCode } from "../recognition/types.js";
+import type { LanguageCode } from "../recognition/types.js";
 import { Logger } from "../logger/index.js";
 import { MenuLabel } from "../text/labels.js";
 import { TextModel } from "../text/index.js";

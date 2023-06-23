@@ -19,6 +19,7 @@ import {
   InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -51,7 +52,7 @@ let localhostUrl: string;
 
 const path = "/health";
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 describe("[health]", () => {

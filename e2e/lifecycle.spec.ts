@@ -19,6 +19,7 @@ import {
   InjectedTestFn,
 } from "./helpers/dependencies.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -36,7 +37,7 @@ const dbPort = appPort + 1;
 
 const path = "/lifecycle";
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let server: InstanceType<InjectedFn["ExpressServer"]>;

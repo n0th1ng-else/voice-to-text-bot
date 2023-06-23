@@ -1,5 +1,5 @@
 import { expect } from "@jest/globals";
-import { LanguageCode } from "../../../src/recognition/types.js";
+import type { LanguageCode } from "../../../src/recognition/types.js";
 import { BotStatRecordModel } from "../../helpers.js";
 import { randomIntFromInterval } from "../../../src/common/timer.js";
 import { Pool as MockPool } from "../../../src/db/__mocks__/pg.js";

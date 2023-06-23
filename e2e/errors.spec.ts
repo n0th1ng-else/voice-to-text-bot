@@ -15,6 +15,7 @@ import {
 } from "../src/testUtils/dependencies.js";
 import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -30,7 +31,7 @@ const enableSSL = false;
 const appPort = 3600;
 const dbPort = appPort + 1;
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let testPool: MockPool;
