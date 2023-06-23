@@ -11,6 +11,7 @@ import {
   TgCore,
   TgFile,
   TgInlineKeyboardButton,
+  TgInvoice,
   TgLeaveChatSchema,
   TgMessage,
   TgWebHook,
@@ -243,6 +244,58 @@ describe("[telegram api client]", () => {
           };
 
           return api.answerPreCheckoutQuery(queryId, errMessage);
+        });
+      });
+
+      describe("sendInvoice", () => {
+        it("should send proper payload", () => {
+          const data: TgInvoice = {
+            amount: 1900,
+            chatId: 234211,
+            description: "Invoice reason description",
+            label: "Invoice for stuff",
+            meta: "Helpful meta",
+            payload: "External payload",
+            photo: {
+              url: "https://some.image.url",
+              height: 1024,
+              width: 768,
+            },
+            title: "donate",
+            token: "payment-token",
+          };
+          testApiResponse = getApiResponse<TgMessage>(true, {
+            date: new Date().getTime(),
+            message_id: 32411244,
+            chat: {
+              id: data.chatId,
+              type: "private",
+            },
+          });
+
+          checkApiData = (config) => {
+            expect(config.url).toBe(`/bot${testApiToken}/sendInvoice`);
+            expect(config.data).toStrictEqual({
+              chat_id: data.chatId,
+              currency: "EUR",
+              description: data.description,
+              payload: data.payload,
+              photo_height: data.photo.height,
+              photo_url: data.photo.url,
+              photo_width: data.photo.width,
+              prices: [
+                {
+                  amount: data.amount,
+                  label: data.label,
+                },
+              ],
+              provider_token: data.token,
+              start_parameter: data.meta,
+              title: data.title,
+            });
+          };
+
+          return api.sendInvoice(data);
         });
       });
 

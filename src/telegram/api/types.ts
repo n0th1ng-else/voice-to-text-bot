@@ -219,9 +219,14 @@ export type MessageDto = z.infer<typeof MessageSchema>;
 const LabeledPriceSchema = z
   .object({
     label: z.string(),
-    amount: z.number(), // Integer cents
+    /**
+     * Integer cents
+     */
+    amount: z.number(),
   })
   .describe("Telegram price schema");
+
+const TgCurrencySchema = z.literal("EUR").describe("Telegram currency schema");
 
 const InvoiceSchema = z
   .object({
@@ -230,7 +235,7 @@ const InvoiceSchema = z
     description: z.string(), // Product description
     payload: z.string(), // Internal data
     provider_token: z.string(), // Provider token
-    currency: z.string(), // EUR
+    currency: TgCurrencySchema,
     prices: z.array(LabeledPriceSchema),
     start_parameter: z.string(), // Donation id
     photo_url: z.string(),

@@ -25,7 +25,7 @@ export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
 
 export class TelegramApi {
   public static readonly url = "https://api.telegram.org";
-  public static readonly timeout = 60_000;
+  public static readonly timeout = 10_000;
 
   private static readonly path = "bot";
 
@@ -156,7 +156,6 @@ export class TelegramApi {
     );
   }
 
-  // TODO add tests
   public sendInvoice(opts: TgInvoice): Promise<TgMessage> {
     const data: InvoiceDto = {
       chat_id: opts.chatId,
