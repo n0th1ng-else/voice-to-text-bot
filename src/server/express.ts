@@ -125,13 +125,13 @@ export class ExpressServer {
         );
 
         try {
-          // TODO enforce req.body validation
-          TgUpdateSchema.parse(req.body);
+          const payload = TgUpdateSchema.parse(req.body);
+          bot.handleApiMessage(payload, analytics);
           logger.info("Incoming message validated");
-        } catch (e) {
-          logger.error("Incoming message failed validation", e);
+        } catch (err) {
+          logger.error("Incoming message failed validation", err);
         }
-        bot.handleApiMessage(req.body, analytics);
+
         res.sendStatus(200);
       });
 

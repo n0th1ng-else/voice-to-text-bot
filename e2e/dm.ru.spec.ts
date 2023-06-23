@@ -514,31 +514,6 @@ describe("[russian language]", () => {
       ]);
     });
 
-    it("responds on a voice message with broken duration", () => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        "123" as unknown as number
-      );
-      const statModel = mockGetBotStatItem(
-        testPool,
-        tgMessage.chatId,
-        botStat.langId,
-        botStat
-      );
-
-      return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
-        mockTgReceiveMessage(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          LabelId.NoContent
-        ),
-      ]);
-    });
-
     it("converts audio into text (it fits 90 sec limit)", () => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 89;

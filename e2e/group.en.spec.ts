@@ -719,23 +719,6 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on a voice file with broken duration", (done) => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        "-34" as unknown as number
-      );
-
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
-
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done && done();
-      });
-    });
-
     it("keeps calm on an audio file with wrong mime type", (done) => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 59;
@@ -745,19 +728,6 @@ describe("[default language - english]", () => {
         voiceFileDuration,
         "audio/flac"
       );
-
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
-
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done && done();
-      });
-    });
-
-    it("keeps calm on an audio file with broken duration", (done) => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setAudio(testMessageId, voiceFileId, "-1" as unknown as number);
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 

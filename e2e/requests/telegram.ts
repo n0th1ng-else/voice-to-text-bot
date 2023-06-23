@@ -17,6 +17,7 @@ import { botCommands } from "../../src/telegram/data.js";
 import { flattenPromise } from "../../src/common/helpers.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
 import { parseDonationPayload } from "../../src/telegram/helpers.js";
+import type { TgUpdate } from "../../src/telegram/api/types.js";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -30,11 +31,13 @@ export const sendTelegramMessage = (
   bot: TelegramBotModel,
   msg: TelegramMessageModel
 ): Promise<void> => {
+  const payload: TgUpdate = {
+    update_id: 12434,
+    message: msg.toApi(),
+  };
   return host
     .post(bot.getPath())
-    .send({
-      message: msg.toApi(),
-    })
+    .send(payload)
     .then((res) => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({});
@@ -46,11 +49,13 @@ export const sendTelegramCallbackMessage = (
   bot: TelegramBotModel,
   msg: TelegramMessageModel
 ): Promise<void> => {
+  const payload: TgUpdate = {
+    update_id: 12434,
+    callback_query: msg.toCallbackApi(),
+  };
   return host
     .post(bot.getPath())
-    .send({
-      callback_query: msg.toCallbackApi(),
-    })
+    .send(payload)
     .then((res) => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({});
