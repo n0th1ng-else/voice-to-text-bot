@@ -1,4 +1,4 @@
-import { LanguageCode } from "../recognition/types.js";
+import type { LanguageCode } from "../recognition/types.js";
 import { LabelId, labels, MenuLabel, menuLabels } from "./labels.js";
 
 export const sSuffix = (word: string, count: number | boolean): string => {

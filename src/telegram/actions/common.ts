@@ -4,7 +4,7 @@ import {
   MessageOptions,
   TelegramMessagePrefix,
 } from "../types.js";
-import { LanguageCode } from "../../recognition/types.js";
+import type { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
 import { TextModel } from "../../text/index.js";
 import { LabelId } from "../../text/labels.js";

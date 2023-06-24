@@ -13,6 +13,7 @@ import {
 } from "../src/testUtils/dependencies.js";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
 import { SpiedFunction } from "jest-mock";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -64,7 +65,7 @@ let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
 let hostUrl: string;
 const enableSSL = false;
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 describe("[uptime daemon]", () => {

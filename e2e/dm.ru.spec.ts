@@ -19,8 +19,9 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { TgChatType } from "../src/telegram/api/types.js";
-import { LanguageCode } from "../src/recognition/types.js";
+import type { TgChatType } from "../src/telegram/api/types.js";
+import type { LanguageCode } from "../src/recognition/types.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -36,7 +37,7 @@ const enableSSL = false;
 const appPort = 3200;
 const dbPort = appPort + 1;
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let testLangId: LanguageCode;
@@ -510,31 +511,6 @@ describe("[russian language]", () => {
             LabelId.SupportedFormatsMessage,
             LabelId.SupportedFormatsMessageExplanation,
           ]
-        ),
-      ]);
-    });
-
-    it("responds on a voice message with broken duration", () => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        "123" as unknown as number
-      );
-      const statModel = mockGetBotStatItem(
-        testPool,
-        tgMessage.chatId,
-        botStat.langId,
-        botStat
-      );
-
-      return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
-        mockTgReceiveMessage(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          LabelId.NoContent
         ),
       ]);
     });

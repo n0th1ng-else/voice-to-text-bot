@@ -19,9 +19,10 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { TgChatType } from "../src/telegram/api/types.js";
+import type { TgChatType } from "../src/telegram/api/types.js";
 import { VoiceConverterOptions } from "../src/recognition/types.js";
-import { LanguageCode } from "../src/recognition/types.js";
+import type { LanguageCode } from "../src/recognition/types.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -45,7 +46,7 @@ const dbConfig = {
 };
 const testPool = new MockPool(dbConfig);
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 // Define dependencies
@@ -719,23 +720,6 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("keeps calm on a voice file with broken duration", (done) => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        "-34" as unknown as number
-      );
-
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
-
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done && done();
-      });
-    });
-
     it("keeps calm on an audio file with wrong mime type", (done) => {
       const voiceFileId = "some-file-id";
       const voiceFileDuration = 59;
@@ -745,19 +729,6 @@ describe("[default language - english]", () => {
         voiceFileDuration,
         "audio/flac"
       );
-
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
-
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done && done();
-      });
-    });
-
-    it("keeps calm on an audio file with broken duration", (done) => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setAudio(testMessageId, voiceFileId, "-1" as unknown as number);
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 

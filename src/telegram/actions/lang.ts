@@ -13,7 +13,7 @@ import {
   isLangMessage,
 } from "../helpers.js";
 import { LabelId } from "../../text/labels.js";
-import { LanguageCode } from "../../recognition/types.js";
+import type { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -83,42 +83,46 @@ export class LangAction extends GenericAction {
     const lang = opts.langId;
     const prefix = opts.prefix;
 
-    return (
-      this.stat.usages
-        .updateLangId(chatId, lang)
-        .then(() => logger.info(`${prefix.getPrefix()} Language updated in DB`))
-        // TODO This is the only place where I use promise.then(resolveFn, rejectFn). Should refactor it.
-        .then(
-          () => this.sendLangUpdatedMessage(chatId, lang, messageId, prefix),
-          (err) => {
-            const errorMessage = "Unable to set the language in DB";
-            logger.error(
-              `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-              err
-            );
-            analytics.addError(errorMessage);
-            return this.sendMessage(
-              messageId,
-              chatId,
-              LabelId.UpdateLanguageError,
-              { lang },
-              prefix,
-              forumThreadId
-            );
-          }
-        )
-        .catch((err) => {
-          const errorMessage = "Unable to set the language";
-          logger.error(
-            `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-            err
-          );
-          analytics.addError(errorMessage);
-        })
-    );
+    return this.stat.usages
+      .updateLangId(chatId, lang)
+      .then(() => {
+        logger.info(`${prefix.getPrefix()} Language updated in DB`);
+        return true;
+      })
+      .catch((err) => {
+        const errorMessage = "Unable to set the language in DB";
+        logger.error(
+          `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
+          err
+        );
+        analytics.addError(errorMessage);
+        return false;
+      })
+      .then((isLangUpdated) => {
+        if (isLangUpdated) {
+          return this.updateLangMessage(chatId, lang, messageId, prefix);
+        }
+
+        return this.sendMessage(
+          messageId,
+          chatId,
+          LabelId.UpdateLanguageError,
+          { lang },
+          prefix,
+          forumThreadId
+        );
+      })
+      .catch((err) => {
+        const errorMessage = "Unable to send the language update message";
+        logger.error(
+          `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
+          err
+        );
+        analytics.addError(errorMessage);
+      });
   }
 
-  private sendLangUpdatedMessage(
+  private updateLangMessage(
     chatId: number,
     lang: LanguageCode,
     messageId: number,

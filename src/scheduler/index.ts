@@ -1,4 +1,5 @@
 import { Logger } from "../logger/index.js";
+import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("daemon");
 
@@ -7,7 +8,7 @@ export class ScheduleDaemon<TickData> {
   private readonly printId: string;
   private handler: NodeJS.Timeout | null = null;
   private shouldStop?: (data: TickData) => boolean;
-  private onFinish?: () => Promise<void>;
+  private onFinish?: VoidPromise;
 
   public get isRunning(): boolean {
     return !!this.handler;
@@ -22,7 +23,7 @@ export class ScheduleDaemon<TickData> {
 
   public setStopHandler(
     shouldStop: (data: TickData) => boolean,
-    onFinish: () => Promise<void>
+    onFinish: VoidPromise
   ): this {
     this.shouldStop = shouldStop;
     this.onFinish = onFinish;

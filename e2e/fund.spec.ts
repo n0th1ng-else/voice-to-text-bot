@@ -19,8 +19,9 @@ import {
   InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
-import { TgChatType } from "../src/telegram/api/types.js";
-import { LanguageCode } from "../src/recognition/types.js";
+import type { TgChatType } from "../src/telegram/api/types.js";
+import type { LanguageCode } from "../src/recognition/types.js";
+import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -47,7 +48,7 @@ const dbConfig = {
 const paymentToken = "stripe-token";
 const testPool = new MockPool(dbConfig);
 
-let stopHandler: () => Promise<void> = () =>
+let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let chatType: TgChatType;

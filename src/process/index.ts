@@ -1,10 +1,11 @@
 import { onExit } from "signal-exit";
 import { Logger } from "../logger/index.js";
+import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("stop-listener");
 
 export class StopListener {
-  private triggers: Array<() => Promise<void>> = [];
+  private triggers: VoidPromise[] = [];
 
   constructor() {
     onExit((code, signal) => {
