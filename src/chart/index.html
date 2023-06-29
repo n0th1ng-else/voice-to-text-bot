@@ -4,17 +4,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@0.1.3/src/chartjs-plugin-trendline.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@0.5.7/chartjs-plugin-annotation.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel@2.0.3/dist/chartjs-plugin-doughnutlabel.min.js"></script>
-    <script src="/index.js"></script>
+    <script type="module" src="./index.js"></script>
     <title>Chart generator</title>
 
     <style>
       .flex {
         display: flex;
+      }
+
+      .flex-1 {
+        flex: 1;
+      }
+
+      .with-gap {
+        gap: 8px;
       }
 
       .side-panel {
@@ -70,7 +73,7 @@
         </div>
         <div class="flex spaced padded">
           <label for="legacyEl">Use file (legacy)</label>
-          <input type="checkbox" id="legacyEl" onchange="switchMethod()" />
+          <input type="checkbox" id="legacyEl" />
         </div>
 
         <div class="flex spaced padded column" id="options">
@@ -82,26 +85,28 @@
             <label for="toEl">To date</label>
             <input type="date" id="toEl" />
           </div>
-          <div class="flex spaced padded">
+          <div class="flex spaced">
             <label for="usageEl">Usage count</label>
             <input type="number" id="usageEl" value="0" />
           </div>
 
-          <div class="flex spaced">
-            <label for="pgUser">Username</label>
-            <input type="text" id="pgUser" />
-          </div>
-          <div class="flex spaced">
-            <label for="pgPwd">Password</label>
-            <input type="password" id="pgPwd" />
-          </div>
-          <div class="flex spaced">
-            <label for="pgHost">Host</label>
-            <input type="tel" id="pgHost" value="rogue.db.elephantsql.com" />
-          </div>
-          <div class="flex spaced">
-            <label for="pgPort">Port</label>
-            <input type="number" id="pgPort" value="5432" />
+          <div class="db-form">
+            <div class="flex spaced">
+              <label for="pgUser" class="flex-1">Username</label>
+              <input type="text" id="pgUser" />
+            </div>
+            <div class="flex spaced">
+              <label for="pgPwd" class="flex-1">Password</label>
+              <input type="password" id="pgPwd" />
+            </div>
+            <div class="flex spaced">
+              <label for="pgHost">Host</label>
+              <input type="tel" id="pgHost" value="rogue.db.elephantsql.com" />
+            </div>
+            <div class="flex spaced">
+              <label for="pgPort">Port</label>
+              <input type="number" id="pgPort" value="5432" />
+            </div>
           </div>
         </div>
 
@@ -111,9 +116,20 @@
           </div>
         </div>
 
-        <div class="flex spaced padded">
-          <button onclick="onReset()">Reset</button>
-          <button onclick="onDraw()">Draw</button>
+        <div class="form-btn hidden">
+          <div class="flex spaced padded">
+            <div class="flex with-gap">
+              <button class="off-btn">Disconnect</button>
+              <button class="reset-btn">Reset</button>
+            </div>
+            <button class="draw-btn">Draw</button>
+          </div>
+        </div>
+
+        <div class="db-form-btn">
+          <div class="flex spaced padded">
+            <button class="on-btn">Connect</button>
+          </div>
         </div>
       </div>
 
