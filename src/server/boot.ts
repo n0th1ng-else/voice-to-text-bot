@@ -46,6 +46,7 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
       host: envy.dbPostgres.host,
       database: envy.dbPostgres.database,
       port: envy.dbPostgres.port,
+      certificate: envy.dbPostgres.cert,
     },
     threadId
   );

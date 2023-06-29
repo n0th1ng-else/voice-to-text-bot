@@ -82,7 +82,9 @@ export class BotActions {
           case "l":
             return this.lang.runCallback(message, button, analytics, msg);
           default:
-            throw new Error("Unknown type passed in callback query");
+            throw new Error(`Unknown type passed in callback query ${data}`, {
+              cause: data,
+            });
         }
       })
       .catch((err) => {
