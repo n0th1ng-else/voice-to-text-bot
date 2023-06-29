@@ -1,4 +1,4 @@
-import pg from "pg";
+import pg, { type PoolConfig } from "pg";
 import { NodesClient } from "./nodes.js";
 import { UsagesClient } from "./usages.js";
 import { Logger } from "../logger/index.js";
@@ -9,6 +9,18 @@ const { Pool } = pg;
 const logger = new Logger("postgres-client");
 
 const getPool = (config: DbConnectionConfig, threadId: number): pg.Pool => {
+  const sslOpts: Pick<PoolConfig, "ssl"> = config.certificate
+    ? {
+        ssl: {
+          rejectUnauthorized: true,
+          ca: config.certificate,
+        },
+      }
+    : {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      };
   return new Pool({
     host: config.host,
     user: config.user,
@@ -17,6 +29,7 @@ const getPool = (config: DbConnectionConfig, threadId: number): pg.Pool => {
     port: config.port,
     max: 1,
     application_name: `sql-stream-replica-${threadId}`,
+    ...sslOpts,
   });
 };
 
@@ -26,6 +39,7 @@ interface DbConnectionConfig {
   host: string;
   database: string;
   port: number;
+  certificate?: string;
 }
 
 export class DbClient {
@@ -38,11 +52,17 @@ export class DbClient {
   private ready = false;
 
   constructor(config: DbConnectionConfig, threadId = 0, p?: pg.Pool) {
-    this.initialized = Object.values(config).every((val) => val);
+    const { certificate, ...cfg } = config;
+    this.initialized = Object.values(cfg).every((val) => val);
     if (!this.initialized) {
       logger.error(
         "Missing connection data for postgres server. Check the config",
         new Error("Missing connection data for postgres server")
+      );
+    }
+    if (!certificate) {
+      logger.warn(
+        "Postgres connection is not secure, ssl certificate is not provided"
       );
     }
 

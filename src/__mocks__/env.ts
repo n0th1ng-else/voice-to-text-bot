@@ -46,6 +46,7 @@ export const dbPostgres = {
   host: "",
   database: "",
   port: 5432,
+  cert: "",
 };
 
 export const analytics = {

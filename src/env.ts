@@ -50,6 +50,7 @@ export const dbPostgres = {
   host: process.env.DB_HOST || "",
   database: process.env.DB_DATABASE || "",
   port: Number(process.env.DB_PORT) || 5432,
+  cert: process.env.DB_CERT || "",
 };
 
 export const analytics = {

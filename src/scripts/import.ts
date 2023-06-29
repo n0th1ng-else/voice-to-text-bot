@@ -28,6 +28,7 @@ export const run = async (): Promise<void> => {
     host: envy.dbPostgres.host,
     database: envy.dbPostgres.database,
     port: envy.dbPostgres.port,
+    certificate: envy.dbPostgres.cert,
   });
 
   let inProgress = false;
