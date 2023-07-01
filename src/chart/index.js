@@ -1,19 +1,85 @@
 /* eslint-env browser */
 
+// TODO optimize if too many items in the array
+
+import {
+  Chart,
+  registerables,
+} from "https://cdn.jsdelivr.net/npm/chart.js@4.3.0/+esm";
+import TrendlinePlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@2.0.3/+esm";
+import LabelsPlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/+esm";
+
+Chart.register(...registerables);
+
+const DoughnutLabelPlugin = {
+  id: "doughnutlabel",
+  beforeDatasetsDraw(chart, args, opts) {
+    const { ctx } = chart;
+    ctx.save();
+    const xCoord = chart.getDatasetMeta(0).data[0].x;
+    const yCoord = chart.getDatasetMeta(0).data[0].y;
+
+    const fontSize = opts.font.size || "60";
+    const fontColor = opts.font.color;
+    if (fontColor) {
+      ctx.fillStyle = fontColor;
+    }
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(opts.label, xCoord, yCoord);
+  },
+};
+
+const TrendLinePlugin = {
+  id: "trendline",
+  afterDatasetsDraw(chart, args, opts) {
+    const { ctx, chartArea, scales } = chart;
+    const { left, right } = chartArea;
+    ctx.save();
+
+    const lines = opts.lines;
+
+    lines.forEach((line) => {
+      ctx.beginPath();
+      ctx.lineWidth = line.lineWidth || 2;
+      ctx.strokeStyle = line.color;
+      ctx.setLineDash([2, 2]);
+      const yPos = scales.y.getPixelForValue(line.value);
+      ctx.moveTo(left, yPos);
+      ctx.lineTo(right, yPos);
+      ctx.stroke();
+    });
+  },
+};
+
+const percentageFormatter = (value, context) => {
+  const allValues = context.chart.data.datasets[0].data;
+  const sum = allValues.reduce((res, num) => res + num, 0);
+  const percentage = sum ? Math.round((value * 100) / sum) : 0;
+  return `${percentage}%`;
+};
+
 const colors = {
   regular: {
-    blue: "rgb(54,162,236)",
-    red: "rgb(255,98,132)",
-    white: "rgb(256,256,256)",
+    blue: "rgb(54, 162, 236)",
+    red: "rgb(255, 98, 132)",
+    white: "rgb(256, 256, 256)",
+    grey: "rgb(102, 102, 102)",
   },
   light: {
-    blue: "rgba(54,162,236, .8)",
-    red: "rgba(255,98,132, .8)",
+    blue: "rgba(54, 162, 236, .8)",
+    red: "rgba(255, 98, 132, .8)",
   },
   lighter: {
-    blue: "rgba(54,162,236, .15)",
-    red: "rgba(255,98,132, .15)",
+    blue: "rgba(54, 162, 236, .15)",
+    red: "rgba(255, 98, 132, .15)",
   },
+};
+
+const printError = (err, ...args) => {
+  // eslint-disable-next-line no-console
+  console.error(err, ...args);
 };
 
 let chart = null;
@@ -64,10 +130,10 @@ const onReset = () => {
   el = document.getElementById("usageEl");
   el.value = 0;
 
-  el = document.getElementById("toEl");
+  el = document.getElementById("fromEl");
   el.valueAsDate = new Date();
 
-  el = document.getElementById("fromEl");
+  el = document.getElementById("toEl");
   el.valueAsDate = new Date();
 
   el = document.getElementById("legacyEl");
@@ -89,28 +155,8 @@ const onReset = () => {
   switchMethod();
 };
 
-const onDraw = () => {
-  let el = document.getElementById("legacyEl");
-  const useFile = el.checked;
-
-  el = document.getElementById("typeEl");
-  const chartType = el.value;
-
-  if (useFile) {
-    el = document.getElementById("fileEl");
-    const file = el.files[0];
-    onFileSelect(file)
-      .then((data) => {
-        chart = drawChart(chartType, data.items);
-      })
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.error("Unable to get the rows", err);
-      });
-    return;
-  }
-
-  el = document.getElementById("usageEl");
+const getForm = () => {
+  let el = document.getElementById("usageEl");
   const usage = el.value;
 
   el = document.getElementById("toEl");
@@ -131,22 +177,45 @@ const onDraw = () => {
   el = document.getElementById("pgPort");
   const port = el.value;
 
-  fetch("/db", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ user, pwd, host, port }),
-  })
-    .then(() => fetch(`/stat?from=${from}&to=${to}&usage=${usage}`))
+  return {
+    usage,
+    from,
+    to,
+    user,
+    pwd,
+    host,
+    port,
+  };
+};
+
+const onDraw = () => {
+  let el = document.getElementById("legacyEl");
+  const useFile = el.checked;
+
+  el = document.getElementById("typeEl");
+  const chartType = el.value;
+
+  if (useFile) {
+    el = document.getElementById("fileEl");
+    const file = el.files[0];
+    onFileSelect(file)
+      .then((data) => {
+        chart = drawChart(chartType, data.items);
+      })
+      .catch((err) => {
+        printError(new Error("Unable to get the rows", { cause: err }), err);
+      });
+    return;
+  }
+
+  const { from, to, usage } = getForm();
+  fetch(`/stat?from=${from}&to=${to}&usage=${usage}`)
     .then((response) => response.json())
     .then((data) => {
       chart = drawChart(chartType, data.items);
     })
     .catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error("Unable to get the rows", err);
+      printError(new Error("Unable to get the rows", { cause: err }), err);
     });
 };
 
@@ -196,38 +265,35 @@ const renderLanguageChart = (drawer, rows) => {
     return res;
   }, {});
 
-  const dataSize = Object.keys(data).length;
+  const chartList = Object.values(data);
+
+  const chartLabels = chartList.map((val) => val.date);
+  const enData = chartList.map((val) => val.en);
+  const ruData = chartList.map((val) => val.ru);
+
+  const chartSize = chartList.length;
   const sum = {
-    en: Object.keys(data).reduce((res, key) => res + data[key].en, 0),
-    ru: Object.keys(data).reduce((res, key) => res + data[key].ru, 0),
+    en: enData.reduce((res, num) => res + num, 0),
+    ru: ruData.reduce((res, num) => res + num, 0),
   };
 
-  // eslint-disable-next-line no-undef
   return new Chart(drawer, {
     type: "bar",
+    plugins: [TrendLinePlugin],
     data: {
-      labels: Object.keys(data).reduce((res, key) => {
-        res.push(data[key].date);
-        return res;
-      }, []),
+      labels: chartLabels,
       datasets: [
         {
           label: "English chats",
           fill: false,
-          data: Object.keys(data).reduce((res, key) => {
-            res.push(data[key].en);
-            return res;
-          }, []),
+          data: enData,
           borderColor: colors.regular.red,
           backgroundColor: colors.regular.red,
         },
         {
           label: "Russian chats",
           fill: false,
-          data: Object.keys(data).reduce((res, key) => {
-            res.push(data[key].ru);
-            return res;
-          }, []),
+          data: ruData,
           borderColor: colors.regular.blue,
           backgroundColor: colors.regular.blue,
         },
@@ -235,53 +301,34 @@ const renderLanguageChart = (drawer, rows) => {
     },
     options: {
       plugins: {
-        labels: {
-          fontSize: 24,
-          fontColor: colors.regular.white,
-          render: () => "",
+        trendline: {
+          lines: [
+            {
+              value: chartSize ? sum.en / chartSize : 0,
+              color: colors.light.red,
+              lineWidth: 3,
+            },
+            {
+              value: chartSize ? sum.ru / chartSize : 0,
+              color: colors.light.blue,
+              lineWidth: 3,
+            },
+          ],
         },
       },
-      annotation: {
-        annotations: [
-          {
-            id: "ru-line",
-            type: "line",
-            mode: "horizontal",
-            scaleID: "y-axis-0",
-            value: dataSize ? sum.ru / dataSize : 0,
-            borderColor: colors.light.blue,
-            borderWidth: 2,
-            borderDash: [2, 2],
-          },
-          {
-            id: "en-line",
-            type: "line",
-            mode: "horizontal",
-            scaleID: "y-axis-0",
-            value: dataSize ? sum.en / dataSize : 0,
-            borderColor: colors.light.red,
-            borderWidth: 2,
-            borderDash: [2, 2],
-          },
-        ],
-      },
       scales: {
-        yAxes: [
-          {
-            scaleLabel: {
-              display: true,
-              labelString: "# of chats",
-            },
+        y: {
+          title: {
+            display: true,
+            text: "# of chats",
           },
-        ],
-        xAxes: [
-          {
-            scaleLabel: {
-              display: true,
-              labelString: "Date",
-            },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Date",
           },
-        ],
+        },
       },
     },
   });
@@ -301,7 +348,6 @@ const renderTotalLanguagePie = (drawer, rows) => {
     { en: 0, ru: 0 }
   );
 
-  // eslint-disable-next-line no-undef
   return new Chart(drawer, {
     type: "pie",
     data: {
@@ -313,11 +359,15 @@ const renderTotalLanguagePie = (drawer, rows) => {
         },
       ],
     },
+    plugins: [LabelsPlugin],
     options: {
       plugins: {
-        labels: {
-          fontSize: 24,
-          fontColor: colors.regular.white,
+        datalabels: {
+          formatter: percentageFormatter,
+          font: {
+            size: 24,
+          },
+          color: colors.regular.white,
         },
       },
     },
@@ -343,49 +393,46 @@ const renderInstallsChart = (drawer, rows) => {
     return res;
   }, {});
 
-  // eslint-disable-next-line no-undef
+  const chartList = Object.values(data);
+  const chartLabels = chartList.map((val) => val.date);
+  const chartData = chartList.map((val) => val.count);
+
   return new Chart(drawer, {
     type: "line",
     data: {
-      labels: Object.keys(data).reduce((res, key) => {
-        res.push(data[key].date);
-        return res;
-      }, []),
+      labels: chartLabels,
       datasets: [
         {
           label: "# of installs",
-          data: Object.keys(data).reduce((res, key) => {
-            res.push(data[key].count);
-            return res;
-          }, []),
+          data: chartData,
+          fill: true,
+          tension: 0.3,
           borderColor: colors.regular.blue,
           backgroundColor: colors.lighter.blue,
           trendlineLinear: {
-            style: colors.light.red,
-            lineStyle: "dotted|solid",
-            width: 2,
+            colorMin: colors.light.red,
+            colorMax: colors.light.red,
+            lineStyle: "dotted",
+            width: 3,
           },
         },
       ],
     },
+    plugins: [TrendlinePlugin],
     options: {
       scales: {
-        yAxes: [
-          {
-            scaleLabel: {
-              display: true,
-              labelString: "# of chats",
-            },
+        y: {
+          title: {
+            display: true,
+            text: "# of installs",
           },
-        ],
-        xAxes: [
-          {
-            scaleLabel: {
-              display: true,
-              labelString: "Date",
-            },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Date",
           },
-        ],
+        },
       },
     },
   });
@@ -411,49 +458,46 @@ const renderInstallsCumulativeChart = (drawer, rows) => {
     return res;
   }, {});
 
-  // eslint-disable-next-line no-undef
+  const chartList = Object.values(data);
+  const chartLabels = chartList.map((val) => val.date);
+  const chartData = chartList.map((val) => val.count);
+
   return new Chart(drawer, {
     type: "line",
     data: {
-      labels: Object.keys(data).reduce((res, key) => {
-        res.push(data[key].date);
-        return res;
-      }, []),
+      labels: chartLabels,
       datasets: [
         {
           label: "# of installs",
-          data: Object.keys(data).reduce((res, key) => {
-            res.push(data[key].count);
-            return res;
-          }, []),
+          data: chartData,
+          fill: true,
+          tension: 0.3,
           borderColor: colors.regular.blue,
           backgroundColor: colors.lighter.blue,
           trendlineLinear: {
-            style: colors.light.red,
-            lineStyle: "dotted|solid",
-            width: 2,
+            colorMin: colors.light.red,
+            colorMax: colors.light.red,
+            lineStyle: "dotted",
+            width: 3,
           },
         },
       ],
     },
+    plugins: [TrendlinePlugin],
     options: {
       scales: {
-        yAxes: [
-          {
-            scaleLabel: {
-              display: true,
-              labelString: "# of chats",
-            },
+        y: {
+          title: {
+            display: true,
+            text: "# of installs",
           },
-        ],
-        xAxes: [
-          {
-            scaleLabel: {
-              display: true,
-              labelString: "Date",
-            },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Date",
           },
-        ],
+        },
       },
     },
   });
@@ -472,7 +516,6 @@ const renderInstallsUsagesPie = (drawer, rows) => {
   );
   const percentage = Math.floor((data.usages * 100) / data.installs);
 
-  // eslint-disable-next-line no-undef
   return new Chart(drawer, {
     type: "doughnut",
     data: {
@@ -484,22 +527,21 @@ const renderInstallsUsagesPie = (drawer, rows) => {
         },
       ],
     },
+    plugins: [DoughnutLabelPlugin, LabelsPlugin],
     options: {
       plugins: {
-        labels: {
-          fontSize: 24,
-          fontColor: colors.regular.white,
-          render: "value",
+        datalabels: {
+          font: {
+            size: 24,
+          },
+          color: colors.regular.white,
         },
         doughnutlabel: {
-          labels: [
-            {
-              text: `${percentage}%`,
-              font: {
-                size: "60",
-              },
-            },
-          ],
+          label: `${percentage}%`,
+          font: {
+            color: colors.regular.grey,
+            size: "60",
+          },
         },
       },
     },
@@ -520,7 +562,6 @@ const renderDirectVsGroupsPie = (drawer, rows) => {
     { direct: 0, group: 0 }
   );
 
-  // eslint-disable-next-line no-undef
   return new Chart(drawer, {
     type: "pie",
     data: {
@@ -532,11 +573,15 @@ const renderDirectVsGroupsPie = (drawer, rows) => {
         },
       ],
     },
+    plugins: [LabelsPlugin],
     options: {
       plugins: {
-        labels: {
-          fontSize: 24,
-          fontColor: colors.regular.white,
+        datalabels: {
+          formatter: percentageFormatter,
+          font: {
+            size: 24,
+          },
+          color: colors.regular.white,
         },
       },
     },
@@ -557,7 +602,6 @@ const renderDirectVsGroupsUsagePie = (drawer, rows) => {
     { direct: 0, group: 0 }
   );
 
-  // eslint-disable-next-line no-undef
   return new Chart(drawer, {
     type: "pie",
     data: {
@@ -569,11 +613,15 @@ const renderDirectVsGroupsUsagePie = (drawer, rows) => {
         },
       ],
     },
+    plugins: [LabelsPlugin],
     options: {
       plugins: {
-        labels: {
-          fontSize: 24,
-          fontColor: colors.regular.white,
+        datalabels: {
+          formatter: percentageFormatter,
+          font: {
+            size: 24,
+          },
+          color: colors.regular.white,
         },
       },
     },
@@ -606,9 +654,79 @@ const drawChart = (type, rows) => {
     case "direct-group-usages":
       return renderDirectVsGroupsUsagePie(drawer, items);
     default:
-      // eslint-disable-next-line no-console
-      console.error("Unknown chart type", type);
+      printError(new Error("Unknown chart", { cause: { type } }), type);
   }
 };
 
+const toggleDbForm = (showForm) => {
+  const hideClass = "hidden";
+  const dbForm = document.querySelector(".db-form");
+  const dbFormBtn = document.querySelector(".db-form-btn");
+  const btn = document.querySelector(".form-btn");
+  if (showForm) {
+    if (dbForm.classList.contains(hideClass)) {
+      dbForm.classList.remove(hideClass);
+    }
+    if (dbFormBtn.classList.contains(hideClass)) {
+      dbFormBtn.classList.remove(hideClass);
+    }
+    if (!btn.classList.contains(hideClass)) {
+      btn.classList.add(hideClass);
+    }
+
+    return;
+  }
+
+  if (!dbForm.classList.contains(hideClass)) {
+    dbForm.classList.add(hideClass);
+  }
+  if (!dbFormBtn.classList.contains(hideClass)) {
+    dbFormBtn.classList.add(hideClass);
+  }
+  if (btn.classList.contains(hideClass)) {
+    btn.classList.remove(hideClass);
+  }
+};
+const onDisconnect = () => {
+  onReset();
+  fetch("/login", {
+    method: "DELETE",
+  })
+    .then(() => {
+      toggleDbForm(true);
+    })
+    .catch((err) => {
+      printError(new Error("Failed to disconnect db", { cause: err }), err);
+    });
+};
+
+const oonConnect = () => {
+  onReset();
+  const { user, pwd, host, port } = getForm();
+  fetch("/login", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ user, pwd, host, port }),
+  })
+    .then(() => {
+      toggleDbForm(false);
+    })
+    .catch((err) => {
+      printError(new Error("Unable to connect db", { cause: err }), err);
+    });
+};
+
+// Attaching event handlers
 window.addEventListener("DOMContentLoaded", () => onReset());
+document.querySelector(".draw-btn").addEventListener("click", () => onDraw());
+document.querySelector(".reset-btn").addEventListener("click", () => onReset());
+document
+  .querySelector(".off-btn")
+  .addEventListener("click", () => onDisconnect());
+document.querySelector(".on-btn").addEventListener("click", () => oonConnect());
+document
+  .querySelector("#legacyEl")
+  .addEventListener("change", () => switchMethod());

@@ -31,7 +31,7 @@ export const run = async (): Promise<void> => {
     res.status(200).sendFile(files.js);
   });
 
-  app.post("/db", (req: express.Request, res: express.Response) => {
+  app.post("/login", (req: express.Request, res: express.Response) => {
     if (db) {
       res.status(200).send({});
       return;
@@ -45,6 +45,17 @@ export const run = async (): Promise<void> => {
     });
 
     res.status(200).send({});
+  });
+
+  app.delete("/login", (req: express.Request, res: express.Response) => {
+    if (db) {
+      db = null;
+    }
+    res.status(200).send({});
+  });
+
+  app.get("/favicon.ico", (_req, res: express.Response<string>) => {
+    res.status(204).send("");
   });
 
   app.get("/stat", (req: express.Request, res: express.Response) => {
