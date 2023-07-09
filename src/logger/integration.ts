@@ -90,7 +90,7 @@ export const sendLogs = (
   id: string,
   prefix: string,
   message: string,
-  rawData: unknown
+  rawData: unknown,
 ): void => {
   if (!logTransports.length) {
     return;

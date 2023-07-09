@@ -19,12 +19,12 @@ export abstract class GenericAction {
 
   constructor(
     protected readonly stat: DbClient,
-    protected readonly bot: TelegramApi
+    protected readonly bot: TelegramApi,
   ) {}
 
   public abstract runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void>;
 
   public abstract runCondition(msg: TgMessage, mdl: BotMessageModel): boolean;
@@ -32,7 +32,7 @@ export abstract class GenericAction {
   public getChatLanguage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
-    lang?: LanguageCode
+    lang?: LanguageCode,
   ): Promise<LanguageCode> {
     if (lang) {
       return Promise.resolve(lang);
@@ -55,7 +55,7 @@ export abstract class GenericAction {
     ids: LabelId | LabelId[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
-    forumThreadId?: number
+    forumThreadId?: number,
   ): Promise<void> {
     const msgs = Array.isArray(ids) ? ids : [ids];
     if (!msgs.length) {
@@ -75,10 +75,10 @@ export abstract class GenericAction {
       {
         buttons: meta.options,
       },
-      forumThreadId
+      forumThreadId,
     )
       .then(() =>
-        this.sendMessage(messageId, chatId, msgs, meta, prefix, forumThreadId)
+        this.sendMessage(messageId, chatId, msgs, meta, prefix, forumThreadId),
       )
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to send the message`, err);
@@ -91,7 +91,7 @@ export abstract class GenericAction {
     messageId: number,
     meta: MessageOptions,
     id: LabelId,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.bot
       .editMessageText(chatId, messageId, this.text.t(id, meta.lang), {
@@ -108,18 +108,18 @@ export abstract class GenericAction {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
     } = {},
-    forumThreadId?: number
+    forumThreadId?: number,
   ): Promise<void> {
     const messageParts = splitTextIntoParts(
       message,
       lang,
-      TELEGRAM_API_MAX_MESSAGE_SIZE
+      TELEGRAM_API_MAX_MESSAGE_SIZE,
     );
     return this.sendRawMessageParts(
       chatId,
       messageParts,
       options,
-      forumThreadId
+      forumThreadId,
     );
   }
 
@@ -130,7 +130,7 @@ export abstract class GenericAction {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
     } = {},
-    forumThreadId?: number
+    forumThreadId?: number,
   ): Promise<void> {
     const message = messageParts.shift();
     if (!message) {
@@ -140,7 +140,7 @@ export abstract class GenericAction {
     return this.bot
       .sendMessage(chatId, message, options, forumThreadId)
       .then(() =>
-        this.sendRawMessageParts(chatId, messageParts, options, forumThreadId)
+        this.sendRawMessageParts(chatId, messageParts, options, forumThreadId),
       );
   }
 }

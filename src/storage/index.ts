@@ -9,11 +9,11 @@ export const printCurrentStorageUsage = (dir: string): Promise<void> => {
     try {
       const folder = resolvePath(process.cwd(), dir);
       const files = readdirSync(folder).filter(
-        (file) => !file.includes("gitkeep")
+        (file) => !file.includes("gitkeep"),
       );
       const cacheSizeBytes = files.reduce(
         (sum, file) => sum + statSync(resolvePath(folder, file)).size,
-        0
+        0,
       );
       const cacheSizeMBytes = Math.ceil(cacheSizeBytes / (1024 * 1000));
       const size =
@@ -31,7 +31,7 @@ export const printCurrentStorageUsage = (dir: string): Promise<void> => {
 
       logger.error(
         message,
-        new Error("The process exceeds cache storage limit")
+        new Error("The process exceeds cache storage limit"),
       );
     } catch (err) {
       logger.error("Unable to read the cache folder size", err);

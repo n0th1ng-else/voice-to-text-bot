@@ -16,6 +16,6 @@ export const parseChunkedResponse = <Dto>(body = ""): Dto[] => {
         return { prev: newPrev, acc };
       }
     },
-    { prev: "", acc: [] }
+    { prev: "", acc: [] },
   ).acc;
 };

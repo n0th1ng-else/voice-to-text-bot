@@ -13,7 +13,7 @@ export const collectEvents = (chatId: number, events: AnalyticsEventExt[]) => {
     if (!isDevelopment()) {
       logger.error(
         "Amplitude analytics token is not provided!",
-        new Error("Amplitude analytics token is not provided")
+        new Error("Amplitude analytics token is not provided"),
       );
     }
     return Promise.resolve();
@@ -45,12 +45,12 @@ export const collectEvents = (chatId: number, events: AnalyticsEventExt[]) => {
             app_version: event.params.app_version,
             event_properties: event,
             ...eventSession,
-          })
-        )
+          }),
+        ),
       );
     })
     .then(() => logger.info("Analytic data Amplitude has been collected"))
     .catch((err) =>
-      logger.warn("Failed to collect analytic data Amplitude", err)
+      logger.warn("Failed to collect analytic data Amplitude", err),
     );
 };

@@ -16,7 +16,7 @@ export class NodesClient {
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("nodes")} has been initialized`)
+        logger.info(`Table ${Logger.y("nodes")} has been initialized`),
       )
       .catch((err) => {
         logger.error(`Unable to initialize ${Logger.y("nodes")} table`, err);
@@ -27,7 +27,7 @@ export class NodesClient {
   public updateState(
     selfUrl: string,
     isActive: boolean,
-    version: string
+    version: string,
   ): Promise<NodeRowScheme> {
     return this.getRows(selfUrl).then((rows) => {
       const row = rows.shift();
@@ -41,7 +41,7 @@ export class NodesClient {
   private updateRow(
     nodeId: string,
     isActive: boolean,
-    version: string
+    version: string,
   ): Promise<NodeRowScheme> {
     logger.info(`Updating the row with id=${nodeId}`);
     return this.db
@@ -50,7 +50,7 @@ export class NodesClient {
         const id = this.db.getId(row);
         logger.info(
           `The row with id=${nodeId} has been updated`,
-          id === nodeId
+          id === nodeId,
         );
         return row;
       })
@@ -63,7 +63,7 @@ export class NodesClient {
   private createRow(
     selfUrl: string,
     isActive: boolean,
-    version: string
+    version: string,
   ): Promise<NodeRowScheme> {
     logger.info("Creating a new row");
     return this.db

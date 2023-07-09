@@ -43,7 +43,7 @@ export class TgError extends Error {
     this.url = apiToken
       ? url.replace(
           getRegExpFromString(apiToken, ["g", "i"]),
-          SANITIZE_CHARACTER
+          SANITIZE_CHARACTER,
         )
       : url;
     return this;
@@ -53,7 +53,7 @@ export class TgError extends Error {
 const assertErrCondition = (
   err: unknown,
   status: number,
-  text: string
+  text: string,
 ): boolean => {
   if (!(err instanceof TgError)) {
     return false;
@@ -69,7 +69,7 @@ export const hasNoRightsToSendMessage = (err: unknown): boolean => {
   return assertErrCondition(
     err,
     400,
-    "Bad Request: not enough rights to send text messages to the chat"
+    "Bad Request: not enough rights to send text messages to the chat",
   );
 };
 
@@ -81,6 +81,6 @@ export const isMessageNotModified = (err: unknown): boolean => {
   return assertErrCondition(
     err,
     400,
-    "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message"
+    "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
   );
 };

@@ -345,7 +345,7 @@ const renderTotalLanguagePie = (drawer, rows) => {
 
       return res;
     },
-    { en: 0, ru: 0 }
+    { en: 0, ru: 0 },
   );
 
   return new Chart(drawer, {
@@ -512,7 +512,7 @@ const renderInstallsUsagesPie = (drawer, rows) => {
 
       return res;
     },
-    { installs: 0, usages: 0 }
+    { installs: 0, usages: 0 },
   );
   const percentage = Math.floor((data.usages * 100) / data.installs);
 
@@ -559,7 +559,7 @@ const renderDirectVsGroupsPie = (drawer, rows) => {
 
       return res;
     },
-    { direct: 0, group: 0 }
+    { direct: 0, group: 0 },
   );
 
   return new Chart(drawer, {
@@ -599,7 +599,7 @@ const renderDirectVsGroupsUsagePie = (drawer, rows) => {
 
       return res;
     },
-    { direct: 0, group: 0 }
+    { direct: 0, group: 0 },
   );
 
   return new Chart(drawer, {

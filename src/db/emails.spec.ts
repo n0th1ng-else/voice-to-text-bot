@@ -12,7 +12,7 @@ import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
-  () => import("../logger/__mocks__/index.js")
+  () => import("../logger/__mocks__/index.js"),
 );
 
 const dbConfig = {
@@ -47,26 +47,26 @@ describe("Used Emails DB", () => {
   describe("not initialized", () => {
     it("can not create row", async () => {
       await expect(client.createRow("test-email")).rejects.toThrowError(
-        "The table usedemails is not initialized yet"
+        "The table usedemails is not initialized yet",
       );
     });
 
     it("can not update row", async () => {
       await expect(client.updateRow(12)).rejects.toThrowError(
-        "The table usedemails is not initialized yet"
+        "The table usedemails is not initialized yet",
       );
     });
 
     it("can not iterate rows", async () => {
       await expect(client.getRows("test-email-2")).rejects.toThrowError(
-        "The table usedemails is not initialized yet"
+        "The table usedemails is not initialized yet",
       );
     });
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrowError();
       await expect(client.createRow("test-email-3")).rejects.toThrowError(
-        "The table usedemails is not initialized yet"
+        "The table usedemails is not initialized yet",
       );
     });
   });

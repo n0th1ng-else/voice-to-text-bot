@@ -31,7 +31,7 @@ export class ExpressServer {
     private readonly port: number,
     private readonly isHttps: boolean,
     private readonly version: string,
-    private readonly httpsOptions: HttpsOptions
+    private readonly httpsOptions: HttpsOptions,
   ) {
     logger.info("Initializing express server");
 
@@ -44,7 +44,7 @@ export class ExpressServer {
 
     const statusHandler = (
       db: DbClient | null,
-      res: express.Response<HealthDto>
+      res: express.Response<HealthDto>,
     ): void => {
       const status = new HealthModel(this.version, this.isHttps, this.threadId);
       if (this.isIdle) {
@@ -115,14 +115,14 @@ export class ExpressServer {
             {
               routeId: req.params.id,
               botId: bot.getId(),
-            }
+            },
           );
         }
 
         const analytics = new AnalyticsData(
           this.version,
           this.selfUrl,
-          this.threadId
+          this.threadId,
         );
 
         try {
@@ -143,7 +143,7 @@ export class ExpressServer {
             {
               routeId: req.params.id,
               botId: bot.getId(),
-            }
+            },
           );
         }
 
@@ -158,13 +158,13 @@ export class ExpressServer {
       const analytics = new AnalyticsData(
         this.version,
         this.selfUrl,
-        this.threadId
+        this.threadId,
       );
 
       analytics.addError("Unknown route for the host");
 
       return collectAnalytics(
-        analytics.setCommand("/app", "Server route not found")
+        analytics.setCommand("/app", "Server route not found"),
       ).then(() => {
         res.status(404).send({
           status: 404,
@@ -211,7 +211,7 @@ export class ExpressServer {
                 logger.warn("Express server has stopped");
                 resolveFn();
               });
-            })
+            }),
         );
       });
     });
@@ -220,7 +220,7 @@ export class ExpressServer {
   public applyHostLocation(timeoutMs = 0): Promise<void> {
     logger.info("Setting up bot hooks");
     return Promise.all(
-      this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs))
+      this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs)),
     ).then(() => {
       this.isIdle = false;
       logger.info("Node is successfully set to be a hook receiver");
@@ -230,21 +230,21 @@ export class ExpressServer {
   public triggerDaemon(
     nextReplicaUrl: string,
     lifecycleInterval: number,
-    timeoutMs = 0
+    timeoutMs = 0,
   ): Promise<void> {
     if (!this.selfUrl) {
       return Promise.reject(
         new Error(
-          "Self url is not set for this node. Unable to set up the daemon"
-        )
+          "Self url is not set for this node. Unable to set up the daemon",
+        ),
       );
     }
 
     if (!nextReplicaUrl) {
       return Promise.reject(
         new Error(
-          "Next node url is not set for this node. Unable to set up the daemon"
-        )
+          "Next node url is not set for this node. Unable to set up the daemon",
+        ),
       );
     }
 

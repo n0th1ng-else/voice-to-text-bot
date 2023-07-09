@@ -26,12 +26,12 @@ import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js")
+  () => import("../src/logger/__mocks__/index.js"),
 );
 jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js")
+  () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
 const enableSSL = false;
@@ -145,7 +145,7 @@ describe("[default language - english]", () => {
     };
     converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions
+      converterOptions,
     );
     hostUrl = `${localhostUrl}:${appPort}`;
     db = new DbClient(dbConfig, 0, testPool);
@@ -165,7 +165,7 @@ describe("[default language - english]", () => {
       appPort,
       enableSSL,
       appVersion,
-      httpsOptions
+      httpsOptions,
     );
 
     testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
@@ -222,7 +222,7 @@ describe("[default language - english]", () => {
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
             LabelId.DonateMessage,
-          ]
+          ],
         ),
       ]);
     });
@@ -230,7 +230,7 @@ describe("[default language - english]", () => {
     it("responds on a /start message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Start}@${telegramBotName}`
+        `${BotCommand.Start}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -245,7 +245,7 @@ describe("[default language - english]", () => {
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
             LabelId.DonateMessage,
-          ]
+          ],
         ),
       ]);
     });
@@ -266,17 +266,17 @@ describe("[default language - english]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -284,7 +284,7 @@ describe("[default language - english]", () => {
     it("responds on a /support message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Support}@${telegramBotName}`
+        `${BotCommand.Support}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -300,17 +300,17 @@ describe("[default language - english]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -333,24 +333,24 @@ describe("[default language - english]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.ContactAuthor,
-                authorUrl
+                authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -360,7 +360,7 @@ describe("[default language - english]", () => {
       bot.setAuthor(authorUrl);
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Support}@${telegramBotName}`
+        `${BotCommand.Support}@${telegramBotName}`,
       );
 
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
@@ -377,24 +377,24 @@ describe("[default language - english]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.ContactAuthor,
-                authorUrl
+                authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -410,7 +410,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]);
     });
@@ -418,7 +418,7 @@ describe("[default language - english]", () => {
     it("responds on a /lang message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Language}@${telegramBotName}`
+        `${BotCommand.Language}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -429,7 +429,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]);
     });
@@ -445,7 +445,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -458,7 +458,7 @@ describe("[default language - english]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang
+            LabelId.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -468,7 +468,7 @@ describe("[default language - english]", () => {
     it("changes language using the /lang callback message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Language}@${telegramBotName}`
+        `${BotCommand.Language}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -479,7 +479,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -492,7 +492,7 @@ describe("[default language - english]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang
+            LabelId.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -516,7 +516,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `🗣 ${voiceFileContent}`
+          `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -542,7 +542,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${userName} 🗣 ${voiceFileContent}`
+          `${userName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -561,7 +561,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          getFundButtons()
+          getFundButtons(),
         ),
       ]);
     });
@@ -577,7 +577,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          getFundButtons()
+          getFundButtons(),
         ),
       ]);
     });
@@ -605,7 +605,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${firstName} 🗣 ${voiceFileContent}`
+          `${firstName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -636,7 +636,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${lastName} 🗣 ${voiceFileContent}`
+          `${lastName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -669,7 +669,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${firstName} ${lastName} 🗣 ${voiceFileContent}`
+          `${firstName} ${lastName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -708,7 +708,7 @@ describe("[default language - english]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "application/json"
+        "application/json",
       );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
@@ -727,7 +727,7 @@ describe("[default language - english]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "audio/flac"
+        "audio/flac",
       );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
@@ -756,7 +756,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `🗣 ${voiceFileContent}`
+          `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {

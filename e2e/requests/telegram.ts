@@ -29,7 +29,7 @@ const makeTelegramResponse = <D>(result: D) => {
 export const sendTelegramMessage = (
   host: request.SuperTest<request.Test>,
   bot: TelegramBotModel,
-  msg: TelegramMessageModel
+  msg: TelegramMessageModel,
 ): Promise<void> => {
   const payload: TgUpdate = {
     update_id: 12434,
@@ -47,7 +47,7 @@ export const sendTelegramMessage = (
 export const sendTelegramCallbackMessage = (
   host: request.SuperTest<request.Test>,
   bot: TelegramBotModel,
-  msg: TelegramMessageModel
+  msg: TelegramMessageModel,
 ): Promise<void> => {
   const payload: TgUpdate = {
     update_id: 12434,
@@ -100,7 +100,7 @@ export const mockTgGetWebHookError = (host: nock.Scope): void => {
 
 export const mockTgReceiveUnexpectedMessage = (
   host: nock.Scope,
-  done
+  done,
 ): void => {
   host
     .post("/bottelegram-api-token/sendMessage")
@@ -111,7 +111,7 @@ export const mockTgReceiveRawMessage = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
-  message: string
+  message: string,
 ): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
@@ -129,7 +129,7 @@ export const mockTgReceiveMessage = (
   chatId: number,
   lang: LanguageCode,
   textId: LabelId,
-  expectedMarkup: TelegramMessageMetaItem[][] = []
+  expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
@@ -157,12 +157,12 @@ export const mockTgReceiveMessage = (
             expect(receivedItem.text).toBe(
               typeof expectedItem.title === "string"
                 ? expectedItem.title
-                : text.t(expectedItem.title, lang)
+                : text.t(expectedItem.title, lang),
             );
 
             if (expectedItem.type === TelegramMessageMetaType.Button) {
               const btnData = TelegramButtonModel.fromDto(
-                receivedItem.callback_data
+                receivedItem.callback_data,
               );
 
               expect(btnData.value).toBe(expectedItem.data);
@@ -189,10 +189,10 @@ export const mockTgReceiveMessages = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
-  textIds: LabelId[]
+  textIds: LabelId[],
 ): Promise<void> => {
   return Promise.all(
-    textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId))
+    textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)),
   ).then(flattenPromise);
 };
 
@@ -214,7 +214,7 @@ export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
       resolvePath(currentDir, "..", "mockData", "sample_file.oga"),
       {
         "Content-Type": "audio/ogg",
-      }
+      },
     );
 };
 
@@ -224,7 +224,7 @@ export const mockTgReceiveCallbackMessage = (
   messageId: number,
   langId: LanguageCode,
   textId: LabelId,
-  expectedMarkup: TelegramMessageMetaItem[][] = []
+  expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<void> => {
   return new Promise((resolve) => {
     host
@@ -255,12 +255,12 @@ export const mockTgReceiveCallbackMessage = (
               expect(receivedItem.text).toBe(
                 typeof expectedItem.title === "string"
                   ? expectedItem.title
-                  : text.t(expectedItem.title, langId)
+                  : text.t(expectedItem.title, langId),
               );
 
               if (expectedItem.type === TelegramMessageMetaType.Button) {
                 const btnData = TelegramButtonModel.fromDto(
-                  receivedItem.callback_data
+                  receivedItem.callback_data,
                 );
 
                 expect(btnData.value).toBe(expectedItem.data);
@@ -289,7 +289,7 @@ export const mockTgReceiveInvoiceMessage = (
   langId: LanguageCode,
   paymentToken: string,
   donationId: number,
-  price: number
+  price: number,
 ): Promise<void> => {
   return new Promise((resolve) => {
     host.post("/bottelegram-api-token/sendInvoice").reply(200, (uri, body) => {
@@ -306,12 +306,12 @@ export const mockTgReceiveInvoiceMessage = (
 
       expect(answer.title).toBe(text.t(LabelId.DonationTitle, langId));
       expect(answer.description).toBe(
-        text.t(LabelId.DonationDescription, langId)
+        text.t(LabelId.DonationDescription, langId),
       );
       expect(answer.prices).toHaveLength(1);
       expect(answer.prices[0].amount).toBe(price * 100);
       expect(answer.prices[0].label).toBe(
-        text.t(LabelId.DonationLabel, langId)
+        text.t(LabelId.DonationLabel, langId),
       );
 
       resolve();

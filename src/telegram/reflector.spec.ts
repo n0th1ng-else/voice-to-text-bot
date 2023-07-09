@@ -12,7 +12,7 @@ let TgError;
 
 jest.unstable_mockModule(
   "../logger/index",
-  () => import("../logger/__mocks__/index.js")
+  () => import("../logger/__mocks__/index.js"),
 );
 
 let res: Promise<boolean> = Promise.resolve(true);

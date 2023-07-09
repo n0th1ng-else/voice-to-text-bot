@@ -25,12 +25,12 @@ import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js")
+  () => import("../src/logger/__mocks__/index.js"),
 );
 jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js")
+  () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
 const enableSSL = false;
@@ -127,7 +127,7 @@ describe("[default language - english]", () => {
 
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions
+      converterOptions,
     );
 
     const hostUrl = `${localhostUrl}:${appPort}`;
@@ -157,7 +157,7 @@ describe("[default language - english]", () => {
       appPort,
       enableSSL,
       appVersion,
-      httpsOptions
+      httpsOptions,
     );
 
     testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
@@ -203,7 +203,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          LabelId.NoContent,
         ),
       ]);
     });
@@ -219,7 +219,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          LabelId.NoContent,
         ),
       ]);
     });
@@ -235,7 +235,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          LabelId.NoContent,
         ),
       ]);
     });
@@ -255,7 +255,7 @@ describe("[default language - english]", () => {
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
             LabelId.DonateMessage,
-          ]
+          ],
         ),
       ]);
     });
@@ -276,17 +276,17 @@ describe("[default language - english]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -309,24 +309,24 @@ describe("[default language - english]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.ContactAuthor,
-                authorUrl
+                authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -342,7 +342,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]);
     });
@@ -358,7 +358,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -371,7 +371,7 @@ describe("[default language - english]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang
+            LabelId.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -389,7 +389,7 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          getFundButtons()
+          getFundButtons(),
         ),
       ]);
     });
@@ -411,13 +411,13 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.InProgress
+          LabelId.InProgress,
         ),
         mockTgReceiveRawMessage(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `🗣 ${voiceFileContent}`
+          `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -437,7 +437,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [LabelId.LongVoiceMessage]
+          [LabelId.LongVoiceMessage],
         ),
       ]);
     });
@@ -455,7 +455,7 @@ describe("[default language - english]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "broken/type"
+        "broken/type",
       );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -469,7 +469,7 @@ describe("[default language - english]", () => {
             LabelId.AudioNotSupportedMessage,
             LabelId.SupportedFormatsMessage,
             LabelId.SupportedFormatsMessageExplanation,
-          ]
+          ],
         ),
       ]);
     });
@@ -485,7 +485,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          LabelId.NoContent,
         ),
       ]);
     });
@@ -507,13 +507,13 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.InProgress
+          LabelId.InProgress,
         ),
         mockTgReceiveRawMessage(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `🗣 ${voiceFileContent}`
+          `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -533,7 +533,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [LabelId.LongVoiceMessage]
+          [LabelId.LongVoiceMessage],
         ),
       ]);
     });
@@ -545,7 +545,7 @@ describe("[default language - english]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "broken/test"
+        "broken/test",
       );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -559,7 +559,7 @@ describe("[default language - english]", () => {
             LabelId.AudioNotSupportedMessage,
             LabelId.SupportedFormatsMessage,
             LabelId.SupportedFormatsMessageExplanation,
-          ]
+          ],
         ),
       ]);
     });
@@ -575,7 +575,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent
+          LabelId.NoContent,
         ),
       ]);
     });

@@ -33,7 +33,7 @@ export const initTgReflector = (token: string): ApiErrorReflector => {
 
           logger.error(
             "Tried to leave the chat, receive false as a result",
-            logData
+            logData,
           );
         })
         .catch((error) => {

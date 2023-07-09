@@ -16,14 +16,14 @@ export class ScheduleDaemon<TickData> {
 
   constructor(
     private readonly id: string,
-    private readonly onTick: () => Promise<TickData>
+    private readonly onTick: () => Promise<TickData>,
   ) {
     this.printId = `[${this.id}]`;
   }
 
   public setStopHandler(
     shouldStop: (data: TickData) => boolean,
-    onFinish: VoidPromise
+    onFinish: VoidPromise,
   ): this {
     this.shouldStop = shouldStop;
     this.onFinish = onFinish;
@@ -63,15 +63,15 @@ export class ScheduleDaemon<TickData> {
     this.onTick()
       .then((data) => {
         logger.info(
-          `${Logger.g(this.printId)} Daemon tick executed successfully`
+          `${Logger.g(this.printId)} Daemon tick executed successfully`,
         );
         return this.stopIfNeeded(data);
       })
       .catch((err) =>
         logger.error(
           `${Logger.r(this.printId)} Error occurred during the tick execution`,
-          err
-        )
+          err,
+        ),
       );
   }
 
@@ -83,7 +83,9 @@ export class ScheduleDaemon<TickData> {
     logger.info(`${Logger.g(this.printId)} Evaluating if daemon needs to stop`);
     if (!this.shouldStop(data)) {
       logger.info(
-        `${Logger.g(this.printId)} Daemon is live and waiting for the next tick`
+        `${Logger.g(
+          this.printId,
+        )} Daemon is live and waiting for the next tick`,
       );
       return Promise.resolve();
     }

@@ -24,7 +24,7 @@ const logger = new Logger("telegram-bot");
 export class LangAction extends GenericAction {
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     return this.showLanguageSelection(mdl, prefix);
@@ -38,7 +38,7 @@ export class LangAction extends GenericAction {
     msg: TgMessage,
     button: TelegramButtonModel,
     analytics: AnalyticsData,
-    query: TgCallbackQuery
+    query: TgCallbackQuery,
   ): Promise<void> {
     analytics.addPageVisit();
     return this.handleLanguageChange(msg, button, analytics, query);
@@ -48,7 +48,7 @@ export class LangAction extends GenericAction {
     message: TgMessage,
     button: TelegramButtonModel,
     analytics: AnalyticsData,
-    msg: TgCallbackQuery
+    msg: TgCallbackQuery,
   ): Promise<void> {
     const messageId = message.message_id;
     const chatId = message.chat.id;
@@ -60,16 +60,16 @@ export class LangAction extends GenericAction {
 
     return this.getLangData(chatId, button)
       .then((opts) =>
-        this.updateLanguage(opts, chatId, messageId, analytics, forumThreadId)
+        this.updateLanguage(opts, chatId, messageId, analytics, forumThreadId),
       )
       .then(() =>
         collectAnalytics(
           analytics.setCommand(
             BotCommand.Language,
             "Language message",
-            "Callback"
-          )
-        )
+            "Callback",
+          ),
+        ),
       );
   }
 
@@ -78,7 +78,7 @@ export class LangAction extends GenericAction {
     chatId: number,
     messageId: number,
     analytics: AnalyticsData,
-    forumThreadId?: number
+    forumThreadId?: number,
   ): Promise<void> {
     const lang = opts.langId;
     const prefix = opts.prefix;
@@ -93,7 +93,7 @@ export class LangAction extends GenericAction {
         const errorMessage = "Unable to set the language in DB";
         logger.error(
           `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-          err
+          err,
         );
         analytics.addError(errorMessage);
         return false;
@@ -109,14 +109,14 @@ export class LangAction extends GenericAction {
           LabelId.UpdateLanguageError,
           { lang },
           prefix,
-          forumThreadId
+          forumThreadId,
         );
       })
       .catch((err) => {
         const errorMessage = "Unable to send the language update message";
         logger.error(
           `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-          err
+          err,
         );
         analytics.addError(errorMessage);
       });
@@ -126,20 +126,20 @@ export class LangAction extends GenericAction {
     chatId: number,
     lang: LanguageCode,
     messageId: number,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.editMessage(
       chatId,
       messageId,
       { lang },
       LabelId.ChangeLang,
-      prefix
+      prefix,
     )
       .catch((err) => {
         if (isMessageNotModified(err)) {
           return logger.warn(
             `${prefix.getPrefix()} Unable to edit language selector. Most likely it is already updated but the user clicked button multiple times`,
-            err
+            err,
           );
         }
         throw err;
@@ -149,11 +149,13 @@ export class LangAction extends GenericAction {
 
   private getLangData(
     chatId: number,
-    button: TelegramButtonModel
+    button: TelegramButtonModel,
   ): Promise<BotLangData> {
     if (!button.value) {
       return Promise.reject(
-        new Error("No language data received. Unable to handle language change")
+        new Error(
+          "No language data received. Unable to handle language change",
+        ),
       );
     }
 
@@ -167,7 +169,7 @@ export class LangAction extends GenericAction {
 
   private showLanguageSelection(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending language selection message`);
 
@@ -198,7 +200,7 @@ export class LangAction extends GenericAction {
             ],
           },
           prefix,
-          model.forumThreadId
+          model.forumThreadId,
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Language selector sent`))
@@ -212,9 +214,9 @@ export class LangAction extends GenericAction {
           model.analytics.setCommand(
             BotCommand.Language,
             "Language message",
-            "Init"
-          )
-        )
+            "Init",
+          ),
+        ),
       );
   }
 }

@@ -57,12 +57,12 @@ export class DbClient {
     if (!this.initialized) {
       logger.error(
         "Missing connection data for postgres server. Check the config",
-        new Error("Missing connection data for postgres server")
+        new Error("Missing connection data for postgres server"),
       );
     }
     if (!certificate) {
       logger.warn(
-        "Postgres connection is not secure, ssl certificate is not provided"
+        "Postgres connection is not secure, ssl certificate is not provided",
       );
     }
 

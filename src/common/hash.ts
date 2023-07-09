@@ -7,7 +7,7 @@ export const getMd5Hash = (...parts: HashPart[]): string => {
     .update(
       parts
         .map((part) => (typeof part === "string" ? part : String(part)))
-        .join(":")
+        .join(":"),
     )
     .digest("hex");
 };

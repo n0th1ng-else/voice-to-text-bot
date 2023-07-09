@@ -27,7 +27,7 @@ export class HealthModel {
   constructor(
     private readonly version: string,
     isHttps: boolean,
-    private readonly threadId: number
+    private readonly threadId: number,
   ) {
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }

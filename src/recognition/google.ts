@@ -33,7 +33,7 @@ export class GoogleProvider extends VoiceConverter {
     fileLink: string,
     isVideo: boolean,
     lang: LanguageCode,
-    opts: ConverterMeta
+    opts: ConverterMeta,
   ): Promise<string> {
     const name = `${opts.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
@@ -60,7 +60,7 @@ export class GoogleProvider extends VoiceConverter {
   }
 
   private unpackTranscription(
-    translationData: google.cloud.speech.v1.IRecognizeResponse
+    translationData: google.cloud.speech.v1.IRecognizeResponse,
   ): Promise<string> {
     const res = translationData.results || [];
     const transcription = res

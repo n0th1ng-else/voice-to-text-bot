@@ -8,21 +8,21 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
 
   constructor(
     private readonly cacheSize: number,
-    private readonly idKey: UniqId
+    private readonly idKey: UniqId,
   ) {
     if (!this.hasCacheEnabled()) {
       logger.warn(
         `Cache size is ${Logger.y(
-          sSuffix("item", cacheSize)
+          sSuffix("item", cacheSize),
         )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(
-          String(idKey)
-        )} stat`
+          String(idKey),
+        )} stat`,
       );
     } else {
       logger.warn(
         `Cache size is ${Logger.y(
-          sSuffix("item", cacheSize)
-        )} initialized for ${Logger.y(String(idKey))} stat`
+          sSuffix("item", cacheSize),
+        )} initialized for ${Logger.y(String(idKey))} stat`,
       );
     }
   }
@@ -37,23 +37,23 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
         `The item with ${String(this.idKey)}=${
           item[this.idKey]
         } can not have empty index value. Caching skipped`,
-        new Error("Cache item can not have empty index value")
+        new Error("Cache item can not have empty index value"),
       );
       return;
     }
 
     logger.info(
-      `Adding cache item with ${String(this.idKey)}=${item[this.idKey]}`
+      `Adding cache item with ${String(this.idKey)}=${item[this.idKey]}`,
     );
 
     const existingItem = this.cache.find(
-      (cItem) => cItem[this.idKey] === item[this.idKey]
+      (cItem) => cItem[this.idKey] === item[this.idKey],
     );
     if (existingItem) {
       logger.warn(
         `The item with ${String(this.idKey)}=${
           item[this.idKey]
-        } is already exists. Removing old data from the cache`
+        } is already exists. Removing old data from the cache`,
       );
 
       this.removeItem(item[this.idKey]);
@@ -64,21 +64,21 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     if (newCacheData.length > this.cacheSize) {
       logger.warn(
         `Cache storage exceeds the limit of ${Logger.y(
-          sSuffix("item", this.cacheSize)
+          sSuffix("item", this.cacheSize),
         )} and have a size of ${Logger.y(
-          sSuffix("item", newCacheData.length)
-        )}. Old records will be removed to keep storage under the limit`
+          sSuffix("item", newCacheData.length),
+        )}. Old records will be removed to keep storage under the limit`,
       );
     }
 
     this.cache = newCacheData.slice(
-      Math.max(newCacheData.length - this.cacheSize, 0)
+      Math.max(newCacheData.length - this.cacheSize, 0),
     );
 
     logger.info(
       `Added cache item with ${String(this.idKey)}=${
         item[this.idKey]
-      }. Cache size=${this.cache.length}`
+      }. Cache size=${this.cache.length}`,
     );
   }
 
@@ -88,22 +88,22 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     }
 
     logger.info(
-      `Looking for item with ${String(this.idKey)}=${idValue} in cache`
+      `Looking for item with ${String(this.idKey)}=${idValue} in cache`,
     );
 
     const cachedItem = this.cache.find(
-      (cItem) => cItem[this.idKey] === idValue
+      (cItem) => cItem[this.idKey] === idValue,
     );
 
     if (!cachedItem) {
       logger.info(
-        `Did not find the item with ${String(this.idKey)}=${idValue} in cache`
+        `Did not find the item with ${String(this.idKey)}=${idValue} in cache`,
       );
       return null;
     }
 
     logger.info(
-      `Found the item with ${String(this.idKey)}=${idValue} in cache`
+      `Found the item with ${String(this.idKey)}=${idValue} in cache`,
     );
     return cachedItem;
   }
@@ -120,7 +120,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     logger.info(
       `Removed cache item for ${String(this.idKey)}=${idValue}. Cache size=${
         this.cache.length
-      }`
+      }`,
     );
   }
 

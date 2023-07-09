@@ -30,7 +30,7 @@ export enum VoiceContentReason {
 export class VoiceContentReasonModel {
   constructor(
     public readonly type: VoiceContentReason,
-    public readonly info?: string | number
+    public readonly info?: string | number,
   ) {}
 }
 
@@ -68,7 +68,7 @@ export class BotMessageModel {
     this.isVideo = isVideoMessage(msg);
     this.userLanguage = getUserLanguage(msg);
     this.donationId = parseDonationPayload(
-      msg.successful_payment?.invoice_payload
+      msg.successful_payment?.invoice_payload,
     ).donationId;
     if (msg.is_topic_message && msg.message_thread_id) {
       this.forumThreadId = msg.message_thread_id;
@@ -91,7 +91,7 @@ export interface MessageOptions {
 export class TelegramMessagePrefix {
   constructor(
     public readonly chatId: number,
-    public readonly id = nanoid(10)
+    public readonly id = nanoid(10),
   ) {}
 
   public getPrefix(): string {
@@ -102,14 +102,17 @@ export class TelegramMessagePrefix {
 export class BotLangData {
   constructor(
     public readonly langId: LanguageCode,
-    public readonly prefix: TelegramMessagePrefix
+    public readonly prefix: TelegramMessagePrefix,
   ) {}
 }
 
 export class BotCommandOption {
   public readonly description: string;
 
-  constructor(public readonly command: BotCommand, textId: MenuLabel) {
+  constructor(
+    public readonly command: BotCommand,
+    textId: MenuLabel,
+  ) {
     const textLib = new TextModel();
     this.description = textLib.menu(textId);
   }
@@ -128,7 +131,7 @@ const ButtonSchema = z
     v: z.string(),
   })
   .describe(
-    "Button schema used in Telegram callback. i is Button Type, l is Log prefix, v is Value"
+    "Button schema used in Telegram callback. i is Button Type, l is Log prefix, v is Value",
   );
 
 export type BotButtonDto = z.infer<typeof ButtonSchema>;
@@ -146,7 +149,7 @@ export class TelegramButtonModel<V extends string = string> {
   constructor(
     public readonly id: TelegramButtonType,
     public readonly value: V,
-    public readonly logPrefix: string
+    public readonly logPrefix: string,
   ) {}
 
   public getDtoString(): string {
@@ -173,7 +176,7 @@ export const DonationSchema = z
     l: z.string(),
   })
   .describe(
-    "Donation schema used in Telegram callback. d is DonationId, c is ChatId, l is Log prefix"
+    "Donation schema used in Telegram callback. d is DonationId, c is ChatId, l is Log prefix",
   );
 
 export type DonationDto = z.infer<typeof DonationSchema>;

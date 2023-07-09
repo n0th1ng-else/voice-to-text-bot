@@ -26,7 +26,7 @@ const getApiResponse = <Response>(
   errorCode?: number,
   errorDescription?: string,
   retryAfter?: number,
-  migrateChatId?: number
+  migrateChatId?: number,
 ): TgCore<Response> => {
   const hasMeta = migrateChatId || retryAfter;
   return {
@@ -48,7 +48,7 @@ const getPromiseError = <R>(fn: () => Promise<R>): Promise<TgError> =>
   new Promise((resolve, reject) => {
     fn().then(
       (data) => reject(data),
-      (err) => resolve(err)
+      (err) => resolve(err),
     );
   });
 
@@ -170,7 +170,7 @@ describe("[telegram api client]", () => {
 
         return api.getFileLink(testFileId).then((fileUrl) => {
           expect(fileUrl).toBe(
-            `${TelegramApi.url}/file/bot${testApiToken}/${testFilePath}`
+            `${TelegramApi.url}/file/bot${testApiToken}/${testFilePath}`,
           );
         });
       });
@@ -215,7 +215,7 @@ describe("[telegram api client]", () => {
 
           checkApiData = (config) => {
             expect(config.url).toBe(
-              `/bot${testApiToken}/answerPreCheckoutQuery`
+              `/bot${testApiToken}/answerPreCheckoutQuery`,
             );
             expect(config.data).toStrictEqual({
               pre_checkout_query_id: queryId,
@@ -234,7 +234,7 @@ describe("[telegram api client]", () => {
 
           checkApiData = (config) => {
             expect(config.url).toBe(
-              `/bot${testApiToken}/answerPreCheckoutQuery`
+              `/bot${testApiToken}/answerPreCheckoutQuery`,
             );
             expect(config.data).toStrictEqual({
               pre_checkout_query_id: queryId,
@@ -326,15 +326,15 @@ describe("[telegram api client]", () => {
           return api.leaveChat(testChatId).then(
             () => {
               throw new Error(
-                "should not resolve, should receive validation error"
+                "should not resolve, should receive validation error",
               );
             },
             (err) => {
               expect(err.issues[0].code).toBe("invalid_type");
               expect(err.issues[0].message).toBe(
-                "Expected boolean, received string"
+                "Expected boolean, received string",
               );
-            }
+            },
           );
         });
       });
@@ -392,10 +392,10 @@ describe("[telegram api client]", () => {
           expect(config.data.text).toBe(testText);
           expect(config.data.parse_mode).toBe("HTML");
           expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
-            testButton.text
+            testButton.text,
           );
           expect(
-            config.data.reply_markup.inline_keyboard[0][0].callback_data
+            config.data.reply_markup.inline_keyboard[0][0].callback_data,
           ).toBe(testButton.callback_data);
         };
 
@@ -465,10 +465,10 @@ describe("[telegram api client]", () => {
           expect(config.data.text).toBe(testText);
           expect(config.data.parse_mode).toBe(undefined);
           expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
-            testButton.text
+            testButton.text,
           );
           expect(
-            config.data.reply_markup.inline_keyboard[0][0].callback_data
+            config.data.reply_markup.inline_keyboard[0][0].callback_data,
           ).toBe(testButton.callback_data);
         };
 
@@ -509,10 +509,10 @@ describe("[telegram api client]", () => {
           expect(config.data.text).toBe(testText);
           expect(config.data.parse_mode).toBe("HTML");
           expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
-            testButton.text
+            testButton.text,
           );
           expect(config.data.reply_markup.inline_keyboard[0][0].url).toBe(
-            testButton.url
+            testButton.url,
           );
         };
 
@@ -535,7 +535,7 @@ describe("[telegram api client]", () => {
           false,
           true,
           testErrorCode,
-          testErrorDescription
+          testErrorDescription,
         );
         const testHook = "some-test-hook-url";
         checkApiData = (config) => {
@@ -565,7 +565,7 @@ describe("[telegram api client]", () => {
           true,
           testErrorCode,
           testErrorDescription,
-          testRetryAfter
+          testRetryAfter,
         );
         const testCommands: BotCommandDto[] = [
           {
@@ -597,7 +597,7 @@ describe("[telegram api client]", () => {
             expect(err.response).toBe(undefined);
             expect(err.migrateToChatId).toBe(0);
             expect(err.retryAfter).toBe(testRetryAfter);
-          }
+          },
         );
       });
 
@@ -609,7 +609,7 @@ describe("[telegram api client]", () => {
         testApiResponse = getApiResponse<TgWebHook>(
           false,
           { url: testHook },
-          testErrorCode
+          testErrorCode,
         );
 
         checkApiData = (config) => {
@@ -620,7 +620,7 @@ describe("[telegram api client]", () => {
         return getPromiseError(() => api.getWebHookInfo()).then((err) => {
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(
-            "ETELEGRAM Telegram request was unsuccessful"
+            "ETELEGRAM Telegram request was unsuccessful",
           );
           expect(err.code).toBe(testErrorCode);
           expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getWebhookInfo`);
@@ -649,7 +649,7 @@ describe("[telegram api client]", () => {
           testErrorCode,
           testErrorDescription,
           testRetryAfter,
-          testMigrateToChat
+          testMigrateToChat,
         );
 
         checkApiData = (config) => {
@@ -668,7 +668,7 @@ describe("[telegram api client]", () => {
             expect(err.response).toBe(undefined);
             expect(err.migrateToChatId).toBe(testMigrateToChat);
             expect(err.retryAfter).toBe(testRetryAfter);
-          }
+          },
         );
       });
 
@@ -691,7 +691,7 @@ describe("[telegram api client]", () => {
           (err) => {
             expect(err.stack).toBeDefined();
             expect(err.message).toBe("ETELEGRAM Unable to get the file link");
-          }
+          },
         );
       });
     });
@@ -728,7 +728,7 @@ describe("[telegram api client]", () => {
       };
 
       return getPromiseError(() =>
-        api.editMessageText(testChatId, testMessageId, testText)
+        api.editMessageText(testChatId, testMessageId, testText),
       ).then((err) => {
         expect(err.stack).toBeDefined();
         expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
@@ -799,7 +799,7 @@ describe("[telegram api client]", () => {
           expect(err.response).toBe(errData);
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
-        }
+        },
       );
     });
   });

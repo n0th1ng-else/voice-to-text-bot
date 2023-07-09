@@ -32,7 +32,7 @@ export class TelegramBotModel {
   constructor(
     private readonly token: string,
     converter: VoiceConverter,
-    stat: DbClient
+    stat: DbClient,
   ) {
     const reflector = initTgReflector(this.token);
     this.bot = new TelegramApi(this.token, reflector);
@@ -47,7 +47,7 @@ export class TelegramBotModel {
   public setHostLocation(
     host: string,
     launchTime = new Date().getTime(),
-    path = "/bot/message"
+    path = "/bot/message",
   ): this {
     this.host = host;
     this.path = path;
@@ -65,7 +65,7 @@ export class TelegramBotModel {
     logger.warn(`WebHook url is ${Logger.y(hookUrl)}`);
 
     return runPromiseWithRetry("bot.getWebHookInfo", () =>
-      this.bot.getWebHookInfo()
+      this.bot.getWebHookInfo(),
     ).then((info) => {
       if (info.url === hookUrl) {
         return true;
@@ -81,11 +81,11 @@ export class TelegramBotModel {
     return runPromiseWithRetry(
       "bot.applyHostLocation",
       () => this.bot.setWebHook(hookUrl),
-      timeoutMs
+      timeoutMs,
     ).then(() =>
       runPromiseWithRetry("bot.setMyCommands", () =>
-        this.bot.setMyCommands(botCommands)
-      )
+        this.bot.setMyCommands(botCommands),
+      ),
     );
   }
 
@@ -104,7 +104,7 @@ export class TelegramBotModel {
 
   public handleApiMessage(
     message: TgUpdate,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     return Promise.resolve()
       .then(() => {
@@ -127,7 +127,7 @@ export class TelegramBotModel {
 
   private handleMessage(
     msg: TgMessage,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId);
@@ -175,22 +175,22 @@ export class TelegramBotModel {
 
   private static logNotSupportedMessage(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.warn(`${prefix.getPrefix()} Message is not supported`);
     return collectAnalytics(
-      model.analytics.setCommand("/app", "Message is not supported")
+      model.analytics.setCommand("/app", "Message is not supported"),
     );
   }
 
   private sendNoVoiceMessage(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     if (model.isGroup) {
       logger.info(`${prefix.getPrefix()} No content`);
       return collectAnalytics(
-        model.analytics.setCommand("/voice", "No voice content", "Group")
+        model.analytics.setCommand("/voice", "No voice content", "Group"),
       );
     }
 
@@ -204,8 +204,8 @@ export class TelegramBotModel {
           LabelId.NoContent,
           { lang },
           prefix,
-          model.forumThreadId
-        )
+          model.forumThreadId,
+        ),
       )
       .catch((err) => {
         const errorMessage = "Unable to send no content";
@@ -214,21 +214,21 @@ export class TelegramBotModel {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand("/voice", "No voice content", "Private")
-        )
+          model.analytics.setCommand("/voice", "No voice content", "Private"),
+        ),
       );
   }
 
   private handleCallbackQuery(
     msg: TgCallbackQuery,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     return this.actions.handleCallback(msg, analytics);
   }
 
   private handleCheckout(
     msg: TgCheckoutQuery,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     return this.actions.handleCheckout(msg, analytics);
   }

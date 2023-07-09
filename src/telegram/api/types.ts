@@ -74,7 +74,7 @@ const TgCheckoutQuerySchema = z
     z.object({
       id: z.string(),
       from: TgUserSchema,
-    })
+    }),
   )
   .describe("Telegram checkout query schema validator");
 
@@ -86,7 +86,7 @@ const TgSuccessfulPaymentSchema = z
     z.object({
       telegram_payment_charge_id: z.string(),
       provider_payment_charge_id: z.string(),
-    })
+    }),
   )
   .describe("Telegram successful payment schema validator");
 
@@ -203,12 +203,12 @@ const MessageSchema = z
         z.literal("HTML"),
         z.literal("Markdown"),
         z.literal("MarkdownV2"),
-      ])
+      ]),
     ),
     reply_markup: z.optional(
       z.object({
         inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
-      })
+      }),
     ),
     message_thread_id: z.optional(z.number()),
   })
@@ -314,7 +314,7 @@ const TgInvoiceSchema = z
       payload: z.string(),
       photo: TgPhotoSchema,
       forumThreadId: z.optional(z.number()),
-    })
+    }),
   )
 
   .describe("Telegram invoice schema");

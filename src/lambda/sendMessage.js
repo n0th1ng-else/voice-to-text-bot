@@ -22,6 +22,6 @@ exports.sendTelegramMessage = (pubSubEvent) => {
   };
 
   return getTelegramToken().then((token) =>
-    new TelegramBot(token).sendMessage(data.chatId, data.message)
+    new TelegramBot(token).sendMessage(data.chatId, data.message),
   );
 };

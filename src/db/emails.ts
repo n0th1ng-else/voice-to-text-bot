@@ -16,12 +16,12 @@ export class UsedEmailClient {
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("usedemails")} has been initialized`)
+        logger.info(`Table ${Logger.y("usedemails")} has been initialized`),
       )
       .catch((err) => {
         logger.error(
           `Unable to initialize ${Logger.y("usedemails")} table`,
-          err
+          err,
         );
         throw err;
       });
@@ -36,7 +36,7 @@ export class UsedEmailClient {
         const id = this.getRowId(row);
         logger.info(
           `The row with id=${emailId} has been updated`,
-          id === emailId
+          id === emailId,
         );
         return row;
       })

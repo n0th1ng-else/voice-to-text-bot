@@ -9,14 +9,14 @@ import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
 
 export const getVoiceConverterProvider = (
-  provider: string
+  provider: string,
 ): VoiceConverterProvider => {
   return VoiceConverterProviderSchema.parse(provider);
 };
 
 export const getVoiceConverterInstance = (
   provider: VoiceConverterProvider,
-  options: VoiceConverterOptions
+  options: VoiceConverterOptions,
 ): VoiceConverter => {
   switch (provider) {
     case "GOOGLE":

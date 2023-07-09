@@ -8,7 +8,7 @@ const logger = new Logger("dev-script");
 
 const startServer = (
   server: ExpressServer,
-  threadId: number
+  threadId: number,
 ): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
   const stopListener = prepareStopListener();

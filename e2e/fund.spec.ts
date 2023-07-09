@@ -25,12 +25,12 @@ import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js")
+  () => import("../src/logger/__mocks__/index.js"),
 );
 jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js")
+  () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
 const appPort = 3900;
@@ -119,7 +119,7 @@ describe("[default language - english] fund", () => {
     };
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions
+      converterOptions,
     );
     const db = new DbClient(dbConfig, 0, testPool);
     const hostUrl = `${localhostUrl}:${appPort}`;
@@ -140,7 +140,7 @@ describe("[default language - english] fund", () => {
       appPort,
       enableSSL,
       appVersion,
-      httpsOptions
+      httpsOptions,
     );
 
     testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
@@ -189,7 +189,7 @@ describe("[default language - english] fund", () => {
         const statModel = mockGetBotStatItem(
           testPool,
           tgMessage.chatId,
-          testLangId
+          testLangId,
         );
 
         return Promise.all([
@@ -199,7 +199,7 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons()
+            getFundButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -214,7 +214,7 @@ describe("[default language - english] fund", () => {
               testLangId,
               paymentToken,
               donationId,
-              price
+              price,
             ),
             mockCreateDonationRow(testPool, statModel, 7, donationId),
           ]);
@@ -237,7 +237,7 @@ describe("[default language - english] fund", () => {
           testPool,
           tgMessage.chatId,
           botStat.langId,
-          botStat
+          botStat,
         );
 
         return Promise.all([
@@ -247,7 +247,7 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons()
+            getFundButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -262,7 +262,7 @@ describe("[default language - english] fund", () => {
               testLangId,
               paymentToken,
               donationId,
-              price
+              price,
             ),
             mockCreateDonationRow(testPool, statModel, 3, donationId),
           ]);
@@ -289,7 +289,7 @@ describe("[default language - english] fund", () => {
         const statModel = mockGetBotStatItem(
           testPool,
           tgMessage.chatId,
-          testLangId
+          testLangId,
         );
 
         return Promise.all([
@@ -299,7 +299,7 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons()
+            getFundButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -314,7 +314,7 @@ describe("[default language - english] fund", () => {
               testLangId,
               paymentToken,
               donationId,
-              price
+              price,
             ),
             mockCreateDonationRow(testPool, statModel, 5, donationId),
           ]);
@@ -337,7 +337,7 @@ describe("[default language - english] fund", () => {
           testPool,
           tgMessage.chatId,
           botStat.langId,
-          botStat
+          botStat,
         );
 
         return Promise.all([
@@ -347,7 +347,7 @@ describe("[default language - english] fund", () => {
             tgMessage.chatId,
             statModel.langId,
             LabelId.FundCommandMessage,
-            getFundButtons()
+            getFundButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -362,7 +362,7 @@ describe("[default language - english] fund", () => {
               testLangId,
               paymentToken,
               donationId,
-              price
+              price,
             ),
             mockCreateDonationRow(testPool, statModel, 7, donationId),
           ]);

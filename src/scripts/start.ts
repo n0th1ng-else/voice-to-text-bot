@@ -8,7 +8,7 @@ const logger = new Logger("start-script");
 
 const startServer = (
   server: ExpressServer,
-  threadId: number
+  threadId: number,
 ): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
   const stopListener = prepareStopListener();
@@ -18,7 +18,7 @@ const startServer = (
     return server.triggerDaemon(
       envy.nextReplicaUrl,
       envy.replicaLifecycleInterval,
-      launchDelay
+      launchDelay,
     );
   });
 };

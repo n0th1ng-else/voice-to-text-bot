@@ -76,7 +76,7 @@ export class AnalyticsData {
   constructor(
     private readonly appVersion: string,
     private readonly url: string,
-    private readonly threadId: number
+    private readonly threadId: number,
   ) {
     this.timer = new TimeMeasure();
   }
@@ -122,7 +122,7 @@ export class AnalyticsData {
   public setCommand(
     command: AnalyticsAction,
     commandTitle: string,
-    commandMeta = ""
+    commandMeta = "",
   ): this {
     this.command = command;
     this.commandTitle = commandTitle;

@@ -37,7 +37,7 @@ export class AWSProvider extends VoiceConverter {
     fileLink: string,
     isVideo: boolean,
     lang: LanguageCode,
-    logData: ConverterMeta
+    logData: ConverterMeta,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
@@ -60,10 +60,10 @@ export class AWSProvider extends VoiceConverter {
               Accept: "application/json",
               "Content-Type": "application/json",
             },
-          })
+          }),
         )
         .then(({ data: translationData }) =>
-          this.cleanStorage(translationData, name)
+          this.cleanStorage(translationData, name),
         )
         .then((text) => {
           logger.info(`Job ${name} completed`);
@@ -121,7 +121,7 @@ export class AWSProvider extends VoiceConverter {
           }
 
           resolve(data);
-        }
+        },
       );
     });
   }
@@ -142,7 +142,7 @@ export class AWSProvider extends VoiceConverter {
           }
 
           resolve(data);
-        }
+        },
       );
     });
   }
@@ -166,7 +166,7 @@ export class AWSProvider extends VoiceConverter {
           }
 
           resolve(data);
-        }
+        },
       );
     });
   }
@@ -185,7 +185,7 @@ export class AWSProvider extends VoiceConverter {
           }
 
           resolve();
-        }
+        },
       );
     });
   }
@@ -204,7 +204,7 @@ export class AWSProvider extends VoiceConverter {
           }
 
           resolve(data);
-        }
+        },
       );
     })
       .then((job) => {

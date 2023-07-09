@@ -33,7 +33,7 @@ export class TelegramApi {
 
   constructor(
     private readonly apiToken: string,
-    private readonly errorReflector?: ApiErrorReflector
+    private readonly errorReflector?: ApiErrorReflector,
   ) {
     this.client = axios.create({
       method: "POST",
@@ -69,12 +69,12 @@ export class TelegramApi {
         const filePath = data.file_path;
         if (!filePath) {
           return Promise.reject(
-            new Error("ETELEGRAM Unable to get the file link")
+            new Error("ETELEGRAM Unable to get the file link"),
           );
         }
 
         return `${TelegramApi.url}/file/bot${this.apiToken}/${filePath}`;
-      }
+      },
     );
   }
 
@@ -85,7 +85,7 @@ export class TelegramApi {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
     } = {},
-    forumThreadId?: number
+    forumThreadId?: number,
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
@@ -116,7 +116,7 @@ export class TelegramApi {
     options: {
       buttons?: TgInlineKeyboardButton[][];
       disableMarkup?: boolean;
-    } = {}
+    } = {},
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
@@ -137,13 +137,13 @@ export class TelegramApi {
     return this.request<TgMessage, EditMessageDto>(
       "editMessageText",
       data,
-      chatId
+      chatId,
     );
   }
 
   public answerPreCheckoutQuery(
     queryId: string,
-    error?: string
+    error?: string,
   ): Promise<TgMessage> {
     const data: PreCheckoutQueryDto = {
       pre_checkout_query_id: queryId,
@@ -152,7 +152,7 @@ export class TelegramApi {
     };
     return this.request<TgMessage, PreCheckoutQueryDto>(
       "answerPreCheckoutQuery",
-      data
+      data,
     );
   }
 
@@ -183,7 +183,7 @@ export class TelegramApi {
     return this.request<TgMessage, InvoiceDto>(
       "sendInvoice",
       data,
-      opts.chatId
+      opts.chatId,
     );
   }
 
@@ -194,7 +194,7 @@ export class TelegramApi {
       {
         chat_id: chatId,
       },
-      chatId
+      chatId,
     );
   }
 
@@ -202,7 +202,7 @@ export class TelegramApi {
     methodName: string,
     schema: Schema,
     data?: Data,
-    chatId?: number
+    chatId?: number,
   ): Promise<z.infer<Schema>> {
     return this.request(methodName, data, chatId).then((result) => {
       return schema.parse(result);
@@ -212,7 +212,7 @@ export class TelegramApi {
   private request<Response, Data>(
     methodName: string,
     data?: Data,
-    chatId?: number
+    chatId?: number,
   ): Promise<Response> {
     const url = this.getApiUrl(methodName);
     return this.client.request<TgCore<Response>>({ url, data }).then(
@@ -221,7 +221,7 @@ export class TelegramApi {
         if (!answer.ok) {
           const tgError = new TgError(
             new Error(answer.description),
-            answer.description
+            answer.description,
           )
             .setUrl(url, this.apiToken)
             .setErrorCode(answer.error_code)
@@ -244,7 +244,7 @@ export class TelegramApi {
 
         this.errorReflector?.(tgError);
         throw tgError;
-      }
+      },
     );
   }
 

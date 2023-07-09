@@ -17,7 +17,7 @@ const getMaxDuration = (minutes: string, seconds: string): string => {
 const getSupportedAudioFormats = (): string => {
   const formats = supportedAudioFormats.reduce(
     (union, format) => union.add(format.ext.toLowerCase()),
-    new Set<string>()
+    new Set<string>(),
   );
 
   return [...formats].map((format) => `*.${format}`).join(", ");
@@ -127,7 +127,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.DonationLabel]: "Единоразовое пожертвование",
     [LabelId.LongVoiceMessage]: `Сообщения длиной больше ${getMaxDuration(
       "мин",
-      "сек"
+      "сек",
     )} не поддерживаются 🌚`,
     [LabelId.AudioNotSupportedMessage]:
       "Формат аудио файла не поддерживается 🌚",
@@ -193,7 +193,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     // voice recognition
     [LabelId.LongVoiceMessage]: `I do not support messages longer than ${getMaxDuration(
       "min",
-      "sec"
+      "sec",
     )} at the moment 🌚`,
     [LabelId.AudioNotSupportedMessage]:
       "The audio file format is not supported at the moment 🌚",

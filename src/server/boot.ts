@@ -23,7 +23,7 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
     envy.appPort,
     envy.enableSSL,
     envy.appVersion,
-    httpsOptions
+    httpsOptions,
   );
 
   const converterOptions: VoiceConverterOptions = {
@@ -36,7 +36,7 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
 
   const converter = getVoiceConverterInstance(
     getVoiceConverterProvider(envy.provider),
-    converterOptions
+    converterOptions,
   );
 
   const db = new DbClient(
@@ -48,7 +48,7 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
       port: envy.dbPostgres.port,
       certificate: envy.dbPostgres.cert,
     },
-    threadId
+    threadId,
   );
 
   const paymentProvider = new StripePayment(envy.stripeToken);
@@ -56,19 +56,19 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
   const bot = new TelegramBotModel(
     envy.telegramBotApi,
     converter,
-    db
+    db,
   ).setAuthor(envy.authorTelegramAccount);
 
   return db
     .init()
     .then(() =>
-      getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken)
+      getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken),
     )
     .then((host) => {
       logger.info(
         `Telling telegram our location is ${Logger.y(
-          host
-        )}. Launched at ${Logger.y(envy.launchTime)}`
+          host,
+        )}. Launched at ${Logger.y(envy.launchTime)}`,
       );
 
       bot.setHostLocation(host, envy.launchTime).setPayment(paymentProvider);
@@ -82,10 +82,10 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
 
 export const prepareStopListener = (): StopListener => {
   const memoryDaemon = new ScheduleDaemon("memory", () =>
-    printCurrentMemoryStat(envy.memoryLimit)
+    printCurrentMemoryStat(envy.memoryLimit),
   ).start();
   const storageDaemon = new ScheduleDaemon("storage", () =>
-    printCurrentStorageUsage("video-temp")
+    printCurrentStorageUsage("video-temp"),
   ).start();
 
   const stopListener = new StopListener().addTrigger(() => {

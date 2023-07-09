@@ -23,7 +23,7 @@ export class FundAction extends GenericAction {
 
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     return this.sendFundMessage(mdl, prefix);
@@ -36,7 +36,7 @@ export class FundAction extends GenericAction {
   public runCallback(
     msg: TgMessage,
     button: TelegramButtonModel,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     analytics.addPageVisit();
     return this.formLinkButton(msg, button, analytics);
@@ -52,14 +52,14 @@ export class FundAction extends GenericAction {
 
   private sendFundMessage(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending fund message`);
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
         const donations = donationLevels.map((level) =>
-          FundAction.getDonationButton(level.amount, prefix.id, level.meta)
+          FundAction.getDonationButton(level.amount, prefix.id, level.meta),
         );
 
         const buttons: TgInlineKeyboardButton[][] = [];
@@ -74,7 +74,7 @@ export class FundAction extends GenericAction {
             options: buttons,
           },
           prefix,
-          model.forumThreadId
+          model.forumThreadId,
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Fund message sent`))
@@ -85,15 +85,15 @@ export class FundAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand(BotCommand.Fund, "Fund message", "Init")
-        )
+          model.analytics.setCommand(BotCommand.Fund, "Fund message", "Init"),
+        ),
       );
   }
 
   private formLinkButton(
     msg: TgMessage,
     button: TelegramButtonModel,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId, button.logPrefix);
@@ -103,15 +103,15 @@ export class FundAction extends GenericAction {
       const errorMessage = `Price is not a number, got ${button.value}`;
       logger.error(
         `${prefix.getPrefix()} ${errorMessage}`,
-        new Error("Price is not a number")
+        new Error("Price is not a number"),
       );
       model.analytics.addError(errorMessage);
       return collectAnalytics(
         model.analytics.setCommand(
           BotCommand.Fund,
           "Fund message error",
-          "Price is not specified"
-        )
+          "Price is not specified",
+        ),
       );
     }
 
@@ -124,15 +124,15 @@ export class FundAction extends GenericAction {
           const errorMessage = "Payment service is not set for callback query";
           logger.error(
             `${prefix.getPrefix()} ${errorMessage}`,
-            new Error("Payment service is not set")
+            new Error("Payment service is not set"),
           );
           model.analytics.addError(errorMessage);
           return collectAnalytics(
             model.analytics.setCommand(
               BotCommand.Fund,
               "Fund message error",
-              "Payment service is not set"
-            )
+              "Payment service is not set",
+            ),
           );
         }
 
@@ -145,13 +145,13 @@ export class FundAction extends GenericAction {
           token,
           lang,
           prefix,
-          model.forumThreadId
+          model.forumThreadId,
         );
       })
       .catch((err) => {
         logger.error(
           `${prefix.getPrefix()} Unable to send the donations link`,
-          err
+          err,
         );
       });
   }
@@ -159,14 +159,14 @@ export class FundAction extends GenericAction {
   private static getDonationButton(
     price: number,
     logId: string,
-    emoji: string
+    emoji: string,
   ): TgInlineKeyboardButton {
     return {
       text: TextModel.toCurrency(price, emoji),
       callback_data: new TelegramButtonModel(
         "d",
         `${price}`,
-        logId
+        logId,
       ).getDtoString(),
     };
   }
@@ -174,7 +174,7 @@ export class FundAction extends GenericAction {
   private getDonationId(
     model: BotMessageModel,
     price: number,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<number> {
     return this.stat.donations
       .createRow(model.chatId, price)
@@ -194,7 +194,7 @@ export class FundAction extends GenericAction {
     token: string,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
-    forumThreadId?: number
+    forumThreadId?: number,
   ): Promise<void> {
     const title = this.text.t(LabelId.DonationTitle, lang);
     const description = this.text.t(LabelId.DonationDescription, lang);

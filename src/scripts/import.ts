@@ -52,7 +52,7 @@ export const run = async (): Promise<void> => {
           item.langId,
           item.user,
           new Date(item.createdAt),
-          new Date(item.updatedAt)
+          new Date(item.updatedAt),
         )
         .catch((err) => logger.error("import error", err));
 
@@ -94,6 +94,6 @@ export const run = async (): Promise<void> => {
   db.init().then(() =>
     server.listen(envy.appPort, () => {
       logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
-    })
+    }),
   );
 };
