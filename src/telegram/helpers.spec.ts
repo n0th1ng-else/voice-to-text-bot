@@ -105,16 +105,16 @@ describe("telegram helpers", () => {
       (lng) => {
         expect(getLanguageByText(lng)).toBe(DEFAULT_LANGUAGE);
         expect(getLanguageByText(lng, false)).toBe(DEFAULT_LANGUAGE);
-      }
+      },
     );
 
     it.each([[""], ["en-GB"], ["es-ES"], ["foo"]])(
       "should throw an error if the input was %s and re-throwing errors enabled",
       (lng) => {
         expect(() => getLanguageByText(lng, true)).toThrowError(
-          `Language code ${lng} is not recognized`
+          `Language code ${lng} is not recognized`,
         );
-      }
+      },
     );
   });
 });

@@ -4,7 +4,7 @@ import { requestHealthData } from "./api.js";
 import { HealthDto, HealthSsl, HealthStatus } from "./types.js";
 
 const mockRequest = (
-  fn: (config?: AxiosRequestConfig) => Promise<HealthDto>
+  fn: (config?: AxiosRequestConfig) => Promise<HealthDto>,
 ) => {
   jest
     .spyOn(axios, "request")

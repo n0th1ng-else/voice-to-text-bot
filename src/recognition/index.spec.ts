@@ -14,6 +14,6 @@ describe("getVoiceConverterProvider", () => {
     (input, output) => {
       // @ts-expect-error we test everything that can fall into process.env
       expect(getVoiceConverterProvider(input)).toBe(output);
-    }
+    },
   );
 });

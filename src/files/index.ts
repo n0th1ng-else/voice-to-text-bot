@@ -14,7 +14,7 @@ const generateFileName = (): string => `${nanoid()}.tmp`;
 const isFileExist = (fileName: string): Promise<boolean> =>
   promises.access(fileName).then(
     () => true,
-    () => false
+    () => false,
   );
 
 /**
@@ -35,10 +35,10 @@ const deleteFile = (fileName: string): Promise<void> => {
 
 export const deleteFileIfExists = (
   fileName: string,
-  err?: Error
+  err?: Error,
 ): Promise<string> => {
   logger.info(
-    `Deleting a file from the filesystem. The file name is ${fileName}`
+    `Deleting a file from the filesystem. The file name is ${fileName}`,
   );
 
   return isFileExist(fileName)
@@ -61,7 +61,7 @@ export const deleteFileIfExists = (
 export const saveBufferToFile = (
   buff: Buffer,
   dir: string,
-  fileName?: string
+  fileName?: string,
 ): Promise<string> => {
   const name = [".", dir, fileName ?? generateFileName()]
     .filter(Boolean)
@@ -83,7 +83,7 @@ export const saveBufferToFile = (
 export const saveStreamToFile = (
   stream: IncomingMessage,
   dir: string,
-  fileName?: string
+  fileName?: string,
 ): Promise<string> => {
   const name = [".", dir, fileName ?? generateFileName()]
     .filter(Boolean)

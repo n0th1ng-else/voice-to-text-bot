@@ -24,7 +24,7 @@ export class UsedEmailDb {
   public createRow(email: string): Promise<UsedEmailRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usedemails is not initialized yet")
+        new Error("The table usedemails is not initialized yet"),
       );
     }
     const query = UsedEmailsSql.insertRow;
@@ -45,7 +45,7 @@ export class UsedEmailDb {
   public updateRow(emailId: number): Promise<UsedEmailRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usedemails is not initialized yet")
+        new Error("The table usedemails is not initialized yet"),
       );
     }
     const query = UsedEmailsSql.updateRow;
@@ -66,7 +66,7 @@ export class UsedEmailDb {
   public getRows(email: string): Promise<UsedEmailRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usedemails is not initialized yet")
+        new Error("The table usedemails is not initialized yet"),
       );
     }
     const query = UsedEmailsSql.getRows;

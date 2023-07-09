@@ -118,7 +118,7 @@ describe("tgerror", () => {
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe(
-        `http://google.com/${SANITIZE_CHARACTER}/sendMessage`
+        `http://google.com/${SANITIZE_CHARACTER}/sendMessage`,
       );
     });
 

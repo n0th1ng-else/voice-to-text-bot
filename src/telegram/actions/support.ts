@@ -18,7 +18,7 @@ export class SupportAction extends GenericAction {
 
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     return this.sendSupportMessage(mdl, prefix);
@@ -34,7 +34,7 @@ export class SupportAction extends GenericAction {
 
   private sendSupportMessage(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending support message`);
 
@@ -68,7 +68,7 @@ export class SupportAction extends GenericAction {
             options: buttons,
           },
           prefix,
-          model.forumThreadId
+          model.forumThreadId,
         );
       })
       .then(() => logger.info(`${prefix.getPrefix()} Support message sent`))
@@ -82,9 +82,9 @@ export class SupportAction extends GenericAction {
           model.analytics.setCommand(
             BotCommand.Support,
             "Support message",
-            "Init"
-          )
-        )
+            "Init",
+          ),
+        ),
       );
   }
 }

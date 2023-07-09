@@ -24,7 +24,7 @@ export const run = async (): Promise<void> => {
         if (!isCLusterSizeValid) {
           logger.error(
             `Cluster size is not valid. Falling back to size=1. cLusterSize=${envy.clusterSize}`,
-            new Error("Cluster size is not valid")
+            new Error("Cluster size is not valid"),
           );
         }
         const size = isCLusterSizeValid ? envy.clusterSize : 1;
@@ -47,6 +47,6 @@ export const run = async (): Promise<void> => {
         // @ts-expect-error We are inside worker, worker is defined
         runServer(cluster.worker.id);
       }
-    }
+    },
   );
 };

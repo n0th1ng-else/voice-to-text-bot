@@ -8,13 +8,13 @@ export const runPromiseWithRetry = <D>(
   fnName: string,
   fn: () => Promise<D>,
   timeoutMs = 0,
-  tries = 5
+  tries = 5,
 ): Promise<D> => {
   if (!tries) {
     return Promise.reject(
       new Error(
-        `Failed to execute function ${fnName} after 5 tries. Rejecting...`
-      )
+        `Failed to execute function ${fnName} after 5 tries. Rejecting...`,
+      ),
     );
   }
   return sleepFor(timeoutMs)
@@ -22,7 +22,7 @@ export const runPromiseWithRetry = <D>(
     .catch((err) => {
       logger.error(
         `Failed to execute function ${fnName}. Retrying in 10 sec...`,
-        err
+        err,
       );
       return runPromiseWithRetry(fnName, fn, 10_000, tries - 1);
     });
@@ -35,7 +35,7 @@ export const flattenPromise = () => {
 export const splitTextIntoParts = (
   text: string,
   lang: LanguageCode,
-  maxLength: number
+  maxLength: number,
 ): string[] => {
   if (text.length <= maxLength) {
     return [text];
@@ -67,7 +67,7 @@ type RegExpFlag = "g" | "i";
 
 export const getRegExpFromString = (
   str: string,
-  flags: RegExpFlag[]
+  flags: RegExpFlag[],
 ): RegExp => {
   const escaped = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   const regExpFlags = flags.join("");

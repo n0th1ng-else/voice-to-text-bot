@@ -47,7 +47,7 @@ export class BotActions {
 
   public handleCallback(
     msg: TgCallbackQuery,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     const message = msg.message;
     const data = msg.data;
@@ -58,7 +58,7 @@ export class BotActions {
       logger.error(msgError.message, msgError);
       analytics.addError(errorMessage);
       return collectAnalytics(
-        analytics.setCommand("/app", "Callback query error", "No message")
+        analytics.setCommand("/app", "Callback query error", "No message"),
       );
     }
 
@@ -68,7 +68,7 @@ export class BotActions {
       logger.error(msgError.message, msgError);
       analytics.addError(errorMessage);
       return collectAnalytics(
-        analytics.setCommand("/app", "Callback query error", "No data")
+        analytics.setCommand("/app", "Callback query error", "No data"),
       );
     }
 
@@ -92,14 +92,14 @@ export class BotActions {
         logger.error(errorMessage, err);
         analytics.addError(errorMessage);
         return collectAnalytics(
-          analytics.setCommand("/app", "Callback query error", "Unknown")
+          analytics.setCommand("/app", "Callback query error", "Unknown"),
         );
       });
   }
 
   public handleCheckout(
     msg: TgCheckoutQuery,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     return this.checkout.confirmCheckout(msg, analytics);
   }

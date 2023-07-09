@@ -26,12 +26,12 @@ import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js")
+  () => import("../src/logger/__mocks__/index.js"),
 );
 jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js")
+  () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
 const enableSSL = false;
@@ -150,7 +150,7 @@ describe("[russian language]", () => {
     };
     converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions
+      converterOptions,
     );
     hostUrl = `${localhostUrl}:${appPort}`;
     db = new DbClient(dbConfig, 0, testPool);
@@ -170,7 +170,7 @@ describe("[russian language]", () => {
       appPort,
       enableSSL,
       appVersion,
-      httpsOptions
+      httpsOptions,
     );
 
     testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
@@ -220,7 +220,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -234,7 +234,7 @@ describe("[russian language]", () => {
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
             LabelId.DonateMessage,
-          ]
+          ],
         ),
       ]);
     });
@@ -242,13 +242,13 @@ describe("[russian language]", () => {
     it("responds on a /start message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Start}@${telegramBotName}`
+        `${BotCommand.Start}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -262,7 +262,7 @@ describe("[russian language]", () => {
             LabelId.WelcomeMessageGroup,
             LabelId.WelcomeMessageMore,
             LabelId.DonateMessage,
-          ]
+          ],
         ),
       ]);
     });
@@ -273,7 +273,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -288,17 +288,17 @@ describe("[russian language]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -306,13 +306,13 @@ describe("[russian language]", () => {
     it("responds on a /support message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Support}@${telegramBotName}`
+        `${BotCommand.Support}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -327,17 +327,17 @@ describe("[russian language]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -350,7 +350,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -365,24 +365,24 @@ describe("[russian language]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.ContactAuthor,
-                authorUrl
+                authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -392,14 +392,14 @@ describe("[russian language]", () => {
       bot.setAuthor(authorUrl);
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Support}@${telegramBotName}`
+        `${BotCommand.Support}@${telegramBotName}`,
       );
 
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -414,24 +414,24 @@ describe("[russian language]", () => {
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.OfficialChannel,
-                officialChannelAccount
+                officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.ContactAuthor,
-                authorUrl
+                authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
                 LabelId.GithubIssues,
-                githubUrl
+                githubUrl,
               ),
             ],
-          ]
+          ],
         ),
       ]);
     });
@@ -442,7 +442,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -452,7 +452,7 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]);
     });
@@ -460,13 +460,13 @@ describe("[russian language]", () => {
     it("responds on a /lang message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Language}@${telegramBotName}`
+        `${BotCommand.Language}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -476,7 +476,7 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]);
     });
@@ -487,7 +487,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -497,7 +497,7 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -510,7 +510,7 @@ describe("[russian language]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang
+            LabelId.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -520,13 +520,13 @@ describe("[russian language]", () => {
     it("changes language using the /lang callback message with bot name", () => {
       tgMessage.setText(
         testMessageId,
-        `${BotCommand.Language}@${telegramBotName}`
+        `${BotCommand.Language}@${telegramBotName}`,
       );
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -536,7 +536,7 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.ChangeLangTitle,
-          getLangButtons()
+          getLangButtons(),
         ),
       ]).then(([, prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
@@ -549,7 +549,7 @@ describe("[russian language]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang
+            LabelId.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -562,7 +562,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -572,7 +572,7 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          getFundButtons()
+          getFundButtons(),
         ),
       ]);
     });
@@ -583,7 +583,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       return Promise.all([
@@ -593,7 +593,7 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           LabelId.FundCommandMessage,
-          getFundButtons()
+          getFundButtons(),
         ),
       ]);
     });
@@ -608,7 +608,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
@@ -620,7 +620,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `🗣 ${voiceFileContent}`
+          `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -639,7 +639,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
@@ -651,7 +651,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${userName} 🗣 ${voiceFileContent}`
+          `${userName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -675,7 +675,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
@@ -687,7 +687,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${firstName} 🗣 ${voiceFileContent}`
+          `${firstName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -711,7 +711,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
@@ -723,7 +723,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${lastName} 🗣 ${voiceFileContent}`
+          `${lastName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -749,7 +749,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
@@ -761,7 +761,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${firstName} ${lastName} 🗣 ${voiceFileContent}`
+          `${firstName} ${lastName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {
@@ -800,7 +800,7 @@ describe("[russian language]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "audio/mp3"
+        "audio/mp3",
       );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
@@ -832,7 +832,7 @@ describe("[russian language]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "audio/wav"
+        "audio/wav",
       );
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
@@ -869,7 +869,7 @@ describe("[russian language]", () => {
         testMessageId,
         voiceFileId,
         voiceFileDuration,
-        "audio/x-opus+ogg"
+        "audio/x-opus+ogg",
       );
       tgMessage.setName(testMessageId, {
         userName,
@@ -880,7 +880,7 @@ describe("[russian language]", () => {
         testPool,
         tgMessage.chatId,
         botStat.langId,
-        botStat
+        botStat,
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
@@ -892,7 +892,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          `${firstName} ${lastName} 🗣 ${voiceFileContent}`
+          `${firstName} ${lastName} 🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
       ]).then(() => {

@@ -8,13 +8,13 @@ const logger = new Logger("analytics:ga");
 
 export const collectEvents = (
   chatId: number,
-  events: AnalyticsEventExt[]
+  events: AnalyticsEventExt[],
 ): Promise<void> => {
   if (!analytics.measurementId || !analytics.apiSecret) {
     if (!isDevelopment()) {
       logger.error(
         "ga analytics Token is not provided!",
-        new Error("ga analytics Token is not provided")
+        new Error("ga analytics Token is not provided"),
       );
     }
     return Promise.resolve();

@@ -11,14 +11,14 @@ const logger = new Logger("telegram-bot");
 export class CheckoutAction extends GenericAction {
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     const donationId = mdl.donationId;
     if (!donationId) {
       logger.error(
         `${prefix.getPrefix()} Unable to parse the donationId in runAction. Will not update the DB row!`,
-        new Error("Unable to parse the donationId in runAction")
+        new Error("Unable to parse the donationId in runAction"),
       );
       return Promise.resolve();
     }
@@ -31,7 +31,7 @@ export class CheckoutAction extends GenericAction {
 
   public confirmCheckout(
     msg: TgCheckoutQuery,
-    analytics: AnalyticsData
+    analytics: AnalyticsData,
   ): Promise<void> {
     analytics.addPageVisit();
     const {
@@ -47,7 +47,7 @@ export class CheckoutAction extends GenericAction {
         if (!donationId) {
           logger.error(
             `${prefix.getPrefix()} Unable to parse the donationId in confirmCheckout. Will not update the DB row!`,
-            new Error("Unable to parse the donationId in confirmCheckout")
+            new Error("Unable to parse the donationId in confirmCheckout"),
           );
           return;
         }
@@ -60,7 +60,7 @@ export class CheckoutAction extends GenericAction {
 
   private markAsPending(
     donationId: number,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.stat.donations
       .updateRow(donationId, DonationStatus.Pending)
@@ -70,14 +70,14 @@ export class CheckoutAction extends GenericAction {
       .catch((err) => {
         logger.error(
           `${prefix.getPrefix()} Unable to update the donation`,
-          err
+          err,
         );
       });
   }
 
   private markAsSuccessful(
     donationId: number,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.stat.donations
       .updateRow(donationId, DonationStatus.Received)
@@ -87,7 +87,7 @@ export class CheckoutAction extends GenericAction {
       .catch((err) => {
         logger.error(
           `${prefix.getPrefix()} Unable to update the donation`,
-          err
+          err,
         );
       });
   }

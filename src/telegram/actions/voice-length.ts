@@ -15,7 +15,7 @@ const logger = new Logger("telegram-bot");
 export class VoiceLengthAction extends GenericAction {
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     return this.sendVoiceIsTooLongMessage(mdl, prefix);
@@ -29,12 +29,12 @@ export class VoiceLengthAction extends GenericAction {
 
   private sendVoiceIsTooLongMessage(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.warn(
       `${prefix.getPrefix()} Message is too long duration=${
         model.voiceDuration
-      }s`
+      }s`,
     );
 
     model.analytics.addTime("voice-length", model.voiceDuration * 1_000);
@@ -44,8 +44,8 @@ export class VoiceLengthAction extends GenericAction {
         model.analytics.setCommand(
           "/voice",
           "Voice message is too long",
-          "Group"
-        )
+          "Group",
+        ),
       );
     }
 
@@ -60,11 +60,11 @@ export class VoiceLengthAction extends GenericAction {
             lang,
           },
           prefix,
-          model.forumThreadId
-        )
+          model.forumThreadId,
+        ),
       )
       .then(() =>
-        logger.info(`${prefix.getPrefix()} Voice is too long message sent`)
+        logger.info(`${prefix.getPrefix()} Voice is too long message sent`),
       )
       .catch((err) => {
         const errorMessage = "Unable to send voice is too long";
@@ -76,9 +76,9 @@ export class VoiceLengthAction extends GenericAction {
           model.analytics.setCommand(
             "/voice",
             "Voice message is too long",
-            "Private"
-          )
-        )
+            "Private",
+          ),
+        ),
       );
   }
 }

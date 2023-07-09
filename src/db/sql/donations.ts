@@ -33,7 +33,7 @@ export class DonationsDb {
   public createRow(chatId: number, price: number): Promise<DonationRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table donations is not initialized yet")
+        new Error("The table donations is not initialized yet"),
       );
     }
     const query = DonationsSql.insertRow;
@@ -59,11 +59,11 @@ export class DonationsDb {
 
   public updateRow(
     donationId: number,
-    status: DonationStatus
+    status: DonationStatus,
   ): Promise<DonationRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table donations is not initialized yet")
+        new Error("The table donations is not initialized yet"),
       );
     }
     const query = DonationsSql.updateRow;
@@ -83,7 +83,7 @@ export class DonationsDb {
   public getRows(status: DonationStatus): Promise<DonationRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table donations is not initialized yet")
+        new Error("The table donations is not initialized yet"),
       );
     }
     const query = DonationsSql.getRows;

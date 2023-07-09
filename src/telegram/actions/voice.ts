@@ -20,7 +20,7 @@ export class VoiceAction extends GenericAction {
 
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     logger.info(`${prefix.getPrefix()} Voice message`);
@@ -28,8 +28,8 @@ export class VoiceAction extends GenericAction {
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
       .then(() =>
         collectAnalytics(
-          mdl.analytics.setCommand("/voice", "Voice message", "Init")
-        )
+          mdl.analytics.setCommand("/voice", "Voice message", "Init"),
+        ),
       );
   }
 
@@ -41,7 +41,7 @@ export class VoiceAction extends GenericAction {
     if (!isVoice && !isNoContent) {
       logger.warn(
         "Some problems identified during the voice object detection",
-        type
+        type,
       );
     }
 
@@ -55,7 +55,7 @@ export class VoiceAction extends GenericAction {
   private recogniseVoiceMessage(
     model: BotMessageModel,
     lang: LanguageCode,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Processing voice`);
 
@@ -89,7 +89,7 @@ export class VoiceAction extends GenericAction {
               lang,
             },
             prefix,
-            model.forumThreadId
+            model.forumThreadId,
           );
         }
 
@@ -103,7 +103,7 @@ export class VoiceAction extends GenericAction {
           {
             disableMarkup: true,
           },
-          model.forumThreadId
+          model.forumThreadId,
         );
       })
       .then(() => {
@@ -136,7 +136,7 @@ export class VoiceAction extends GenericAction {
             lang,
           },
           prefix,
-          model.forumThreadId
+          model.forumThreadId,
         );
       })
       .catch((err) => {
@@ -149,13 +149,13 @@ export class VoiceAction extends GenericAction {
 
   private getFileLInk(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<string> {
     logger.info(`${prefix.getPrefix()} Fetching file link`);
 
     if (!model.voiceFileId) {
       return Promise.reject(
-        new Error("Unable to find a voice file in the message")
+        new Error("Unable to find a voice file in the message"),
       );
     }
 
@@ -165,7 +165,7 @@ export class VoiceAction extends GenericAction {
   private sendInProgressMessage(
     model: BotMessageModel,
     lang: LanguageCode,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     if (model.isGroup) {
       return Promise.resolve();
@@ -179,7 +179,7 @@ export class VoiceAction extends GenericAction {
         lang,
       },
       prefix,
-      model.forumThreadId
+      model.forumThreadId,
     ).catch((err) => {
       const isBlocked = isBlockedByUser(err);
       const errorMessage = "Unable to send in progress message";
@@ -197,7 +197,7 @@ export class VoiceAction extends GenericAction {
 
   private updateUsageCount(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Updating usage count`);
 

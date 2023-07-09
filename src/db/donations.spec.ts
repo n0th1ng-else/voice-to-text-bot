@@ -12,7 +12,7 @@ import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
-  () => import("../logger/__mocks__/index.js")
+  () => import("../logger/__mocks__/index.js"),
 );
 
 const dbConfig = {
@@ -49,26 +49,26 @@ describe("Donations DB", () => {
   describe("not initialized", () => {
     it("can not create row", async () => {
       await expect(client.createRow(23444, 3)).rejects.toThrowError(
-        "The table donations is not initialized yet"
+        "The table donations is not initialized yet",
       );
     });
 
     it("can not update row", async () => {
       await expect(
-        client.updateRow(23, DonationStatus.Pending)
+        client.updateRow(23, DonationStatus.Pending),
       ).rejects.toThrowError("The table donations is not initialized yet");
     });
 
     it("can not iterate rows", async () => {
       await expect(client.getPendingRows()).rejects.toThrowError(
-        "The table donations is not initialized yet"
+        "The table donations is not initialized yet",
       );
     });
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrowError();
       await expect(client.createRow(5231, 5)).rejects.toThrowError(
-        "The table donations is not initialized yet"
+        "The table donations is not initialized yet",
       );
     });
   });

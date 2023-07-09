@@ -15,7 +15,7 @@ const logger = new Logger("telegram-bot");
 export class StartAction extends GenericAction {
   public runAction(
     mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addFirstVisit();
     mdl.analytics.addPageVisit();
@@ -28,7 +28,7 @@ export class StartAction extends GenericAction {
 
   private sendHelloMessage(
     model: BotMessageModel,
-    prefix: TelegramMessagePrefix
+    prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending hello message`);
     return this.getChatLanguage(model, prefix)
@@ -44,8 +44,8 @@ export class StartAction extends GenericAction {
           ],
           { lang },
           prefix,
-          model.forumThreadId
-        )
+          model.forumThreadId,
+        ),
       )
       .then(() => logger.info(`${prefix.getPrefix()} Hello message sent`))
       .catch((err) => {
@@ -55,8 +55,8 @@ export class StartAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand(BotCommand.Start, "Hello message", "Init")
-        )
+          model.analytics.setCommand(BotCommand.Start, "Hello message", "Init"),
+        ),
       );
   }
 }

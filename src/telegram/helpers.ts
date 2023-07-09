@@ -18,28 +18,28 @@ import { durationLimitSec, supportedAudioFormats } from "../const.js";
 
 export const isLangMessage = (
   model: BotMessageModel,
-  msg: TgMessage
+  msg: TgMessage,
 ): boolean => isCommandMessage(model, msg, BotCommand.Language);
 
 export const isHelloMessage = (
   model: BotMessageModel,
-  msg: TgMessage
+  msg: TgMessage,
 ): boolean => isCommandMessage(model, msg, BotCommand.Start);
 
 export const isSupportMessage = (
   model: BotMessageModel,
-  msg: TgMessage
+  msg: TgMessage,
 ): boolean => isCommandMessage(model, msg, BotCommand.Support);
 
 export const isFundMessage = (
   model: BotMessageModel,
-  msg: TgMessage
+  msg: TgMessage,
 ): boolean => isCommandMessage(model, msg, BotCommand.Fund);
 
 const isCommandMessage = (
   model: BotMessageModel,
   msg: TgMessage,
-  command: BotCommand
+  command: BotCommand,
 ): boolean => {
   if (!msg?.text) {
     return false;
@@ -82,7 +82,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   if (typeof data.duration !== "number" || data.duration < 0) {
     return new VoiceContentReasonModel(
       VoiceContentReason.NoDuration,
-      data.duration
+      data.duration,
     );
   }
 
@@ -91,7 +91,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
 
   const formats = supportedAudioFormats.reduce(
     (union, format) => union.add(format.mimeType.toLowerCase()),
-    new Set<string>()
+    new Set<string>(),
   );
 
   const isAudioSupported = formats.has(mimeType.toLowerCase());
@@ -100,7 +100,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
     ? new VoiceContentReasonModel(VoiceContentReason.Ok)
     : new VoiceContentReasonModel(
         VoiceContentReason.WrongMimeType,
-        data.mime_type
+        data.mime_type,
       );
 };
 
@@ -175,14 +175,14 @@ export const getUserLanguage = (msg: TgMessage): LanguageCode => {
 };
 
 export const getRawUserLanguage = (
-  msg: TgMessage | TgCallbackQuery
+  msg: TgMessage | TgCallbackQuery,
 ): string => {
   return msg.from?.language_code || "";
 };
 
 export const getLanguageByText = (
   lang: string,
-  throwOnError = false
+  throwOnError = false,
 ): LanguageCode => {
   try {
     const lng = LanguageSchema.parse(lang);
@@ -199,7 +199,7 @@ export const getLanguageByText = (
 export const getDonationDtoString = (
   donationId: number,
   chatId: number,
-  logPrefix: string
+  logPrefix: string,
 ): string => {
   const dto: DonationDto = {
     d: donationId,

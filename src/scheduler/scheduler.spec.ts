@@ -14,7 +14,7 @@ import type { VoidPromise } from "../common/types.js";
 
 jest.unstable_mockModule(
   "../logger/index",
-  () => import("../logger/__mocks__/index.js")
+  () => import("../logger/__mocks__/index.js"),
 );
 
 jest.useFakeTimers();

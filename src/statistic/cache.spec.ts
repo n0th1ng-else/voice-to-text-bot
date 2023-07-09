@@ -3,7 +3,7 @@ import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
-  () => import("../logger/__mocks__/index.js")
+  () => import("../logger/__mocks__/index.js"),
 );
 
 interface TestCacheData {

@@ -33,7 +33,7 @@ export class WithAiProvider extends VoiceConverter {
     fileLink: string,
     isVideo: boolean,
     lang: LanguageCode,
-    logData: ConverterMeta
+    logData: ConverterMeta,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
@@ -49,20 +49,20 @@ export class WithAiProvider extends VoiceConverter {
   private static recognise(
     data: Buffer,
     authToken: string,
-    logPrefix: string
+    logPrefix: string,
   ): Promise<WitAiBaseResponse[]> {
     const duration = new TimeMeasure();
     return WithAiProvider.recogniseDictation(data, authToken, logPrefix)
       .catch((err) => {
         logger.error(
           `${logPrefix} Unable to resolve the dictation api. Retrying with speech api`,
-          err
+          err,
         );
         return WithAiProvider.recogniseSpeech(data, authToken, logPrefix);
       })
       .finally(() => {
         logger.info(
-          `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`
+          `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`,
         );
       });
   }
@@ -70,26 +70,26 @@ export class WithAiProvider extends VoiceConverter {
   private static recogniseSpeech(
     data: Buffer,
     authToken: string,
-    logPrefix: string
+    logPrefix: string,
   ): Promise<WitAiSpeechResponse[]> {
     return WithAiProvider.runRequest<WitAiSpeechResponse>(
       data,
       "speech",
       authToken,
-      logPrefix
+      logPrefix,
     );
   }
 
   private static recogniseDictation(
     data: Buffer,
     authToken: string,
-    logPrefix: string
+    logPrefix: string,
   ): Promise<WitAiDictationResponse[]> {
     return WithAiProvider.runRequest<WitAiDictationResponse>(
       data,
       "dictation",
       authToken,
-      logPrefix
+      logPrefix,
     );
   }
 
@@ -97,7 +97,7 @@ export class WithAiProvider extends VoiceConverter {
     data: Buffer,
     path: "speech" | "dictation",
     authToken: string,
-    logPrefix: string
+    logPrefix: string,
   ): Promise<Dto[]> {
     if (!authToken) {
       return Promise.reject(new Error("The auth token is not provided"));
@@ -134,12 +134,12 @@ export class WithAiProvider extends VoiceConverter {
       .then((response) => {
         const chunks = parseChunkedResponse<Dto>(response);
         const finalizedChunks = chunks.filter(
-          ({ is_final: isFinal }) => isFinal
+          ({ is_final: isFinal }) => isFinal,
         );
         if (!finalizedChunks.length) {
           logger.warn(
             `${logPrefix} The final response chunk not found. Transcription is empty.`,
-            chunks.map(({ text }) => text)
+            chunks.map(({ text }) => text),
           );
         }
         return finalizedChunks;

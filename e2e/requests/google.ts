@@ -9,7 +9,7 @@ export const mockGoogleAuth = (): nock.Scope => {
       expires_in: 100000,
       token_type: "Bearer",
     },
-    { "Content-Type": "application/json" }
+    { "Content-Type": "application/json" },
   );
   return scope;
 };

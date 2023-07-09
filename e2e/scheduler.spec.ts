@@ -17,12 +17,12 @@ import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js")
+  () => import("../src/logger/__mocks__/index.js"),
 );
 jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js")
+  () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
 jest.unstable_mockModule("../src/server/api.js", () => {
@@ -120,7 +120,7 @@ describe("[uptime daemon]", () => {
       const errMessage =
         "Next node url is not set for this node. Unable to set up the daemon";
       await expect(server.triggerDaemon("", 1)).rejects.toThrowError(
-        errMessage
+        errMessage,
       );
     });
 

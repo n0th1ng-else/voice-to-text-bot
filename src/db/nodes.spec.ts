@@ -12,7 +12,7 @@ import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",
-  () => import("../logger/__mocks__/index.js")
+  () => import("../logger/__mocks__/index.js"),
 );
 
 const dbConfig = {
@@ -47,14 +47,14 @@ describe("Nodes DB", () => {
   describe("not initialized", () => {
     it("can not update state", async () => {
       await expect(
-        client.updateState("test-url", true, "new-v")
+        client.updateState("test-url", true, "new-v"),
       ).rejects.toThrowError("The table nodes is not initialized yet");
     });
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrow();
       await expect(
-        client.updateState("test-url", true, "new-v")
+        client.updateState("test-url", true, "new-v"),
       ).rejects.toThrowError("The table nodes is not initialized yet");
     });
   });
@@ -125,7 +125,7 @@ describe("Nodes DB", () => {
       });
 
       await expect(
-        client.updateState(selfUrl, active, version)
+        client.updateState(selfUrl, active, version),
       ).rejects.toThrowError("Unable to get created row info");
     });
 
@@ -148,7 +148,7 @@ describe("Nodes DB", () => {
               updated_at: new Date(),
             },
           ],
-        })
+        }),
       );
 
       testPool.mockQuery(NodesSql.updateRow, (values) => {
@@ -199,7 +199,7 @@ describe("Nodes DB", () => {
               updated_at: new Date(),
             },
           ],
-        })
+        }),
       );
 
       testPool.mockQuery(NodesSql.updateRow, (values) => {
@@ -216,7 +216,7 @@ describe("Nodes DB", () => {
       });
 
       await expect(
-        client.updateState(selfUrl, active, version)
+        client.updateState(selfUrl, active, version),
       ).rejects.toThrowError("Unable to get updated row info");
     });
   });

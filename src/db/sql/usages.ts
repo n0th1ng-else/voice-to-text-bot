@@ -29,11 +29,11 @@ export class UsagesDb {
     chatId: number,
     langId: string,
     username: string,
-    usageCount: number
+    usageCount: number,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usages is not initialized yet")
+        new Error("The table usages is not initialized yet"),
       );
     }
 
@@ -63,11 +63,11 @@ export class UsagesDb {
     usageId: string,
     langId: string,
     usageCount: number,
-    username: string
+    username: string,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usages is not initialized yet")
+        new Error("The table usages is not initialized yet"),
       );
     }
     const query = UsagesSql.updateRow;
@@ -91,11 +91,11 @@ export class UsagesDb {
     usageCount: number,
     username: string,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usages is not initialized yet")
+        new Error("The table usages is not initialized yet"),
       );
     }
     const query = UsagesSql.updateRowWithDate;
@@ -119,7 +119,7 @@ export class UsagesDb {
   public getRows(chatId: number): Promise<UsageRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table usages is not initialized yet")
+        new Error("The table usages is not initialized yet"),
       );
     }
 
@@ -140,7 +140,7 @@ export class UsagesDb {
   public statRows(
     from: Date,
     to: Date,
-    usageCountFrom: number
+    usageCountFrom: number,
   ): Promise<UsageRowScheme[]> {
     const query = UsagesSql.statRows;
     const values = [usageCountFrom, from, to];

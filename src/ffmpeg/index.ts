@@ -56,7 +56,7 @@ const readWavBuffer = (wavStream: prism.FFmpeg): Promise<Buffer> => {
 
 const readWavBufferFromFileAndDelete = (
   fileLink: string,
-  fileName: string
+  fileName: string,
 ): Promise<Buffer> => {
   if (isDebug) {
     logger.info(`The link is ${fileLink}`);
@@ -65,14 +65,14 @@ const readWavBufferFromFileAndDelete = (
   const wavStream = getMpegDecoderStream(fileName);
   return readWavBuffer(wavStream)
     .then((buff) =>
-      Promise.all([Promise.resolve(buff), deleteFileIfExists(fileName)])
+      Promise.all([Promise.resolve(buff), deleteFileIfExists(fileName)]),
     )
     .then(([buff]) => buff)
     .catch((err) => deleteFileIfExists(fileName, err))
     .then((buff) => {
       if (typeof buff === "string") {
         return Promise.reject(
-          new Error("wrong file output! expected Buffer received string")
+          new Error("wrong file output! expected Buffer received string"),
         );
       }
 

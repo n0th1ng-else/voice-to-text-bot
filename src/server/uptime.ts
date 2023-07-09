@@ -24,10 +24,10 @@ export class UptimeDaemon {
 
   constructor(private readonly version = "") {
     this.daemon = new ScheduleDaemon("uptime", () =>
-      this.onTick()
+      this.onTick(),
     ).setStopHandler(
       () => this.shouldStop(),
-      () => this.onFinish()
+      () => this.onFinish(),
     );
   }
 
@@ -53,7 +53,7 @@ export class UptimeDaemon {
 
     if (interval < minInterval) {
       logger.warn(
-        `Lifecycle interval can not be less than 1 day. Falling back to 1 (Received ${interval})`
+        `Lifecycle interval can not be less than 1 day. Falling back to 1 (Received ${interval})`,
       );
     }
 
@@ -61,8 +61,8 @@ export class UptimeDaemon {
 
     logger.info(
       `Lifecycle interval is set to ${Logger.y(
-        sSuffix("day", this.lifecycleInterval)
-      )}`
+        sSuffix("day", this.lifecycleInterval),
+      )}`,
     );
 
     return this;
@@ -82,8 +82,8 @@ export class UptimeDaemon {
     const daysRunning = this.daysRunning.join(", ");
     logger.info(
       `Daemon tick. Today is ${Logger.y(
-        currentDay
-      )} and I have been running for (${Logger.y(daysRunning)}) already`
+        currentDay,
+      )} and I have been running for (${Logger.y(daysRunning)}) already`,
     );
 
     return requestHealthData(this.currentUrl).then((health) => {
@@ -95,7 +95,7 @@ export class UptimeDaemon {
       logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
 
       const isCallbackOwner = health.urls.every((url) =>
-        url.includes(this.currentUrl)
+        url.includes(this.currentUrl),
       );
 
       if (!isCallbackOwner && this.isRunning) {
@@ -124,8 +124,8 @@ export class UptimeDaemon {
 
       logger.warn(
         `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
-          this.nextUrl
-        )}`
+          this.nextUrl,
+        )}`,
       );
 
       if (!this.stat) {
@@ -145,7 +145,7 @@ export class UptimeDaemon {
 
     if (shouldStop) {
       logger.warn(
-        "Lifecycle limit reached. Delegating execution to the next node"
+        "Lifecycle limit reached. Delegating execution to the next node",
       );
     }
 

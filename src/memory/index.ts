@@ -4,7 +4,7 @@ const logger = new Logger("memory");
 
 export const printCurrentMemoryStat = (
   limit?: number,
-  offset = 15
+  offset = 15,
 ): Promise<void> => {
   const stat = getMemoryUsageMb();
   const line = `Current usage [rss=${stat.rss}Mb] [heapTotal=${stat.heapTotal}Mb] [heapUsed=${stat.heapUsed}Mb]`;
@@ -21,7 +21,7 @@ export const printCurrentMemoryStat = (
   if (statDiff > fullStat) {
     logger.error(
       `The process exceeds memory limit ${limit}Mb! ${line}`,
-      new Error("The process exceeds memory limit")
+      new Error("The process exceeds memory limit"),
     );
     return Promise.resolve();
   }

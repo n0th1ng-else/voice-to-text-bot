@@ -18,7 +18,7 @@ export class UsagesClient {
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("usages")} has been initialized`)
+        logger.info(`Table ${Logger.y("usages")} has been initialized`),
       )
       .catch((err) => {
         logger.error(`Unable to initialize ${Logger.y("usages")} table`, err);
@@ -29,7 +29,7 @@ export class UsagesClient {
   public getLangId(
     chatId: number,
     username: string,
-    langId: LanguageCode
+    langId: LanguageCode,
   ): Promise<LanguageCode> {
     return this.getRows(chatId)
       .then((rows) => {
@@ -45,7 +45,7 @@ export class UsagesClient {
 
   public updateLangId(
     chatId: number,
-    langId: LanguageCode
+    langId: LanguageCode,
   ): Promise<UsageRowScheme> {
     return this.getRows(chatId).then((rows) => {
       const row = rows.shift();
@@ -54,7 +54,7 @@ export class UsagesClient {
           row.usage_id,
           langId,
           row.usage_count,
-          row.user_name
+          row.user_name,
         );
       }
 
@@ -65,7 +65,7 @@ export class UsagesClient {
   public updateUsageCount(
     chatId: number,
     username: string,
-    langId: LanguageCode
+    langId: LanguageCode,
   ): Promise<UsageRowScheme> {
     return this.getRows(chatId).then((rows) => {
       const row = rows.shift();
@@ -74,7 +74,7 @@ export class UsagesClient {
           row.usage_id,
           row.lang_id || langId,
           row.usage_count + 1,
-          username || row.user_name
+          username || row.user_name,
         );
       }
 
@@ -91,7 +91,7 @@ export class UsagesClient {
     langId: string,
     username: string,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ): Promise<UsageRowScheme> {
     return this.getRows(chatId)
       .then((rows) => {
@@ -107,8 +107,8 @@ export class UsagesClient {
           usageCount,
           username,
           createdAt,
-          updatedAt
-        )
+          updatedAt,
+        ),
       );
   }
 
@@ -118,7 +118,7 @@ export class UsagesClient {
   public statRows(
     from: Date,
     to: Date,
-    usageCountFrom: number
+    usageCountFrom: number,
   ): Promise<UsageRowScheme[]> {
     logger.info("Looking for rows");
     return this.db
@@ -137,7 +137,7 @@ export class UsagesClient {
     usageId: string,
     langId: string,
     usageCount: number,
-    username: string
+    username: string,
   ): Promise<UsageRowScheme> {
     logger.info(`Updating the row with id=${usageId}`);
     return this.db
@@ -146,7 +146,7 @@ export class UsagesClient {
         const id = this.db.getId(row);
         logger.info(
           `The row with id=${usageId} has been updated`,
-          id === usageId
+          id === usageId,
         );
         return row;
       })
@@ -160,7 +160,7 @@ export class UsagesClient {
     chatId: number,
     langId: LanguageCode,
     username = "",
-    usageCount = 0
+    usageCount = 0,
   ): Promise<UsageRowScheme> {
     logger.info("Creating a new row");
     return this.db

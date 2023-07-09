@@ -20,12 +20,12 @@ export class DonationsClient {
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("donations")} has been initialized`)
+        logger.info(`Table ${Logger.y("donations")} has been initialized`),
       )
       .catch((err) => {
         logger.error(
           `Unable to initialize ${Logger.y("donations")} table`,
-          err
+          err,
         );
         throw err;
       });
@@ -33,7 +33,7 @@ export class DonationsClient {
 
   public updateRow(
     donationId: number,
-    status: DonationStatus
+    status: DonationStatus,
   ): Promise<DonationRowScheme> {
     logger.info(`Updating the row with id=${donationId}`);
     return this.db
@@ -42,7 +42,7 @@ export class DonationsClient {
         const id = this.getRowId(row);
         logger.info(
           `The row with id=${donationId} has been updated`,
-          id === donationId
+          id === donationId,
         );
         return row;
       })
@@ -73,14 +73,14 @@ export class DonationsClient {
       .getRows(DonationStatus.Pending)
       .then((rows) => {
         logger.info(
-          `Row search has been executed for status=${DonationStatus.Pending}`
+          `Row search has been executed for status=${DonationStatus.Pending}`,
         );
         return rows;
       })
       .catch((err) => {
         logger.error(
           `Unable provide a search for status=${DonationStatus.Pending}`,
-          err
+          err,
         );
         throw err;
       });

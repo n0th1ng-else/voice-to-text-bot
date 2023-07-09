@@ -39,14 +39,14 @@ export class TelegramMessageModel {
 
   constructor(
     public readonly chatId: number,
-    public readonly chatType: TgChatType
+    public readonly chatType: TgChatType,
   ) {}
 
   public setName(
     messageId: number,
     options: UserNameOptions,
     isBot = false,
-    lang = ""
+    lang = "",
   ): this {
     this.messageId = messageId;
     this.isBot = isBot;
@@ -68,7 +68,7 @@ export class TelegramMessageModel {
     messageId: number,
     id: string,
     duration: number,
-    type = "audio/ogg"
+    type = "audio/ogg",
   ): this {
     this.messageId = messageId;
     this.voiceId = id;
@@ -81,7 +81,7 @@ export class TelegramMessageModel {
     messageId: number,
     id: string,
     duration: number,
-    type = "audio/opus"
+    type = "audio/opus",
   ): this {
     this.messageId = messageId;
     this.voiceId = id;
@@ -94,7 +94,7 @@ export class TelegramMessageModel {
   public setLangCallback(
     messageId: number,
     langId: LanguageCode,
-    prefixId: string
+    prefixId: string,
   ): this {
     this.messageId = messageId;
     const data = new TelegramButtonModel<LanguageCode>("l", langId, prefixId);
@@ -106,7 +106,7 @@ export class TelegramMessageModel {
   public setFundCallback(
     messageId: number,
     price: number,
-    prefixId: string
+    prefixId: string,
   ): this {
     this.messageId = messageId;
     const data = new TelegramButtonModel("d", String(price), prefixId);
@@ -187,7 +187,7 @@ export class TelegramMessageMetaItem {
     public readonly type: TelegramMessageMetaType,
     public readonly title: LabelId | string,
     public readonly data: string,
-    public readonly btnType: TelegramButtonType = "d"
+    public readonly btnType: TelegramButtonType = "d",
   ) {}
 }
 
@@ -196,7 +196,10 @@ export class BotStatRecordModel {
   public user = "";
   public usageCount = 0;
 
-  constructor(public chatId: number, public langId: LanguageCode = "en-US") {}
+  constructor(
+    public chatId: number,
+    public langId: LanguageCode = "en-US",
+  ) {}
 
   public setObjectId(objectId: number): this {
     this.objectId = String(objectId);
@@ -227,8 +230,8 @@ export const getFundButtons = (): TelegramMessageMetaItem[][] => {
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
         TextModel.toCurrency(level.amount, level.meta),
-        String(level.amount)
-      )
+        String(level.amount),
+      ),
   );
 
   buttons.push(extendedButtons);
@@ -243,7 +246,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
         TelegramMessageMetaType.Button,
         LabelId.BtnRussian,
         "ru-RU",
-        "l"
+        "l",
       ),
     ],
     [
@@ -251,7 +254,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
         TelegramMessageMetaType.Button,
         LabelId.BtnEnglish,
         "en-US",
-        "l"
+        "l",
       ),
     ],
   ];

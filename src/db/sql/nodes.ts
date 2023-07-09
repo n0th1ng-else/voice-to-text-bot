@@ -27,11 +27,11 @@ export class NodesDb {
   public createRow(
     selfUrl: string,
     isActive: boolean,
-    version: string
+    version: string,
   ): Promise<NodeRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table nodes is not initialized yet")
+        new Error("The table nodes is not initialized yet"),
       );
     }
     const query = NodesSql.insertRow;
@@ -51,11 +51,11 @@ export class NodesDb {
   public updateRow(
     nodeId: string,
     isActive: boolean,
-    version: string
+    version: string,
   ): Promise<NodeRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table nodes is not initialized yet")
+        new Error("The table nodes is not initialized yet"),
       );
     }
     const query = NodesSql.updateRow;
@@ -73,7 +73,7 @@ export class NodesDb {
   public getRows(selfUrl: string): Promise<NodeRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
-        new Error("The table nodes is not initialized yet")
+        new Error("The table nodes is not initialized yet"),
       );
     }
     const query = NodesSql.getRows;

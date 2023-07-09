@@ -11,7 +11,7 @@ export const mockCreateDonationRow = (
   pool: MockPool,
   item: BotStatRecordModel,
   price: number,
-  donationId: number
+  donationId: number,
 ): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(DonationsSql.insertRow, (values) => {
@@ -30,7 +30,7 @@ export const mockCreateDonationRow = (
             String(item.chatId),
             price,
             DonationStatus.Initialized,
-            donationId
+            donationId,
           ),
         ],
       });
@@ -42,7 +42,7 @@ const getDbDto = (
   chatId: string,
   price: number,
   status: string,
-  donationId: number
+  donationId: number,
 ): DonationRowScheme => {
   return {
     donation_id: donationId,

@@ -27,17 +27,17 @@ export class Pool extends EventEmitter implements pg.Pool {
 
   public query(
     queryStream: AnyTypeForMock,
-    values?: AnyTypeForMock
+    values?: AnyTypeForMock,
   ): Promise<AnyTypeForMock> {
     const queryRecord = this.mockQueue.find(
-      (mockItem) => mockItem.sql === queryStream
+      (mockItem) => mockItem.sql === queryStream,
     );
     if (!queryRecord) {
       return Promise.reject(new Error(`Unexpected sql ${queryStream}`));
     }
 
     this.mockQueue = this.mockQueue.filter(
-      (mockItem) => mockItem.id !== queryRecord.id
+      (mockItem) => mockItem.id !== queryRecord.id,
     );
     return queryRecord.handler(values);
   }
@@ -48,7 +48,7 @@ export class Pool extends EventEmitter implements pg.Pool {
 
   public mockQuery(
     query: string,
-    handler: (values: AnyTypeForMock[]) => Promise<AnyTypeForMock>
+    handler: (values: AnyTypeForMock[]) => Promise<AnyTypeForMock>,
   ): void {
     this.mockQueue.push(new MockSql(query, handler));
   }
@@ -72,7 +72,7 @@ class MockSql {
   constructor(
     public readonly sql: string,
     public readonly handler: (
-      values: AnyTypeForMock[]
-    ) => Promise<AnyTypeForMock>
+      values: AnyTypeForMock[],
+    ) => Promise<AnyTypeForMock>,
   ) {}
 }

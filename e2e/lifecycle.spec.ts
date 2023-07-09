@@ -23,12 +23,12 @@ import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js")
+  () => import("../src/logger/__mocks__/index.js"),
 );
 jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js")
+  () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
 const enableSSL = false;
@@ -85,7 +85,7 @@ describe("[lifecycle]", () => {
 
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions
+      converterOptions,
     );
 
     hostUrl = `${localhostUrl}:${appPort}`;
@@ -127,7 +127,7 @@ describe("[lifecycle]", () => {
       expect(res.body.urls).toEqual([]);
       expect(res.body.version).toBe(appVersion);
       expect(res.body.message).toBe(
-        "App is not connected to the Telegram server"
+        "App is not connected to the Telegram server",
       );
     });
   });

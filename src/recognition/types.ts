@@ -14,7 +14,7 @@ export abstract class VoiceConverter {
     fileLink: string,
     isVideo: boolean,
     lang: LanguageCode,
-    opts: ConverterMeta
+    opts: ConverterMeta,
   ): Promise<string>;
 }
 

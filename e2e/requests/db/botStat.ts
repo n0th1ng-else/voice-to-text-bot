@@ -10,7 +10,7 @@ export const mockGetBotStatItem = (
   pool: MockPool,
   chatId: number,
   lang: LanguageCode,
-  item?: BotStatRecordModel
+  item?: BotStatRecordModel,
 ): BotStatRecordModel => {
   if (!item) {
     mockBotStatFind(pool, chatId);
@@ -24,7 +24,7 @@ export const mockGetBotStatItem = (
 
 export const mockUpdateBotStatUsage = (
   pool: MockPool,
-  item: BotStatRecordModel
+  item: BotStatRecordModel,
 ): Promise<void> => {
   mockBotStatFind(pool, item.chatId, [item]);
   return mockBotStatUpdateUsage(pool, item);
@@ -33,7 +33,7 @@ export const mockUpdateBotStatUsage = (
 export const mockUpdateBotStatLang = (
   pool: MockPool,
   item: BotStatRecordModel,
-  langId: LanguageCode
+  langId: LanguageCode,
 ): Promise<void> => {
   mockBotStatFind(pool, item.chatId, [item]);
   return mockBotStatUpdateLang(pool, item, langId);
@@ -42,7 +42,7 @@ export const mockUpdateBotStatLang = (
 const mockBotStatFind = (
   pool: MockPool,
   chatId: number,
-  items: BotStatRecordModel[] = []
+  items: BotStatRecordModel[] = [],
 ): void => {
   pool.mockQuery(UsagesSql.getRows, (values) => {
     expect(values).toHaveLength(1);
@@ -55,7 +55,7 @@ const mockBotStatCreate = (
   pool: MockPool,
   chatId: number,
   userName: string,
-  lang: LanguageCode
+  lang: LanguageCode,
 ): BotStatRecordModel => {
   const stat = new BotStatRecordModel(chatId, lang);
   const objectId = randomIntFromInterval(1, 100000);
@@ -80,7 +80,7 @@ const mockBotStatCreate = (
 
 const mockBotStatUpdateUsage = (
   pool: MockPool,
-  item: BotStatRecordModel
+  item: BotStatRecordModel,
 ): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(UsagesSql.updateRow, (values) => {
@@ -100,7 +100,7 @@ const mockBotStatUpdateUsage = (
 const mockBotStatUpdateLang = (
   pool: MockPool,
   item: BotStatRecordModel,
-  langId: LanguageCode
+  langId: LanguageCode,
 ): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(UsagesSql.updateRow, (values) => {
