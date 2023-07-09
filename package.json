@@ -32,9 +32,9 @@
   },
   "dependencies": {
     "@amplitude/node": "1.10.2",
-    "@google-cloud/pubsub": "2.16.1",
-    "@google-cloud/secret-manager": "3.9.0",
-    "@google-cloud/speech": "4.5.5",
+    "@google-cloud/pubsub": "3.7.1",
+    "@google-cloud/secret-manager": "4.2.2",
+    "@google-cloud/speech": "5.5.1",
     "@sentry/node": "7.57.0",
     "@sentry/profiling-node": "1.0.8",
     "aws-sdk": "2.1310.0",
