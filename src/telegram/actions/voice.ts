@@ -114,7 +114,7 @@ export class VoiceAction extends GenericAction {
           },
           prefix,
           model.forumThreadId,
-        ).then(flattenPromise);
+        ).then(flattenPromise); // TODO fix
       })
       .catch((err) => {
         const errorMessage =
