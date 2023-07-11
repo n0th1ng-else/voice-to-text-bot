@@ -22,6 +22,7 @@ import { Logger } from "../../logger/index.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
+import { flattenPromise } from "../../common/helpers.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -114,7 +115,7 @@ export class LangAction extends GenericAction {
           { lang },
           prefix,
           forumThreadId,
-        );
+        ).then(flattenPromise);
       })
       .catch((err) => {
         const errorMessage = "Unable to send the language update message";

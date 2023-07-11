@@ -301,6 +301,10 @@ export const TgLeaveChatSchema = z
 
 export type TgLeaveChatSchema = z.infer<typeof TgLeaveChatSchema>;
 
+export const TgDeleteMessageSchema = z
+  .boolean()
+  .describe("Telegram delete message schema");
+
 const TgPhotoSchema = z
   .object({
     url: z.string(),

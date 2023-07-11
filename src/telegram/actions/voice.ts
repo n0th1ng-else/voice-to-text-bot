@@ -12,6 +12,7 @@ import { type LanguageCode, VoiceConverter } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";
+import { flattenPromise } from "../../common/helpers.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -74,37 +75,13 @@ export class VoiceAction extends GenericAction {
           this.sendInProgressMessage(model, lang, prefix),
         ]);
       })
-      .then(([text, time]) => {
+      .then(([text, time, messageId]) => {
         if (!text) {
-          logger.warn(`${prefix.getPrefix()} Empty recognition response`);
-          if (model.isGroup) {
-            return;
-          }
-
-          return this.sendMessage(
-            model.chatId,
-            model.id,
-            LabelId.RecognitionEmpty,
-            {
-              lang,
-            },
-            prefix,
-            model.forumThreadId,
-          );
+          return this.sendEmptyRecognition(model, lang, prefix, messageId);
         }
 
         model.analytics.addTime("voice-to-text-time", time.getMs());
-        const name = model.fullUserName || model.userName;
-        const msgPrefix = model.isGroup && name ? `${name} ` : "";
-        return this.sendRawMessage(
-          model.chatId,
-          `${msgPrefix}🗣 ${text}`,
-          lang,
-          {
-            disableMarkup: true,
-          },
-          model.forumThreadId,
-        );
+        return this.sendRecognition(model, lang, text, prefix, messageId);
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
@@ -137,7 +114,7 @@ export class VoiceAction extends GenericAction {
           },
           prefix,
           model.forumThreadId,
-        );
+        ).then(flattenPromise);
       })
       .catch((err) => {
         const errorMessage =
@@ -166,9 +143,9 @@ export class VoiceAction extends GenericAction {
     model: BotMessageModel,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  ): Promise<number> {
     if (model.isGroup) {
-      return Promise.resolve();
+      return Promise.resolve(0);
     }
 
     return this.sendMessage(
@@ -180,19 +157,25 @@ export class VoiceAction extends GenericAction {
       },
       prefix,
       model.forumThreadId,
-    ).catch((err) => {
-      const isBlocked = isBlockedByUser(err);
-      const errorMessage = "Unable to send in progress message";
-      const logError = `${prefix.getPrefix()} ${errorMessage}`;
-      if (isBlocked) {
-        // TODO remove faking errors into warnings
-        logger.warn(logError, err);
-      } else {
-        logger.error(logError, err);
-      }
+    )
+      .then((messagesIds) => {
+        const messageId = messagesIds.at(0);
+        return messageId ?? 0;
+      })
+      .catch((err) => {
+        const isBlocked = isBlockedByUser(err);
+        const errorMessage = "Unable to send in progress message";
+        const logError = `${prefix.getPrefix()} ${errorMessage}`;
+        if (isBlocked) {
+          // TODO remove faking errors into warnings
+          logger.warn(logError, err);
+        } else {
+          logger.error(logError, err);
+        }
 
-      model.analytics.addError(errorMessage);
-    });
+        model.analytics.addError(errorMessage);
+        return 0;
+      });
   }
 
   private updateUsageCount(
@@ -209,5 +192,74 @@ export class VoiceAction extends GenericAction {
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.addError(errorMessage);
       });
+  }
+
+  private deleteInProgressMessage(
+    model: BotMessageModel,
+    messageId: number,
+    prefix: TelegramMessagePrefix,
+  ): Promise<boolean> {
+    if (!messageId) {
+      return Promise.resolve(true);
+    }
+    return this.deleteMessage(model.chatId, messageId).catch((err) => {
+      const errorMessage = "Unable to delete in progress message";
+      logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+      model.analytics.addError(errorMessage);
+      return false;
+    });
+  }
+
+  private sendEmptyRecognition(
+    model: BotMessageModel,
+    lang: LanguageCode,
+    prefix: TelegramMessagePrefix,
+    inProgressMessageId: number,
+  ): Promise<void> {
+    logger.warn(`${prefix.getPrefix()} Empty recognition response`);
+    if (model.isGroup) {
+      return Promise.resolve();
+    }
+
+    return this.sendMessage(
+      model.chatId,
+      model.id,
+      LabelId.RecognitionEmpty,
+      {
+        lang,
+      },
+      prefix,
+      model.forumThreadId,
+    )
+      .then(() =>
+        this.deleteInProgressMessage(model, inProgressMessageId, prefix),
+      )
+      .then(flattenPromise);
+  }
+
+  private sendRecognition(
+    model: BotMessageModel,
+    lang: LanguageCode,
+    text: string,
+    prefix: TelegramMessagePrefix,
+    inProgressMessageId: number,
+  ) {
+    const name = model.fullUserName || model.userName;
+    const msgPrefix = model.isGroup && name ? `${name} ` : "";
+    const fullMessage = `${msgPrefix}🗣 ${text}`;
+
+    return this.sendRawMessage(
+      model.chatId,
+      fullMessage,
+      lang,
+      {
+        disableMarkup: true,
+      },
+      model.forumThreadId,
+    )
+      .then(() =>
+        this.deleteInProgressMessage(model, inProgressMessageId, prefix),
+      )
+      .then(flattenPromise);
   }
 }

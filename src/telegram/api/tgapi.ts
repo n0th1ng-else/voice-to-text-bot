@@ -10,6 +10,7 @@ import {
   MessageDto,
   PreCheckoutQueryDto,
   TgCore,
+  TgDeleteMessageSchema,
   TgFile,
   TgInvoice,
   TgLeaveChatSchema,
@@ -187,6 +188,18 @@ export class TelegramApi {
       TgLeaveChatSchema,
       {
         chat_id: chatId,
+      },
+      chatId,
+    );
+  }
+
+  public deleteMessage(chatId: number, messageId: number) {
+    return this.requestValidate(
+      "deleteMessage",
+      TgDeleteMessageSchema,
+      {
+        chat_id: chatId,
+        message_id: messageId,
       },
       chatId,
     );
