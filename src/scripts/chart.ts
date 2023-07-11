@@ -1,35 +1,19 @@
 import { createServer as createHttps } from "node:https";
 import { createServer as createHttp } from "node:http";
-import { resolve as resolvePath } from "node:path";
-import { fileURLToPath } from "node:url";
 import express from "express";
 import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
 import { sSuffix } from "../text/index.js";
 import { httpsOptions } from "../../certs/index.js";
 import { DbClient } from "../db/index.js";
+import { initStaticServer } from "../server/static.js";
 
 const logger = new Logger("chart-script");
 
 export const run = async (): Promise<void> => {
-  const currentDir = fileURLToPath(new URL(".", import.meta.url));
-  const files = {
-    html: resolvePath(currentDir, "../chart/index.html"),
-    js: resolvePath(currentDir, "../chart/index.js"),
-  };
+  const app = initStaticServer("chart");
 
   let db: DbClient | null = null;
-
-  const app = express();
-  app.use(express.json());
-
-  app.get("/", (req: express.Request, res: express.Response) => {
-    res.status(200).sendFile(files.html);
-  });
-
-  app.get("/index.js", (req: express.Request, res: express.Response) => {
-    res.status(200).sendFile(files.js);
-  });
 
   app.post("/login", (req: express.Request, res: express.Response) => {
     if (db) {
@@ -52,10 +36,6 @@ export const run = async (): Promise<void> => {
       db = null;
     }
     res.status(200).send({});
-  });
-
-  app.get("/favicon.ico", (_req, res: express.Response<string>) => {
-    res.status(204).send("");
   });
 
   app.get("/stat", (req: express.Request, res: express.Response) => {
