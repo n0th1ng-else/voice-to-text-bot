@@ -34,8 +34,8 @@ export class StartAction extends GenericAction {
     return this.getChatLanguage(model, prefix)
       .then((lang) =>
         this.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           [
             LabelId.WelcomeMessage,
             LabelId.WelcomeMessageGroup,

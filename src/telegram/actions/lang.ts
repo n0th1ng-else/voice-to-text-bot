@@ -108,8 +108,8 @@ export class LangAction extends GenericAction {
         }
 
         return this.sendMessage(
-          messageId,
           chatId,
+          messageId,
           LabelId.UpdateLanguageError,
           { lang },
           prefix,
@@ -203,8 +203,8 @@ export class LangAction extends GenericAction {
         const buttons: TgInlineKeyboardButton[][] = [[ruBtn], [enBtn]];
 
         return this.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           LabelId.ChangeLangTitle,
           {
             lang,

@@ -82,8 +82,8 @@ export class VoiceAction extends GenericAction {
           }
 
           return this.sendMessage(
-            model.id,
             model.chatId,
+            model.id,
             LabelId.RecognitionEmpty,
             {
               lang,
@@ -129,8 +129,8 @@ export class VoiceAction extends GenericAction {
         }
 
         return this.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           LabelId.RecognitionFailed,
           {
             lang,
@@ -172,8 +172,8 @@ export class VoiceAction extends GenericAction {
     }
 
     return this.sendMessage(
-      model.id,
       model.chatId,
+      model.id,
       LabelId.InProgress,
       {
         lang,

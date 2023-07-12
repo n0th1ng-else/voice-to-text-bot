@@ -53,8 +53,8 @@ export class VoiceLengthAction extends GenericAction {
     return this.getChatLanguage(model, prefix)
       .then((lang) =>
         this.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           LabelId.LongVoiceMessage,
           {
             lang,

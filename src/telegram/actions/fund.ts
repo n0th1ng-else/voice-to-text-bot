@@ -66,8 +66,8 @@ export class FundAction extends GenericAction {
         buttons.push(donations);
 
         return this.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           LabelId.FundCommandMessage,
           {
             lang,

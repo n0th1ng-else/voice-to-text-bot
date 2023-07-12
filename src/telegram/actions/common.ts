@@ -50,8 +50,8 @@ export abstract class GenericAction {
   }
 
   public sendMessage(
-    messageId: number,
     chatId: number,
+    messageId: number,
     ids: LabelId | LabelId[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
@@ -76,7 +76,7 @@ export abstract class GenericAction {
       forumThreadId,
     )
       .then(() =>
-        this.sendMessage(messageId, chatId, msgs, meta, prefix, forumThreadId),
+        this.sendMessage(chatId, messageId, msgs, meta, prefix, forumThreadId),
       )
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to send the message`, err);
