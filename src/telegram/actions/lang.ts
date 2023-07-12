@@ -1,4 +1,8 @@
-import { TgCallbackQuery, TgMessage } from "../api/types.js";
+import {
+  TgCallbackQuery,
+  TgInlineKeyboardButton,
+  TgMessage,
+} from "../api/types.js";
 import { GenericAction } from "./common.js";
 import {
   BotCommand,
@@ -175,8 +179,28 @@ export class LangAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const EnData = new TelegramButtonModel("l", "en-US", prefix.id);
-        const RuData = new TelegramButtonModel("l", "ru-RU", prefix.id);
+        const ruData = new TelegramButtonModel<LanguageCode>(
+          "l",
+          "ru-RU",
+          prefix.id,
+        );
+        const enData = new TelegramButtonModel<LanguageCode>(
+          "l",
+          "en-US",
+          prefix.id,
+        );
+
+        const ruBtn: TgInlineKeyboardButton = {
+          text: this.text.t(LabelId.BtnRussian, lang),
+          callback_data: ruData.getDtoString(),
+        };
+
+        const enBtn: TgInlineKeyboardButton = {
+          text: this.text.t(LabelId.BtnEnglish, lang),
+          callback_data: enData.getDtoString(),
+        };
+
+        const buttons: TgInlineKeyboardButton[][] = [[ruBtn], [enBtn]];
 
         return this.sendMessage(
           model.id,
@@ -184,20 +208,9 @@ export class LangAction extends GenericAction {
           LabelId.ChangeLangTitle,
           {
             lang,
-            options: [
-              [
-                {
-                  text: this.text.t(LabelId.BtnRussian, lang),
-                  callback_data: RuData.getDtoString(),
-                },
-              ],
-              [
-                {
-                  text: this.text.t(LabelId.BtnEnglish, lang),
-                  callback_data: EnData.getDtoString(),
-                },
-              ],
-            ],
+            options: {
+              buttons,
+            },
           },
           prefix,
           model.forumThreadId,

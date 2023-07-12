@@ -1,4 +1,4 @@
-import { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
+import { TgMessage, TgMessageOptions } from "../api/types.js";
 import {
   BotMessageModel,
   MessageOptions,
@@ -72,9 +72,7 @@ export abstract class GenericAction {
       chatId,
       this.text.t(part, meta.lang),
       meta.lang,
-      {
-        buttons: meta.options,
-      },
+      meta.options,
       forumThreadId,
     )
       .then(() =>
@@ -94,9 +92,12 @@ export abstract class GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.bot
-      .editMessageText(chatId, messageId, this.text.t(id, meta.lang), {
-        buttons: meta.options,
-      })
+      .editMessageText(
+        chatId,
+        messageId,
+        this.text.t(id, meta.lang),
+        meta.options,
+      )
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`));
   }
 
@@ -104,10 +105,7 @@ export abstract class GenericAction {
     chatId: number,
     message: string,
     lang: LanguageCode,
-    options: {
-      buttons?: TgInlineKeyboardButton[][];
-      disableMarkup?: boolean;
-    } = {},
+    options: TgMessageOptions = {},
     forumThreadId?: number,
   ): Promise<void> {
     const messageParts = splitTextIntoParts(
@@ -126,10 +124,7 @@ export abstract class GenericAction {
   private sendRawMessageParts(
     chatId: number,
     messageParts: string[],
-    options: {
-      buttons?: TgInlineKeyboardButton[][];
-      disableMarkup?: boolean;
-    } = {},
+    options: TgMessageOptions = {},
     forumThreadId?: number,
   ): Promise<void> {
     const message = messageParts.shift();

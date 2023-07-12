@@ -11,10 +11,10 @@ import {
   PreCheckoutQueryDto,
   TgCore,
   TgFile,
-  TgInlineKeyboardButton,
   TgInvoice,
   TgLeaveChatSchema,
   TgMessage,
+  TgMessageOptions,
   TgSetWebHookSchema,
   TgWebHook,
   TgWebHookSchema,
@@ -81,10 +81,7 @@ export class TelegramApi {
   public sendMessage(
     chatId: number,
     text: string,
-    options: {
-      buttons?: TgInlineKeyboardButton[][];
-      disableMarkup?: boolean;
-    } = {},
+    options: TgMessageOptions = {},
     forumThreadId?: number,
   ): Promise<TgMessage> {
     const data: MessageDto = {
@@ -113,10 +110,7 @@ export class TelegramApi {
     chatId: number,
     messageId: number,
     text: string,
-    options: {
-      buttons?: TgInlineKeyboardButton[][];
-      disableMarkup?: boolean;
-    } = {},
+    options: TgMessageOptions = {},
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
