@@ -83,7 +83,7 @@ let getLangButtons: InjectedTestFn["getLangButtons"];
 let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
 let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"];
 let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
-let getFundButtons: InjectedTestFn["getFundButtons"];
+let getDonateButtons: InjectedTestFn["getDonateButtons"];
 let botStat: InstanceType<InjectedTestFn["BotStatRecordModel"]>;
 let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
 let testLangId: LanguageCode;
@@ -117,7 +117,7 @@ describe("[russian language]", () => {
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
     mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
-    getFundButtons = initTest.getFundButtons;
+    getDonateButtons = initTest.getDonateButtons;
     BotStatRecordModel = initTest.BotStatRecordModel;
     testLangId = "ru-RU";
 
@@ -556,8 +556,8 @@ describe("[russian language]", () => {
       });
     });
 
-    it("responds on a /fund message", () => {
-      tgMessage.setText(testMessageId, BotCommand.Fund);
+    it("responds on a /donate message", () => {
+      tgMessage.setText(testMessageId, BotCommand.Donate);
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
@@ -571,14 +571,17 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.FundCommandMessage,
-          getFundButtons(),
+          LabelId.DonateCommandMessage,
+          getDonateButtons(),
         ),
       ]);
     });
 
-    it("responds on a /fund message with bot name", () => {
-      tgMessage.setText(testMessageId, `${BotCommand.Fund}@${telegramBotName}`);
+    it("responds on a /donate message with bot name", () => {
+      tgMessage.setText(
+        testMessageId,
+        `${BotCommand.Donate}@${telegramBotName}`,
+      );
       const statModel = mockGetBotStatItem(
         testPool,
         tgMessage.chatId,
@@ -592,8 +595,8 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.FundCommandMessage,
-          getFundButtons(),
+          LabelId.DonateCommandMessage,
+          getDonateButtons(),
         ),
       ]);
     });

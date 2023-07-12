@@ -103,7 +103,7 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setFundCallback(
+  public setDonateCallback(
     messageId: number,
     price: number,
     prefixId: string,
@@ -223,7 +223,7 @@ export const getMockCertificate = (): string => {
   return readFileSync(path, { encoding: "utf-8" });
 };
 
-export const getFundButtons = (): TelegramMessageMetaItem[][] => {
+export const getDonateButtons = (): TelegramMessageMetaItem[][] => {
   const buttons: TelegramMessageMetaItem[][] = [];
   const extendedButtons: TelegramMessageMetaItem[] = donationLevels.map(
     (level) =>

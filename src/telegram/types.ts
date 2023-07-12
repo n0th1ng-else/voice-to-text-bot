@@ -38,7 +38,7 @@ export enum BotCommand {
   Start = "/start",
   Language = "/lang",
   Support = "/support",
-  Fund = "/fund",
+  Donate = "/donate",
 }
 
 export class BotMessageModel {

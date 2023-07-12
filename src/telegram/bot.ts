@@ -150,8 +150,8 @@ export class TelegramBotModel {
       return this.actions.support.runAction(model, prefix);
     }
 
-    if (this.actions.fund.runCondition(msg, model)) {
-      return this.actions.fund.runAction(model, prefix);
+    if (this.actions.donate.runCondition(msg, model)) {
+      return this.actions.donate.runAction(model, prefix);
     }
 
     if (this.actions.voiceFormat.runCondition(msg)) {

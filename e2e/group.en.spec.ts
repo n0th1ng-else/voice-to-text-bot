@@ -83,7 +83,7 @@ let getLangButtons: InjectedTestFn["getLangButtons"];
 let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
 let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"];
 let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
-let getFundButtons: InjectedTestFn["getFundButtons"];
+let getDonateButtons: InjectedTestFn["getDonateButtons"];
 // *EndOf Define dependencies
 
 describe("[default language - english]", () => {
@@ -114,7 +114,7 @@ describe("[default language - english]", () => {
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
     mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
-    getFundButtons = initTest.getFundButtons;
+    getDonateButtons = initTest.getDonateButtons;
 
     const mockGoogleAuth = initTest.mockGoogleAuth;
     const TelegramBotModel = init.TelegramBotModel;
@@ -550,8 +550,8 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("responds on a /fund message", () => {
-      tgMessage.setText(testMessageId, BotCommand.Fund);
+    it("responds on a /donate message", () => {
+      tgMessage.setText(testMessageId, BotCommand.Donate);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -560,14 +560,17 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.FundCommandMessage,
-          getFundButtons(),
+          LabelId.DonateCommandMessage,
+          getDonateButtons(),
         ),
       ]);
     });
 
-    it("responds on a /fund message with bot name", () => {
-      tgMessage.setText(testMessageId, `${BotCommand.Fund}@${telegramBotName}`);
+    it("responds on a /donate message with bot name", () => {
+      tgMessage.setText(
+        testMessageId,
+        `${BotCommand.Donate}@${telegramBotName}`,
+      );
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -576,8 +579,8 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.FundCommandMessage,
-          getFundButtons(),
+          LabelId.DonateCommandMessage,
+          getDonateButtons(),
         ),
       ]);
     });

@@ -31,10 +31,10 @@ export const isSupportMessage = (
   msg: TgMessage,
 ): boolean => isCommandMessage(model, msg, BotCommand.Support);
 
-export const isFundMessage = (
+export const isDonateMessage = (
   model: BotMessageModel,
   msg: TgMessage,
-): boolean => isCommandMessage(model, msg, BotCommand.Fund);
+): boolean => isCommandMessage(model, msg, BotCommand.Donate);
 
 const isCommandMessage = (
   model: BotMessageModel,
