@@ -61,7 +61,7 @@ let TelegramMessageMetaType: InjectedTestFn["TelegramMessageMetaType"];
 let officialChannelAccount: InjectedFn["officialChannelAccount"];
 let githubUrl: InjectedFn["githubUrl"];
 let getLangButtons: InjectedTestFn["getLangButtons"];
-let getFundButtons: InjectedTestFn["getFundButtons"];
+let getDonateButtons: InjectedTestFn["getDonateButtons"];
 let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
 let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"];
 let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
@@ -93,7 +93,7 @@ describe("[default language - english]", () => {
     mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
     mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
     mockSpeechRecognition = initTest.mockSpeechRecognition;
-    getFundButtons = initTest.getFundButtons;
+    getDonateButtons = initTest.getDonateButtons;
     mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
     mockTgGetFileUrl = initTest.mockTgGetFileUrl;
     mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
@@ -378,8 +378,8 @@ describe("[default language - english]", () => {
       });
     });
 
-    it("responds on a /fund message", () => {
-      tgMessage.setText(testMessageId, BotCommand.Fund);
+    it("responds on a /donate message", () => {
+      tgMessage.setText(testMessageId, BotCommand.Donate);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -388,8 +388,8 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.FundCommandMessage,
-          getFundButtons(),
+          LabelId.DonateCommandMessage,
+          getDonateButtons(),
         ),
       ]);
     });

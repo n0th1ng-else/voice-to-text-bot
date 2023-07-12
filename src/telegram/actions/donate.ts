@@ -6,7 +6,7 @@ import {
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
-import { getDonationDtoString, isFundMessage } from "../helpers.js";
+import { getDonationDtoString, isDonateMessage } from "../helpers.js";
 import { LabelId } from "../../text/labels.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -18,7 +18,7 @@ import { TextModel } from "../../text/index.js";
 
 const logger = new Logger("telegram-bot");
 
-export class FundAction extends GenericAction {
+export class DonateAction extends GenericAction {
   private payment?: PaymentService;
 
   public runAction(
@@ -26,11 +26,11 @@ export class FundAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
-    return this.sendFundMessage(mdl, prefix);
+    return this.sendDonateMessage(mdl, prefix);
   }
 
   public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isFundMessage(mdl, msg);
+    return isDonateMessage(mdl, msg);
   }
 
   public runCallback(
@@ -50,16 +50,16 @@ export class FundAction extends GenericAction {
     this.payment = payment;
   }
 
-  private sendFundMessage(
+  private sendDonateMessage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    logger.info(`${prefix.getPrefix()} Sending fund message`);
+    logger.info(`${prefix.getPrefix()} Sending donate message`);
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
         const donations = donationLevels.map((level) =>
-          FundAction.getDonationButton(level.amount, prefix.id, level.meta),
+          DonateAction.getDonationButton(level.amount, prefix.id, level.meta),
         );
 
         const buttons: TgInlineKeyboardButton[][] = [];
@@ -68,7 +68,7 @@ export class FundAction extends GenericAction {
         return this.sendMessage(
           model.chatId,
           model.id,
-          LabelId.FundCommandMessage,
+          LabelId.DonateCommandMessage,
           {
             lang,
             options: { buttons },
@@ -77,15 +77,19 @@ export class FundAction extends GenericAction {
           model.forumThreadId,
         );
       })
-      .then(() => logger.info(`${prefix.getPrefix()} Fund message sent`))
+      .then(() => logger.info(`${prefix.getPrefix()} Donate message sent`))
       .catch((err) => {
-        const errorMessage = "Unable to send fund message";
+        const errorMessage = "Unable to send donate message";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.addError(errorMessage);
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand(BotCommand.Fund, "Fund message", "Init"),
+          model.analytics.setCommand(
+            BotCommand.Donate,
+            "Donate message",
+            "Init",
+          ),
         ),
       );
   }
@@ -108,8 +112,8 @@ export class FundAction extends GenericAction {
       model.analytics.addError(errorMessage);
       return collectAnalytics(
         model.analytics.setCommand(
-          BotCommand.Fund,
-          "Fund message error",
+          BotCommand.Donate,
+          "Donate message error",
           "Price is not specified",
         ),
       );
@@ -129,8 +133,8 @@ export class FundAction extends GenericAction {
           model.analytics.addError(errorMessage);
           return collectAnalytics(
             model.analytics.setCommand(
-              BotCommand.Fund,
-              "Fund message error",
+              BotCommand.Donate,
+              "Donate message error",
               "Payment service is not set",
             ),
           );

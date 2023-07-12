@@ -43,8 +43,8 @@ export enum LabelId {
   StartCommandDescription = 17,
   LanguageCommandDescription = 18,
   SupportCommandDescription = 19,
-  FundCommandDescription = 20,
-  FundCommandMessage = 21,
+  DonateCommandDescription = 20,
+  DonateCommandMessage = 21,
   AudioNotSupportedMessage = 22,
   SupportedFormatsMessage = 23,
   SupportedFormatsMessageExplanation = 24,
@@ -59,7 +59,7 @@ export enum LabelId {
 export type MenuLabel =
   | LabelId.StartCommandDescription
   | LabelId.LanguageCommandDescription
-  | LabelId.FundCommandDescription
+  | LabelId.DonateCommandDescription
   | LabelId.SupportCommandDescription;
 
 export type LabelWithNoMenu = Exclude<LabelId, MenuLabel>;
@@ -68,7 +68,7 @@ export const menuLabels: Record<MenuLabel, string> = {
   [LabelId.LanguageCommandDescription]: "Switch the recognition language",
   [LabelId.SupportCommandDescription]: "Show support links",
   [LabelId.StartCommandDescription]: "Say hello and see bot info",
-  [LabelId.FundCommandDescription]: "Help us with funding the project",
+  [LabelId.DonateCommandDescription]: "Help us with funding the project",
 } as const;
 
 export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
@@ -84,7 +84,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.WelcomeMessageMore]:
       "Не забудь выбрать язык голосовых сообщений с помощью команды /lang",
     [LabelId.DonateMessage]:
-      "Вы можете помочь и поддержать проект. Выполните /fund для подробностей",
+      "Вы можете помочь и поддержать проект. Выполните /donate для подробностей",
     // "lang" command
     [LabelId.ChangeLangTitle]: "Какой язык использовать? 🔮",
     [LabelId.ChangeLang]: "Язык изменен 🆗",
@@ -103,7 +103,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.InProgress]: "🎙 Распознаю голос",
     [LabelId.RecognitionFailed]: "Не получилось распознать голос 😔",
     // "fund" command
-    [LabelId.FundCommandMessage]:
+    [LabelId.DonateCommandMessage]:
       "Этот проект не является коммерческим. Тем не менее, он тратит мои ресурсы на то, чтобы превращать голос в текст." +
       "\n\n" +
       "Я буду рад, если вы поддержите проект финансово и поможете оплатить инфраструктуру для моего Телеграм бота. " +
@@ -148,7 +148,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.WelcomeMessageMore]:
       "Do not forget to select the language you want to recognise by typing the /lang command",
     [LabelId.DonateMessage]:
-      "Support this project. Run /fund command for details",
+      "Support this project. Run /donate command for details",
     // "lang" command
     [LabelId.ChangeLangTitle]: "Select the language 🔮",
     [LabelId.ChangeLang]: "Language has been changed 🆗",
@@ -166,11 +166,11 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.NoContent]: "No voice track found in the message 🌚",
     [LabelId.InProgress]: "🎙 Processing voice message",
     [LabelId.RecognitionFailed]: "Unable to convert voice 😔",
-    // "fund" command
-    [LabelId.FundCommandMessage]:
+    // "donate" command
+    [LabelId.DonateCommandMessage]:
       "This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text." +
       "\n\n" +
-      "I would love to ask you to support the project and fund us so I can pay for the infrastructure, thus make the bot available 24/7. " +
+      "I would love to ask you to support the project and donate some money so I can pay for the infrastructure, thus keep making the bot available 24/7. " +
       "Contact me (the author) if you have any donations-related questions." +
       "\n\n" +
       "All donations are non-refundable. " +

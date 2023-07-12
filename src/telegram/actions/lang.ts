@@ -141,10 +141,12 @@ export class LangAction extends GenericAction {
     )
       .catch((err) => {
         if (isMessageNotModified(err)) {
-          return logger.warn(
+          logger.warn(
             `${prefix.getPrefix()} Unable to edit language selector. Most likely it is already updated but the user clicked button multiple times`,
             err,
           );
+
+          return;
         }
         throw err;
       })

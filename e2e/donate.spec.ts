@@ -67,13 +67,13 @@ let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
 let LabelId: InjectedFn["LabelId"];
-let getFundButtons: InjectedTestFn["getFundButtons"];
+let getDonateButtons: InjectedTestFn["getDonateButtons"];
 let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
 let mockTgReceiveInvoiceMessage: InjectedTestFn["mockTgReceiveInvoiceMessage"];
 let mockCreateDonationRow: InjectedTestFn["mockCreateDonationRow"];
 let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
 
-describe("[default language - english] fund", () => {
+describe("[default language - english] donate", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
@@ -85,7 +85,7 @@ describe("[default language - english] fund", () => {
     sendTelegramMessage = initTest.sendTelegramMessage;
     mockTgReceiveMessage = initTest.mockTgReceiveMessage;
     LabelId = init.LabelId;
-    getFundButtons = initTest.getFundButtons;
+    getDonateButtons = initTest.getDonateButtons;
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     mockTgReceiveInvoiceMessage = initTest.mockTgReceiveInvoiceMessage;
     mockCreateDonationRow = initTest.mockCreateDonationRow;
@@ -181,8 +181,8 @@ describe("[default language - english] fund", () => {
         testLangId = "en-US";
       });
 
-      it("responds on a /fund message with extra buttons and sends payment link", () => {
-        tgMessage.setText(testMessageId, BotCommand.Fund);
+      it("responds on a /donate message with extra buttons and sends payment link", () => {
+        tgMessage.setText(testMessageId, BotCommand.Donate);
         const donationId = 43646456;
         const price = 7;
 
@@ -198,12 +198,12 @@ describe("[default language - english] fund", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.FundCommandMessage,
-            getFundButtons(),
+            LabelId.DonateCommandMessage,
+            getDonateButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -227,8 +227,8 @@ describe("[default language - english] fund", () => {
         testLangId = "ru-RU";
       });
 
-      it("responds on a /fund message with extra buttons and sends payment link", () => {
-        tgMessage.setText(testMessageId, BotCommand.Fund);
+      it("responds on a /donate message with extra buttons and sends payment link", () => {
+        tgMessage.setText(testMessageId, BotCommand.Donate);
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
         const donationId = 214566;
         const price = 3;
@@ -246,12 +246,12 @@ describe("[default language - english] fund", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.FundCommandMessage,
-            getFundButtons(),
+            LabelId.DonateCommandMessage,
+            getDonateButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -282,10 +282,10 @@ describe("[default language - english] fund", () => {
         testLangId = "en-US";
       });
 
-      it("responds on a /fund message with extra buttons and sends payment link", () => {
+      it("responds on a /donate message with extra buttons and sends payment link", () => {
         const donationId = 5780;
         const price = 5;
-        tgMessage.setText(testMessageId, BotCommand.Fund);
+        tgMessage.setText(testMessageId, BotCommand.Donate);
         const statModel = mockGetBotStatItem(
           testPool,
           tgMessage.chatId,
@@ -298,12 +298,12 @@ describe("[default language - english] fund", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.FundCommandMessage,
-            getFundButtons(),
+            LabelId.DonateCommandMessage,
+            getDonateButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -327,8 +327,8 @@ describe("[default language - english] fund", () => {
         testLangId = "ru-RU";
       });
 
-      it("responds on a /fund message with extra buttons and sends payment link", () => {
-        tgMessage.setText(testMessageId, BotCommand.Fund);
+      it("responds on a /donate message with extra buttons and sends payment link", () => {
+        tgMessage.setText(testMessageId, BotCommand.Donate);
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
         const donationId = 911;
         const price = 7;
@@ -346,12 +346,12 @@ describe("[default language - english] fund", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.FundCommandMessage,
-            getFundButtons(),
+            LabelId.DonateCommandMessage,
+            getDonateButtons(),
           ),
         ]).then(([, prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setFundCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),

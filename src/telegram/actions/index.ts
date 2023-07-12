@@ -4,7 +4,7 @@ import { LangAction } from "./lang.js";
 import { SupportAction } from "./support.js";
 import { VoiceAction } from "./voice.js";
 import { CoreAction } from "./common.js";
-import { FundAction } from "./fund.js";
+import { DonateAction } from "./donate.js";
 import { VoiceFormatAction } from "./voice-format.js";
 import { VoiceLengthAction } from "./voice-length.js";
 import { DbClient } from "../../db/index.js";
@@ -24,7 +24,7 @@ export class BotActions {
   public readonly support: SupportAction;
   public readonly voice: VoiceAction;
   public readonly core: CoreAction;
-  public readonly fund: FundAction;
+  public readonly donate: DonateAction;
   public readonly voiceFormat: VoiceFormatAction;
   public readonly voiceLength: VoiceLengthAction;
   public readonly checkout: CheckoutAction;
@@ -35,14 +35,14 @@ export class BotActions {
     this.support = new SupportAction(stat, bot);
     this.voice = new VoiceAction(stat, bot);
     this.core = new CoreAction(stat, bot);
-    this.fund = new FundAction(stat, bot);
+    this.donate = new DonateAction(stat, bot);
     this.voiceFormat = new VoiceFormatAction(stat, bot);
     this.voiceLength = new VoiceLengthAction(stat, bot);
     this.checkout = new CheckoutAction(stat, bot);
   }
 
   public setPayment(payment: PaymentService): void {
-    this.fund.setPayment(payment);
+    this.donate.setPayment(payment);
   }
 
   public handleCallback(
@@ -78,7 +78,7 @@ export class BotActions {
 
         switch (button.id) {
           case "d":
-            return this.fund.runCallback(message, button, analytics);
+            return this.donate.runCallback(message, button, analytics);
           case "l":
             return this.lang.runCallback(message, button, analytics, msg);
           default:
