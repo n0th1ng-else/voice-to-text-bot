@@ -176,6 +176,15 @@ export type TgInlineKeyboardButton = z.infer<
   typeof TgInlineKeyboardButtonSchema
 >;
 
+const TgMessageOptionsSchema = z
+  .object({
+    buttons: z.optional(z.array(z.array(TgInlineKeyboardButtonSchema))),
+    disableMarkup: z.optional(z.boolean()),
+  })
+  .describe("Telegram message options schema");
+
+export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
+
 const BotCommandSchema = z
   .object({
     command: z.string(),

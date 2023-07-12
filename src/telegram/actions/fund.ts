@@ -71,7 +71,7 @@ export class FundAction extends GenericAction {
           LabelId.FundCommandMessage,
           {
             lang,
-            options: buttons,
+            options: { buttons },
           },
           prefix,
           model.forumThreadId,

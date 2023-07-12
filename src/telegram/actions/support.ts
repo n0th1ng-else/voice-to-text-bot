@@ -65,7 +65,7 @@ export class SupportAction extends GenericAction {
           LabelId.SupportCommand,
           {
             lang,
-            options: buttons,
+            options: { buttons },
           },
           prefix,
           model.forumThreadId,
