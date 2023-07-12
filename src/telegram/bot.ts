@@ -199,8 +199,8 @@ export class TelegramBotModel {
       .getChatLanguage(model, prefix)
       .then((lang) =>
         this.actions.core.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           LabelId.NoContent,
           { lang },
           prefix,

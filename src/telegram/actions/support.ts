@@ -60,8 +60,8 @@ export class SupportAction extends GenericAction {
           : [[newsBtn], [issueBtn]];
 
         return this.sendMessage(
-          model.id,
           model.chatId,
+          model.id,
           LabelId.SupportCommand,
           {
             lang,
