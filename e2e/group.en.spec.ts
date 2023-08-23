@@ -686,6 +686,7 @@ describe("[default language - english]", () => {
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -697,6 +698,7 @@ describe("[default language - english]", () => {
       tgMessage.setName(testMessageId, {}, true);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -716,6 +718,7 @@ describe("[default language - english]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -735,6 +738,7 @@ describe("[default language - english]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();

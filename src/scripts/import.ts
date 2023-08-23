@@ -82,9 +82,8 @@ export const run = async (): Promise<void> => {
     ? createHttps(httpsOptions, app)
     : createHttp(app);
 
-  db.init().then(() =>
-    server.listen(envy.appPort, () => {
-      logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
-    }),
-  );
+  await db.init();
+  server.listen(envy.appPort, () => {
+    logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
+  });
 };

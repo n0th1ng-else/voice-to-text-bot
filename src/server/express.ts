@@ -127,13 +127,19 @@ export class ExpressServer {
 
         try {
           const payload = TgUpdateSchema.parse(req.body);
-          bot.handleApiMessage(payload, analytics);
           logger.info("Incoming message validated");
+          return bot
+            .handleApiMessage(payload, analytics)
+            .catch((err) => {
+              logger.error("Incoming message failed to handle", err);
+            })
+            .finally(() => {
+              res.sendStatus(200);
+            });
         } catch (err) {
           logger.error("Incoming message failed validation", err);
+          res.sendStatus(200);
         }
-
-        res.sendStatus(200);
       });
 
       this.app.get(bot.getPath(":id"), (req, _res, next) => {
