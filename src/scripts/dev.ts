@@ -21,7 +21,7 @@ const startServer = (
 };
 
 export const run = async (threadId = 0): Promise<void> => {
-  prepareInstance(threadId)
+  return prepareInstance(threadId)
     .then((server) => startServer(server, threadId))
     .catch((err) => logger.error("Failed to run dev instance", err));
 };

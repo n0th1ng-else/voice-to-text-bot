@@ -223,6 +223,7 @@ export class TelegramApi {
             .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
             .setChatId(chatId);
 
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.errorReflector?.(tgError);
           return Promise.reject(tgError);
         }
@@ -236,6 +237,7 @@ export class TelegramApi {
           .setResponse(err?.response?.data)
           .setChatId(chatId);
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.errorReflector?.(tgError);
         throw tgError;
       },

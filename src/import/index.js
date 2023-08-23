@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
 const onAction = () => {
-  fetch("/status")
+  return fetch("/status")
     .then((response) => response.json())
     .then((data) => {
       const status = data.idle ? "Idling" : "Running";
@@ -22,7 +22,7 @@ const onFileSelect = () => {
   const el = document.getElementById("fileEl");
   el.setAttribute("disabled", "disabled");
 
-  fetch("/import", {
+  return fetch("/import", {
     method: "POST",
     body: el.files[0],
   })

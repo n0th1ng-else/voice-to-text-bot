@@ -778,6 +778,7 @@ describe("[russian language]", () => {
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -789,6 +790,7 @@ describe("[russian language]", () => {
       tgMessage.setName(testMessageId, {}, true);
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -808,6 +810,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -821,6 +824,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -840,6 +844,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
@@ -853,6 +858,7 @@ describe("[russian language]", () => {
 
       mockTgReceiveUnexpectedMessage(telegramServer, done);
 
+      // eslint-disable-next-line
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
