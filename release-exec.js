@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 
-const verifyRelease = async (_, context) => {
+const verifyRelease = (_, context) => {
   const next = context.nextRelease.version;
   writeFileSync(".VERSION", next);
 };

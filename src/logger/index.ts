@@ -43,7 +43,7 @@ export class Logger {
 
   private readonly additionalPrefix: string;
 
-  constructor(private readonly id: string = "") {
+  constructor(private readonly id = "") {
     const threadId = cluster.isMaster ? 0 : cluster?.worker?.id || 0;
     this.additionalPrefix = `thread-${threadId}`;
   }

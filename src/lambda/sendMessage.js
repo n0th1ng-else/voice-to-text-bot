@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment*/
 const TelegramBot = require("node-telegram-bot-api");
 const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
 

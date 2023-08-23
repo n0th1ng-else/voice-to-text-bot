@@ -1,5 +1,3 @@
-import { VoiceConverterProvider } from "./recognition/types.js";
-
 process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegram-bot-api" package
 
 export const appPort: number = Number(process.env.PORT) || 3000;
@@ -8,8 +6,7 @@ export const appVersion: string = process.env.APP_VERSION || "dev";
 
 export const enableSSL = process.env.ENABLE_SSL === "true";
 
-export const provider: string | VoiceConverterProvider =
-  process.env.PROVIDER || "WITAI";
+export const provider: string = process.env.PROVIDER || "WITAI";
 
 export const selfUrl: string = process.env.SELF_URL || "";
 

@@ -50,6 +50,7 @@ describe("requestHealthData", () => {
     try {
       await requestHealthData(TEST_URL);
       return Promise.reject("Should not resolve");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe("EINTERNAL Health request was unsuccessful");
@@ -74,6 +75,7 @@ describe("requestHealthData", () => {
     try {
       await requestHealthData(TEST_URL);
       return Promise.reject("Should not resolve");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`EINTERNAL ${errCause.message}`);

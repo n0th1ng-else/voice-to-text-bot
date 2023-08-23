@@ -82,10 +82,10 @@ export class BotMessageModel {
   }
 }
 
-export interface MessageOptions {
+export type MessageOptions = {
   lang: LanguageCode;
   options?: TgMessageOptions;
-}
+};
 
 export class TelegramMessagePrefix {
   constructor(
@@ -162,11 +162,11 @@ export class TelegramButtonModel<V extends string = string> {
   }
 }
 
-export interface DonationPayload {
+export type DonationPayload = {
   donationId: number;
   chatId: number;
   prefix: string;
-}
+};
 
 export const DonationSchema = z
   .object({

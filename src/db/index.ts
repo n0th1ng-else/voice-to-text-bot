@@ -33,14 +33,14 @@ const getPool = (config: DbConnectionConfig, threadId: number): pg.Pool => {
   });
 };
 
-interface DbConnectionConfig {
+type DbConnectionConfig = {
   user: string;
   password: string;
   host: string;
   database: string;
   port: number;
   certificate?: string;
-}
+};
 
 export class DbClient {
   public readonly nodes: NodesClient;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 const { SpeechClient } = require("@google-cloud/speech");
 const { PubSub } = require("@google-cloud/pubsub");
 

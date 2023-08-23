@@ -45,7 +45,7 @@ const isCommandMessage = (
     return false;
   }
 
-  if (msg.text === command) {
+  if (msg.text === String(command)) {
     return true;
   }
 

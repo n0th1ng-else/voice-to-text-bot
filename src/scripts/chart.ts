@@ -10,26 +10,41 @@ import { initStaticServer } from "../server/static.js";
 
 const logger = new Logger("chart-script");
 
-export const run = async (): Promise<void> => {
+export const run = (): void => {
   const app = initStaticServer("chart");
 
   let db: DbClient | null = null;
 
-  app.post("/login", (req: express.Request, res: express.Response) => {
-    if (db) {
-      res.status(200).send({});
-      return;
-    }
-    db = new DbClient({
-      user: req.body.user,
-      password: req.body.pwd,
-      host: req.body.host,
-      database: req.body.user,
-      port: req.body.port,
-    });
+  app.post(
+    "/login",
+    (
+      req: express.Request<
+        unknown,
+        unknown,
+        {
+          user: string;
+          pwd: string;
+          host: string;
+          port: number;
+        }
+      >,
+      res: express.Response,
+    ) => {
+      if (db) {
+        res.status(200).send({});
+        return;
+      }
+      db = new DbClient({
+        user: req.body.user,
+        password: req.body.pwd,
+        host: req.body.host,
+        database: req.body.user,
+        port: req.body.port,
+      });
 
-    res.status(200).send({});
-  });
+      res.status(200).send({});
+    },
+  );
 
   app.delete("/login", (req: express.Request, res: express.Response) => {
     if (db) {

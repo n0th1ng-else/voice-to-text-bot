@@ -17,11 +17,11 @@ import type {
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { LabelWithNoMenu } from "../src/text/index.js";
 
-interface UserNameOptions {
+type UserNameOptions = {
   userName?: string;
   firstName?: string;
   lastName?: string;
-}
+};
 
 export class TelegramMessageModel {
   public messageId = 0;

@@ -1,11 +1,11 @@
-export interface HealthDto {
+export type HealthDto = {
   status: HealthStatus;
   ssl: HealthSsl;
   message: string;
   urls: string[];
   version: string;
   threadId: number;
-}
+};
 
 export enum HealthStatus {
   Error = "ERROR",

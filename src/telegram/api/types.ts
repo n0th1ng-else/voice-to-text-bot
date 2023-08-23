@@ -3,7 +3,7 @@ import { Prettify } from "../../common/types.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 
-export interface TgCore<Response> {
+export type TgCore<Response> = {
   /**
    * Highlights if the request was successful
    */
@@ -12,7 +12,7 @@ export interface TgCore<Response> {
   description?: string;
   error_code?: number;
   parameters?: TgErrorParameters;
-}
+};
 
 const TgErrorParametersSchema = z
   .object({

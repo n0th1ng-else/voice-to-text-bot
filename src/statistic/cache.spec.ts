@@ -6,10 +6,10 @@ jest.unstable_mockModule(
   () => import("../logger/__mocks__/index.js"),
 );
 
-interface TestCacheData {
+type TestCacheData = {
   testId: string;
   testData: string;
-}
+};
 
 const testId = "some-id-1";
 const testData = "some-test-data";

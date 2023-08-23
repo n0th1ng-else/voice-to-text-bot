@@ -2,14 +2,14 @@ import type { Pool } from "pg";
 import { nanoid } from "nanoid";
 import { NodesSql } from "./nodes.sql.js";
 
-export interface NodeRowScheme {
+export type NodeRowScheme = {
   node_id: string;
   self_url: string;
   is_active: boolean;
   version: string;
   created_at: Date;
   updated_at: Date;
-}
+};
 
 export class NodesDb {
   private initialized = false;
