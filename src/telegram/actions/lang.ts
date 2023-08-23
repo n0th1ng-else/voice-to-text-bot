@@ -16,7 +16,7 @@ import {
   getRawUserLanguage,
   isLangMessage,
 } from "../helpers.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelId } from "../../text/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";

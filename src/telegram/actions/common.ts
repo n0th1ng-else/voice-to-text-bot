@@ -4,13 +4,12 @@ import {
   MessageOptions,
   TelegramMessagePrefix,
 } from "../types.js";
-import type { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
-import { TextModel } from "../../text/index.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelWithNoMenu, TextModel } from "../../text/index.js";
 import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api/tgapi.js";
 import { DbClient } from "../../db/index.js";
 import { splitTextIntoParts } from "../../common/helpers.js";
+import type { LanguageCode } from "../../recognition/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -52,7 +51,7 @@ export abstract class GenericAction {
   public sendMessage(
     chatId: number,
     messageId: number,
-    ids: LabelId | LabelId[],
+    ids: LabelWithNoMenu | LabelWithNoMenu[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
     forumThreadId?: number,
@@ -88,7 +87,7 @@ export abstract class GenericAction {
     chatId: number,
     messageId: number,
     meta: MessageOptions,
-    id: LabelId,
+    id: LabelWithNoMenu,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.bot

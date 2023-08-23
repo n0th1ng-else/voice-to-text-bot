@@ -7,7 +7,7 @@ import {
 } from "../types.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelId } from "../../text/types.js";
 import { type LanguageCode, VoiceConverter } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";

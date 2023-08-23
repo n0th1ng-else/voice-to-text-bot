@@ -15,8 +15,7 @@ import {
 } from "./helpers.js";
 import type { LanguageCode } from "../recognition/types.js";
 import { Logger } from "../logger/index.js";
-import { MenuLabel } from "../text/labels.js";
-import { TextModel } from "../text/index.js";
+import { TextModel, MenuLabel } from "../text/index.js";
 import { TgMessage, TgMessageOptions } from "./api/types.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 

@@ -7,7 +7,7 @@ export const injectDependencies = async () => {
   const recognitionApi = await import("../recognition/index.js");
   const recognitionTypes = await import("../recognition/types.js");
   const constants = await import("../const.js");
-  const labels = await import("../text/labels.js");
+  const labels = await import("../text/types.js");
   const timer = await import("../common/timer.js");
   const dbClient = await import("../db/index.js");
   const dbNode = await import("../db/sql/nodes.sql.js");

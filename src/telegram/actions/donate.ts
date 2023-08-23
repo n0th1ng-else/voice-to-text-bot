@@ -7,14 +7,14 @@ import {
   TelegramMessagePrefix,
 } from "../types.js";
 import { getDonationDtoString, isDonateMessage } from "../helpers.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelId } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { PaymentService } from "../../donate/types.js";
 import { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import { BOT_LOGO, donationLevels } from "../../const.js";
-import { TextModel } from "../../text/index.js";
+import { toCurrency } from "../../text/utils.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -166,7 +166,7 @@ export class DonateAction extends GenericAction {
     emoji: string,
   ): TgInlineKeyboardButton {
     return {
-      text: TextModel.toCurrency(price, emoji),
+      text: toCurrency(price, emoji),
       callback_data: new TelegramButtonModel(
         "d",
         `${price}`,
