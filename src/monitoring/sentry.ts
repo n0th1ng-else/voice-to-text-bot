@@ -22,8 +22,10 @@ export const initSentry = (app: Express): void => {
       // enable Express.js middleware tracing
       new sentry.Integrations.Express({ app }),
       // Automatically instrument Node.js libraries and frameworks
+      // @ts-expect-error Current version types are broken
       ...sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
       // Add profiling
+      // @ts-expect-error Current version types are broken
       new ProfilingIntegration(),
     ],
 
