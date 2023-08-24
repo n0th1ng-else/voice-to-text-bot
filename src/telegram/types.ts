@@ -13,11 +13,12 @@ import {
   isChatGroup,
   isVideoMessage,
 } from "./helpers.js";
-import type { LanguageCode } from "../recognition/types.js";
 import { Logger } from "../logger/index.js";
-import { TextModel, MenuLabel } from "../text/index.js";
+import { TextModel } from "../text/index.js";
 import { TgMessage, TgMessageOptions } from "./api/types.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
+import type { LanguageCode } from "../recognition/types.js";
+import type { MenuLabel } from "../text/types.js";
 
 export enum VoiceContentReason {
   Ok = "Ok",

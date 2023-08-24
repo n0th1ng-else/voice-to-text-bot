@@ -1,9 +1,6 @@
 import { labels, menuLabels } from "./labels.js";
-import { MenuLabel, LabelWithNoMenu } from "./types.js";
-import { sSuffix } from "./utils.js";
+import type { MenuLabel, LabelWithNoMenu } from "./types.js";
 import type { LanguageCode } from "../recognition/types.js";
-
-export { MenuLabel, LabelWithNoMenu, sSuffix };
 
 export class TextModel {
   private readonly cbLang: LanguageCode = "en-US";

@@ -3,7 +3,7 @@ import { createServer as createHttp } from "node:http";
 import express from "express";
 import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
-import { sSuffix } from "../text/index.js";
+import { sSuffix } from "../text/utils.js";
 import { httpsOptions } from "../../certs/index.js";
 import { DbClient } from "../db/index.js";
 import { initStaticServer } from "../server/static.js";

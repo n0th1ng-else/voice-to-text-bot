@@ -10,8 +10,8 @@ import {
   TelegramMessageMetaType,
   TelegramMessageModel,
 } from "../helpers.js";
-import { LabelWithNoMenu, TextModel } from "../../src/text/index.js";
-import { LabelId } from "../../src/text/types.js";
+import { TextModel } from "../../src/text/index.js";
+import { LabelId, type LabelWithNoMenu } from "../../src/text/types.js";
 import { botCommands } from "../../src/telegram/data.js";
 import { flattenPromise } from "../../src/common/helpers.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";

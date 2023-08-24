@@ -1,5 +1,5 @@
-import { LabelId, LabelWithNoMenu, MenuLabel } from "./types.js";
 import { getMaxDuration, getSupportedAudioFormats } from "./utils.js";
+import { LabelId, type LabelWithNoMenu, type MenuLabel } from "./types.js";
 import type { LanguageCode } from "../recognition/types.js";
 
 export const menuLabels: Record<MenuLabel, string> = {

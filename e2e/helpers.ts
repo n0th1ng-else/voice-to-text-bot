@@ -15,7 +15,7 @@ import type {
   TgMessage,
 } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
-import type { LabelWithNoMenu } from "../src/text/index.js";
+import type { LabelWithNoMenu } from "../src/text/types.js";
 
 type UserNameOptions = {
   userName?: string;
