@@ -95,11 +95,11 @@ describe("text/utils", () => {
 
   describe("toCurrency", () => {
     it("should show the amount in euro", () => {
-      expect(toCurrency(123)).toBe("123 €");
+      expect(toCurrency(123)).toBe("123€");
     });
 
     it("should show the amount in euro with note", () => {
-      expect(toCurrency(81230, "test")).toBe("81230 € test");
+      expect(toCurrency(81230, "test")).toBe("81230€  test");
     });
   });
 });

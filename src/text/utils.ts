@@ -37,6 +37,6 @@ export const sSuffix = (word: string, count: number | boolean): string => {
 };
 
 export const toCurrency = (amount: number, meta?: string): string => {
-  const amountStr = `${amount} €`;
+  const amountStr = `${amount}€`;
   return meta ? `${amountStr}  ${meta}` : amountStr;
 };
