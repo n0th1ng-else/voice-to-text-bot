@@ -3,33 +3,48 @@ import { createServer as createHttp } from "node:http";
 import express from "express";
 import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
-import { sSuffix } from "../text/index.js";
+import { sSuffix } from "../text/utils.js";
 import { httpsOptions } from "../../certs/index.js";
 import { DbClient } from "../db/index.js";
 import { initStaticServer } from "../server/static.js";
 
 const logger = new Logger("chart-script");
 
-export const run = async (): Promise<void> => {
+export const run = (): void => {
   const app = initStaticServer("chart");
 
   let db: DbClient | null = null;
 
-  app.post("/login", (req: express.Request, res: express.Response) => {
-    if (db) {
-      res.status(200).send({});
-      return;
-    }
-    db = new DbClient({
-      user: req.body.user,
-      password: req.body.pwd,
-      host: req.body.host,
-      database: req.body.user,
-      port: req.body.port,
-    });
+  app.post(
+    "/login",
+    (
+      req: express.Request<
+        unknown,
+        unknown,
+        {
+          user: string;
+          pwd: string;
+          host: string;
+          port: number;
+        }
+      >,
+      res: express.Response,
+    ) => {
+      if (db) {
+        res.status(200).send({});
+        return;
+      }
+      db = new DbClient({
+        user: req.body.user,
+        password: req.body.pwd,
+        host: req.body.host,
+        database: req.body.user,
+        port: req.body.port,
+      });
 
-    res.status(200).send({});
-  });
+      res.status(200).send({});
+    },
+  );
 
   app.delete("/login", (req: express.Request, res: express.Response) => {
     if (db) {

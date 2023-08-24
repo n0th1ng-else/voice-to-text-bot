@@ -8,14 +8,14 @@ export enum DonationStatus {
   Received = "RECEIVED",
 }
 
-export interface DonationRowScheme {
+export type DonationRowScheme = {
   donation_id: number;
   status: string;
   chat_id: string;
   price: number;
   created_at: Date;
   updated_at: Date;
-}
+};
 
 export class DonationsDb {
   private initialized = false;

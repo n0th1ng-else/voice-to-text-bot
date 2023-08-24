@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 import pg from "pg";
 import { nanoid } from "nanoid";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyTypeForMock = any;
 
 export class Pool extends EventEmitter implements pg.Pool {
@@ -11,6 +12,7 @@ export class Pool extends EventEmitter implements pg.Pool {
 
   private mockQueue: MockSql[] = [];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(_config: pg.PoolConfig) {
     super();
   }

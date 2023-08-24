@@ -16,7 +16,7 @@ export const httpsOptions: HttpsOptions = {
   key: httpsKey,
 };
 
-export interface HttpsOptions {
+export type HttpsOptions = {
   cert?: Buffer;
   key?: Buffer;
-}
+};

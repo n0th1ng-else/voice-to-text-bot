@@ -6,7 +6,7 @@ import {
 } from "./api/types.js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter } from "../recognition/types.js";
-import { LabelId } from "../text/labels.js";
+import { LabelId } from "../text/types.js";
 import { BotMessageModel, TelegramMessagePrefix } from "./types.js";
 import { isMessageSupported } from "./helpers.js";
 import { runPromiseWithRetry } from "../common/helpers.js";

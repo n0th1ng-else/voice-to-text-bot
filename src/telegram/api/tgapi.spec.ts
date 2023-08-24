@@ -56,7 +56,7 @@ let testApiToken = nanoid(10);
 let api = new TelegramApi(testApiToken);
 
 let checkApiData = (config: AxiosRequestConfig): void => {
-  throw new Error(`Initialize check api data ${config}`);
+  throw new Error(`Initialize check api data ${JSON.stringify(config)}`);
 };
 
 let testApiResponse: TgCore<unknown>;

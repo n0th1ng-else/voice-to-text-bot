@@ -84,8 +84,8 @@ export class WithAiProvider extends VoiceConverter {
     data: Buffer,
     authToken: string,
     logPrefix: string,
-  ): Promise<WitAiDictationResponse[]> {
-    return WithAiProvider.runRequest<WitAiDictationResponse>(
+  ): Promise<WitAiBaseResponse[]> {
+    return WithAiProvider.runRequest<WitAiBaseResponse>(
       data,
       "dictation",
       authToken,
@@ -122,7 +122,7 @@ export class WithAiProvider extends VoiceConverter {
         maxBodyLength: Infinity,
         responseType: "text",
         data,
-        transformResponse: (d) => d,
+        transformResponse: (d: string) => d,
       })
       .then((response) => {
         if (response.status !== 200) {
@@ -164,26 +164,24 @@ export class WithAiProvider extends VoiceConverter {
   }
 }
 
-interface WitAiBaseResponse {
+type WitAiBaseResponse = {
   text?: string;
   is_final?: boolean;
-}
+};
 
-interface WitAiSpeechResponse extends WitAiBaseResponse {
+type WitAiSpeechResponse = {
   entities: Record<string, WitAiEntity>;
   intents: WitAiIntent[];
   traits: Record<string, WitAiIntent>;
-}
+} & WitAiBaseResponse;
 
-interface WitAiDictationResponse extends WitAiBaseResponse {}
-
-interface WitAiIntent {
+type WitAiIntent = {
   id: string;
   value: string;
   confidence: number;
-}
+};
 
-interface WitAiEntity extends WitAiIntent {
+type WitAiEntity = {
   name: string;
   role: string;
   start: number;
@@ -191,4 +189,4 @@ interface WitAiEntity extends WitAiIntent {
   body: string;
   entities: WitAiEntity[];
   type: string;
-}
+} & WitAiIntent;

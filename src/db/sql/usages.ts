@@ -2,7 +2,7 @@ import type { Pool } from "pg";
 import { nanoid } from "nanoid";
 import { UsagesSql } from "./usages.sql.js";
 
-export interface UsageRowScheme {
+export type UsageRowScheme = {
   usage_id: string;
   chat_id: number;
   user_name: string;
@@ -10,7 +10,7 @@ export interface UsageRowScheme {
   lang_id: string;
   created_at: Date;
   updated_at: Date;
-}
+};
 
 export class UsagesDb {
   private initialized = false;

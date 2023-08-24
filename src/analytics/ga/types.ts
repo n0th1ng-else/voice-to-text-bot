@@ -2,7 +2,7 @@ import { BotCommand } from "../../telegram/types.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { TelegramApi } from "../../telegram/api/tgapi.js";
 
-interface AnalyticsEventBaseParams {
+type AnalyticsEventBaseParams = {
   app_version: string;
   thread_id: number;
   engagement_time_msec: number;
@@ -12,7 +12,12 @@ interface AnalyticsEventBaseParams {
   page_referrer: typeof TelegramApi.url;
   screen_resolution: "1920x1080";
   page_meta: string;
-}
+};
+
+type WithArbitraryParams = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params?: any;
+};
 
 type AnalyticsError = {
   name: "app_exception";
@@ -33,18 +38,15 @@ type AnalyticsTime = {
 
 type AnalyticsFlow = {
   name: "flow";
-  params?: any;
-};
+} & WithArbitraryParams;
 
 type AnalyticsFirstVisit = {
   name: "app_init";
-  params?: any;
-};
+} & WithArbitraryParams;
 
 type AnalyticsPageVisit = {
   name: "page_view";
-  params?: any;
-};
+} & WithArbitraryParams;
 
 export type AnalyticsEvent =
   | AnalyticsError

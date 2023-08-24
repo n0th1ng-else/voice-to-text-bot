@@ -31,7 +31,7 @@ export const supportedAudioFormats = [
     mimeType: "audio/mpeg",
     ext: "m4a",
   },
-] as const;
+];
 
 export const donationLevels = [
   {

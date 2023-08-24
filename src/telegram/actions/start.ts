@@ -6,7 +6,7 @@ import {
   BotMessageModel,
   TelegramMessagePrefix,
 } from "../types.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelId } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 

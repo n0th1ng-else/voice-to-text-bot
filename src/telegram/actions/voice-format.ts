@@ -7,7 +7,7 @@ import {
 } from "../types.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelId } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 
 const logger = new Logger("telegram-bot");

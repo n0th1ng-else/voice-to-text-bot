@@ -10,3 +10,5 @@ assets
 # overage reports
 coverage-e2e
 coverage-unit
+package.json
+package-lock.json

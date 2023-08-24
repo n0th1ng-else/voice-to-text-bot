@@ -11,13 +11,13 @@ import {
   TelegramMessageModel,
 } from "../helpers.js";
 import { TextModel } from "../../src/text/index.js";
-import type { LanguageCode } from "../../src/recognition/types.js";
-import { LabelId } from "../../src/text/labels.js";
+import { LabelId, type LabelWithNoMenu } from "../../src/text/types.js";
 import { botCommands } from "../../src/telegram/data.js";
 import { flattenPromise } from "../../src/common/helpers.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
 import { parseDonationPayload } from "../../src/telegram/helpers.js";
 import type { TgUpdate } from "../../src/telegram/api/types.js";
+import type { LanguageCode } from "../../src/recognition/types.js";
 
 const text = new TextModel();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -128,7 +128,7 @@ export const mockTgReceiveMessage = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
-  textId: LabelId,
+  textId: LabelWithNoMenu,
   expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
@@ -189,7 +189,7 @@ export const mockTgReceiveMessages = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
-  textIds: LabelId[],
+  textIds: LabelWithNoMenu[],
 ): Promise<void> => {
   return Promise.all(
     textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)),
@@ -223,7 +223,7 @@ export const mockTgReceiveCallbackMessage = (
   chatId: number,
   messageId: number,
   langId: LanguageCode,
-  textId: LabelId,
+  textId: LabelWithNoMenu,
   expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<void> => {
   return new Promise((resolve) => {

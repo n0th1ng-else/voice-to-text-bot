@@ -1,26 +1,27 @@
 import { readFileSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { LanguageCode } from "../src/recognition/types.js";
-import { LabelId } from "../src/text/labels.js";
+import { LabelId } from "../src/text/types.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
-import type {
-  TgCallbackQuery,
-  TgChatType,
-  TgMessage,
-} from "../src/telegram/api/types.js";
 import {
   TelegramButtonModel,
   TelegramButtonType,
 } from "../src/telegram/types.js";
 import { donationLevels } from "../src/const.js";
-import { TextModel } from "../src/text/index.js";
+import { toCurrency } from "../src/text/utils.js";
+import type {
+  TgCallbackQuery,
+  TgChatType,
+  TgMessage,
+} from "../src/telegram/api/types.js";
+import type { LanguageCode } from "../src/recognition/types.js";
+import type { LabelWithNoMenu } from "../src/text/types.js";
 
-interface UserNameOptions {
+type UserNameOptions = {
   userName?: string;
   firstName?: string;
   lastName?: string;
-}
+};
 
 export class TelegramMessageModel {
   public messageId = 0;
@@ -185,7 +186,7 @@ export enum TelegramMessageMetaType {
 export class TelegramMessageMetaItem {
   constructor(
     public readonly type: TelegramMessageMetaType,
-    public readonly title: LabelId | string,
+    public readonly title: LabelWithNoMenu | string,
     public readonly data: string,
     public readonly btnType: TelegramButtonType = "d",
   ) {}
@@ -229,7 +230,7 @@ export const getDonateButtons = (): TelegramMessageMetaItem[][] => {
     (level) =>
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
-        TextModel.toCurrency(level.amount, level.meta),
+        toCurrency(level.amount, level.meta),
         String(level.amount),
       ),
   );

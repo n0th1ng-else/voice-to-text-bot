@@ -13,12 +13,12 @@ import {
   isChatGroup,
   isVideoMessage,
 } from "./helpers.js";
-import type { LanguageCode } from "../recognition/types.js";
 import { Logger } from "../logger/index.js";
-import { MenuLabel } from "../text/labels.js";
 import { TextModel } from "../text/index.js";
 import { TgMessage, TgMessageOptions } from "./api/types.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
+import type { LanguageCode } from "../recognition/types.js";
+import type { MenuLabel } from "../text/types.js";
 
 export enum VoiceContentReason {
   Ok = "Ok",
@@ -83,10 +83,10 @@ export class BotMessageModel {
   }
 }
 
-export interface MessageOptions {
+export type MessageOptions = {
   lang: LanguageCode;
   options?: TgMessageOptions;
-}
+};
 
 export class TelegramMessagePrefix {
   constructor(
@@ -163,11 +163,11 @@ export class TelegramButtonModel<V extends string = string> {
   }
 }
 
-export interface DonationPayload {
+export type DonationPayload = {
   donationId: number;
   chatId: number;
   prefix: string;
-}
+};
 
 export const DonationSchema = z
   .object({

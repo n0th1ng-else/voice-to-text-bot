@@ -18,14 +18,14 @@ export abstract class VoiceConverter {
   ): Promise<string>;
 }
 
-export interface VoiceConverterOptions {
+export type VoiceConverterOptions = {
   isTestEnv?: boolean;
   googleProjectId?: string;
   googleClientEmail?: string;
   googlePrivateKey?: string;
   witAiTokenEn?: string;
   witAiTokenRu?: string;
-}
+};
 
 export const LanguageSchema = z
   .union([z.literal("en-US"), z.literal("ru-RU")])
@@ -35,7 +35,7 @@ export type LanguageCode = z.infer<typeof LanguageSchema>;
 
 export const DEFAULT_LANGUAGE: LanguageCode = "en-US";
 
-export interface ConverterMeta {
+export type ConverterMeta = {
   fileId: string;
   prefix: string;
-}
+};

@@ -6,7 +6,7 @@ import {
   TelegramMessagePrefix,
 } from "../types.js";
 import { isSupportMessage } from "../helpers.js";
-import { LabelId } from "../../text/labels.js";
+import { LabelId } from "../../text/types.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";

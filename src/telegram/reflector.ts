@@ -36,7 +36,7 @@ export const initTgReflector = (token: string): ApiErrorReflector => {
             logData,
           );
         })
-        .catch((error) => {
+        .catch((error: unknown) => {
           logger.error("Failed to leave the chat", {
             chatId: err.chatId,
             error,

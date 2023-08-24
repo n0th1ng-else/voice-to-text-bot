@@ -3,12 +3,21 @@ import { createServer as createHttp } from "node:http";
 import express from "express";
 import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
-import { sSuffix } from "../text/index.js";
+import { sSuffix } from "../text/utils.js";
 import { httpsOptions } from "../../certs/index.js";
 import { DbClient } from "../db/index.js";
 import { initStaticServer } from "../server/static.js";
 
 const logger = new Logger("import-script");
+
+type ImportRow = {
+  chatId: number;
+  usageCount: number;
+  langId: string;
+  user: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export const run = async (): Promise<void> => {
   const app = initStaticServer("import");
@@ -26,7 +35,7 @@ export const run = async (): Promise<void> => {
   let rowsTotal = 0;
   let rowsDone = 0;
 
-  const importRows = async (items) => {
+  const importRows = async (items: ImportRow[]) => {
     rowsTotal = items.length;
     rowsDone = 0;
     inProgress = true;
@@ -54,19 +63,26 @@ export const run = async (): Promise<void> => {
     inProgress = false;
   };
 
-  app.post("/import", async (req: express.Request, res: express.Response) => {
-    try {
-      const file = req.body;
-      await importRows(file.results);
-      res.status(200).send({});
-    } catch (err) {
-      logger.error("err", err);
-      inProgress = false;
-      rowsTotal = 0;
-      rowsDone = 0;
-      res.status(400).send(err);
-    }
-  });
+  app.post(
+    "/import",
+    (
+      req: express.Request<unknown, unknown, { results: ImportRow[] }>,
+      res: express.Response,
+    ) => {
+      const { results } = req.body;
+      importRows(results)
+        .then(() => {
+          res.status(200).send({});
+        })
+        .catch((err: unknown) => {
+          logger.error("err", err);
+          inProgress = false;
+          rowsTotal = 0;
+          rowsDone = 0;
+          res.status(400).send(err);
+        });
+    },
+  );
 
   app.get("/status", (req: express.Request, res: express.Response) => {
     res.status(200).send({

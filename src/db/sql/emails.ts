@@ -1,12 +1,12 @@
 import type { Pool } from "pg";
 import { UsedEmailsSql } from "./emails.sql.js";
 
-export interface UsedEmailRowScheme {
+export type UsedEmailRowScheme = {
   email_id: number;
   email: string;
   start_at: Date;
   stop_at: Date;
-}
+};
 
 export class UsedEmailDb {
   private initialized = false;

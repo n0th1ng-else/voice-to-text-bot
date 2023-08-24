@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
 import axios from "axios";
 import AWS from "aws-sdk";
 import {
@@ -72,7 +76,11 @@ export class AWSProvider extends VoiceConverter {
     );
   }
 
-  private processFile(fileLink, name, isVideo): Promise<any> {
+  private processFile(
+    fileLink: string,
+    name: string,
+    isVideo: boolean,
+  ): Promise<any> {
     return getWav(fileLink, isVideo)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
@@ -88,13 +96,13 @@ export class AWSProvider extends VoiceConverter {
     return Promise.resolve(transcripts[0].transcript);
   }
 
-  private cleanStorage(translationData, name): Promise<any> {
+  private cleanStorage(translationData, name: string): Promise<any> {
     return this.deleteFromS3(name)
       .then(() => this.removeTranscriptionJob(name))
       .then(() => this.unpackTranscription(translationData));
   }
 
-  private getJobWithDelay(name, job): Promise<any> {
+  private getJobWithDelay(name: string, job): Promise<any> {
     logger.info("Scheduling job", name);
     if (job.TranscriptionJob.TranscriptionJobStatus !== "IN_PROGRESS") {
       return Promise.resolve(job);
@@ -105,7 +113,7 @@ export class AWSProvider extends VoiceConverter {
       .then((info) => this.getJobWithDelay(name, info.job));
   }
 
-  private uploadToS3(name, file): Promise<any> {
+  private uploadToS3(name: string, file): Promise<any> {
     logger.info("Uploading to S3", name);
     return new Promise((resolve, reject) => {
       this.storage.upload(
@@ -126,7 +134,7 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private deleteFromS3(name): Promise<any> {
+  private deleteFromS3(name: string): Promise<any> {
     logger.info("Deleting from S3", name);
 
     return new Promise((resolve, reject) => {
@@ -147,7 +155,7 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private convertToText(name, uri): Promise<any> {
+  private convertToText(name: string, uri: string): Promise<any> {
     logger.info("Start converting", name, uri);
     return new Promise((resolve, reject) => {
       this.service.startTranscriptionJob(
@@ -171,7 +179,7 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private removeTranscriptionJob(name): Promise<any> {
+  private removeTranscriptionJob(name: string): Promise<any> {
     logger.info("Remove transcription job", name);
     return new Promise<void>((resolve, reject) => {
       this.service.deleteTranscriptionJob(
@@ -213,7 +221,7 @@ export class AWSProvider extends VoiceConverter {
           job,
         };
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         return {
           isExists: false,
           err,

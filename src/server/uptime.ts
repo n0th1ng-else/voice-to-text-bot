@@ -1,7 +1,7 @@
 import { ScheduleDaemon } from "../scheduler/index.js";
 import { Logger } from "../logger/index.js";
 import { HealthStatus } from "./types.js";
-import { sSuffix } from "../text/index.js";
+import { sSuffix } from "../text/utils.js";
 import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
 import { requestHealthData } from "./api.js";

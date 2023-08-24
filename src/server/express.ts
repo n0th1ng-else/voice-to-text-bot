@@ -5,7 +5,7 @@ import { Logger } from "../logger/index.js";
 import { TelegramBotModel } from "../telegram/bot.js";
 import { HttpsOptions } from "../../certs/index.js";
 import { HealthDto, HealthModel } from "./types.js";
-import { sSuffix } from "../text/index.js";
+import { sSuffix } from "../text/utils.js";
 import { UptimeDaemon } from "./uptime.js";
 import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
