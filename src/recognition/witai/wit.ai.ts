@@ -84,8 +84,8 @@ export class WithAiProvider extends VoiceConverter {
     data: Buffer,
     authToken: string,
     logPrefix: string,
-  ): Promise<WitAiDictationResponse[]> {
-    return WithAiProvider.runRequest<WitAiDictationResponse>(
+  ): Promise<WitAiBaseResponse[]> {
+    return WithAiProvider.runRequest<WitAiBaseResponse>(
       data,
       "dictation",
       authToken,
@@ -174,8 +174,6 @@ type WitAiSpeechResponse = {
   intents: WitAiIntent[];
   traits: Record<string, WitAiIntent>;
 } & WitAiBaseResponse;
-
-type WitAiDictationResponse = WitAiBaseResponse;
 
 type WitAiIntent = {
   id: string;
