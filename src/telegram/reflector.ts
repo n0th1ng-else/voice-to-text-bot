@@ -1,13 +1,18 @@
 import { Logger } from "../logger/index.js";
 import { TelegramApi } from "./api/tgapi.js";
-import {
-  hasNoRightsToSendMessage,
-  isKickedFromSupergroup,
-  TgError,
-} from "./api/tgerror.js";
+import { hasNoRightsToSendMessage, TgError } from "./api/tgerror.js";
 import { ApiErrorReflector } from "./api/types.js";
 
 const logger = new Logger("telegram:reflector");
+
+class ReflectorError extends Error {
+  public chatId: number | undefined;
+  public isChatLeft: boolean | undefined;
+
+  constructor(message: string, cause?: unknown) {
+    super(`ETGREFLECTOR ${message}`, { cause });
+  }
+}
 
 export const initTgReflector = (token: string): ApiErrorReflector => {
   const api = new TelegramApi(token);
@@ -16,7 +21,7 @@ export const initTgReflector = (token: string): ApiErrorReflector => {
       return;
     }
 
-    if (hasNoRightsToSendMessage(err) || isKickedFromSupergroup(err)) {
+    if (hasNoRightsToSendMessage(err)) {
       if (!err.chatId) {
         logger.error("No chatId provided", err);
         return;
@@ -24,27 +29,23 @@ export const initTgReflector = (token: string): ApiErrorReflector => {
 
       return api
         .leaveChat(err.chatId)
-        .then((chatLeft) => {
-          const logData = {
-            chatId: err.chatId,
-            reason: "hasNoRightsToSendMessage",
-          };
-
-          if (chatLeft) {
-            logger.warn("Left the chat", logData);
+        .then((isChatLeft) => {
+          if (isChatLeft) {
+            logger.warn("Left the chat", { chatId: err.chatId });
             return;
           }
 
-          logger.error(
+          const rfErr = new ReflectorError(
             "Tried to leave the chat, receive false as a result",
-            logData,
           );
+          rfErr.chatId = err.chatId;
+          rfErr.isChatLeft = isChatLeft;
+          logger.error(rfErr.message, rfErr);
         })
         .catch((error: unknown) => {
-          logger.error("Failed to leave the chat", {
-            chatId: err.chatId,
-            error,
-          });
+          const rfErr = new ReflectorError("Failed to leave the chat", error);
+          rfErr.chatId = err.chatId;
+          logger.error(rfErr.message, rfErr);
         });
     }
   };
