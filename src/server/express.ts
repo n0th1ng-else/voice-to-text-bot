@@ -130,10 +130,11 @@ export class ExpressServer {
           logger.info("Incoming message validated");
           return bot
             .handleApiMessage(payload, analytics)
+            .then(() => {
+              res.sendStatus(200);
+            })
             .catch((err) => {
               logger.error("Incoming message failed to handle", err);
-            })
-            .finally(() => {
               res.sendStatus(200);
             });
         } catch (err) {
