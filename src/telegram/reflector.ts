@@ -1,6 +1,10 @@
 import { Logger } from "../logger/index.js";
 import { TelegramApi } from "./api/tgapi.js";
-import { hasNoRightsToSendMessage, TgError } from "./api/tgerror.js";
+import {
+  hasNoRightsToSendMessage,
+  isKickedFromSupergroup,
+  TgError,
+} from "./api/tgerror.js";
 import { ApiErrorReflector } from "./api/types.js";
 
 const logger = new Logger("telegram:reflector");
@@ -12,7 +16,7 @@ export const initTgReflector = (token: string): ApiErrorReflector => {
       return;
     }
 
-    if (hasNoRightsToSendMessage(err)) {
+    if (hasNoRightsToSendMessage(err) || isKickedFromSupergroup(err)) {
       if (!err.chatId) {
         logger.error("No chatId provided", err);
         return;

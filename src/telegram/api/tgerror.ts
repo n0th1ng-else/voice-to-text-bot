@@ -73,6 +73,14 @@ export const hasNoRightsToSendMessage = (err: unknown): boolean => {
   );
 };
 
+export const isKickedFromSupergroup = (err: unknown): boolean => {
+  return assertErrCondition(
+    err,
+    403,
+    "Forbidden: bot was kicked from the supergroup chat",
+  );
+};
+
 export const isBlockedByUser = (err: unknown): boolean => {
   return assertErrCondition(err, 403, "Forbidden: bot was blocked by the user");
 };

@@ -4,6 +4,7 @@ import {
   hasNoRightsToSendMessage,
   isBlockedByUser,
   isMessageNotModified,
+  isKickedFromSupergroup,
 } from "./tgerror.js";
 import { TgCore } from "./types.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
@@ -139,6 +140,52 @@ describe("tgerror", () => {
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe("");
+    });
+  });
+
+  describe("isKickedFromSupergroup", () => {
+    it("should return false if the argument is non-tg error", () => {
+      expect(isKickedFromSupergroup(new Error("just an error"))).toBe(false);
+    });
+
+    it("should return false if the error description is different", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse({
+        ok: false,
+        result: undefined,
+        description: "Forbidden: another reason",
+      });
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the error code is different", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(400).setResponse({
+        ok: false,
+        result: undefined,
+        description: "Forbidden: bot was kicked from the supergroup chat",
+      });
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the error is ok", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse({
+        ok: true,
+        result: undefined,
+        description: "Forbidden: bot was kicked from the supergroup chat",
+      });
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return true if bot was blocked by the user", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse({
+        ok: false,
+        result: undefined,
+        description: "Forbidden: bot was kicked from the supergroup chat",
+      });
+      expect(isKickedFromSupergroup(tgErr)).toBe(true);
     });
   });
 
