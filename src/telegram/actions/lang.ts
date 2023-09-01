@@ -34,8 +34,11 @@ export class LangAction extends GenericAction {
     return this.showLanguageSelection(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isLangMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isLangMessage(mdl, msg));
   }
 
   public runCallback(

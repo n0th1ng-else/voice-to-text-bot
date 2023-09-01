@@ -10,6 +10,7 @@ import { TelegramButtonModel } from "../types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { CheckoutAction } from "./checkout.js";
+import { IgnoreAction } from "./ignore.js";
 import type { TelegramApi } from "../api/tgapi.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
@@ -28,6 +29,7 @@ export class BotActions {
   public readonly voiceFormat: VoiceFormatAction;
   public readonly voiceLength: VoiceLengthAction;
   public readonly checkout: CheckoutAction;
+  public readonly ignore: IgnoreAction;
 
   constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -39,6 +41,7 @@ export class BotActions {
     this.voiceFormat = new VoiceFormatAction(stat, bot);
     this.voiceLength = new VoiceLengthAction(stat, bot);
     this.checkout = new CheckoutAction(stat, bot);
+    this.ignore = new IgnoreAction(stat, bot);
   }
 
   public setPayment(payment: PaymentService): void {

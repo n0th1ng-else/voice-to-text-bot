@@ -21,10 +21,13 @@ export class VoiceLengthAction extends GenericAction {
     return this.sendVoiceIsTooLongMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
-    return isVoice && isVoiceMessageLong(mdl);
+    return Promise.resolve(isVoice && isVoiceMessageLong(mdl));
   }
 
   private sendVoiceIsTooLongMessage(

@@ -24,8 +24,11 @@ export class SupportAction extends GenericAction {
     return this.sendSupportMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isSupportMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isSupportMessage(mdl, msg));
   }
 
   public setAuthorUrl(url: string): void {

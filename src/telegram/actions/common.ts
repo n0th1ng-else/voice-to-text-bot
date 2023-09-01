@@ -30,9 +30,12 @@ export abstract class GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void>;
 
-  public abstract runCondition(msg: TgMessage, mdl: BotMessageModel): boolean;
+  public abstract runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean>;
 
-  public getChatLanguage(
+  public async getChatLanguage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
     lang?: LanguageCode,
@@ -52,7 +55,7 @@ export abstract class GenericAction {
       });
   }
 
-  public sendMessage(
+  public async sendMessage(
     chatId: number,
     messageId: number,
     ids: LabelWithNoMenu | LabelWithNoMenu[],
@@ -87,7 +90,7 @@ export abstract class GenericAction {
       });
   }
 
-  public editMessage(
+  public async editMessage(
     chatId: number,
     messageId: number,
     meta: MessageOptions,
@@ -104,7 +107,7 @@ export abstract class GenericAction {
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`));
   }
 
-  protected sendRawMessage(
+  protected async sendRawMessage(
     chatId: number,
     message: string,
     lang: LanguageCode,
@@ -124,7 +127,7 @@ export abstract class GenericAction {
     );
   }
 
-  private sendRawMessageParts(
+  private async sendRawMessageParts(
     chatId: number,
     messageParts: string[],
     options: TgMessageOptions = {},
@@ -148,7 +151,7 @@ export class CoreAction extends GenericAction {
     return Promise.resolve();
   }
 
-  public runCondition(): boolean {
-    return false;
+  public async runCondition(): Promise<boolean> {
+    return Promise.resolve(false);
   }
 }

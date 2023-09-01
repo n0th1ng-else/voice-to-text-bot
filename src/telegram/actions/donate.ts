@@ -29,11 +29,14 @@ export class DonateAction extends GenericAction {
     return this.sendDonateMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isDonateMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isDonateMessage(mdl, msg));
   }
 
-  public runCallback(
+  public async runCallback(
     msg: TgMessage,
     button: TelegramButtonModel,
     analytics: AnalyticsData,
@@ -50,7 +53,7 @@ export class DonateAction extends GenericAction {
     this.payment = payment;
   }
 
-  private sendDonateMessage(
+  private async sendDonateMessage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
@@ -94,7 +97,7 @@ export class DonateAction extends GenericAction {
       );
   }
 
-  private formLinkButton(
+  private async formLinkButton(
     msg: TgMessage,
     button: TelegramButtonModel,
     analytics: AnalyticsData,

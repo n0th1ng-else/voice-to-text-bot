@@ -48,6 +48,11 @@ export class Logger {
     this.additionalPrefix = `thread-${threadId}`;
   }
 
+  public debug(msg: string, ...data: unknown[]): void {
+    // TODO use env to disable
+    this.info(msg, ...data);
+  }
+
   public info(msg: string, ...data: unknown[]): void {
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), msg, ...data);

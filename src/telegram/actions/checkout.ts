@@ -9,7 +9,7 @@ import type { AnalyticsData } from "../../analytics/ga/types.js";
 const logger = new Logger("telegram-bot");
 
 export class CheckoutAction extends GenericAction {
-  public runAction(
+  public async runAction(
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
@@ -25,11 +25,11 @@ export class CheckoutAction extends GenericAction {
     return this.markAsSuccessful(donationId, prefix);
   }
 
-  public runCondition(msg: TgMessage): boolean {
-    return Boolean(msg.successful_payment);
+  public async runCondition(msg: TgMessage): Promise<boolean> {
+    return Promise.resolve(Boolean(msg.successful_payment));
   }
 
-  public confirmCheckout(
+  public async confirmCheckout(
     msg: TgCheckoutQuery,
     analytics: AnalyticsData,
   ): Promise<void> {
@@ -58,7 +58,7 @@ export class CheckoutAction extends GenericAction {
       });
   }
 
-  private markAsPending(
+  private async markAsPending(
     donationId: number,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
@@ -75,7 +75,7 @@ export class CheckoutAction extends GenericAction {
       });
   }
 
-  private markAsSuccessful(
+  private async markAsSuccessful(
     donationId: number,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {

@@ -125,7 +125,7 @@ export class TelegramBotModel {
       });
   }
 
-  private handleMessage(
+  private async handleMessage(
     msg: TgMessage,
     analytics: AnalyticsData,
   ): Promise<void> {
@@ -138,35 +138,39 @@ export class TelegramBotModel {
       return TelegramBotModel.logNotSupportedMessage(model, prefix);
     }
 
-    if (this.actions.start.runCondition(msg, model)) {
+    if (await this.actions.ignore.runCondition(msg, model)) {
+      return this.actions.ignore.runAction(model, prefix);
+    }
+
+    if (await this.actions.start.runCondition(msg, model)) {
       return this.actions.start.runAction(model, prefix);
     }
 
-    if (this.actions.lang.runCondition(msg, model)) {
+    if (await this.actions.lang.runCondition(msg, model)) {
       return this.actions.lang.runAction(model, prefix);
     }
 
-    if (this.actions.support.runCondition(msg, model)) {
+    if (await this.actions.support.runCondition(msg, model)) {
       return this.actions.support.runAction(model, prefix);
     }
 
-    if (this.actions.donate.runCondition(msg, model)) {
+    if (await this.actions.donate.runCondition(msg, model)) {
       return this.actions.donate.runAction(model, prefix);
     }
 
-    if (this.actions.voiceFormat.runCondition(msg)) {
+    if (await this.actions.voiceFormat.runCondition(msg)) {
       return this.actions.voiceFormat.runAction(model, prefix);
     }
 
-    if (this.actions.voiceLength.runCondition(msg, model)) {
+    if (await this.actions.voiceLength.runCondition(msg, model)) {
       return this.actions.voiceLength.runAction(model, prefix);
     }
 
-    if (this.actions.voice.runCondition(msg)) {
+    if (await this.actions.voice.runCondition(msg)) {
       return this.actions.voice.runAction(model, prefix);
     }
 
-    if (this.actions.checkout.runCondition(msg)) {
+    if (await this.actions.checkout.runCondition(msg)) {
       return this.actions.checkout.runAction(model, prefix);
     }
 

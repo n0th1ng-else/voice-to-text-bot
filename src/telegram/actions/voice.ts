@@ -33,7 +33,7 @@ export class VoiceAction extends GenericAction {
       );
   }
 
-  public runCondition(msg: TgMessage): boolean {
+  public async runCondition(msg: TgMessage): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
     const isNoContent = type.type === VoiceContentReason.NoContent;
@@ -45,7 +45,7 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    return isVoice;
+    return Promise.resolve(isVoice);
   }
 
   public setConverter(converter: VoiceConverter): void {

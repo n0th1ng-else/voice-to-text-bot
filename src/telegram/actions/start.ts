@@ -22,8 +22,11 @@ export class StartAction extends GenericAction {
     return this.sendHelloMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isHelloMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isHelloMessage(mdl, msg));
   }
 
   private sendHelloMessage(
