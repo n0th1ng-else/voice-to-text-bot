@@ -1,14 +1,17 @@
-import { TgMessage, TgMessageOptions } from "../api/types.js";
+import { Logger } from "../../logger/index.js";
+import { TextModel } from "../../text/index.js";
+import { splitTextIntoParts } from "../../common/helpers.js";
 import {
+  TELEGRAM_API_MAX_MESSAGE_SIZE,
+  type TelegramApi,
+} from "../api/tgapi.js";
+import type { TgMessage, TgMessageOptions } from "../api/types.js";
+import type {
   BotMessageModel,
   MessageOptions,
   TelegramMessagePrefix,
 } from "../types.js";
-import { Logger } from "../../logger/index.js";
-import { TextModel } from "../../text/index.js";
-import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api/tgapi.js";
-import { DbClient } from "../../db/index.js";
-import { splitTextIntoParts } from "../../common/helpers.js";
+import type { getDb } from "../../db/index.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import type { LabelWithNoMenu } from "../../text/types.js";
 
@@ -18,7 +21,7 @@ export abstract class GenericAction {
   protected readonly text = new TextModel();
 
   constructor(
-    protected readonly stat: DbClient,
+    protected readonly stat: ReturnType<typeof getDb>,
     protected readonly bot: TelegramApi,
   ) {}
 
@@ -39,8 +42,8 @@ export abstract class GenericAction {
     }
 
     logger.info(`${prefix.getPrefix()} Fetching language`);
-    return this.stat.usages
-      .getLangId(model.chatId, model.name, model.userLanguage)
+    return this.stat
+      .getLanguage(model.chatId, model.name, model.userLanguage)
       .catch((err) => {
         const errorMessage = "Unable to get the lang";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);

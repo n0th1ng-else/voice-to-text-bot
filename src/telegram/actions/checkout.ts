@@ -1,10 +1,10 @@
 import { GenericAction } from "./common.js";
-import { TgCheckoutQuery, TgMessage } from "../api/types.js";
-import { BotMessageModel, TelegramMessagePrefix } from "../types.js";
-import { AnalyticsData } from "../../analytics/ga/types.js";
 import { DonationStatus } from "../../db/sql/donations.js";
 import { Logger } from "../../logger/index.js";
 import { parseDonationPayload } from "../helpers.js";
+import { type BotMessageModel, TelegramMessagePrefix } from "../types.js";
+import type { TgCheckoutQuery, TgMessage } from "../api/types.js";
+import type { AnalyticsData } from "../../analytics/ga/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -62,8 +62,8 @@ export class CheckoutAction extends GenericAction {
     donationId: number,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    return this.stat.donations
-      .updateRow(donationId, DonationStatus.Pending)
+    return this.stat
+      .updateDonationRow(donationId, DonationStatus.Pending)
       .then(() => {
         logger.info(`${prefix.getPrefix()} Donation marked as PENDING`);
       })
@@ -79,8 +79,8 @@ export class CheckoutAction extends GenericAction {
     donationId: number,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    return this.stat.donations
-      .updateRow(donationId, DonationStatus.Received)
+    return this.stat
+      .updateDonationRow(donationId, DonationStatus.Received)
       .then(() => {
         logger.info(`${prefix.getPrefix()} Donation marked as SUCCESSFUL`);
       })

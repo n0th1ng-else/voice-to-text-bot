@@ -1,8 +1,8 @@
 import type { Pool } from "pg";
 import { IgnoredChatsSql } from "./ignoredchats.sql.js";
 
-export type IgnoredChatRowScheme = {
-  ignored_chat_id: string;
+export type IgnoredChatsRowScheme = {
+  row_id: string;
   chat_id: number;
   ignore: boolean;
   created_at: Date;
@@ -22,7 +22,7 @@ export class IgnoredChatsDb {
     });
   }
 
-  public getRow(chatId: number): Promise<IgnoredChatRowScheme | null> {
+  public getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table ignoredchats is not initialized yet"),
@@ -31,14 +31,14 @@ export class IgnoredChatsDb {
     const query = IgnoredChatsSql.getRows;
     const values = [chatId];
     return this.pool
-      .query<IgnoredChatRowScheme>(query, values)
+      .query<IgnoredChatsRowScheme>(query, values)
       .then((queryData) => {
         const row = queryData.rows.shift();
         return row ?? null;
       });
   }
 
-  public getId(row: IgnoredChatRowScheme): string {
-    return row.ignored_chat_id;
+  public getId(row: IgnoredChatsRowScheme): string {
+    return row.row_id;
   }
 }

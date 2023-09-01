@@ -1,6 +1,9 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
-import { IgnoredChatsDb, IgnoredChatRowScheme } from "./sql/ignoredchats.js";
+import {
+  IgnoredChatsDb,
+  type IgnoredChatsRowScheme,
+} from "./sql/ignoredchats.js";
 
 const logger = new Logger("postgres-ignored-chats");
 
@@ -27,7 +30,7 @@ export class IgnoredChatsClient {
       });
   }
 
-  getRow(chatId: number): Promise<IgnoredChatRowScheme | null> {
+  public getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
     logger.info(`Looking for row for chatId=${chatId}`);
     return this.db
       .getRow(chatId)

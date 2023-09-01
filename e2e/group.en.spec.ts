@@ -53,7 +53,6 @@ let stopHandler: VoidPromise = () =>
 let converterOptions: VoiceConverterOptions;
 let converter: InstanceType<InjectedFn["VoiceConverter"]>;
 let hostUrl: string;
-let db: InstanceType<InjectedFn["DbClient"]>;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let chatType: TgChatType;
 let testMessageId = 0;
@@ -135,6 +134,7 @@ describe("[default language - english]", () => {
     const localhostUrl = init.localhostUrl;
     const launchTime = init.launchTime;
     const DbClient = init.DbClient;
+    const getDb = init.getDb;
 
     mockGoogleAuth();
     converterOptions = {
@@ -148,7 +148,9 @@ describe("[default language - english]", () => {
       converterOptions,
     );
     hostUrl = `${localhostUrl}:${appPort}`;
-    db = new DbClient(dbConfig, 0, testPool);
+    const mainDb = new DbClient(dbConfig, 0, testPool);
+    const db = getDb([dbConfig], 0, mainDb);
+
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramApi.url);

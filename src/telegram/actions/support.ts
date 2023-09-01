@@ -1,15 +1,15 @@
-import { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import { GenericAction } from "./common.js";
-import {
-  BotCommand,
-  BotMessageModel,
-  TelegramMessagePrefix,
-} from "../types.js";
 import { isSupportMessage } from "../helpers.js";
 import { LabelId } from "../../text/types.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
+import {
+  BotCommand,
+  type BotMessageModel,
+  type TelegramMessagePrefix,
+} from "../types.js";
+import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 
 const logger = new Logger("telegram-bot");
 

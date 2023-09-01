@@ -5,7 +5,7 @@ import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
 import { sSuffix } from "../text/utils.js";
 import { httpsOptions } from "../../certs/index.js";
-import { DbClient } from "../db/index.js";
+import { getDb } from "../db/index.js";
 import { initStaticServer } from "../server/static.js";
 
 const logger = new Logger("chart-script");
@@ -13,7 +13,7 @@ const logger = new Logger("chart-script");
 export const run = (): void => {
   const app = initStaticServer("chart");
 
-  let db: DbClient | null = null;
+  let db: ReturnType<typeof getDb> | null = null;
 
   app.post(
     "/login",
@@ -34,13 +34,15 @@ export const run = (): void => {
         res.status(200).send({});
         return;
       }
-      db = new DbClient({
-        user: req.body.user,
-        password: req.body.pwd,
-        host: req.body.host,
-        database: req.body.user,
-        port: req.body.port,
-      });
+      db = getDb([
+        {
+          user: req.body.user,
+          password: req.body.pwd,
+          host: req.body.host,
+          database: req.body.user,
+          port: req.body.port,
+        },
+      ]);
 
       res.status(200).send({});
     },
@@ -82,8 +84,7 @@ export const run = (): void => {
       return;
     }
 
-    db.usages
-      .statRows(new Date(from), new Date(to), usageCount)
+    db.fetchUsageRows(new Date(from), new Date(to), usageCount)
       .then((rows) => {
         res.status(200).send({ items: rows, total: rows.length });
       })

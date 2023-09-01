@@ -7,12 +7,12 @@ import { HttpsOptions } from "../../certs/index.js";
 import { HealthDto, HealthModel } from "./types.js";
 import { sSuffix } from "../text/utils.js";
 import { UptimeDaemon } from "./uptime.js";
-import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
+import type { getDb } from "../db/index.js";
 import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("server");
@@ -21,7 +21,7 @@ export class ExpressServer {
   private readonly app = express();
   private readonly uptimeDaemon: UptimeDaemon;
 
-  private stat: DbClient | null = null;
+  private stat: ReturnType<typeof getDb> | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
@@ -43,7 +43,7 @@ export class ExpressServer {
     this.app.use("/static", express.static("assets/v2"));
 
     const statusHandler = (
-      db: DbClient | null,
+      db: ReturnType<typeof getDb> | null,
       res: express.Response<HealthDto>,
     ): void => {
       const status = new HealthModel(this.version, this.isHttps, this.threadId);
@@ -54,6 +54,7 @@ export class ExpressServer {
       }
 
       if (!db?.isReady()) {
+        logger.warn("Database is not ready");
         // TODO fix behavior
         // const errMessage = "Database is not ready";
         // logger.error(errMessage, new Error(errMessage));
@@ -91,7 +92,7 @@ export class ExpressServer {
     });
   }
 
-  public setStat(stat: DbClient): this {
+  public setStat(stat: ReturnType<typeof getDb>): this {
     this.stat = stat;
     this.uptimeDaemon.setStat(stat);
     return this;
@@ -266,8 +267,8 @@ export class ExpressServer {
         return;
       }
 
-      return this.stat.nodes
-        .updateState(this.selfUrl, true, this.version)
+      return this.stat
+        .updateNodeState(this.selfUrl, true, this.version)
         .then(flattenPromise);
     });
   }

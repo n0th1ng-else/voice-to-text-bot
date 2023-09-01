@@ -27,7 +27,7 @@ export class DurationsClient {
       });
   }
 
-  private createRow(
+  public createRow(
     chatId: number,
     duration: number,
   ): Promise<DurationRowScheme> {

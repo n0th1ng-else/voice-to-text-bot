@@ -1,4 +1,3 @@
-import { TelegramApi } from "../api/tgapi.js";
 import { StartAction } from "./start.js";
 import { LangAction } from "./lang.js";
 import { SupportAction } from "./support.js";
@@ -7,14 +6,15 @@ import { CoreAction } from "./common.js";
 import { DonateAction } from "./donate.js";
 import { VoiceFormatAction } from "./voice-format.js";
 import { VoiceLengthAction } from "./voice-length.js";
-import { DbClient } from "../../db/index.js";
-import { PaymentService } from "../../donate/types.js";
-import { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
-import { AnalyticsData } from "../../analytics/ga/types.js";
 import { TelegramButtonModel } from "../types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { CheckoutAction } from "./checkout.js";
+import type { TelegramApi } from "../api/tgapi.js";
+import type { PaymentService } from "../../donate/types.js";
+import type { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
+import type { AnalyticsData } from "../../analytics/ga/types.js";
+import type { getDb } from "../../db/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -29,7 +29,7 @@ export class BotActions {
   public readonly voiceLength: VoiceLengthAction;
   public readonly checkout: CheckoutAction;
 
-  constructor(stat: DbClient, bot: TelegramApi) {
+  constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
     this.lang = new LangAction(stat, bot);
     this.support = new SupportAction(stat, bot);

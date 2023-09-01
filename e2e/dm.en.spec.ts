@@ -103,6 +103,7 @@ describe("[default language - english]", () => {
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const DbClient = init.DbClient;
+    const getDb = init.getDb;
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
     const TelegramApi = init.TelegramApi;
@@ -140,7 +141,8 @@ describe("[default language - english]", () => {
       port: dbPort,
     };
     testPool = new MockPool(dbConfig);
-    const db = new DbClient(dbConfig, 0, testPool);
+    const mainDb = new DbClient(dbConfig, 0, testPool);
+    const db = getDb([dbConfig], 0, mainDb);
 
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);

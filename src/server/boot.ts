@@ -6,7 +6,7 @@ import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
 } from "../recognition/index.js";
-import { DbClient } from "../db/index.js";
+import { getDb } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
 import { TelegramBotModel } from "../telegram/bot.js";
 import { ScheduleDaemon } from "../scheduler/index.js";
@@ -39,15 +39,17 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
     converterOptions,
   );
 
-  const db = new DbClient(
-    {
-      user: envy.dbPostgres.user,
-      password: envy.dbPostgres.password,
-      host: envy.dbPostgres.host,
-      database: envy.dbPostgres.database,
-      port: envy.dbPostgres.port,
-      certificate: envy.dbPostgres.cert,
-    },
+  const db = getDb(
+    [
+      {
+        user: envy.dbPostgres.user,
+        password: envy.dbPostgres.password,
+        host: envy.dbPostgres.host,
+        database: envy.dbPostgres.database,
+        port: envy.dbPostgres.port,
+        certificate: envy.dbPostgres.cert,
+      },
+    ],
     threadId,
   );
 

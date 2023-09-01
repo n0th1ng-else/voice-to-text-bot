@@ -15,10 +15,10 @@ import { BotActions } from "./actions/index.js";
 import { botCommands } from "./data.js";
 import { TelegramApi } from "./api/tgapi.js";
 import { collectAnalytics } from "../analytics/index.js";
-import { DbClient } from "../db/index.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import { PaymentService } from "../donate/types.js";
 import { initTgReflector } from "./reflector.js";
+import type { getDb } from "../db/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -32,7 +32,7 @@ export class TelegramBotModel {
   constructor(
     private readonly token: string,
     converter: VoiceConverter,
-    stat: DbClient,
+    stat: ReturnType<typeof getDb>,
   ) {
     const reflector = initTgReflector(this.token);
     this.bot = new TelegramApi(this.token, reflector);
