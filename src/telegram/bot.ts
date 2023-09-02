@@ -134,9 +134,10 @@ export class TelegramBotModel {
 
     logger.info(`${prefix.getPrefix()} Incoming message`);
 
-    if (await this.actions.ignore.runCondition(msg, model)) {
-      return this.actions.ignore.runAction(model, prefix);
-    }
+    // TODO enable with caching
+    // if (await this.actions.ignore.runCondition(msg, model)) {
+    //   return this.actions.ignore.runAction(model, prefix);
+    // }
 
     if (!isMessageSupported(msg)) {
       return TelegramBotModel.logNotSupportedMessage(model, prefix);
