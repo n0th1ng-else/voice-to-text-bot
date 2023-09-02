@@ -1,7 +1,7 @@
 import {
-  VoiceConverter,
-  VoiceConverterOptions,
-  VoiceConverterProvider,
+  type VoiceConverter,
+  type VoiceConverterOptions,
+  type VoiceConverterProvider,
   VoiceConverterProviderSchema,
 } from "./types.js";
 import { GoogleProvider } from "./google.js";

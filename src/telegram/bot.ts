@@ -132,7 +132,7 @@ export class TelegramBotModel {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId);
 
-    logger.info(`${prefix.getPrefix()} Incoming message`);
+    logger.debug(`${prefix.getPrefix()} Incoming message`);
 
     // TODO enable with caching
     // if (await this.actions.ignore.runCondition(msg, model)) {
