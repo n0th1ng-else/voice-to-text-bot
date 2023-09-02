@@ -1,5 +1,7 @@
+const TABLE_NAME = "usages";
+
 const createTable = `
-      CREATE TABLE IF NOT EXISTS usages (
+      CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
         usage_id varchar(20) PRIMARY KEY,
         chat_id bigint UNIQUE NOT NULL,
         user_name text NOT NULL,
@@ -11,13 +13,13 @@ const createTable = `
     `;
 
 const insertRow = `
-      INSERT INTO usages(usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at) 
+      INSERT INTO ${TABLE_NAME}(usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at) 
       VALUES($1, $2, $3, $4, $5, $6, $7)
       RETURNING usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at;
     `;
 
 const updateRow = `
-      UPDATE usages SET
+      UPDATE ${TABLE_NAME} SET
         user_name=$1,
         usage_count=$2,
         lang_id=$3,
@@ -27,7 +29,7 @@ const updateRow = `
     `;
 
 const updateRowWithDate = `
-      UPDATE usages SET
+      UPDATE ${TABLE_NAME} SET
         user_name=$1,
         usage_count=$2,
         lang_id=$3,
@@ -39,14 +41,14 @@ const updateRowWithDate = `
 
 const getRows = `
       SELECT usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at 
-      FROM usages 
+      FROM ${TABLE_NAME} 
       WHERE chat_id=$1 
       ORDER BY created_at;
     `;
 
 const statRows = `
       SELECT usage_id, chat_id, user_name, usage_count, lang_id, created_at, updated_at
-      FROM usages 
+      FROM ${TABLE_NAME} 
       WHERE usage_count>=$1 
       AND created_at BETWEEN $2 AND $3
       ORDER BY created_at;

@@ -18,7 +18,7 @@ import {
   InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
-import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
@@ -31,6 +31,10 @@ jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
 jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
   () => import("../src/analytics/amplitude/__mocks__/index.js"),
+);
+jest.unstable_mockModule(
+  "../src/analytics/ga/index",
+  () => import("../src/analytics/ga/__mocks__/index.js"),
 );
 
 const enableSSL = false;
@@ -69,6 +73,8 @@ let mockTgReceiveRawMessage: InjectedTestFn["mockTgReceiveRawMessage"];
 let mockSpeechRecognition: InjectedTestFn["mockSpeechRecognition"];
 let mockTgGetFileUrl: InjectedTestFn["mockTgGetFileUrl"];
 let mockUpdateBotStatUsage: InjectedTestFn["mockUpdateBotStatUsage"];
+let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];
+let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
 
 describe("[default language - english]", () => {
   beforeAll(async () => {
@@ -97,7 +103,9 @@ describe("[default language - english]", () => {
     mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
     mockTgGetFileUrl = initTest.mockTgGetFileUrl;
     mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
+    mockGetIgnoredChatsRow = initTest.mockGetIgnoredChatsRow;
 
+    trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
@@ -111,10 +119,6 @@ describe("[default language - english]", () => {
     const ExpressServer = init.ExpressServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;
-    const NodesSql = init.NodesSql;
-    const UsagesSql = init.UsagesSql;
-    const DonationsSql = init.DonationsSql;
-    const UsedEmailsSql = init.UsedEmailsSql;
     const launchTime = init.launchTime;
 
     mockGoogleAuth();
@@ -141,6 +145,7 @@ describe("[default language - english]", () => {
       port: dbPort,
     };
     testPool = new MockPool(dbConfig);
+    mockTableCreation(testPool);
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
@@ -161,11 +166,6 @@ describe("[default language - english]", () => {
       appVersion,
       httpsOptions,
     );
-
-    testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
-    testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
-    testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
-    testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
 
     return db
       .init()
@@ -188,6 +188,7 @@ describe("[default language - english]", () => {
   afterEach(() => {
     expect(telegramServer.isDone()).toBe(true);
     expect(testPool.isDone()).toBe(true);
+    expect(trackNotMatchedRoutes()).toBe(true);
   });
 
   describe("private messages", () => {
@@ -201,6 +202,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -217,6 +219,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -233,6 +236,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -248,6 +252,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
@@ -268,6 +273,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -301,6 +307,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -339,6 +346,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -354,7 +362,6 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -362,7 +369,9 @@ describe("[default language - english]", () => {
           LabelId.ChangeLangTitle,
           getLangButtons(),
         ),
-      ]).then(([, prefixId]) => {
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+      ]).then(([prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId: LanguageCode = "ru-RU";
         cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
@@ -386,6 +395,7 @@ describe("[default language - english]", () => {
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
@@ -394,6 +404,12 @@ describe("[default language - english]", () => {
           getDonateButtons(),
         ),
       ]);
+    });
+
+    it("does nothing if the message is from another bot", () => {
+      tgMessage.setName(testMessageId, {}, true);
+
+      return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
     });
 
     it("converts voice into text (it fits 90 sec limit)", () => {
@@ -422,6 +438,7 @@ describe("[default language - english]", () => {
           `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]).then(() => {
         expect(speechScope.isDone()).toBe(true);
       });
@@ -434,20 +451,15 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
           [LabelId.LongVoiceMessage],
         ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
-    });
-
-    it("does nothing if the message is from another bot", () => {
-      tgMessage.setName(testMessageId, {}, true);
-
-      return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
     });
 
     it("responds on a voice message with wrong mime type", () => {
@@ -462,7 +474,6 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
@@ -473,6 +484,8 @@ describe("[default language - english]", () => {
             LabelId.SupportedFormatsMessageExplanation,
           ],
         ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
     });
 
@@ -482,13 +495,14 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
           LabelId.NoContent,
         ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
     });
 
@@ -518,6 +532,7 @@ describe("[default language - english]", () => {
           `🗣 ${voiceFileContent}`,
         ),
         mockUpdateBotStatUsage(testPool, statModel),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]).then(() => {
         expect(speechScope.isDone()).toBe(true);
       });
@@ -530,13 +545,14 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
           [LabelId.LongVoiceMessage],
         ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
     });
 
@@ -552,7 +568,6 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessages(
           telegramServer,
           tgMessage.chatId,
@@ -563,6 +578,8 @@ describe("[default language - english]", () => {
             LabelId.SupportedFormatsMessageExplanation,
           ],
         ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
     });
 
@@ -572,13 +589,81 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        sendTelegramMessage(host, bot, tgMessage),
         mockTgReceiveMessage(
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
           LabelId.NoContent,
         ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+      ]);
+    });
+
+    it("converts video_note into text (it fits 90 sec limit)", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 89;
+      const voiceFileContent = "supergroup";
+      tgMessage.setVideoNote(testMessageId, voiceFileId, voiceFileDuration);
+
+      const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
+
+      const speechScope = mockSpeechRecognition(voiceFileContent);
+      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+
+      return Promise.all([
+        sendTelegramMessage(host, bot, tgMessage),
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.InProgress,
+        ),
+        mockTgReceiveRawMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          `🗣 ${voiceFileContent}`,
+        ),
+        mockUpdateBotStatUsage(testPool, statModel),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+      ]).then(() => {
+        expect(speechScope.isDone()).toBe(true);
+      });
+    });
+
+    it("denies to convert big video_note files more than 90 sec", () => {
+      const voiceFileId = "some-file-id";
+      const voiceFileDuration = 90;
+      tgMessage.setVideoNote(testMessageId, voiceFileId, voiceFileDuration);
+      const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
+
+      return Promise.all([
+        mockTgReceiveMessages(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          [LabelId.LongVoiceMessage],
+        ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+      ]);
+    });
+
+    it("responds on an video_note message with broken duration", () => {
+      const voiceFileId = "some-file-id";
+      tgMessage.setVideoNote(testMessageId, voiceFileId, -38);
+      const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
+
+      return Promise.all([
+        mockTgReceiveMessage(
+          telegramServer,
+          tgMessage.chatId,
+          statModel.langId,
+          LabelId.NoContent,
+        ),
+        sendTelegramMessage(host, bot, tgMessage),
+        mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
     });
   });

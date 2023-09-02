@@ -134,12 +134,12 @@ export class TelegramBotModel {
 
     logger.info(`${prefix.getPrefix()} Incoming message`);
 
-    if (!isMessageSupported(msg)) {
-      return TelegramBotModel.logNotSupportedMessage(model, prefix);
-    }
-
     if (await this.actions.ignore.runCondition(msg, model)) {
       return this.actions.ignore.runAction(model, prefix);
+    }
+
+    if (!isMessageSupported(msg)) {
+      return TelegramBotModel.logNotSupportedMessage(model, prefix);
     }
 
     if (await this.actions.start.runCondition(msg, model)) {

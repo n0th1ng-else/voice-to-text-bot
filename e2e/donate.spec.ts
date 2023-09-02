@@ -10,7 +10,7 @@ import {
 } from "@jest/globals";
 import nock from "nock";
 import request from "supertest";
-import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import {
   injectDependencies,
   InjectedFn,
@@ -32,6 +32,10 @@ jest.unstable_mockModule(
   "../src/analytics/amplitude/index",
   () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
+jest.unstable_mockModule(
+  "../src/analytics/ga/index",
+  () => import("../src/analytics/ga/__mocks__/index.js"),
+);
 
 const appPort = 3900;
 const dbPort = appPort + 1;
@@ -47,6 +51,7 @@ const dbConfig = {
 
 const paymentToken = "stripe-token";
 const testPool = new MockPool(dbConfig);
+mockTableCreation(testPool);
 
 let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
@@ -72,6 +77,8 @@ let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
 let mockTgReceiveInvoiceMessage: InjectedTestFn["mockTgReceiveInvoiceMessage"];
 let mockCreateDonationRow: InjectedTestFn["mockCreateDonationRow"];
 let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
+let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];
+let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
 
 describe("[default language - english] donate", () => {
   beforeAll(async () => {
@@ -90,7 +97,9 @@ describe("[default language - english] donate", () => {
     mockTgReceiveInvoiceMessage = initTest.mockTgReceiveInvoiceMessage;
     mockCreateDonationRow = initTest.mockCreateDonationRow;
     BotStatRecordModel = initTest.BotStatRecordModel;
+    mockGetIgnoredChatsRow = initTest.mockGetIgnoredChatsRow;
 
+    trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
@@ -105,10 +114,6 @@ describe("[default language - english] donate", () => {
     const ExpressServer = init.ExpressServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;
-    const NodesSql = init.NodesSql;
-    const UsagesSql = init.UsagesSql;
-    const DonationsSql = init.DonationsSql;
-    const UsedEmailsSql = init.UsedEmailsSql;
 
     mockGoogleAuth();
 
@@ -146,11 +151,6 @@ describe("[default language - english] donate", () => {
       httpsOptions,
     );
 
-    testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
-    testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
-    testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
-    testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
-
     return db
       .init()
       .then(() => server.setSelfUrl(hostUrl).setBots([bot]).setStat(db).start())
@@ -171,6 +171,7 @@ describe("[default language - english] donate", () => {
   afterEach(() => {
     expect(telegramServer.isDone()).toBe(true);
     expect(testPool.isDone()).toBe(true);
+    expect(trackNotMatchedRoutes()).toBe(true);
   });
 
   describe("DIRECT", () => {
@@ -196,7 +197,6 @@ describe("[default language - english] donate", () => {
         );
 
         return Promise.all([
-          sendTelegramMessage(host, bot, tgMessage),
           mockTgReceiveMessage(
             telegramServer,
             tgMessage.chatId,
@@ -204,7 +204,9 @@ describe("[default language - english] donate", () => {
             LabelId.DonateCommandMessage,
             getDonateButtons(),
           ),
-        ]).then(([, prefixId]) => {
+          sendTelegramMessage(host, bot, tgMessage),
+          mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+        ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
           cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
@@ -244,7 +246,6 @@ describe("[default language - english] donate", () => {
         );
 
         return Promise.all([
-          sendTelegramMessage(host, bot, tgMessage),
           mockTgReceiveMessage(
             telegramServer,
             tgMessage.chatId,
@@ -252,7 +253,9 @@ describe("[default language - english] donate", () => {
             LabelId.DonateCommandMessage,
             getDonateButtons(),
           ),
-        ]).then(([, prefixId]) => {
+          sendTelegramMessage(host, bot, tgMessage),
+          mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+        ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
           cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
@@ -296,7 +299,6 @@ describe("[default language - english] donate", () => {
         );
 
         return Promise.all([
-          sendTelegramMessage(host, bot, tgMessage),
           mockTgReceiveMessage(
             telegramServer,
             tgMessage.chatId,
@@ -304,7 +306,9 @@ describe("[default language - english] donate", () => {
             LabelId.DonateCommandMessage,
             getDonateButtons(),
           ),
-        ]).then(([, prefixId]) => {
+          sendTelegramMessage(host, bot, tgMessage),
+          mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+        ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
           cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
@@ -344,7 +348,6 @@ describe("[default language - english] donate", () => {
         );
 
         return Promise.all([
-          sendTelegramMessage(host, bot, tgMessage),
           mockTgReceiveMessage(
             telegramServer,
             tgMessage.chatId,
@@ -352,7 +355,9 @@ describe("[default language - english] donate", () => {
             LabelId.DonateCommandMessage,
             getDonateButtons(),
           ),
-        ]).then(([, prefixId]) => {
+          sendTelegramMessage(host, bot, tgMessage),
+          mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
+        ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
           cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);

@@ -29,10 +29,15 @@ export class IgnoreAction extends GenericAction {
     msg: TgMessage,
     mdl: BotMessageModel,
   ): Promise<boolean> {
-    const ignoredChatRow = await this.stat.getIgnoredChatRow(mdl.chatId);
-    if (!ignoredChatRow) {
-      return false;
-    }
-    return Promise.resolve(ignoredChatRow.ignore);
+    return this.stat
+      .getIgnoredChatRow(mdl.chatId)
+      .then((row) => {
+        if (!row) {
+          return false;
+        }
+
+        return row.ignore;
+      })
+      .catch(() => false);
   }
 }

@@ -1,5 +1,7 @@
+const TABLE_NAME = "usedemails";
+
 const createTable = `
-    CREATE TABLE IF NOT EXISTS usedemails (
+    CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
         email_id SERIAL PRIMARY KEY,
         email varchar(100) NOT NULL,        
         start_at timestamptz NOT NULL,
@@ -8,13 +10,13 @@ const createTable = `
 `;
 
 const insertRow = `
-      INSERT INTO usedemails(email, start_at) 
+      INSERT INTO ${TABLE_NAME}(email, start_at) 
       VALUES($1, $2)
       RETURNING email_id, email, start_at, stop_at;
     `;
 
 const updateRow = `
-      UPDATE usedemails SET
+      UPDATE ${TABLE_NAME} SET
         stop_at=$1
       WHERE email_id=$2
       RETURNING email_id, email, start_at, stop_at;
@@ -22,7 +24,7 @@ const updateRow = `
 
 const getRows = `
       SELECT email_id, email, start_at, stop_at
-       FROM usedemails
+       FROM ${TABLE_NAME}
        WHERE email=$1
        ORDER BY start_at;
      `;

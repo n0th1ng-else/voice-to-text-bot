@@ -1,6 +1,12 @@
 import { EventEmitter } from "node:events";
 import pg from "pg";
 import { nanoid } from "nanoid";
+import { NodesSql } from "../sql/nodes.sql.js";
+import { UsagesSql } from "../sql/usages.sql.js";
+import { DonationsSql } from "../sql/donations.sql.js";
+import { UsedEmailsSql } from "../sql/emails.sql.js";
+import { IgnoredChatsSql } from "../sql/ignoredchats.sql.js";
+import { DurationsSql } from "../sql/durations.sql.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyTypeForMock = any;
@@ -78,3 +84,12 @@ class MockSql {
     ) => Promise<AnyTypeForMock>,
   ) {}
 }
+
+export const mockTableCreation = (testPool: Pool) => {
+  testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(DurationsSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(IgnoredChatsSql.createTable, () => Promise.resolve());
+};
