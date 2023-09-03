@@ -11,6 +11,7 @@ jobs:
   tag-release:
     runs-on: ubuntu-latest
     name: Tag release changes
+    timeout-minutes: 3
     outputs:
       version: ${{ steps.reader.outputs.version }}
     steps:
@@ -36,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Send release info into sentry
     needs: [tag-release]
+    timeout-minutes: 1
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"

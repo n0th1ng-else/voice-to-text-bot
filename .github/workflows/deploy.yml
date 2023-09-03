@@ -12,6 +12,7 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     name: Push docker image
+    timeout-minutes: 5
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -43,6 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Heroku
     environment: ${{ matrix.environment }}
+    timeout-minutes: 5
     strategy:
       max-parallel: 1
       matrix:
@@ -74,20 +76,3 @@ jobs:
         run: heroku container:release web --app ${{ vars.HEROKU_APP }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-
-  production:
-    runs-on: ubuntu-latest
-    name: Deploy to Railway.app production
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install NodeJS and NPM modules
-        uses: ./.github/actions/npm
-
-      - name: Install Railway CLI
-        run: npm i -g @railway/cli
-#      - name: Deploy Dockerfile to PRODUCTION
-#        run: railway up
-#        env:
-#          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PRODUCTION_TOKEN }}

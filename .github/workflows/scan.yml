@@ -7,6 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run test suite
+    timeout-minutes: 5
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -29,6 +30,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     name: Run validations
+    timeout-minutes: 3
     strategy:
       matrix:
         command: [typecheck, "lint:all", "format:check"]
@@ -51,6 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run SonarCloud security audit
     needs: [test, validate]
+    timeout-minutes: 5
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
