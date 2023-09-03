@@ -26,7 +26,8 @@ COPY ./video-temp $APP_DIR/video-temp
 COPY ./init.cjs $APP_DIR
 COPY ./tsconfig.json $APP_DIR
 
-RUN find $APP_DIR/src -type f -name '*.spec.ts' -delete
+RUN find $APP_DIR/src -type d -name __mocks__ -prune -exec rm -rf {} \;
+RUN find $APP_DIR/src -type f -name '*.spec.ts' -prune -exec rm -rf {} \;
 
 RUN npm run build
 
