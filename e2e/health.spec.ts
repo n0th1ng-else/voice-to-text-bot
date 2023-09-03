@@ -74,6 +74,7 @@ describe("[health]", () => {
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const DbClient = init.DbClient;
+    const getDb = init.getDb;
     const TelegramBotModel = init.TelegramBotModel;
     const launchTime = init.launchTime;
     const TelegramApi = init.TelegramApi;
@@ -100,7 +101,9 @@ describe("[health]", () => {
       port: dbPort,
     };
     testPool = new MockPool(dbConfig);
-    const db = new DbClient(dbConfig, 0, testPool);
+    const mainDb = new DbClient(dbConfig, 0, testPool);
+    const db = getDb([dbConfig], 0, mainDb);
+
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramApi.url);

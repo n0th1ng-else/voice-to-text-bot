@@ -15,10 +15,10 @@ import { BotActions } from "./actions/index.js";
 import { botCommands } from "./data.js";
 import { TelegramApi } from "./api/tgapi.js";
 import { collectAnalytics } from "../analytics/index.js";
-import { DbClient } from "../db/index.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import { PaymentService } from "../donate/types.js";
 import { initTgReflector } from "./reflector.js";
+import type { getDb } from "../db/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -32,7 +32,7 @@ export class TelegramBotModel {
   constructor(
     private readonly token: string,
     converter: VoiceConverter,
-    stat: DbClient,
+    stat: ReturnType<typeof getDb>,
   ) {
     const reflector = initTgReflector(this.token);
     this.bot = new TelegramApi(this.token, reflector);
@@ -125,48 +125,53 @@ export class TelegramBotModel {
       });
   }
 
-  private handleMessage(
+  private async handleMessage(
     msg: TgMessage,
     analytics: AnalyticsData,
   ): Promise<void> {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId);
 
-    logger.info(`${prefix.getPrefix()} Incoming message`);
+    logger.debug(`${prefix.getPrefix()} Incoming message`);
+
+    // TODO enable with caching
+    // if (await this.actions.ignore.runCondition(msg, model)) {
+    //   return this.actions.ignore.runAction(model, prefix);
+    // }
 
     if (!isMessageSupported(msg)) {
       return TelegramBotModel.logNotSupportedMessage(model, prefix);
     }
 
-    if (this.actions.start.runCondition(msg, model)) {
+    if (await this.actions.start.runCondition(msg, model)) {
       return this.actions.start.runAction(model, prefix);
     }
 
-    if (this.actions.lang.runCondition(msg, model)) {
+    if (await this.actions.lang.runCondition(msg, model)) {
       return this.actions.lang.runAction(model, prefix);
     }
 
-    if (this.actions.support.runCondition(msg, model)) {
+    if (await this.actions.support.runCondition(msg, model)) {
       return this.actions.support.runAction(model, prefix);
     }
 
-    if (this.actions.donate.runCondition(msg, model)) {
+    if (await this.actions.donate.runCondition(msg, model)) {
       return this.actions.donate.runAction(model, prefix);
     }
 
-    if (this.actions.voiceFormat.runCondition(msg)) {
+    if (await this.actions.voiceFormat.runCondition(msg)) {
       return this.actions.voiceFormat.runAction(model, prefix);
     }
 
-    if (this.actions.voiceLength.runCondition(msg, model)) {
+    if (await this.actions.voiceLength.runCondition(msg, model)) {
       return this.actions.voiceLength.runAction(model, prefix);
     }
 
-    if (this.actions.voice.runCondition(msg)) {
+    if (await this.actions.voice.runCondition(msg)) {
       return this.actions.voice.runAction(model, prefix);
     }
 
-    if (this.actions.checkout.runCondition(msg)) {
+    if (await this.actions.checkout.runCondition(msg)) {
       return this.actions.checkout.runAction(model, prefix);
     }
 

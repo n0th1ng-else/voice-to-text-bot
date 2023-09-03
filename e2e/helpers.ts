@@ -35,7 +35,7 @@ export class TelegramMessageModel {
   private lastName = "";
   private userName = "";
   private userLanguage = "";
-  private isAudio = false;
+  private contentType: "voice" | "audio" | "video_note" = "voice";
   private mimeType = "";
 
   constructor(
@@ -88,7 +88,21 @@ export class TelegramMessageModel {
     this.voiceId = id;
     this.voiceDuration = duration;
     this.mimeType = type;
-    this.isAudio = true;
+    this.contentType = "audio";
+    return this;
+  }
+
+  public setVideoNote(
+    messageId: number,
+    id: string,
+    duration: number,
+    type = "audio/mpeg",
+  ): this {
+    this.messageId = messageId;
+    this.voiceId = id;
+    this.voiceDuration = duration;
+    this.mimeType = type;
+    this.contentType = "video_note";
     return this;
   }
 
@@ -136,7 +150,7 @@ export class TelegramMessageModel {
         type: this.chatType,
       },
       voice:
-        this.voiceId && !this.isAudio
+        this.voiceId && this.contentType === "voice"
           ? {
               duration: this.voiceDuration,
               file_id: this.voiceId,
@@ -144,7 +158,15 @@ export class TelegramMessageModel {
             }
           : undefined,
       audio:
-        this.voiceId && this.isAudio
+        this.voiceId && this.contentType === "audio"
+          ? {
+              duration: this.voiceDuration,
+              file_id: this.voiceId,
+              mime_type: this.mimeType,
+            }
+          : undefined,
+      video_note:
+        this.voiceId && this.contentType === "video_note"
           ? {
               duration: this.voiceDuration,
               file_id: this.voiceId,

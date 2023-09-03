@@ -1,10 +1,4 @@
-import { TgMessage } from "../api/types.js";
 import { GenericAction } from "./common.js";
-import {
-  BotMessageModel,
-  TelegramMessagePrefix,
-  VoiceContentReason,
-} from "../types.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { LabelId } from "../../text/types.js";
@@ -12,6 +6,12 @@ import { type LanguageCode, VoiceConverter } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";
+import {
+  type BotMessageModel,
+  type TelegramMessagePrefix,
+  VoiceContentReason,
+} from "../types.js";
+import type { TgMessage } from "../api/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -33,7 +33,7 @@ export class VoiceAction extends GenericAction {
       );
   }
 
-  public runCondition(msg: TgMessage): boolean {
+  public async runCondition(msg: TgMessage): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
     const isNoContent = type.type === VoiceContentReason.NoContent;
@@ -45,7 +45,7 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    return isVoice;
+    return Promise.resolve(isVoice);
   }
 
   public setConverter(converter: VoiceConverter): void {
@@ -201,7 +201,7 @@ export class VoiceAction extends GenericAction {
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Updating usage count`);
 
-    return this.stat.usages
+    return this.stat
       .updateUsageCount(model.chatId, model.name, model.userLanguage)
       .then(() => logger.info(`${prefix.getPrefix()} Usage count updated`))
       .catch((err) => {

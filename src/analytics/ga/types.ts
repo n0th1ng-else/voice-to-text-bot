@@ -63,7 +63,7 @@ export const EVENTS_LIMIT_GA = 25;
 
 const defaultLang = "not provided";
 
-type AnalyticsAction = BotCommand | "/voice" | "/app";
+type AnalyticsAction = BotCommand | "/voice" | "/app" | "/ignore";
 
 export class AnalyticsData {
   private readonly timer: TimeMeasure;

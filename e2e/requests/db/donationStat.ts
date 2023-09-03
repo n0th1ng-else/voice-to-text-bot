@@ -26,12 +26,7 @@ export const mockCreateDonationRow = (
 
       return Promise.resolve({
         rows: [
-          getDbDto(
-            String(item.chatId),
-            price,
-            DonationStatus.Initialized,
-            donationId,
-          ),
+          getDbDto(item.chatId, price, DonationStatus.Initialized, donationId),
         ],
       });
     });
@@ -39,7 +34,7 @@ export const mockCreateDonationRow = (
 };
 
 const getDbDto = (
-  chatId: string,
+  chatId: number,
   price: number,
   status: string,
   donationId: number,

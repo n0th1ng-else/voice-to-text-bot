@@ -2,9 +2,9 @@ import { ScheduleDaemon } from "../scheduler/index.js";
 import { Logger } from "../logger/index.js";
 import { HealthStatus } from "./types.js";
 import { sSuffix } from "../text/utils.js";
-import { DbClient } from "../db/index.js";
 import { flattenPromise } from "../common/helpers.js";
 import { requestHealthData } from "./api.js";
+import type { getDb } from "../db/index.js";
 
 const logger = new Logger("uptime");
 
@@ -16,7 +16,7 @@ export class UptimeDaemon {
   private nextUrl = "";
   private lifecycleInterval = UptimeDaemon.minLifecycleInterval;
   private daysRunning: number[] = [];
-  private stat: DbClient | null = null;
+  private stat: ReturnType<typeof getDb> | null = null;
 
   public get isRunning(): boolean {
     return this.daemon.isRunning;
@@ -68,7 +68,7 @@ export class UptimeDaemon {
     return this;
   }
 
-  public setStat(stat: DbClient): this {
+  public setStat(stat: ReturnType<typeof getDb>): this {
     this.stat = stat;
     return this;
   }
@@ -108,8 +108,8 @@ export class UptimeDaemon {
         }
 
         const isActive = false;
-        return this.stat.nodes
-          .updateState(this.currentUrl, isActive, this.version)
+        return this.stat
+          .updateNodeState(this.currentUrl, isActive, this.version)
           .then(flattenPromise);
       }
     });
@@ -133,8 +133,8 @@ export class UptimeDaemon {
       }
 
       const isActive = false;
-      return this.stat.nodes
-        .updateState(this.currentUrl, isActive, this.version)
+      return this.stat
+        .updateNodeState(this.currentUrl, isActive, this.version)
         .then(flattenPromise);
     });
   }

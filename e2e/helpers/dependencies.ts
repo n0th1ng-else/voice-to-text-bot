@@ -4,6 +4,8 @@ export const injectTestDependencies = async () => {
   const tgStat = await import("../requests/db/botStat.js");
   const externalMock = await import("../requests/google.js");
   const donationStats = await import("../requests/db/donationStat.js");
+  const ignoredChatsDb = await import("../requests/db/ignoredChatsDb.js");
+  const nockUtils = await import("../requests/common.js");
 
   return {
     ...testHelpers,
@@ -11,6 +13,8 @@ export const injectTestDependencies = async () => {
     ...tgStat,
     ...externalMock,
     ...donationStats,
+    ...ignoredChatsDb,
+    ...nockUtils,
   };
 };
 

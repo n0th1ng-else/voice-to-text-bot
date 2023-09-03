@@ -1,4 +1,3 @@
-import { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import { GenericAction } from "./common.js";
 import {
   BotCommand,
@@ -10,11 +9,12 @@ import { getDonationDtoString, isDonateMessage } from "../helpers.js";
 import { LabelId } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
-import { PaymentService } from "../../donate/types.js";
-import { AnalyticsData } from "../../analytics/ga/types.js";
-import type { LanguageCode } from "../../recognition/types.js";
 import { BOT_LOGO, donationLevels } from "../../const.js";
 import { toCurrency } from "../../text/utils.js";
+import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
+import type { PaymentService } from "../../donate/types.js";
+import type { AnalyticsData } from "../../analytics/ga/types.js";
+import type { LanguageCode } from "../../recognition/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -29,11 +29,14 @@ export class DonateAction extends GenericAction {
     return this.sendDonateMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isDonateMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isDonateMessage(mdl, msg));
   }
 
-  public runCallback(
+  public async runCallback(
     msg: TgMessage,
     button: TelegramButtonModel,
     analytics: AnalyticsData,
@@ -50,7 +53,7 @@ export class DonateAction extends GenericAction {
     this.payment = payment;
   }
 
-  private sendDonateMessage(
+  private async sendDonateMessage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
@@ -94,7 +97,7 @@ export class DonateAction extends GenericAction {
       );
   }
 
-  private formLinkButton(
+  private async formLinkButton(
     msg: TgMessage,
     button: TelegramButtonModel,
     analytics: AnalyticsData,
@@ -180,9 +183,9 @@ export class DonateAction extends GenericAction {
     price: number,
     prefix: TelegramMessagePrefix,
   ): Promise<number> {
-    return this.stat.donations
-      .createRow(model.chatId, price)
-      .then((row) => this.stat.donations.getRowId(row))
+    return this.stat
+      .createDonationRow(model.chatId, price)
+      .then((row) => this.stat.getDonationId(row))
       .catch((err) => {
         const errorMessage = `Unable to create donationId for price=${price}`;
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);

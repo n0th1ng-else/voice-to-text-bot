@@ -1,14 +1,17 @@
-import { TgMessage, TgMessageOptions } from "../api/types.js";
+import { Logger } from "../../logger/index.js";
+import { TextModel } from "../../text/index.js";
+import { splitTextIntoParts } from "../../common/helpers.js";
 import {
+  TELEGRAM_API_MAX_MESSAGE_SIZE,
+  type TelegramApi,
+} from "../api/tgapi.js";
+import type { TgMessage, TgMessageOptions } from "../api/types.js";
+import type {
   BotMessageModel,
   MessageOptions,
   TelegramMessagePrefix,
 } from "../types.js";
-import { Logger } from "../../logger/index.js";
-import { TextModel } from "../../text/index.js";
-import { TELEGRAM_API_MAX_MESSAGE_SIZE, TelegramApi } from "../api/tgapi.js";
-import { DbClient } from "../../db/index.js";
-import { splitTextIntoParts } from "../../common/helpers.js";
+import type { getDb } from "../../db/index.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import type { LabelWithNoMenu } from "../../text/types.js";
 
@@ -18,7 +21,7 @@ export abstract class GenericAction {
   protected readonly text = new TextModel();
 
   constructor(
-    protected readonly stat: DbClient,
+    protected readonly stat: ReturnType<typeof getDb>,
     protected readonly bot: TelegramApi,
   ) {}
 
@@ -27,9 +30,12 @@ export abstract class GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void>;
 
-  public abstract runCondition(msg: TgMessage, mdl: BotMessageModel): boolean;
+  public abstract runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean>;
 
-  public getChatLanguage(
+  public async getChatLanguage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
     lang?: LanguageCode,
@@ -39,8 +45,8 @@ export abstract class GenericAction {
     }
 
     logger.info(`${prefix.getPrefix()} Fetching language`);
-    return this.stat.usages
-      .getLangId(model.chatId, model.name, model.userLanguage)
+    return this.stat
+      .getLanguage(model.chatId, model.name, model.userLanguage)
       .catch((err) => {
         const errorMessage = "Unable to get the lang";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
@@ -49,7 +55,7 @@ export abstract class GenericAction {
       });
   }
 
-  public sendMessage(
+  public async sendMessage(
     chatId: number,
     messageId: number,
     ids: LabelWithNoMenu | LabelWithNoMenu[],
@@ -84,7 +90,7 @@ export abstract class GenericAction {
       });
   }
 
-  public editMessage(
+  public async editMessage(
     chatId: number,
     messageId: number,
     meta: MessageOptions,
@@ -101,7 +107,7 @@ export abstract class GenericAction {
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`));
   }
 
-  protected sendRawMessage(
+  protected async sendRawMessage(
     chatId: number,
     message: string,
     lang: LanguageCode,
@@ -121,7 +127,7 @@ export abstract class GenericAction {
     );
   }
 
-  private sendRawMessageParts(
+  private async sendRawMessageParts(
     chatId: number,
     messageParts: string[],
     options: TgMessageOptions = {},
@@ -145,7 +151,7 @@ export class CoreAction extends GenericAction {
     return Promise.resolve();
   }
 
-  public runCondition(): boolean {
-    return false;
+  public async runCondition(): Promise<boolean> {
+    return Promise.resolve(false);
   }
 }

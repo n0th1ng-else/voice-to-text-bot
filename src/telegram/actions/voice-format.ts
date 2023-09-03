@@ -1,14 +1,14 @@
-import { TgMessage } from "../api/types.js";
 import { GenericAction } from "./common.js";
-import {
-  BotMessageModel,
-  TelegramMessagePrefix,
-  VoiceContentReason,
-} from "../types.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { LabelId } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
+import {
+  type BotMessageModel,
+  type TelegramMessagePrefix,
+  VoiceContentReason,
+} from "../types.js";
+import type { TgMessage } from "../api/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -21,7 +21,7 @@ export class VoiceFormatAction extends GenericAction {
     return this.sendWrongFormatMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage): boolean {
+  public async runCondition(msg: TgMessage): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
     const isWrongFormat = type.type === VoiceContentReason.WrongMimeType;
@@ -31,7 +31,7 @@ export class VoiceFormatAction extends GenericAction {
       logger.warn("Wrong audio file mime-type", type);
     }
 
-    return triggersAction;
+    return Promise.resolve(triggersAction);
   }
 
   private sendWrongFormatMessage(

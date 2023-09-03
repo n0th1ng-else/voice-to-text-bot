@@ -5,7 +5,7 @@ import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
 import { sSuffix } from "../text/utils.js";
 import { httpsOptions } from "../../certs/index.js";
-import { DbClient } from "../db/index.js";
+import { getDb } from "../db/index.js";
 import { initStaticServer } from "../server/static.js";
 
 const logger = new Logger("import-script");
@@ -22,14 +22,16 @@ type ImportRow = {
 export const run = async (): Promise<void> => {
   const app = initStaticServer("import");
 
-  const db = new DbClient({
-    user: envy.dbPostgres.user,
-    password: envy.dbPostgres.password,
-    host: envy.dbPostgres.host,
-    database: envy.dbPostgres.database,
-    port: envy.dbPostgres.port,
-    certificate: envy.dbPostgres.cert,
-  });
+  const db = getDb([
+    {
+      user: envy.dbPostgres.user,
+      password: envy.dbPostgres.password,
+      host: envy.dbPostgres.host,
+      database: envy.dbPostgres.database,
+      port: envy.dbPostgres.port,
+      certificate: envy.dbPostgres.cert,
+    },
+  ]);
 
   let inProgress = false;
   let rowsTotal = 0;
@@ -45,8 +47,8 @@ export const run = async (): Promise<void> => {
       if (!item) {
         throw new Error("Unable to get the item for import");
       }
-      await db.usages
-        .importRow(
+      await db
+        .importUsageRow(
           item.chatId,
           item.usageCount,
           item.langId,

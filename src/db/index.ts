@@ -1,105 +1,136 @@
-import pg, { type PoolConfig } from "pg";
-import { NodesClient } from "./nodes.js";
-import { UsagesClient } from "./usages.js";
-import { Logger } from "../logger/index.js";
-import { DonationsClient } from "./donations.js";
-import { UsedEmailClient } from "./emails.js";
+import { DbClient, type DbConnectionConfig } from "./client.js";
+import type { LanguageCode } from "../recognition/types.js";
+import type { UsageRowScheme } from "./sql/usages.js";
+import type { NodeRowScheme } from "./sql/nodes.js";
+import type { DonationRowScheme, DonationStatus } from "./sql/donations.js";
+import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 
-const { Pool } = pg;
-const logger = new Logger("postgres-client");
+class DbCore {
+  private readonly clients: DbClient[];
+  private readonly main: DbClient;
 
-const getPool = (config: DbConnectionConfig, threadId: number): pg.Pool => {
-  const sslOpts: Pick<PoolConfig, "ssl"> = config.certificate
-    ? {
-        ssl: {
-          rejectUnauthorized: true,
-          ca: config.certificate,
-        },
-      }
-    : {
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      };
-  return new Pool({
-    host: config.host,
-    user: config.user,
-    password: config.password,
-    database: config.database,
-    port: config.port,
-    max: 1,
-    application_name: `sql-stream-replica-${threadId}`,
-    ...sslOpts,
-  });
-};
-
-type DbConnectionConfig = {
-  user: string;
-  password: string;
-  host: string;
-  database: string;
-  port: number;
-  certificate?: string;
-};
-
-export class DbClient {
-  public readonly nodes: NodesClient;
-  public readonly usages: UsagesClient;
-  public readonly donations: DonationsClient;
-  public readonly emails: UsedEmailClient;
-
-  private readonly initialized: boolean;
-  private ready = false;
-
-  constructor(config: DbConnectionConfig, threadId = 0, p?: pg.Pool) {
-    const { certificate, ...cfg } = config;
-    this.initialized = Object.values(cfg).every((val) => val);
-    if (!this.initialized) {
-      logger.error(
-        "Missing connection data for postgres server. Check the config",
-        new Error("Missing connection data for postgres server"),
-      );
-    }
-    if (!certificate) {
-      logger.warn(
-        "Postgres connection is not secure, ssl certificate is not provided",
-      );
-    }
-
-    this.setDefaults();
-    const pool = p ?? getPool(config, threadId);
-    this.setParsers();
-
-    this.nodes = new NodesClient(pool);
-    this.usages = new UsagesClient(pool);
-    this.donations = new DonationsClient(pool);
-    this.emails = new UsedEmailClient(pool);
+  constructor(
+    main: DbConnectionConfig,
+    configs: DbConnectionConfig[],
+    threadId = 0,
+    mainClient?: DbClient,
+  ) {
+    this.main = mainClient ?? new DbClient(main, threadId);
+    this.clients = configs.map((config) => new DbClient(config, threadId));
   }
 
-  public init(): Promise<void> {
-    if (!this.initialized) {
-      return Promise.resolve();
-    }
-
-    return Promise.all([
-      this.usages.init(),
-      this.nodes.init(),
-      this.donations.init(),
-      this.emails.init(),
-    ]).then(() => {
-      this.ready = true;
-    });
+  public async init(): Promise<void> {
+    await this.main.init();
+    await Promise.all(this.clients.map((client) => client.init()));
   }
 
   public isReady(): boolean {
-    return this.ready;
+    return this.main.isReady();
   }
 
-  private setParsers(): void {
-    pg.types.setTypeParser(pg.types.builtins.INT8, (val) => parseInt(val));
+  public async updateNodeState(
+    selfUrl: string,
+    isActive: boolean,
+    version: string,
+  ): Promise<NodeRowScheme> {
+    const row = await this.main.nodes.updateState(selfUrl, isActive, version);
+    return row;
   }
 
-  private setDefaults(): void {
-    pg.defaults.poolSize = 1;
+  public async getLanguage(
+    chatId: number,
+    username: string,
+    langId: LanguageCode,
+  ): Promise<LanguageCode> {
+    const row = await this.main.usages.getLangId(chatId, username, langId);
+    return row;
+  }
+
+  public async updateLanguage(
+    chatId: number,
+    langId: LanguageCode,
+  ): Promise<UsageRowScheme> {
+    const row = await this.main.usages.updateLangId(chatId, langId);
+    return row;
+  }
+
+  public async updateUsageCount(
+    chatId: number,
+    username: string,
+    langId: LanguageCode,
+  ): Promise<UsageRowScheme> {
+    const row = await this.main.usages.updateUsageCount(
+      chatId,
+      username,
+      langId,
+    );
+    return row;
+  }
+
+  public async importUsageRow(
+    chatId: number,
+    usageCount: number,
+    langId: string,
+    username: string,
+    createdAt: Date,
+    updatedAt: Date,
+  ): Promise<UsageRowScheme> {
+    const row = await this.main.usages.importRow(
+      chatId,
+      usageCount,
+      langId,
+      username,
+      createdAt,
+      updatedAt,
+    );
+    return row;
+  }
+
+  public async fetchUsageRows(
+    from: Date,
+    to: Date,
+    usageCountFrom: number,
+  ): Promise<UsageRowScheme[]> {
+    const rows = await this.main.usages.statRows(from, to, usageCountFrom);
+    return rows;
+  }
+
+  public async updateDonationRow(
+    donationId: number,
+    status: DonationStatus,
+  ): Promise<DonationRowScheme> {
+    const row = await this.main.donations.updateRow(donationId, status);
+    return row;
+  }
+
+  public async createDonationRow(
+    chatId: number,
+    price: number,
+  ): Promise<DonationRowScheme> {
+    const row = await this.main.donations.createRow(chatId, price);
+    return row;
+  }
+
+  public getDonationId(row: DonationRowScheme): number {
+    return this.main.donations.getRowId(row);
+  }
+
+  public async getIgnoredChatRow(
+    chatId: number,
+  ): Promise<IgnoredChatsRowScheme | null> {
+    return this.main.ignoredChats.getRow(chatId);
   }
 }
+
+export const getDb = (
+  configs: DbConnectionConfig[],
+  threadId = 0,
+  mainClient?: DbClient,
+): DbCore => {
+  const main = configs.shift();
+  if (!main) {
+    throw new Error("No database configs found");
+  }
+
+  return new DbCore(main, configs, threadId, mainClient);
+};

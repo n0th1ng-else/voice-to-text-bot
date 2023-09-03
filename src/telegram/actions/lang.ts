@@ -1,8 +1,3 @@
-import {
-  TgCallbackQuery,
-  TgInlineKeyboardButton,
-  TgMessage,
-} from "../api/types.js";
 import { GenericAction } from "./common.js";
 import {
   BotCommand,
@@ -17,11 +12,16 @@ import {
   isLangMessage,
 } from "../helpers.js";
 import { LabelId } from "../../text/types.js";
-import type { LanguageCode } from "../../recognition/types.js";
 import { Logger } from "../../logger/index.js";
-import { AnalyticsData } from "../../analytics/ga/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
+import type {
+  TgCallbackQuery,
+  TgInlineKeyboardButton,
+  TgMessage,
+} from "../api/types.js";
+import type { LanguageCode } from "../../recognition/types.js";
+import type { AnalyticsData } from "../../analytics/ga/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -34,8 +34,11 @@ export class LangAction extends GenericAction {
     return this.showLanguageSelection(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isLangMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isLangMessage(mdl, msg));
   }
 
   public runCallback(
@@ -87,8 +90,8 @@ export class LangAction extends GenericAction {
     const lang = opts.langId;
     const prefix = opts.prefix;
 
-    return this.stat.usages
-      .updateLangId(chatId, lang)
+    return this.stat
+      .updateLanguage(chatId, lang)
       .then(() => {
         logger.info(`${prefix.getPrefix()} Language updated in DB`);
         return true;

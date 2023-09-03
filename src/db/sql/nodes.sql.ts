@@ -1,5 +1,7 @@
+const TABLE_NAME = "nodes";
+
 const createTable = `
-    CREATE TABLE IF NOT EXISTS nodes (
+    CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
         node_id varchar(20) PRIMARY KEY,
         self_url text UNIQUE NOT NULL,
         is_active boolean NOT NULL,
@@ -10,13 +12,13 @@ const createTable = `
 `;
 
 const insertRow = `
-      INSERT INTO nodes(node_id, self_url, is_active, version, created_at, updated_at) 
+      INSERT INTO ${TABLE_NAME}(node_id, self_url, is_active, version, created_at, updated_at) 
       VALUES($1, $2, $3, $4, $5, $6)
       RETURNING node_id, self_url, is_active, version, created_at, updated_at;
     `;
 
 const updateRow = `
-      UPDATE nodes SET
+      UPDATE ${TABLE_NAME} SET
         is_active=$1,
         version=$2,
         updated_at=$3
@@ -26,7 +28,7 @@ const updateRow = `
 
 const getRows = `
       SELECT node_id, self_url, is_active, version, created_at, updated_at 
-      FROM nodes 
+      FROM ${TABLE_NAME} 
       WHERE self_url=$1 
       ORDER BY created_at;
     `;

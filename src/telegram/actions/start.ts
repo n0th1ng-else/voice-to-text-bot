@@ -1,14 +1,14 @@
-import { TgMessage } from "../api/types.js";
 import { GenericAction } from "./common.js";
 import { isHelloMessage } from "../helpers.js";
-import {
-  BotCommand,
-  BotMessageModel,
-  TelegramMessagePrefix,
-} from "../types.js";
 import { LabelId } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
+import {
+  BotCommand,
+  type BotMessageModel,
+  type TelegramMessagePrefix,
+} from "../types.js";
+import type { TgMessage } from "../api/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -22,8 +22,11 @@ export class StartAction extends GenericAction {
     return this.sendHelloMessage(mdl, prefix);
   }
 
-  public runCondition(msg: TgMessage, mdl: BotMessageModel): boolean {
-    return isHelloMessage(mdl, msg);
+  public async runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    return Promise.resolve(isHelloMessage(mdl, msg));
   }
 
   private sendHelloMessage(

@@ -20,6 +20,11 @@ export class Logger {
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+  public debug(...messages: any[]): void {
+    this.output(...messages);
+  }
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   public info(...messages: any[]): void {
     this.output(...messages);
   }

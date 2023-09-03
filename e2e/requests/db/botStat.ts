@@ -46,7 +46,8 @@ const mockBotStatFind = (
 ): void => {
   pool.mockQuery(UsagesSql.getRows, (values) => {
     expect(values).toHaveLength(1);
-    expect(values[0]).toBe(chatId);
+    const [rChatId] = values;
+    expect(rChatId).toBe(chatId);
     return Promise.resolve({ rows: items.map((stat) => getDbDto(stat)) });
   });
 };

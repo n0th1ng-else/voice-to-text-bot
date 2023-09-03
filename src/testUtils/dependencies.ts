@@ -9,11 +9,14 @@ export const injectDependencies = async () => {
   const constants = await import("../const.js");
   const labels = await import("../text/types.js");
   const timer = await import("../common/timer.js");
-  const dbClient = await import("../db/index.js");
+  const getDb = await import("../db/index.js");
+  const dbClient = await import("../db/client.js");
   const dbNode = await import("../db/sql/nodes.sql.js");
   const dbUsages = await import("../db/sql/usages.sql.js");
   const dbDonations = await import("../db/sql/donations.sql.js");
   const dbEmails = await import("../db/sql/emails.sql.js");
+  const dbDurations = await import("../db/sql/durations.sql.js");
+  const dbIgnoredChats = await import("../db/sql/ignoredchats.sql.js");
   const env = await import("../env.js");
   const express = await import("../server/express.js");
   const expressHelpers = await import("../server/api.js");
@@ -39,11 +42,14 @@ export const injectDependencies = async () => {
     ...timer,
     ...tgApiTypes,
     ...tgApi,
+    ...getDb,
     ...dbClient,
     ...dbNode,
     ...dbUsages,
     ...dbDonations,
     ...dbEmails,
+    ...dbDurations,
+    ...dbIgnoredChats,
     ...env,
     ...express,
     ...donations,

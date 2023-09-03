@@ -11,7 +11,7 @@ export enum DonationStatus {
 export type DonationRowScheme = {
   donation_id: number;
   status: string;
-  chat_id: string;
+  chat_id: number;
   price: number;
   created_at: Date;
   updated_at: Date;
