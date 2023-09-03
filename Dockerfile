@@ -26,6 +26,8 @@ COPY ./video-temp $APP_DIR/video-temp
 COPY ./init.cjs $APP_DIR
 COPY ./tsconfig.json $APP_DIR
 
+RUN find $APP_DIR/src -type f -name '*.spec.ts' -delete
+
 RUN npm run build
 
 RUN find $APP_DIR/src -type f | xargs -L1 rm -f
