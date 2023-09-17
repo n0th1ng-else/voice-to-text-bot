@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import {
   ConverterMeta,
@@ -7,10 +6,13 @@ import {
   VoiceConverterOptions,
 } from "../types.js";
 import { getWav } from "../../ffmpeg/index.js";
-import { parseChunkedResponse } from "../../common/request.js";
+import {
+  parseChunkedResponse,
+  runRequestWithTimeout,
+} from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { wavSampleRate } from "../../const.js";
-import { WitAiError } from "./wit.ai.error.js";
+import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -50,7 +52,7 @@ export class WithAiProvider extends VoiceConverter {
     data: Buffer,
     authToken: string,
     logPrefix: string,
-  ): Promise<WitAiBaseResponse[]> {
+  ): Promise<WitAiDictationResponse[]> {
     const duration = new TimeMeasure();
     return WithAiProvider.recogniseDictation(data, authToken, logPrefix)
       .catch((err) => {
@@ -84,8 +86,8 @@ export class WithAiProvider extends VoiceConverter {
     data: Buffer,
     authToken: string,
     logPrefix: string,
-  ): Promise<WitAiBaseResponse[]> {
-    return WithAiProvider.runRequest<WitAiBaseResponse>(
+  ): Promise<WitAiDictationResponse[]> {
+    return WithAiProvider.runRequest<WitAiDictationResponse>(
       data,
       "dictation",
       authToken,
@@ -93,7 +95,7 @@ export class WithAiProvider extends VoiceConverter {
     );
   }
 
-  private static runRequest<Dto extends WitAiBaseResponse>(
+  private static runRequest<Dto extends WitAiDictationResponse>(
     data: Buffer,
     path: "speech" | "dictation",
     authToken: string,
@@ -104,38 +106,37 @@ export class WithAiProvider extends VoiceConverter {
     }
 
     const url = `${WithAiProvider.url}/${path}`;
-    return axios
-      .request<string>({
-        method: "POST",
-        url,
-        params: {
-          v: WithAiProvider.apiVersion,
-        },
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          Accept: "application/json",
-          "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
-          "Transfer-Encoding": "chunked",
-        },
-        timeout: WithAiProvider.timeout,
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        responseType: "text",
-        data,
-        transformResponse: (d: string) => d,
-      })
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error("The api request was unsuccessful");
-        }
-
-        return response.data;
-      })
+    return runRequestWithTimeout<string>({
+      method: "POST",
+      url,
+      params: {
+        v: WithAiProvider.apiVersion,
+      },
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        Accept: "application/json",
+        "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
+        "Transfer-Encoding": "chunked",
+      },
+      timeout: WithAiProvider.timeout,
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+      responseType: "text",
+      data,
+      transformResponse: (d: string) => d,
+    })
       .then((response) => {
         const chunks = parseChunkedResponse<Dto>(response);
-        const finalizedChunks = chunks.filter(
-          ({ is_final: isFinal }) => isFinal,
-        );
+        const errorChunk = chunks.find((chunk) => chunk.error);
+        if (errorChunk) {
+          logger.error(
+            `${logPrefix} Recognition api returned error`,
+            new WitAiChunkError(errorChunk)
+              .setErrorCode(errorChunk.code)
+              .setResponse(errorChunk.error),
+          );
+        }
+        const finalizedChunks = chunks.filter((chunk) => chunk.is_final);
         if (!finalizedChunks.length) {
           logger.warn(
             `${logPrefix} The final response chunk not found. Transcription is empty.`,
@@ -164,16 +165,18 @@ export class WithAiProvider extends VoiceConverter {
   }
 }
 
-type WitAiBaseResponse = {
+export type WitAiDictationResponse = {
   text?: string;
   is_final?: boolean;
+  code?: string;
+  error?: string;
 };
 
 type WitAiSpeechResponse = {
   entities: Record<string, WitAiEntity>;
   intents: WitAiIntent[];
   traits: Record<string, WitAiIntent>;
-} & WitAiBaseResponse;
+} & WitAiDictationResponse;
 
 type WitAiIntent = {
   id: string;
