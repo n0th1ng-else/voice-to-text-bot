@@ -42,7 +42,7 @@ export const runRequestWithTimeout = async <Response>(
     {
       cause: {
         url: config.url,
-        timeout: config.timeout,
+        timeout: timeoutMs,
       },
     },
   );

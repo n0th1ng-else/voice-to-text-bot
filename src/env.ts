@@ -71,3 +71,5 @@ export const nodeEnvironment = process.env.NODE_ENV || "production";
 export const sentryDsn = process.env.SENTRY_DSN || "";
 
 export const logLevel = process.env.LOG_LEVEL || "";
+
+export const webhookDoNotWait = process.env.WEBHOOK_DO_NOT_WAIT === "true";

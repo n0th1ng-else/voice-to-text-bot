@@ -40,6 +40,7 @@ jest.unstable_mockModule(
 const enableSSL = false;
 const appPort = 3200;
 const dbPort = appPort + 1;
+const webhookDoNotWait = false;
 
 let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
@@ -175,6 +176,7 @@ describe("[russian language]", () => {
       appPort,
       enableSSL,
       appVersion,
+      webhookDoNotWait,
       httpsOptions,
     );
 

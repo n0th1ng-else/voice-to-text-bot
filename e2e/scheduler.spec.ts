@@ -64,6 +64,7 @@ let httpsOptions: InjectedFn["httpsOptions"];
 let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
 let hostUrl: string;
 const enableSSL = false;
+const webhookDoNotWait = false;
 
 let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
@@ -94,7 +95,13 @@ describe("[uptime daemon]", () => {
         waiter.tick();
       });
 
-    server = new ExpressServer(appPort, enableSSL, appVersion, httpsOptions);
+    server = new ExpressServer(
+      appPort,
+      enableSSL,
+      appVersion,
+      webhookDoNotWait,
+      httpsOptions,
+    );
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 

@@ -40,6 +40,7 @@ jest.unstable_mockModule(
 const appPort = 3900;
 const dbPort = appPort + 1;
 const enableSSL = false;
+const webhookDoNotWait = false;
 
 const dbConfig = {
   user: "spy-user",
@@ -148,6 +149,7 @@ describe("[default language - english] donate", () => {
       appPort,
       enableSSL,
       appVersion,
+      webhookDoNotWait,
       httpsOptions,
     );
 

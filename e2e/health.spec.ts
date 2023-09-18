@@ -34,6 +34,7 @@ jest.unstable_mockModule(
 const enableSSL = false;
 const appPort = 3300;
 const dbPort = appPort + 1;
+const webhookDoNotWait = false;
 
 let hostUrl: string;
 let server: InstanceType<InjectedFn["ExpressServer"]>;
@@ -111,7 +112,13 @@ describe("[health]", () => {
   });
 
   beforeEach(() => {
-    server = new ExpressServer(appPort, enableSSL, appVersion, httpsOptions);
+    server = new ExpressServer(
+      appPort,
+      enableSSL,
+      appVersion,
+      webhookDoNotWait,
+      httpsOptions,
+    );
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 

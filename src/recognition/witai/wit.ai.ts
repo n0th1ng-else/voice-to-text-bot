@@ -106,25 +106,27 @@ export class WithAiProvider extends VoiceConverter {
     }
 
     const url = `${WithAiProvider.url}/${path}`;
-    return runRequestWithTimeout<string>({
-      method: "POST",
-      url,
-      params: {
-        v: WithAiProvider.apiVersion,
+    return runRequestWithTimeout<string>(
+      {
+        method: "POST",
+        url,
+        params: {
+          v: WithAiProvider.apiVersion,
+        },
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+          "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
+          "Transfer-Encoding": "chunked",
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        responseType: "text",
+        data,
+        transformResponse: (d: string) => d,
       },
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        Accept: "application/json",
-        "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
-        "Transfer-Encoding": "chunked",
-      },
-      timeout: WithAiProvider.timeout,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-      responseType: "text",
-      data,
-      transformResponse: (d: string) => d,
-    })
+      WithAiProvider.timeout,
+    )
       .then((response) => {
         const chunks = parseChunkedResponse<Dto>(response);
         const errorChunk = chunks.find((chunk) => chunk.error);

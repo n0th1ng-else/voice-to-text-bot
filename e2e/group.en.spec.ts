@@ -41,6 +41,8 @@ jest.unstable_mockModule(
 const enableSSL = false;
 const appPort = 3400;
 const dbPort = appPort + 1;
+const webhookDoNotWait = false;
+
 const dbConfig = {
   user: "spy-user",
   password: "not-me",
@@ -172,6 +174,7 @@ describe("[default language - english]", () => {
       appPort,
       enableSSL,
       appVersion,
+      webhookDoNotWait,
       httpsOptions,
     );
 

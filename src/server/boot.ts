@@ -23,6 +23,7 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
     envy.appPort,
     envy.enableSSL,
     envy.appVersion,
+    envy.webhookDoNotWait,
     httpsOptions,
   );
 
