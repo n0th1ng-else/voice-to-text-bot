@@ -4,7 +4,7 @@ export class WitAiError extends Error {
   public url = "";
   public bufferLength = -1;
 
-  constructor(cause: Error, message = "WitAi request was unsuccessful") {
+  constructor(cause: unknown, message = "Request was unsuccessful") {
     super(`EWITAI ${message}`, { cause });
   }
 
@@ -35,6 +35,25 @@ export class WitAiError extends Error {
 
   public setBufferLength(buff: Buffer): this {
     this.bufferLength = buff?.length ?? -1;
+    return this;
+  }
+}
+
+export class WitAiChunkError extends Error {
+  public code?: string;
+  public response?: string;
+
+  constructor(cause: unknown, message = "Received chunk with error") {
+    super(`EWITAI ${message}`, { cause });
+  }
+
+  public setErrorCode(code?: string): this {
+    this.code = code;
+    return this;
+  }
+
+  public setResponse(response?: string): this {
+    this.response = response;
     return this;
   }
 }
