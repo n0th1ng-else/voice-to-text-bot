@@ -98,8 +98,7 @@ describe("WitAi errors", () => {
 
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe("EWITAI Received chunk with error");
-      expect(err.code).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.id).toBe(undefined);
     });
 
     it("should construct the WitAiChunkError with custom message", () => {
@@ -109,32 +108,18 @@ describe("WitAi errors", () => {
 
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`EWITAI ${msg}`);
-      expect(err.code).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.id).toBe(undefined);
     });
 
-    it("should set the error code", () => {
+    it("should set the error id", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
-      const errorCode = "Some error code";
-      const err = new WitAiChunkError(errCause, msg).setErrorCode(errorCode);
+      const errorId = "Some error code";
+      const err = new WitAiChunkError(errCause, msg).setId(errorId);
 
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`EWITAI ${msg}`);
-      expect(err.code).toBe(errorCode);
-      expect(err.response).toBe(undefined);
-    });
-
-    it("should set the response", () => {
-      const errCause = new Error("original error");
-      const msg = "ooops";
-      const response = "Some response";
-      const err = new WitAiChunkError(errCause, msg).setResponse(response);
-
-      expect(err.cause).toBe(errCause);
-      expect(err.message).toBe(`EWITAI ${msg}`);
-      expect(err.code).toBe(undefined);
-      expect(err.response).toBe(response);
+      expect(err.id).toBe(errorId);
     });
   });
 });
