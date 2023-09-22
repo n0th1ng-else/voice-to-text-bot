@@ -34,6 +34,7 @@ jest.unstable_mockModule(
 const enableSSL = false;
 const appPort = 3800;
 const dbPort = appPort + 1;
+const webhookDoNotWait = false;
 
 const path = "/lifecycle";
 
@@ -110,7 +111,13 @@ describe("[lifecycle]", () => {
   });
 
   beforeEach(() => {
-    server = new ExpressServer(appPort, enableSSL, appVersion, httpsOptions);
+    server = new ExpressServer(
+      appPort,
+      enableSSL,
+      appVersion,
+      webhookDoNotWait,
+      httpsOptions,
+    );
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 

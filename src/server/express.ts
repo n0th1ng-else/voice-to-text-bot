@@ -31,6 +31,7 @@ export class ExpressServer {
     private readonly port: number,
     private readonly isHttps: boolean,
     private readonly version: string,
+    private readonly webhookDoNotWait: boolean,
     private readonly httpsOptions: HttpsOptions,
   ) {
     logger.info("Initializing express server");
@@ -128,25 +129,25 @@ export class ExpressServer {
 
         try {
           const payload = TgUpdateSchema.parse(req.body);
-          logger.info("Incoming message validated");
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          bot.handleApiMessage(payload, analytics);
-          res.sendStatus(200);
+          logger.debug("Incoming message validated");
 
-          /**
-           * Telegram webhook serves the timeout 60sec.
-           * We must ensure we answer the request, otherwise
-           * we are stuck sending messages
-           */
-          // return bot
-          //   .handleApiMessage(payload, analytics)
-          //   .then(() => {
-          //     res.sendStatus(200);
-          //   })
-          //   .catch((err) => {
-          //     logger.error("Incoming message failed to handle", err);
-          //     res.sendStatus(200);
-          //   });
+          if (this.webhookDoNotWait) {
+            res.sendStatus(200);
+            logger.debug("Webhook response sent");
+          }
+
+          return bot
+            .handleApiMessage(payload, analytics)
+            .catch((err) => {
+              logger.error("Incoming message failed to handle", err);
+            })
+            .finally(() => {
+              if (this.webhookDoNotWait) {
+                return;
+              }
+              res.sendStatus(200);
+              logger.debug("Webhook response sent");
+            });
         } catch (err) {
           logger.error("Incoming message failed validation", err);
           res.sendStatus(200);

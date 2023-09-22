@@ -40,20 +40,14 @@ export class WitAiError extends Error {
 }
 
 export class WitAiChunkError extends Error {
-  public code?: string;
-  public response?: string;
+  public id?: string;
 
   constructor(cause: unknown, message = "Received chunk with error") {
     super(`EWITAI ${message}`, { cause });
   }
 
-  public setErrorCode(code?: string): this {
-    this.code = code;
-    return this;
-  }
-
-  public setResponse(response?: string): this {
-    this.response = response;
+  public setId(id?: string): this {
+    this.id = id;
     return this;
   }
 }

@@ -70,3 +70,5 @@ export const nodeEnvironment = "production";
 export const sentryDsn = "";
 
 export const logLevel = "debug";
+
+export const webhookDoNotWait = false;

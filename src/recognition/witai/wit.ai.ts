@@ -1,15 +1,13 @@
+import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import {
-  ConverterMeta,
-  LanguageCode,
   VoiceConverter,
-  VoiceConverterOptions,
+  type ConverterMeta,
+  type LanguageCode,
+  type VoiceConverterOptions,
 } from "../types.js";
 import { getWav } from "../../ffmpeg/index.js";
-import {
-  parseChunkedResponse,
-  runRequestWithTimeout,
-} from "../../common/request.js";
+import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
@@ -63,6 +61,15 @@ export class WithAiProvider extends VoiceConverter {
         return WithAiProvider.recogniseSpeech(data, authToken, logPrefix);
       })
       .finally(() => {
+        const timeTotal = duration.getMs();
+        const timeLimit = 2 * WithAiProvider.timeout + 1_000;
+        if (timeTotal > timeLimit) {
+          logger.error(
+            `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`,
+            new Error("Voice recognition api took too long"),
+          );
+          return;
+        }
         logger.info(
           `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`,
         );
@@ -106,35 +113,51 @@ export class WithAiProvider extends VoiceConverter {
     }
 
     const url = `${WithAiProvider.url}/${path}`;
-    return runRequestWithTimeout<string>({
-      method: "POST",
-      url,
-      params: {
-        v: WithAiProvider.apiVersion,
-      },
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        Accept: "application/json",
-        "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
-        "Transfer-Encoding": "chunked",
-      },
-      timeout: WithAiProvider.timeout,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-      responseType: "text",
-      data,
-      transformResponse: (d: string) => d,
-    })
+    return axios
+      .request<string>({
+        method: "POST",
+        url,
+        params: {
+          v: WithAiProvider.apiVersion,
+        },
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+          "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
+          "Transfer-Encoding": "chunked",
+        },
+        timeout: WithAiProvider.timeout,
+        signal: AbortSignal.timeout(WithAiProvider.timeout),
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        responseType: "text",
+        data,
+        transformResponse: (d: string) => d,
+      })
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error("The api request was unsuccessful");
+        }
+
+        return response.data;
+      })
+      .catch((err) => {
+        const witAiError = new WitAiError(err, err.message)
+          .setUrl(url)
+          .setErrorCode(err?.response?.status)
+          .setResponse(err?.response?.data)
+          .setBufferLength(data);
+        throw witAiError;
+      })
       .then((response) => {
         const chunks = parseChunkedResponse<Dto>(response);
         const errorChunk = chunks.find((chunk) => chunk.error);
         if (errorChunk) {
-          logger.error(
-            `${logPrefix} Recognition api returned error`,
-            new WitAiChunkError(errorChunk)
-              .setErrorCode(errorChunk.code)
-              .setResponse(errorChunk.error),
-          );
+          const witAiError = new WitAiChunkError(
+            errorChunk,
+            errorChunk.error,
+          ).setId(errorChunk.code);
+          throw witAiError;
         }
         const finalizedChunks = chunks.filter((chunk) => chunk.is_final);
         if (!finalizedChunks.length) {
@@ -144,14 +167,6 @@ export class WithAiProvider extends VoiceConverter {
           );
         }
         return finalizedChunks;
-      })
-      .catch((err) => {
-        const witAiError = new WitAiError(err, err.message)
-          .setUrl(url)
-          .setErrorCode(err?.response?.status)
-          .setResponse(err?.response?.data)
-          .setBufferLength(data);
-        throw witAiError;
       });
   }
 
