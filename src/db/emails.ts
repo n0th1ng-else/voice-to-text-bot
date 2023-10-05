@@ -6,17 +6,18 @@ const logger = new Logger("postgres-emails");
 
 export class UsedEmailClient {
   private readonly db: UsedEmailDb;
+  private secondary = false;
 
   constructor(pool: Pool) {
     this.db = new UsedEmailDb(pool);
   }
 
   public init(): Promise<void> {
-    logger.info("Initializing the table");
+    this.logInfo("Initializing the table");
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("usedemails")} has been initialized`),
+        this.logInfo(`Table ${Logger.y("usedemails")} has been initialized`),
       )
       .catch((err) => {
         logger.error(
@@ -27,16 +28,19 @@ export class UsedEmailClient {
       });
   }
 
+  public setSecondary(): void {
+    this.secondary = true;
+  }
+
   public updateRow(emailId: number): Promise<UsedEmailRowScheme> {
-    logger.info(`Updating the row with id=${emailId}`);
+    this.logInfo(`Updating the row with id=${emailId}`);
 
     return this.db
       .updateRow(emailId)
       .then((row) => {
         const id = this.getRowId(row);
-        logger.info(
-          `The row with id=${emailId} has been updated`,
-          id === emailId,
+        this.logInfo(
+          `The row with id=${emailId} has been updated ${id === emailId}`,
         );
         return row;
       })
@@ -47,12 +51,12 @@ export class UsedEmailClient {
   }
 
   public createRow(email: string): Promise<UsedEmailRowScheme> {
-    logger.info("Creating a new row");
+    this.logInfo("Creating a new row");
     return this.db
       .createRow(email)
       .then((row) => {
         const emailId = this.getRowId(row);
-        logger.info(`The row with id=${emailId} has been created`);
+        this.logInfo(`The row with id=${emailId} has been created`);
         return row;
       })
       .catch((err) => {
@@ -62,11 +66,11 @@ export class UsedEmailClient {
   }
 
   public getRows(email: string): Promise<UsedEmailRowScheme[]> {
-    logger.info(`Looking for rows for email=${email}`);
+    this.logInfo(`Looking for rows for email=${email}`);
     return this.db
       .getRows(email)
       .then((rows) => {
-        logger.info(`Row search has been executed for email=${email}`);
+        this.logInfo(`Row search has been executed for email=${email}`);
         return rows;
       })
       .catch((err) => {
@@ -77,5 +81,13 @@ export class UsedEmailClient {
 
   public getRowId(row: UsedEmailRowScheme): number {
     return this.db.getId(row);
+  }
+
+  private logInfo(message: string): void {
+    if (this.secondary) {
+      return;
+    }
+
+    logger.info(message);
   }
 }

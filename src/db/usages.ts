@@ -8,22 +8,27 @@ const logger = new Logger("postgres-usages");
 
 export class UsagesClient {
   private readonly db: UsagesDb;
+  private secondary = false;
 
   constructor(pool: Pool) {
     this.db = new UsagesDb(pool);
   }
 
   public init(): Promise<void> {
-    logger.info("Initializing the table");
+    this.logInfo("Initializing the table");
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("usages")} has been initialized`),
+        this.logInfo(`Table ${Logger.y("usages")} has been initialized`),
       )
       .catch((err) => {
         logger.error(`Unable to initialize ${Logger.y("usages")} table`, err);
         throw err;
       });
+  }
+
+  public setSecondary(): void {
+    this.secondary = true;
   }
 
   public getLangId(
@@ -120,11 +125,11 @@ export class UsagesClient {
     to: Date,
     usageCountFrom: number,
   ): Promise<UsageRowScheme[]> {
-    logger.info("Looking for rows");
+    this.logInfo("Looking for rows");
     return this.db
       .statRows(from, to, usageCountFrom)
       .then((rows) => {
-        logger.info("Row search has been executed");
+        this.logInfo("Row search has been executed");
         return rows;
       })
       .catch((err) => {
@@ -139,14 +144,13 @@ export class UsagesClient {
     usageCount: number,
     username: string,
   ): Promise<UsageRowScheme> {
-    logger.info(`Updating the row with id=${usageId}`);
+    this.logInfo(`Updating the row with id=${usageId}`);
     return this.db
       .updateRow(usageId, langId, usageCount, username)
       .then((row) => {
         const id = this.db.getId(row);
-        logger.info(
-          `The row with id=${usageId} has been updated`,
-          id === usageId,
+        this.logInfo(
+          `The row with id=${usageId} has been updated ${id === usageId}`,
         );
         return row;
       })
@@ -162,12 +166,12 @@ export class UsagesClient {
     username = "",
     usageCount = 0,
   ): Promise<UsageRowScheme> {
-    logger.info("Creating a new row");
+    this.logInfo("Creating a new row");
     return this.db
       .createRow(chatId, langId, username, usageCount)
       .then((row) => {
         const usageId = this.db.getId(row);
-        logger.info(`The row with id=${usageId} has been created`);
+        this.logInfo(`The row with id=${usageId} has been created`);
         return row;
       })
       .catch((err) => {
@@ -177,16 +181,24 @@ export class UsagesClient {
   }
 
   private getRows(chatId: number): Promise<UsageRowScheme[]> {
-    logger.info(`Looking for rows for chatId=${chatId}`);
+    this.logInfo(`Looking for rows for chatId=${chatId}`);
     return this.db
       .getRows(chatId)
       .then((rows) => {
-        logger.info(`Row search has been executed for chatId=${chatId}`);
+        this.logInfo(`Row search has been executed for chatId=${chatId}`);
         return rows;
       })
       .catch((err) => {
         logger.error(`Unable provide a search for chatId=${chatId}`, err);
         throw err;
       });
+  }
+
+  private logInfo(message: string): void {
+    if (this.secondary) {
+      return;
+    }
+
+    logger.info(message);
   }
 }

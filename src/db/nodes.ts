@@ -6,22 +6,27 @@ const logger = new Logger("postgres-nodes");
 
 export class NodesClient {
   private readonly db: NodesDb;
+  private secondary = false;
 
   constructor(pool: Pool) {
     this.db = new NodesDb(pool);
   }
 
   public init(): Promise<void> {
-    logger.info("Initializing the table");
+    this.logInfo("Initializing the table");
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("nodes")} has been initialized`),
+        this.logInfo(`Table ${Logger.y("nodes")} has been initialized`),
       )
       .catch((err) => {
         logger.error(`Unable to initialize ${Logger.y("nodes")} table`, err);
         throw err;
       });
+  }
+
+  public setSecondary(): void {
+    this.secondary = true;
   }
 
   public updateState(
@@ -43,14 +48,13 @@ export class NodesClient {
     isActive: boolean,
     version: string,
   ): Promise<NodeRowScheme> {
-    logger.info(`Updating the row with id=${nodeId}`);
+    this.logInfo(`Updating the row with id=${nodeId}`);
     return this.db
       .updateRow(nodeId, isActive, version)
       .then((row) => {
         const id = this.db.getId(row);
-        logger.info(
-          `The row with id=${nodeId} has been updated`,
-          id === nodeId,
+        this.logInfo(
+          `The row with id=${nodeId} has been updated ${id === nodeId}`,
         );
         return row;
       })
@@ -65,12 +69,12 @@ export class NodesClient {
     isActive: boolean,
     version: string,
   ): Promise<NodeRowScheme> {
-    logger.info("Creating a new row");
+    this.logInfo("Creating a new row");
     return this.db
       .createRow(selfUrl, isActive, version)
       .then((row) => {
         const nodeId = this.db.getId(row);
-        logger.info(`The row with id=${nodeId} has been created`);
+        this.logInfo(`The row with id=${nodeId} has been created`);
         return row;
       })
       .catch((err) => {
@@ -80,16 +84,24 @@ export class NodesClient {
   }
 
   private getRows(selfUrl: string): Promise<NodeRowScheme[]> {
-    logger.info(`Looking for rows for selfUrl=${selfUrl}`);
+    this.logInfo(`Looking for rows for selfUrl=${selfUrl}`);
     return this.db
       .getRows(selfUrl)
       .then((rows) => {
-        logger.info(`Row search has been executed for selfUrl=${selfUrl}`);
+        this.logInfo(`Row search has been executed for selfUrl=${selfUrl}`);
         return rows;
       })
       .catch((err) => {
         logger.error(`Unable provide a search for selfUrl=${selfUrl}`, err);
         throw err;
       });
+  }
+
+  private logInfo(message: string): void {
+    if (this.secondary) {
+      return;
+    }
+
+    logger.info(message);
   }
 }

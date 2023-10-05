@@ -9,17 +9,18 @@ const logger = new Logger("postgres-ignored-chats");
 
 export class IgnoredChatsClient {
   private readonly db: IgnoredChatsDb;
+  private secondary = false;
 
   constructor(pool: Pool) {
     this.db = new IgnoredChatsDb(pool);
   }
 
   public init(): Promise<void> {
-    logger.info("Initializing the table");
+    this.logInfo("Initializing the table");
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("ignoredchats")} has been initialized`),
+        this.logInfo(`Table ${Logger.y("ignoredchats")} has been initialized`),
       )
       .catch((err) => {
         logger.error(
@@ -30,17 +31,29 @@ export class IgnoredChatsClient {
       });
   }
 
+  public setSecondary(): void {
+    this.secondary = true;
+  }
+
   public getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
-    logger.info(`Looking for row for chatId=${chatId}`);
+    this.logInfo(`Looking for row for chatId=${chatId}`);
     return this.db
       .getRow(chatId)
       .then((row) => {
-        logger.info(`Row search has been executed for chatId=${chatId}`);
+        this.logInfo(`Row search has been executed for chatId=${chatId}`);
         return row;
       })
       .catch((err) => {
         logger.error(`Unable provide a search for chatId=${chatId}`, err);
         throw err;
       });
+  }
+
+  private logInfo(message: string): void {
+    if (this.secondary) {
+      return;
+    }
+
+    logger.info(message);
   }
 }

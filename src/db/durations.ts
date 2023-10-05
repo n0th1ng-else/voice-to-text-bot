@@ -6,17 +6,18 @@ const logger = new Logger("postgres-durations");
 
 export class DurationsClient {
   private readonly db: DurationsDb;
+  private secondary = false;
 
   constructor(pool: Pool) {
     this.db = new DurationsDb(pool);
   }
 
   public init(): Promise<void> {
-    logger.info("Initializing the table");
+    this.logInfo("Initializing the table");
     return this.db
       .init()
       .then(() =>
-        logger.info(`Table ${Logger.y("durations")} has been initialized`),
+        this.logInfo(`Table ${Logger.y("durations")} has been initialized`),
       )
       .catch((err) => {
         logger.error(
@@ -27,21 +28,33 @@ export class DurationsClient {
       });
   }
 
+  public setSecondary(): void {
+    this.secondary = true;
+  }
+
   public createRow(
     chatId: number,
     duration: number,
   ): Promise<DurationRowScheme> {
-    logger.info("Creating a new row");
+    this.logInfo("Creating a new row");
     return this.db
       .createRow(chatId, duration)
       .then((row) => {
         const durationId = this.db.getId(row);
-        logger.info(`The row with id=${durationId} has been created`);
+        this.logInfo(`The row with id=${durationId} has been created`);
         return row;
       })
       .catch((err) => {
         logger.error("Unable to create a row", err);
         throw err;
       });
+  }
+
+  private logInfo(message: string): void {
+    if (this.secondary) {
+      return;
+    }
+
+    logger.info(message);
   }
 }
