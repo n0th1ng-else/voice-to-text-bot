@@ -50,6 +50,15 @@ export const dbPostgres = {
   cert: process.env.DB_CERT || "",
 };
 
+export const dbPostgres2 = {
+  user: process.env.DB_USER_2 || "",
+  password: process.env.DB_PASSWORD_2 || "",
+  host: process.env.DB_HOST_2 || "",
+  database: process.env.DB_DATABASE_2 || "",
+  port: Number(process.env.DB_PORT_2) || 5432,
+  cert: process.env.DB_CERT_2 || "",
+};
+
 export const analytics = {
   apiSecret: process.env.GA_V4_SECRET || "",
   measurementId: process.env.GA_V4_MEASUREMENT_ID || "",

@@ -1,9 +1,10 @@
-import { DbClient, type DbConnectionConfig } from "./client.js";
+import { DbClient } from "./client.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { UsageRowScheme } from "./sql/usages.js";
 import type { NodeRowScheme } from "./sql/nodes.js";
 import type { DonationRowScheme, DonationStatus } from "./sql/donations.js";
 import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
+import type { DbConnectionConfig } from "./utils.js";
 
 class DbCore {
   private readonly clients: DbClient[];
@@ -16,7 +17,9 @@ class DbCore {
     mainClient?: DbClient,
   ) {
     this.main = mainClient ?? new DbClient(main, threadId);
-    this.clients = configs.map((config) => new DbClient(config, threadId));
+    this.clients = configs.map((config) =>
+      new DbClient(config, threadId).setSecondary(),
+    );
   }
 
   public async init(): Promise<void> {

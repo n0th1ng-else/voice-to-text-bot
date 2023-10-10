@@ -1,7 +1,9 @@
 import pg, { type PoolConfig } from "pg";
+import { Logger } from "../logger/index.js";
+import { getHostDomain } from "../common/url.js";
+import { type DbConnectionConfig, validateConfigState } from "./utils.js";
 import { NodesClient } from "./nodes.js";
 import { UsagesClient } from "./usages.js";
-import { Logger } from "../logger/index.js";
 import { DonationsClient } from "./donations.js";
 import { UsedEmailClient } from "./emails.js";
 import { DurationsClient } from "./durations.js";
@@ -35,15 +37,6 @@ const getPool = (config: DbConnectionConfig, threadId: number): pg.Pool => {
   });
 };
 
-export type DbConnectionConfig = {
-  user: string;
-  password: string;
-  host: string;
-  database: string;
-  port: number;
-  certificate?: string;
-};
-
 export class DbClient {
   public readonly nodes: NodesClient;
   public readonly usages: UsagesClient;
@@ -56,17 +49,27 @@ export class DbClient {
   private ready = false;
 
   constructor(config: DbConnectionConfig, threadId = 0, p?: pg.Pool) {
-    const { certificate, ...cfg } = config;
-    this.initialized = Object.values(cfg).every((val) => val);
+    const configState = validateConfigState(config);
+    const domain = config.host ? getHostDomain(config.host) : "missing.domain";
+    logger.info(`Initializing the database ${Logger.y(domain)}`);
+    this.initialized = configState !== "invalid";
     if (!this.initialized) {
       logger.error(
-        "Missing connection data for postgres server. Check the config",
-        new Error("Missing connection data for postgres server"),
+        `Missing connection data for postgres server. Check the config for ${Logger.y(
+          domain,
+        )}`,
+        new Error("Missing connection data for postgres server", {
+          cause: {
+            domain,
+          },
+        }),
       );
     }
-    if (!certificate) {
+    if (configState === "unsecure") {
       logger.warn(
-        "Postgres connection is not secure, ssl certificate is not provided",
+        `Postgres connection is not secure, ssl certificate is not provided for ${Logger.y(
+          domain,
+        )}`,
       );
     }
 
@@ -101,6 +104,16 @@ export class DbClient {
 
   public isReady(): boolean {
     return this.ready;
+  }
+
+  public setSecondary(): this {
+    this.nodes.setSecondary();
+    this.usages.setSecondary();
+    this.donations.setSecondary();
+    this.emails.setSecondary();
+    this.durations.setSecondary();
+    this.ignoredChats.setSecondary();
+    return this;
   }
 
   private setParsers(): void {

@@ -15,6 +15,7 @@ import { printCurrentStorageUsage } from "../storage/index.js";
 import { StopListener } from "../process/index.js";
 import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
+import { isDBConfigValid } from "../db/utils.js";
 
 const logger = new Logger("boot-server");
 
@@ -50,7 +51,15 @@ export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
         port: envy.dbPostgres.port,
         certificate: envy.dbPostgres.cert,
       },
-    ],
+      {
+        user: envy.dbPostgres2.user,
+        password: envy.dbPostgres2.password,
+        host: envy.dbPostgres2.host,
+        database: envy.dbPostgres2.database,
+        port: envy.dbPostgres2.port,
+        certificate: envy.dbPostgres2.cert,
+      },
+    ].filter((cfg) => isDBConfigValid(cfg)),
     threadId,
   );
 
