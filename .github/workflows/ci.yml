@@ -8,3 +8,10 @@ jobs:
   scan:
     uses: ./.github/workflows/scan.yml
     secrets: inherit
+
+  deploy:
+    needs: [scan]
+    uses: ./.github/workflows/docker.yml
+    secrets: inherit
+    with:
+      version: 0.0.0-${{ github.sha }}
