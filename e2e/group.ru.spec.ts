@@ -62,7 +62,7 @@ let converter: InstanceType<InjectedFn["VoiceConverter"]>;
 let hostUrl: string;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let telegramServer: nock.Scope;
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let chatType: TgChatType;
 let testMessageId = 0;
 let testChatId = 0;

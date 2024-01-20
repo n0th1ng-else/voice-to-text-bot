@@ -37,7 +37,7 @@ let stopHandler: VoidPromise = () =>
 
 let testPool: MockPool;
 let telegramServer: nock.Scope;
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 
 describe("error cases", () => {

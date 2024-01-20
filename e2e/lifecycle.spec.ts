@@ -48,7 +48,7 @@ let appVersion: InjectedFn["appVersion"];
 let httpsOptions: InjectedFn["httpsOptions"];
 let telegramServer: nock.Scope;
 let testPool: MockPool;
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
 let hostUrl: string;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;

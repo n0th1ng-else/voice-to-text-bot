@@ -66,7 +66,7 @@ let testMessageId = 0;
 let testChatId = 0;
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
 let telegramServer: nock.Scope;
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let mockTgReceiveUnexpectedMessage: InjectedTestFn["mockTgReceiveUnexpectedMessage"];
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockUpdateBotStatUsage: InjectedTestFn["mockUpdateBotStatUsage"];
