@@ -24,8 +24,8 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        environment: ["Production β"]
-    #        environment: ["Production β", "Production Ω"]
+        #        environment: ["Production β"]
+        environment: ["Production β", "Production Ω"]
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
