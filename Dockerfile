@@ -8,7 +8,8 @@ RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
 COPY package.json package-lock.json tsconfig.json $APP_DIR
-RUN npm ci --ignore-scripts && npm cache clean --force
+RUN npm pkg delete scripts.prepare
+RUN npm ci && npm cache clean --force
 
 COPY ./src $APP_DIR/src
 COPY ./certs $APP_DIR/certs
@@ -39,7 +40,8 @@ WORKDIR $APP_DIR
 
 COPY --from=builder $APP_DIR/package.json $APP_DIR
 COPY --from=builder $APP_DIR/package-lock.json $APP_DIR
-RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+RUN npm pkg delete scripts.prepare
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
 COPY --from=builder $APP_DIR/video-temp $APP_DIR/video-temp
