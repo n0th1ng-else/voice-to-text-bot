@@ -12,6 +12,7 @@ RUN npm ci --ignore-scripts && npm cache clean --force
 
 COPY ./src $APP_DIR/src
 COPY ./certs $APP_DIR/certs
+COPY ./init.cjs $APP_DIR/init.cjs
 RUN find "$APP_DIR/src" -type d -name __mocks__ -prune -exec rm -rf {} \;
 RUN find "$APP_DIR/src" -type f -name '*.spec.ts' -prune -exec rm -rf {} \;
 
@@ -40,6 +41,7 @@ COPY --from=builder $APP_DIR/package-lock.json $APP_DIR
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
+COPY --from=builder $APP_DIR/init.cjs $APP_DIR/init.cjs
 
 USER node
 
