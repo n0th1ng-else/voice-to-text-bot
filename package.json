@@ -7,7 +7,7 @@
   },
   "type": "module",
   "scripts": {
-    "ts": "ts-node-esm -r ./init.cjs src/scripts/run.js",
+    "ts": "NODE_OPTIONS=\"--loader ts-node/esm\" node -r ./init.cjs src/scripts/run.js",
     "import": "npm run ts -- import ts",
     "chart": "npm run ts -- chart ts",
     "start": "npm run ts -- start ts",
