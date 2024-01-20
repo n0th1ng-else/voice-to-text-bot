@@ -27,7 +27,7 @@ const makeTelegramResponse = <D>(result: D) => {
 };
 
 export const sendTelegramMessage = (
-  host: request.SuperTest<request.Test>,
+  host: request.Agent,
   bot: TelegramBotModel,
   msg: TelegramMessageModel,
 ): Promise<void> => {
@@ -45,7 +45,7 @@ export const sendTelegramMessage = (
 };
 
 export const sendTelegramCallbackMessage = (
-  host: request.SuperTest<request.Test>,
+  host: request.Agent,
   bot: TelegramBotModel,
   msg: TelegramMessageModel,
 ): Promise<void> => {

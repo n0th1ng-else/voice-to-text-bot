@@ -53,7 +53,7 @@ let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
 let botStat: InstanceType<InjectedTestFn["BotStatRecordModel"]>;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let telegramServer: nock.Scope;
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
 let testPool: MockPool;
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];

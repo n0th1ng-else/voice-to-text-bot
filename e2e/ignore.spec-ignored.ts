@@ -53,7 +53,7 @@ let telegramServer: nock.Scope;
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let testPool: MockPool;
 let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let BotCommand: InjectedFn["BotCommand"];
 let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];

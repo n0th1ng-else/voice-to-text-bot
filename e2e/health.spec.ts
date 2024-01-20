@@ -39,7 +39,7 @@ const webhookDoNotWait = false;
 let hostUrl: string;
 let server: InstanceType<InjectedFn["ExpressServer"]>;
 let telegramServer: nock.Scope;
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let ExpressServer: InjectedFn["ExpressServer"];
 let appVersion: InjectedFn["appVersion"];
 let httpsOptions: InjectedFn["httpsOptions"];

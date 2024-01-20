@@ -55,7 +55,7 @@ let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let testPool: MockPool;
 let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
 let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
-let host: request.SuperTest<request.Test>;
+let host: request.Agent;
 let LabelId: InjectedFn["LabelId"];
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
