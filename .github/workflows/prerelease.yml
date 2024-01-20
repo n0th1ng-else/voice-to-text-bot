@@ -35,7 +35,7 @@ jobs:
 
   sentry:
     runs-on: ubuntu-latest
-    name: Send release info into sentry
+    name: Send release into sentry
     needs: [tag-release]
     timeout-minutes: 1
     steps:
