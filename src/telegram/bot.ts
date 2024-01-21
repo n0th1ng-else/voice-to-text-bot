@@ -102,7 +102,7 @@ export class TelegramBotModel {
     return `${this.path}/${id}`;
   }
 
-  public handleApiMessage(
+  public async handleApiMessage(
     message: TgUpdate,
     analytics: AnalyticsData,
   ): Promise<void> {
@@ -188,7 +188,7 @@ export class TelegramBotModel {
     );
   }
 
-  private sendNoVoiceMessage(
+  private async sendNoVoiceMessage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {

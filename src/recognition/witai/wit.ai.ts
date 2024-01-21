@@ -11,6 +11,7 @@ import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
+import { addAttachment } from "../../monitoring/sentry.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -29,13 +30,14 @@ export class WithAiProvider extends VoiceConverter {
     this.tokenRu = options.witAiTokenRu ?? "";
   }
 
-  public transformToText(
+  public async transformToText(
     fileLink: string,
     isVideo: boolean,
     lang: LanguageCode,
     logData: ConverterMeta,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
+    addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
     return getWav(fileLink, isVideo)
       .then((bufferData) => {
@@ -46,7 +48,7 @@ export class WithAiProvider extends VoiceConverter {
       .then((chunks) => chunks.map(({ text }) => text).join(" ") || "");
   }
 
-  private static recognise(
+  private static async recognise(
     data: Buffer,
     authToken: string,
     logPrefix: string,

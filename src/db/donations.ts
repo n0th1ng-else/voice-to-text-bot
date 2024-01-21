@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
 import {
-  DonationRowScheme,
+  type DonationRowScheme,
   DonationsDb,
   DonationStatus,
 } from "./sql/donations.js";

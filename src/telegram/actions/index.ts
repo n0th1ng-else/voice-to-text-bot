@@ -48,7 +48,7 @@ export class BotActions {
     this.donate.setPayment(payment);
   }
 
-  public handleCallback(
+  public async handleCallback(
     msg: TgCallbackQuery,
     analytics: AnalyticsData,
   ): Promise<void> {

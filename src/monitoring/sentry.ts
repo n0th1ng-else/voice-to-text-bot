@@ -1,4 +1,4 @@
-import { Express } from "express";
+import type { Express } from "express";
 import * as sentry from "@sentry/node";
 import { ProfilingIntegration } from "@sentry/profiling-node";
 import { appVersion, nodeEnvironment, sentryDsn } from "../env.js";
@@ -51,4 +51,15 @@ export const captureError = (err: unknown): void => {
     return;
   }
   sentry.captureException(err);
+};
+
+export const addAttachment = (
+  filename: string,
+  data: string | Uint8Array,
+): void => {
+  sentry.getCurrentScope().addAttachment({
+    filename,
+    data,
+    contentType: "text/plain",
+  });
 };
