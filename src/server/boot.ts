@@ -1,7 +1,7 @@
 import * as envy from "../env.js";
 import { ExpressServer } from "./express.js";
 import { httpsOptions } from "../../certs/index.js";
-import { VoiceConverterOptions } from "../recognition/types.js";
+import type { VoiceConverterOptions } from "../recognition/types.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
