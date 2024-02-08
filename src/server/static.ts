@@ -1,29 +1,48 @@
 import { fileURLToPath } from "node:url";
 import { resolve as resolvePath } from "node:path";
-import express from "express";
+import { readFileSync } from "node:fs";
+import Fastify, { type FastifyInstance } from "fastify";
+import { httpsOptions } from "../../certs/index.js";
+import { enableSSL } from "../env.js";
+
+export type FastifyStaticRoute<Body = void, Query = void, Reply = void> = {
+  Body: Body;
+  Querystring: Query;
+  Reply: Reply | { result: "ok" } | { result: "error"; error: string };
+};
 
 export const initStaticServer = (
   script: "import" | "chart",
-): express.Express => {
+): FastifyInstance => {
   const currentDir = fileURLToPath(new URL(".", import.meta.url));
   const files = {
     html: resolvePath(currentDir, `../${script}/index.html`),
     js: resolvePath(currentDir, `../${script}/index.js`),
   };
 
-  const app = express();
-  app.use(express.json({ limit: "102400kb" }));
+  const httpsOpts = enableSSL
+    ? {
+        https: httpsOptions,
+      }
+    : {};
 
-  app.get("/", (req: express.Request, res: express.Response) => {
-    res.status(200).sendFile(files.html);
+  const app = Fastify({
+    ...httpsOpts,
+    bodyLimit: 1024 * 1024 * 100, // 100 MB
   });
 
-  app.get("/index.js", (req: express.Request, res: express.Response) => {
-    res.status(200).sendFile(files.js);
+  app.get("/", async (_, res) => {
+    const bufferIndexHtml = readFileSync(files.html);
+    await res.type("text/html").send(bufferIndexHtml);
   });
 
-  app.get("/favicon.ico", (_req, res: express.Response<string>) => {
-    res.status(204).send("");
+  app.get("/index.js", async (_, res) => {
+    const bufferIndexHtml = readFileSync(files.js);
+    await res.type("application/javascript").send(bufferIndexHtml);
+  });
+
+  app.get("/favicon.ico", async (_, res) => {
+    await res.status(204).send("");
   });
 
   return app;

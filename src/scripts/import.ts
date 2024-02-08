@@ -1,14 +1,14 @@
-import { createServer as createHttps } from "node:https";
-import { createServer as createHttp } from "node:http";
-import express from "express";
 import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
 import { sSuffix } from "../text/utils.js";
-import { httpsOptions } from "../../certs/index.js";
 import { getDb } from "../db/index.js";
-import { initStaticServer } from "../server/static.js";
+import { initStaticServer, type FastifyStaticRoute } from "../server/static.js";
 
 const logger = new Logger("import-script");
+
+type ImportPayload = {
+  results: ImportRow[];
+};
 
 type ImportRow = {
   chatId: number;
@@ -65,29 +65,24 @@ export const run = async (): Promise<void> => {
     inProgress = false;
   };
 
-  app.post(
-    "/import",
-    (
-      req: express.Request<unknown, unknown, { results: ImportRow[] }>,
-      res: express.Response,
-    ) => {
-      const { results } = req.body;
-      importRows(results)
-        .then(() => {
-          res.status(200).send({});
-        })
-        .catch((err: unknown) => {
-          logger.error("err", err);
-          inProgress = false;
-          rowsTotal = 0;
-          rowsDone = 0;
-          res.status(400).send(err);
-        });
-    },
-  );
+  app.post<FastifyStaticRoute<ImportPayload>>("/import", async (req, res) => {
+    const { results } = req.body;
+    await importRows(results)
+      .then(() => res.status(200).send({ result: "ok" }))
+      .catch((err: unknown) => {
+        logger.error("err", err);
+        inProgress = false;
+        rowsTotal = 0;
+        rowsDone = 0;
 
-  app.get("/status", (req: express.Request, res: express.Response) => {
-    res.status(200).send({
+        return res
+          .status(500)
+          .send({ result: "error", error: "Something went wrong" });
+      });
+  });
+
+  app.get("/status", async (_, res) => {
+    await res.status(200).send({
       idle: !inProgress,
       total: rowsTotal,
       done: rowsDone,
@@ -96,12 +91,12 @@ export const run = async (): Promise<void> => {
 
   logger.info(`Starting ${Logger.y(sSuffix("http", envy.enableSSL))} server`);
 
-  const server = envy.enableSSL
-    ? createHttps(httpsOptions, app)
-    : createHttp(app);
-
   await db.init();
-  server.listen(envy.appPort, () => {
-    logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
-  });
+
+  try {
+    const fullUrl = await app.listen({ port: envy.appPort });
+    logger.info(`Server is listening on ${Logger.y(fullUrl)}`);
+  } catch (err) {
+    process.exit(1);
+  }
 };

@@ -7,7 +7,7 @@
 <div>
     <span>
         <a href="https://t.me/AudioMessBot" target="_blank">
-            <img alt="Number of installs" src="https://img.shields.io/badge/installs-30000%2B-blueviolet"> 
+            <img alt="Number of installs" src="https://img.shields.io/badge/installs-125k%2B-blueviolet"> 
         </a>
     </span>
     <span>

@@ -1,106 +1,125 @@
-import { createServer as createHttps } from "node:https";
-import { createServer as createHttp } from "node:http";
-import express from "express";
 import { Logger } from "../logger/index.js";
 import * as envy from "../env.js";
 import { sSuffix } from "../text/utils.js";
-import { httpsOptions } from "../../certs/index.js";
 import { getDb } from "../db/index.js";
-import { initStaticServer } from "../server/static.js";
+import { initStaticServer, type FastifyStaticRoute } from "../server/static.js";
+import type { UsageRowScheme } from "../db/sql/usages.js";
+
+type LoginPayload = {
+  user: string;
+  pwd: string;
+  host: string;
+  port: number;
+  database: string;
+};
+
+type SearchQuery = {
+  usage: string;
+  from: string;
+  to: string;
+};
+
+type SearchResult = {
+  items: UsageRowScheme[];
+  total: number;
+};
 
 const logger = new Logger("chart-script");
 
-export const run = (): void => {
+export const run = async (): Promise<void> => {
   const app = initStaticServer("chart");
 
   let db: ReturnType<typeof getDb> | null = null;
 
-  app.post(
-    "/login",
-    (
-      req: express.Request<
-        unknown,
-        unknown,
-        {
-          user: string;
-          pwd: string;
-          host: string;
-          port: number;
-        }
-      >,
-      res: express.Response,
-    ) => {
-      if (db) {
-        res.status(200).send({});
+  app.post<FastifyStaticRoute<LoginPayload>>("/login", async (req, res) => {
+    if (db) {
+      await res.status(200).send({ result: "ok" });
+      return;
+    }
+    const { user, pwd, host, port, database } = req.body;
+    if ([user, pwd, host, port, database].filter(Boolean).length !== 5) {
+      await res.status(400).send({
+        result: "error",
+        error: "Wrong credentials",
+      });
+      return;
+    }
+    db = getDb([
+      {
+        user,
+        host,
+        port,
+        database,
+        password: pwd,
+      },
+    ]);
+
+    await res.status(200).send({ result: "ok" });
+  });
+
+  app.delete<FastifyStaticRoute>("/login", async (_, res) => {
+    db = null;
+    await res.status(200).send({ result: "ok" });
+  });
+
+  app.get<FastifyStaticRoute<void, SearchQuery, SearchResult>>(
+    "/stat",
+    async (req, res) => {
+      const usageCount = Number(req.query.usage);
+
+      if (!usageCount && usageCount !== 0) {
+        await res.status(400).send({
+          result: "error",
+          error: "Wrong usage parameter. Number expected",
+        });
         return;
       }
-      db = getDb([
-        {
-          user: req.body.user,
-          password: req.body.pwd,
-          host: req.body.host,
-          database: req.body.user,
-          port: req.body.port,
-        },
-      ]);
 
-      res.status(200).send({});
+      const from = Number(req.query.from);
+      if (!from) {
+        await res.status(400).send({
+          result: "error",
+          error: "Wrong from parameter. Number expected",
+        });
+        return;
+      }
+
+      const to = Number(req.query.to);
+      if (!to) {
+        await res.status(400).send({
+          result: "error",
+          error: "Wrong to parameter. Number expected",
+        });
+        return;
+      }
+
+      if (!db) {
+        await res
+          .status(400)
+          .send({ result: "error", error: "DB is not initialized" });
+        return;
+      }
+
+      await db
+        .fetchUsageRows(new Date(from), new Date(to), usageCount)
+        .then((rows) => {
+          return res.status(200).send({ items: rows, total: rows.length });
+        })
+        .catch((err) => {
+          logger.error("Unable to select rows", err);
+          return res
+            .status(500)
+            .send({ result: "error", error: "Something went wrong" });
+        });
     },
   );
 
-  app.delete("/login", (req: express.Request, res: express.Response) => {
-    if (db) {
-      db = null;
-    }
-    res.status(200).send({});
-  });
-
-  app.get("/stat", (req: express.Request, res: express.Response) => {
-    const usageCount = Number(req.query.usage);
-
-    if (!usageCount && usageCount !== 0) {
-      res
-        .status(400)
-        .send({ message: "Wrong usage parameter. Number expected" });
-      return;
-    }
-
-    const from = Number(req.query.from);
-    if (!from) {
-      res
-        .status(400)
-        .send({ message: "Wrong from parameter. Number expected" });
-      return;
-    }
-
-    const to = Number(req.query.to);
-    if (!to) {
-      res.status(400).send({ message: "Wrong to parameter. Number expected" });
-      return;
-    }
-
-    if (!db) {
-      res.status(400).send({ message: "DB is not initialized" });
-      return;
-    }
-
-    db.fetchUsageRows(new Date(from), new Date(to), usageCount)
-      .then((rows) => {
-        res.status(200).send({ items: rows, total: rows.length });
-      })
-      .catch((err) => {
-        logger.error("Unable to select rows", err);
-        res.status(500).send({ message: "Something went wrong" });
-      });
-  });
-
   logger.info(`Starting ${Logger.y(sSuffix("http", envy.enableSSL))} server`);
 
-  const server = envy.enableSSL
-    ? createHttps(httpsOptions, app)
-    : createHttp(app);
-
-  server.listen(envy.appPort, () => {
-    logger.info(`Express server is listening on ${Logger.y(envy.appPort)}`);
-  });
+  try {
+    const fullUrl = await app.listen({ port: envy.appPort });
+    logger.info(`Server is listening on ${Logger.y(fullUrl)}`);
+  } catch (err) {
+    process.exit(1);
+  }
 };
