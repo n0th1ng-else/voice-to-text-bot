@@ -5,8 +5,8 @@
 import {
   Chart,
   registerables,
-} from "https://cdn.jsdelivr.net/npm/chart.js@4.3.0/+esm";
-import TrendlinePlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@2.0.3/+esm";
+} from "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/+esm";
+import TrendlinePlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@2.1.0/+esm";
 import LabelsPlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/+esm";
 
 Chart.register(...registerables);
@@ -124,7 +124,9 @@ const onFileSelect = (file) => {
 };
 
 const onReset = () => {
-  let el = document.getElementById("typeEl");
+  let el;
+
+  el = document.getElementById("typeEl");
   el.value = "language";
 
   el = document.getElementById("usageEl");
@@ -146,36 +148,28 @@ const onReset = () => {
   el.value = "";
 
   el = document.getElementById("pgHost");
-  el.value = "rogue.db.elephantsql.com";
+  el.value = "";
 
   el = document.getElementById("pgPort");
-  el.value = 5432;
+  el.value = 10058;
+
+  el = document.getElementById("pgDB");
+  el.value = "defaultdb";
 
   clearDrawer();
   switchMethod();
 };
 
 const getForm = () => {
-  let el = document.getElementById("usageEl");
-  const usage = el.value;
+  const usage = document.getElementById("usageEl").value;
+  const to = document.getElementById("toEl").valueAsDate.getTime();
+  const from = document.getElementById("fromEl").valueAsDate.getTime();
 
-  el = document.getElementById("toEl");
-  const to = el.valueAsDate.getTime();
-
-  el = document.getElementById("fromEl");
-  const from = el.valueAsDate.getTime();
-
-  el = document.getElementById("pgUser");
-  const user = el.value;
-
-  el = document.getElementById("pgPwd");
-  const pwd = el.value;
-
-  el = document.getElementById("pgHost");
-  const host = el.value;
-
-  el = document.getElementById("pgPort");
-  const port = el.value;
+  const user = document.getElementById("pgUser").value;
+  const pwd = document.getElementById("pgPwd").value;
+  const host = document.getElementById("pgHost").value;
+  const port = document.getElementById("pgPort").value;
+  const database = document.getElementById("pgDB").value;
 
   return {
     usage,
@@ -185,11 +179,13 @@ const getForm = () => {
     pwd,
     host,
     port,
+    database,
   };
 };
 
 const onDraw = () => {
-  let el = document.getElementById("legacyEl");
+  let el;
+  el = document.getElementById("legacyEl");
   const useFile = el.checked;
 
   el = document.getElementById("typeEl");
@@ -210,7 +206,12 @@ const onDraw = () => {
 
   const { from, to, usage } = getForm();
   fetch(`/stat?from=${from}&to=${to}&usage=${usage}`)
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
+      return response.json();
+    })
     .then((data) => {
       chart = drawChart(chartType, data.items);
     })
@@ -692,6 +693,12 @@ const onDisconnect = () => {
   fetch("/login", {
     method: "DELETE",
   })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
+      return response.json();
+    })
     .then(() => {
       toggleDbForm(true);
     })
@@ -700,21 +707,27 @@ const onDisconnect = () => {
     });
 };
 
-const oonConnect = () => {
-  onReset();
-  const { user, pwd, host, port } = getForm();
+const onConnect = () => {
+  const { user, pwd, host, port, database } = getForm();
   fetch("/login", {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ user, pwd, host, port }),
+    body: JSON.stringify({ user, pwd, host, port, database }),
   })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
+      return response.json();
+    })
     .then(() => {
       toggleDbForm(false);
     })
     .catch((err) => {
+      toggleDbForm(true);
       printError(new Error("Unable to connect db", { cause: err }), err);
     });
 };
@@ -726,7 +739,7 @@ document.querySelector(".reset-btn").addEventListener("click", () => onReset());
 document
   .querySelector(".off-btn")
   .addEventListener("click", () => onDisconnect());
-document.querySelector(".on-btn").addEventListener("click", () => oonConnect());
+document.querySelector(".on-btn").addEventListener("click", () => onConnect());
 document
   .querySelector("#legacyEl")
   .addEventListener("change", () => switchMethod());

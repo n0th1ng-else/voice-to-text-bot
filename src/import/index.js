@@ -2,7 +2,12 @@
 
 const onAction = () => {
   return fetch("/status")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
+      return response.json();
+    })
     .then((data) => {
       const status = data.idle ? "Idling" : "Running";
       const percentage = data.total ? (100 * data.done) / data.total : 0;
@@ -26,6 +31,12 @@ const onFileSelect = () => {
     method: "POST",
     body: el.files[0],
   })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
+      return response.json();
+    })
     .then(() => onAction())
     .finally(() => el.removeAttribute("disabled"));
 };
