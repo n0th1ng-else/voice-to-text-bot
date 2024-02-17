@@ -47,7 +47,7 @@
     "ffmpeg-static": "5.2.0",
     "nanoid": "5.0.4",
     "newrelic": "11.9.0",
-    "ngrok": "4.3.3",
+    "ngrok": "5.0.0-beta.2",
     "node-telegram-bot-api": "0.64.0",
     "pg": "8.11.3",
     "picocolors": "1.0.0",

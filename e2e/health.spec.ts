@@ -37,10 +37,10 @@ const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
 let hostUrl: string;
-let server: InstanceType<InjectedFn["ExpressServer"]>;
+let server: InstanceType<InjectedFn["BotServer"]>;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let ExpressServer: InjectedFn["ExpressServer"];
+let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
 let httpsOptions: InjectedFn["httpsOptions"];
 let testPool: MockPool;
@@ -61,7 +61,7 @@ describe("[health]", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    ExpressServer = init.ExpressServer;
+    BotServer = init.BotServer;
     appVersion = init.appVersion;
     httpsOptions = init.httpsOptions;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
@@ -112,7 +112,7 @@ describe("[health]", () => {
   });
 
   beforeEach(() => {
-    server = new ExpressServer(
+    server = new BotServer(
       appPort,
       enableSSL,
       appVersion,

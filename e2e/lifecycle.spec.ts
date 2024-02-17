@@ -41,9 +41,9 @@ const path = "/lifecycle";
 let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
-let server: InstanceType<InjectedFn["ExpressServer"]>;
+let server: InstanceType<InjectedFn["BotServer"]>;
 let localhostUrl: string;
-let ExpressServer: InjectedFn["ExpressServer"];
+let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
 let httpsOptions: InjectedFn["httpsOptions"];
 let telegramServer: nock.Scope;
@@ -59,7 +59,7 @@ describe("[lifecycle]", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    ExpressServer = init.ExpressServer;
+    BotServer = init.BotServer;
     appVersion = init.appVersion;
     httpsOptions = init.httpsOptions;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
@@ -111,7 +111,7 @@ describe("[lifecycle]", () => {
   });
 
   beforeEach(() => {
-    server = new ExpressServer(
+    server = new BotServer(
       appPort,
       enableSSL,
       appVersion,

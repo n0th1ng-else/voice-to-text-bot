@@ -1,6 +1,6 @@
 import { createServer as createHttp } from "node:http";
 import { createServer as createHttps } from "node:https";
-import express from "express";
+import express, { type Response } from "express";
 import { Logger } from "../logger/index.js";
 import { TelegramBotModel } from "../telegram/bot.js";
 import { HttpsOptions } from "../../certs/index.js";
@@ -15,13 +15,15 @@ import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
 import type { getDb } from "../db/index.js";
 import type { VoidPromise } from "../common/types.js";
 
+type StatCore = ReturnType<typeof getDb>;
+
 const logger = new Logger("server");
 
-export class ExpressServer {
+export class BotServer {
   private readonly app = express();
   private readonly uptimeDaemon: UptimeDaemon;
 
-  private stat: ReturnType<typeof getDb> | null = null;
+  private stat: StatCore | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
@@ -34,7 +36,7 @@ export class ExpressServer {
     private readonly webhookDoNotWait: boolean,
     private readonly httpsOptions: HttpsOptions,
   ) {
-    logger.info("Initializing express server");
+    logger.info("Initializing the bot server server");
 
     this.uptimeDaemon = new UptimeDaemon(version);
 
@@ -44,8 +46,8 @@ export class ExpressServer {
     this.app.use("/static", express.static("assets/v2"));
 
     const statusHandler = (
-      db: ReturnType<typeof getDb> | null,
-      res: express.Response<HealthDto>,
+      res: Response<HealthDto>,
+      db: StatCore | null,
     ): void => {
       const status = new HealthModel(this.version, this.isHttps, this.threadId);
       if (this.isIdle) {
@@ -77,23 +79,23 @@ export class ExpressServer {
         });
     };
 
-    this.app.get("/health", (_req, res: express.Response<HealthDto>) => {
-      statusHandler(this.stat, res);
+    this.app.get("/health", (_req, res: Response<HealthDto>) => {
+      statusHandler(res, this.stat);
     });
-    this.app.get("/favicon.ico", (_req, res: express.Response<string>) => {
+    this.app.get("/favicon.ico", (_req, res: Response<string>) => {
       res.status(204).send("");
     });
-    this.app.get("/", (_req, res: express.Response<string>) => {
+    this.app.get("/", (_req, res: Response<string>) => {
       logger.info("Received app root request");
       res.status(200).send("The app is running");
     });
-    this.app.post("/lifecycle", (req, res: express.Response<HealthDto>) => {
+    this.app.post("/lifecycle", (req, res: Response<HealthDto>) => {
       logger.warn("Received app:restart hook from the buddy node", req.body);
-      statusHandler(this.stat, res);
+      statusHandler(res, this.stat);
     });
   }
 
-  public setStat(stat: ReturnType<typeof getDb>): this {
+  public setStat(stat: StatCore): this {
     this.stat = stat;
     this.uptimeDaemon.setStat(stat);
     return this;
@@ -209,7 +211,7 @@ export class ExpressServer {
 
     return new Promise((resolve) => {
       server.listen(this.port, () => {
-        logger.info(`Express server is listening on ${Logger.y(this.port)}`);
+        logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
         resolve(
           () =>
             new Promise((resolveFn, rejectFn) => {
@@ -221,12 +223,12 @@ export class ExpressServer {
 
               server.close((err) => {
                 if (err) {
-                  logger.error("Unable to stop express server", err);
+                  logger.error("Unable to stop the bot server", err);
                   rejectFn(err);
                   return;
                 }
 
-                logger.warn("Express server has stopped");
+                logger.warn("The bot server has stopped");
                 resolveFn();
               });
             }),
@@ -241,7 +243,7 @@ export class ExpressServer {
       this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs)),
     ).then(() => {
       this.isIdle = false;
-      logger.info("Node is successfully set to be a hook receiver");
+      logger.info("Instance is successfully set as a hook receiver");
     });
   }
 
@@ -261,7 +263,7 @@ export class ExpressServer {
     if (!nextReplicaUrl) {
       return Promise.reject(
         new Error(
-          "Next node url is not set for this node. Unable to set up the daemon",
+          "Next instance url is not set for this node. Unable to set up the daemon",
         ),
       );
     }
