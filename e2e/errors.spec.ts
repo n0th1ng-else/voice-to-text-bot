@@ -58,7 +58,7 @@ describe("error cases", () => {
       const mockTgGetWebHook = initTest.mockTgGetWebHook;
       const mockTgSetWebHook = initTest.mockTgSetWebHook;
       const mockTgSetCommands = initTest.mockTgSetCommands;
-      const ExpressServer = init.ExpressServer;
+      const BotServer = init.BotServer;
       const appVersion = init.appVersion;
       const httpsOptions = init.httpsOptions;
       const launchTime = init.launchTime;
@@ -100,7 +100,7 @@ describe("error cases", () => {
       mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
       mockTgSetCommands(telegramServer);
 
-      const server = new ExpressServer(
+      const server = new BotServer(
         appPort,
         enableSSL,
         appVersion,

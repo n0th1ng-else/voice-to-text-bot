@@ -18,8 +18,8 @@ export const injectDependencies = async () => {
   const dbDurations = await import("../db/sql/durations.sql.js");
   const dbIgnoredChats = await import("../db/sql/ignoredchats.sql.js");
   const env = await import("../env.js");
-  const express = await import("../server/express.js");
-  const expressHelpers = await import("../server/api.js");
+  const server = await import("../server/bot-server.js");
+  const serverHelpers = await import("../server/api.js");
   const stripe = await import("../donate/stripe.js");
   const utils = await import("./waitFor.js");
   const emails = await import("../db/emails.js");
@@ -51,10 +51,10 @@ export const injectDependencies = async () => {
     ...dbDurations,
     ...dbIgnoredChats,
     ...env,
-    ...express,
+    ...server,
     ...donations,
     ...stripe,
-    ...expressHelpers,
+    ...serverHelpers,
     ...utils,
     ...emails,
     ...nodes,

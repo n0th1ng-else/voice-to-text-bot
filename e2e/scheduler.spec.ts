@@ -56,9 +56,9 @@ let clearIntervalSpy = jest
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
-let server: InstanceType<InjectedFn["ExpressServer"]>;
+let server: InstanceType<InjectedFn["BotServer"]>;
 let requestHealthData: SpiedFunction<InjectedFn["requestHealthData"]>;
-let ExpressServer: InjectedFn["ExpressServer"];
+let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
 let httpsOptions: InjectedFn["httpsOptions"];
 let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
@@ -73,7 +73,7 @@ describe("[uptime daemon]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
     requestHealthData = jest.spyOn(init, "requestHealthData");
-    ExpressServer = init.ExpressServer;
+    BotServer = init.BotServer;
     appVersion = init.appVersion;
     httpsOptions = init.httpsOptions;
 
@@ -95,7 +95,7 @@ describe("[uptime daemon]", () => {
         waiter.tick();
       });
 
-    server = new ExpressServer(
+    server = new BotServer(
       appPort,
       enableSSL,
       appVersion,
@@ -125,7 +125,7 @@ describe("[uptime daemon]", () => {
 
     it("Failed to trigger the daemon if nextUrl is not set", async () => {
       const errMessage =
-        "Next node url is not set for this node. Unable to set up the daemon";
+        "Next instance url is not set for this node. Unable to set up the daemon";
       await expect(server.triggerDaemon("", 1)).rejects.toThrowError(
         errMessage,
       );

@@ -81,7 +81,7 @@ describe("ignore chats", () => {
     const TelegramBotModel = init.TelegramBotModel;
     const TelegramApi = init.TelegramApi;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
-    const ExpressServer = init.ExpressServer;
+    const BotServer = init.BotServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;
     const launchTime = init.launchTime;
@@ -122,7 +122,7 @@ describe("ignore chats", () => {
 
     mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
 
-    const server = new ExpressServer(
+    const server = new BotServer(
       appPort,
       enableSSL,
       appVersion,

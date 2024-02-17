@@ -4,7 +4,7 @@ import { sSuffix } from "../text/utils.js";
 
 const logger = new Logger("tunnel");
 
-const createTunnel = (
+const createTunnel = async (
   port: number,
   enableSSL: boolean,
   token?: string,

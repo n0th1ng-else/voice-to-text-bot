@@ -1,5 +1,5 @@
 import * as envy from "../env.js";
-import { ExpressServer } from "./express.js";
+import { BotServer } from "./bot-server.js";
 import { httpsOptions } from "../../certs/index.js";
 import type { VoiceConverterOptions } from "../recognition/types.js";
 import {
@@ -19,8 +19,8 @@ import { isDBConfigValid } from "../db/utils.js";
 
 const logger = new Logger("boot-server");
 
-export const prepareInstance = (threadId: number): Promise<ExpressServer> => {
-  const server = new ExpressServer(
+export const prepareInstance = (threadId: number): Promise<BotServer> => {
+  const server = new BotServer(
     envy.appPort,
     envy.enableSSL,
     envy.appVersion,

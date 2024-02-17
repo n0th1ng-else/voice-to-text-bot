@@ -134,7 +134,7 @@ describe("[default language - english]", () => {
     const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
-    const ExpressServer = init.ExpressServer;
+    const BotServer = init.BotServer;
     const appVersion = init.appVersion;
     const httpsOptions = init.httpsOptions;
     const TelegramApi = init.TelegramApi;
@@ -170,7 +170,7 @@ describe("[default language - english]", () => {
     mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
     mockTgSetCommands(telegramServer);
 
-    const server = new ExpressServer(
+    const server = new BotServer(
       appPort,
       enableSSL,
       appVersion,
