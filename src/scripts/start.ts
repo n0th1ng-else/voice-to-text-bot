@@ -1,17 +1,20 @@
 import * as envy from "../env.js";
 import { Logger } from "../logger/index.js";
-import type { BotServer } from "../server/bot-server.js";
 import { getLaunchDelay } from "../common/timer.js";
 import { prepareInstance, prepareStopListener } from "../server/boot.js";
+import type { BotServerModel } from "../server/types.js";
 
 const logger = new Logger("start-script");
 
-const startServer = (server: BotServer, threadId: number): Promise<void> => {
+const startServer = async (
+  server: BotServerModel,
+  threadId: number,
+): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
   const stopListener = prepareStopListener();
 
   return server.start().then((stopFn) => {
-    stopListener.addTrigger(() => stopFn());
+    stopListener.addTrigger(stopFn);
     return server.triggerDaemon(
       envy.nextReplicaUrl,
       envy.replicaLifecycleInterval,

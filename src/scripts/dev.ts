@@ -1,12 +1,15 @@
 import { Logger } from "../logger/index.js";
-import type { BotServer } from "../server/bot-server.js";
 import { getLaunchDelay } from "../common/timer.js";
 import { prepareInstance, prepareStopListener } from "../server/boot.js";
 import { flattenPromise } from "../common/helpers.js";
+import type { BotServerModel } from "../server/types.js";
 
 const logger = new Logger("dev-script");
 
-const startServer = (server: BotServer, threadId: number): Promise<void> => {
+const startServer = async (
+  server: BotServerModel,
+  threadId: number,
+): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
   const stopListener = prepareStopListener();
 

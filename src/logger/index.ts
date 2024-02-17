@@ -24,7 +24,7 @@ const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
   ERROR: 4,
 } as const;
 
-const { green, red, yellow } = picocolors;
+const { green, red, yellow, dim } = picocolors;
 
 export class Logger {
   public static g(message: string | number): string {
@@ -40,6 +40,11 @@ export class Logger {
   public static r(message: string | number): string {
     const msg = typeof message === "string" ? message : String(message);
     return red(msg);
+  }
+
+  private static d(message: string | number): string {
+    const msg = typeof message === "string" ? message : String(message);
+    return dim(msg);
   }
 
   private get prefix(): string {
@@ -83,7 +88,7 @@ export class Logger {
       return;
     }
     // eslint-disable-next-line no-console
-    console.log(Logger.g(this.prefix), msg, ...data);
+    console.log(Logger.g(this.prefix), Logger.d(msg), ...data);
     sendLogs("info", this.id, this.additionalPrefix, msg, data);
   }
 

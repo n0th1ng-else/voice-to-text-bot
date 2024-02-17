@@ -31,7 +31,6 @@ jest.unstable_mockModule(
   () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
-const enableSSL = false;
 const appPort = 3300;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
@@ -42,7 +41,6 @@ let telegramServer: nock.Scope;
 let host: request.Agent;
 let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
-let httpsOptions: InjectedFn["httpsOptions"];
 let testPool: MockPool;
 let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
 let mockTgSetWebHook: InjectedTestFn["mockTgSetWebHook"];
@@ -63,7 +61,6 @@ describe("[health]", () => {
 
     BotServer = init.BotServer;
     appVersion = init.appVersion;
-    httpsOptions = init.httpsOptions;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
     mockTgSetWebHook = initTest.mockTgSetWebHook;
     mockTgSetCommands = initTest.mockTgSetCommands;
@@ -112,13 +109,7 @@ describe("[health]", () => {
   });
 
   beforeEach(() => {
-    server = new BotServer(
-      appPort,
-      enableSSL,
-      appVersion,
-      webhookDoNotWait,
-      httpsOptions,
-    );
+    server = new BotServer(appPort, appVersion, webhookDoNotWait);
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 

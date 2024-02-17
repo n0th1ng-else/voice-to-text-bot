@@ -11,12 +11,11 @@ COPY package.json package-lock.json tsconfig.json $APP_DIR
 RUN npm pkg delete scripts.prepare
 RUN npm ci && npm cache clean --force
 
-COPY ./src $APP_DIR/src
+COPY ./assets $APP_DIR/assets
 COPY ./certs $APP_DIR/certs
 COPY ./video-temp $APP_DIR/video-temp
 COPY ./init.cjs $APP_DIR/init.cjs
-RUN find "$APP_DIR/src" -type d -name __mocks__ -prune -exec rm -rf {} \;
-RUN find "$APP_DIR/src" -type f -name '*.spec.ts' -prune -exec rm -rf {} \;
+COPY ./src $APP_DIR/src
 
 RUN npm run build
 
@@ -38,15 +37,16 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
+COPY --from=builder $APP_DIR/assets $APP_DIR/assets
+COPY --from=builder $APP_DIR/video-temp $APP_DIR/video-temp
+COPY --from=builder $APP_DIR/init.cjs $APP_DIR/init.cjs
 COPY --from=builder $APP_DIR/package.json $APP_DIR
 COPY --from=builder $APP_DIR/package-lock.json $APP_DIR
 RUN npm pkg delete scripts.prepare
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
-COPY --from=builder $APP_DIR/video-temp $APP_DIR/video-temp
-COPY --from=builder $APP_DIR/init.cjs $APP_DIR/init.cjs
-
+RUN dir -s
 USER node
 
 CMD ["npm", "run", "cluster:js"]

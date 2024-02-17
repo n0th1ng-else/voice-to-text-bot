@@ -11,6 +11,10 @@ export class Logger {
     return typeof message === "string" ? message : String(message);
   }
 
+  private static d(message: string | number): string {
+    return typeof message === "string" ? message : String(message);
+  }
+
   private additionalPrefix = "";
 
   constructor(private readonly id = "") {}

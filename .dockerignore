@@ -2,9 +2,12 @@
 .github
 .husky
 .idea
-assets
+.env.dev
+.nvmrc
+
 coverage-e2e
 coverage-unit
+coverage
 e2e
 k8s
 node_modules
@@ -12,3 +15,4 @@ spmdb
 spmlogs
 HISTORY.md
 /**/*/*.spec.ts
+/**/__mocks__/*

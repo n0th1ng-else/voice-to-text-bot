@@ -44,12 +44,12 @@ and the results you can see below in the table.
 
 # Tech Stack
 
-- [Typescript](https://github.com/microsoft/TypeScript)
-- [ExpressJS](https://github.com/expressjs/express)
-- [Axios](https://github.com/axios/axios)
-- PostgreSQL
-- Google Cloud API
+- [Typescript](https://www.typescriptlang.org/)
+- [Fastify](https://fastify.dev/)
+- [Axios](https://axios-http.com/)
+- [PostgreSQL](https://node-postgres.com/)
 - Google Analytics
+- [Amplitude](https://amplitude.com/)
 
 # Service model
 
@@ -88,6 +88,6 @@ flowchart BT
 
 - For direct upload
   <br/>
-  1 Unlimited for asynchronous upload via Google Drive
+  <sup>1</sup> Unlimited for asynchronous upload via Google Drive
   <br/>
-  2 Takes a while for asynchronous upload via Google Drive
+  <sup>2</sup> Takes a while for asynchronous upload via Google Drive

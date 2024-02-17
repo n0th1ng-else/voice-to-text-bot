@@ -11,6 +11,7 @@ jest.unstable_mockModule("picocolors", () => {
       green: jest.fn((msg: string) => msg),
       red: jest.fn((msg: string) => msg),
       yellow: jest.fn((msg: string) => msg),
+      dim: jest.fn((msg: string) => msg),
     },
   };
 });
