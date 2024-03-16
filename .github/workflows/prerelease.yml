@@ -19,7 +19,7 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install NodeJS and NPM modules
         uses: ./.github/actions/npm
@@ -43,7 +43,7 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create Sentry release
         uses: getsentry/action-release@v1

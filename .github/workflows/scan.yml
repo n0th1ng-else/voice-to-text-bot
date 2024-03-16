@@ -13,7 +13,7 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install NodeJS and NPM modules
         uses: ./.github/actions/npm
@@ -22,7 +22,7 @@ jobs:
         run: npm test
 
       - name: Store test coverage results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage
@@ -41,7 +41,7 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install NodeJS and NPM modules
         uses: ./.github/actions/npm
@@ -59,14 +59,15 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Download test coverage results
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: coverage
+          path: coverage
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master

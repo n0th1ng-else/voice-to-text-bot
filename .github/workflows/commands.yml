@@ -15,14 +15,14 @@ jobs:
       CMD_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Reaction in progress
-        uses: dkershner6/reaction-action@v1
+        uses: dkershner6/reaction-action@v2
         with:
           token: ${{ env.CMD_TOKEN }}
           reaction: "eyes"
 
       - name: Fetch the last commit in the PR
         id: sha
-        uses: actions/github-script@v4
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           script: |
@@ -38,17 +38,12 @@ jobs:
         run: echo Working on the commit hash ${{ steps.sha.outputs.result }}
 
       - name: Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ steps.sha.outputs.result }}
 
-      - name: Setup NodeJS using the obtained nvm version
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: Install dependencies
-        run: npm install
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
 
       - name: Install Railway CLI
         if: github.event.comment.body == '/sandbox'
@@ -61,14 +56,14 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_SANDBOX_TOKEN }}
 
       - name: Send a rocket for success
-        uses: dkershner6/reaction-action@v1
+        uses: dkershner6/reaction-action@v2
         with:
           token: ${{ env.CMD_TOKEN }}
           reaction: "rocket"
 
       - name: Send a thumbs down when failed
         if: ${{ failure() }}
-        uses: dkershner6/reaction-action@v1
+        uses: dkershner6/reaction-action@v2
         with:
           token: ${{ env.CMD_TOKEN }}
           reaction: "-1"
