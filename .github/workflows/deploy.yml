@@ -31,13 +31,13 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install NodeJS and NPM modules
         uses: ./.github/actions/npm
 
       - name: Login to Heroku Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: registry.heroku.com
           username: ${{ secrets.HEROKU_EMAIL }}

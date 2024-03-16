@@ -46,7 +46,7 @@ RUN npm pkg delete scripts.prepare
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
-RUN dir -s
+
 USER node
 
 CMD ["npm", "run", "cluster:js"]
