@@ -1,4 +1,4 @@
-import Fastify, { type FastifyInstance } from "fastify";
+import { fastify, type FastifyInstance } from "fastify";
 import { Logger } from "../logger/index.js";
 import { UptimeDaemon } from "./uptime.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
@@ -51,7 +51,7 @@ export class BotServerNew implements BotServerModel {
         }
       : {};
 
-    this.app = Fastify({
+    this.app = fastify({
       ...httpsOpts,
       bodyLimit: 1024 * 1024 * 100, // 100 MB
     });
