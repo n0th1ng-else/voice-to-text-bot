@@ -38,7 +38,6 @@ jest.unstable_mockModule(
   () => import("../src/analytics/ga/__mocks__/index.js"),
 );
 
-const enableSSL = false;
 const appPort = 3400;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
@@ -136,7 +135,6 @@ describe("[default language - english]", () => {
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const BotServer = init.BotServer;
     const appVersion = init.appVersion;
-    const httpsOptions = init.httpsOptions;
     const TelegramApi = init.TelegramApi;
     const localhostUrl = init.localhostUrl;
     const launchTime = init.launchTime;
@@ -170,13 +168,7 @@ describe("[default language - english]", () => {
     mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
     mockTgSetCommands(telegramServer);
 
-    const server = new BotServer(
-      appPort,
-      enableSSL,
-      appVersion,
-      webhookDoNotWait,
-      httpsOptions,
-    );
+    const server = new BotServer(appPort, appVersion, webhookDoNotWait);
 
     return db
       .init()

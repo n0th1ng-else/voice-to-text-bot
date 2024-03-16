@@ -11,11 +11,14 @@ const generateFileName = (): string => `${nanoid()}.tmp`;
  * Safe, never throws
  * @param fileName  file path to be checked
  */
-const isFileExist = (fileName: string): Promise<boolean> =>
+export const isFileExist = async (fileName: string | URL): Promise<boolean> =>
   promises.access(fileName).then(
     () => true,
     () => false,
   );
+
+export const readFile = async (fileName: string | URL): Promise<Buffer> =>
+  promises.readFile(fileName);
 
 /**
  * Safe, never throws
@@ -33,7 +36,7 @@ const deleteFile = (fileName: string): Promise<void> => {
     });
 };
 
-export const deleteFileIfExists = (
+export const deleteFileIfExists = async (
   fileName: string,
   err?: Error,
 ): Promise<string> => {
@@ -58,7 +61,7 @@ export const deleteFileIfExists = (
     });
 };
 
-export const saveBufferToFile = (
+export const saveBufferToFile = async (
   buff: Buffer,
   dir: string,
   fileName?: string,
@@ -80,7 +83,7 @@ export const saveBufferToFile = (
     });
 };
 
-export const saveStreamToFile = (
+export const saveStreamToFile = async (
   stream: IncomingMessage,
   dir: string,
   fileName?: string,

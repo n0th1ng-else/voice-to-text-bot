@@ -1,3 +1,31 @@
+import type { VoidPromise } from "../common/types.js";
+import type { TelegramBotModel } from "../telegram/bot.js";
+import type { getDb } from "../db/index.js";
+
+export type ServerStatCore = ReturnType<typeof getDb>;
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface BotServerModel {
+  readonly serverName: string;
+  start(): Promise<VoidPromise | VoidFunction>;
+  applyHostLocation(launchDelay?: number): Promise<void>;
+  triggerDaemon(
+    nextReplicaUrl: string,
+    lifecycleInterval: number,
+    timeoutMs: number,
+  ): void;
+  setSelfUrl(url: string): this;
+  setBots(bots: TelegramBotModel[]): this;
+  setStat(stat: ServerStatCore): this;
+  setThreadId(threadId: number): this;
+}
+
+export type NotFoundDto = {
+  status: 404;
+  message: string;
+  error: string;
+};
+
 export type HealthDto = {
   status: HealthStatus;
   ssl: HealthSsl;
@@ -5,6 +33,7 @@ export type HealthDto = {
   urls: string[];
   version: string;
   threadId: number;
+  serverName: string;
 };
 
 export enum HealthStatus {
@@ -28,6 +57,7 @@ export class HealthModel {
     private readonly version: string,
     isHttps: boolean,
     private readonly threadId: number,
+    private readonly serverName: string,
   ) {
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
@@ -53,6 +83,7 @@ export class HealthModel {
       urls: this.urls,
       message: this.message,
       threadId: this.threadId,
+      serverName: this.serverName,
     };
   }
 }

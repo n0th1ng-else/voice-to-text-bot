@@ -37,7 +37,6 @@ jest.unstable_mockModule(
   () => import("../src/analytics/ga/__mocks__/index.js"),
 );
 
-const enableSSL = false;
 const appPort = 3100;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
@@ -119,7 +118,6 @@ describe("[default language - english]", () => {
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const BotServer = init.BotServer;
     const appVersion = init.appVersion;
-    const httpsOptions = init.httpsOptions;
     const launchTime = init.launchTime;
 
     mockGoogleAuth();
@@ -161,13 +159,7 @@ describe("[default language - english]", () => {
 
     mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
 
-    const server = new BotServer(
-      appPort,
-      enableSSL,
-      appVersion,
-      webhookDoNotWait,
-      httpsOptions,
-    );
+    const server = new BotServer(appPort, appVersion, webhookDoNotWait);
 
     return db
       .init()

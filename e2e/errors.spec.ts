@@ -27,7 +27,6 @@ jest.unstable_mockModule(
   () => import("../src/analytics/amplitude/__mocks__/index.js"),
 );
 
-const enableSSL = false;
 const appPort = 3600;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
@@ -60,7 +59,6 @@ describe("error cases", () => {
       const mockTgSetCommands = initTest.mockTgSetCommands;
       const BotServer = init.BotServer;
       const appVersion = init.appVersion;
-      const httpsOptions = init.httpsOptions;
       const launchTime = init.launchTime;
 
       mockGoogleAuth();
@@ -100,13 +98,7 @@ describe("error cases", () => {
       mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
       mockTgSetCommands(telegramServer);
 
-      const server = new BotServer(
-        appPort,
-        enableSSL,
-        appVersion,
-        webhookDoNotWait,
-        httpsOptions,
-      );
+      const server = new BotServer(appPort, appVersion, webhookDoNotWait);
       return server
         .setSelfUrl(hostUrl)
         .setBots([bot])

@@ -1,7 +1,7 @@
 import * as envy from "../env.js";
 import { BotServer } from "./bot-server.js";
+import { BotServerNew } from "./bot-server-new.js";
 import { httpsOptions } from "../../certs/index.js";
-import type { VoiceConverterOptions } from "../recognition/types.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
@@ -16,17 +16,28 @@ import { StopListener } from "../process/index.js";
 import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
+import type { VoiceConverterOptions } from "../recognition/types.js";
+import type { BotServerModel } from "./types.js";
 
 const logger = new Logger("boot-server");
 
-export const prepareInstance = (threadId: number): Promise<BotServer> => {
-  const server = new BotServer(
-    envy.appPort,
-    envy.enableSSL,
-    envy.appVersion,
-    envy.webhookDoNotWait,
-    httpsOptions,
-  );
+export const prepareInstance = async (
+  threadId: number,
+): Promise<BotServerModel> => {
+  const sslOptions = envy.enableSSL ? httpsOptions : undefined;
+  const server = envy.newRouter
+    ? new BotServerNew(
+        envy.appPort,
+        envy.appVersion,
+        envy.webhookDoNotWait,
+        sslOptions,
+      )
+    : new BotServer(
+        envy.appPort,
+        envy.appVersion,
+        envy.webhookDoNotWait,
+        sslOptions,
+      );
 
   const converterOptions: VoiceConverterOptions = {
     googlePrivateKey: envy.googleApi.privateKey,

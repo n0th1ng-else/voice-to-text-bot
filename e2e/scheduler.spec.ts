@@ -35,6 +35,7 @@ jest.unstable_mockModule("../src/server/api.js", () => {
         message: "ok",
         ssl: HealthSsl.Off,
         threadId: 0,
+        serverName: "MockedServer",
       };
       waiter.tick();
       return Promise.resolve(dto);
@@ -60,10 +61,8 @@ let server: InstanceType<InjectedFn["BotServer"]>;
 let requestHealthData: SpiedFunction<InjectedFn["requestHealthData"]>;
 let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
-let httpsOptions: InjectedFn["httpsOptions"];
 let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
 let hostUrl: string;
-const enableSSL = false;
 const webhookDoNotWait = false;
 
 let stopHandler: VoidPromise = () =>
@@ -75,7 +74,6 @@ describe("[uptime daemon]", () => {
     requestHealthData = jest.spyOn(init, "requestHealthData");
     BotServer = init.BotServer;
     appVersion = init.appVersion;
-    httpsOptions = init.httpsOptions;
 
     const localhostUrl = init.localhostUrl;
     const WaiterForCalls = init.WaiterForCalls;
@@ -95,13 +93,7 @@ describe("[uptime daemon]", () => {
         waiter.tick();
       });
 
-    server = new BotServer(
-      appPort,
-      enableSSL,
-      appVersion,
-      webhookDoNotWait,
-      httpsOptions,
-    );
+    server = new BotServer(appPort, appVersion, webhookDoNotWait);
     return server.start().then((stopFn) => (stopHandler = stopFn));
   });
 

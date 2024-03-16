@@ -2,9 +2,6 @@ import { createServer as createHttp } from "node:http";
 import { createServer as createHttps } from "node:https";
 import express, { type Response } from "express";
 import { Logger } from "../logger/index.js";
-import { TelegramBotModel } from "../telegram/bot.js";
-import { HttpsOptions } from "../../certs/index.js";
-import { HealthDto, HealthModel } from "./types.js";
 import { sSuffix } from "../text/utils.js";
 import { UptimeDaemon } from "./uptime.js";
 import { flattenPromise } from "../common/helpers.js";
@@ -12,29 +9,35 @@ import { AnalyticsData } from "../analytics/ga/types.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
-import type { getDb } from "../db/index.js";
+import {
+  type BotServerModel,
+  type HealthDto,
+  HealthModel,
+  type ServerStatCore,
+} from "./types.js";
+import type { TelegramBotModel } from "../telegram/bot.js";
+import type { HttpsOptions } from "../../certs/index.js";
 import type { VoidPromise } from "../common/types.js";
-
-type StatCore = ReturnType<typeof getDb>;
 
 const logger = new Logger("server");
 
-export class BotServer {
+export class BotServer implements BotServerModel {
   private readonly app = express();
   private readonly uptimeDaemon: UptimeDaemon;
 
-  private stat: StatCore | null = null;
+  private stat: ServerStatCore | null = null;
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
   private threadId = 0;
 
+  public readonly serverName = "ExpressJS";
+
   constructor(
     private readonly port: number,
-    private readonly isHttps: boolean,
     private readonly version: string,
     private readonly webhookDoNotWait: boolean,
-    private readonly httpsOptions: HttpsOptions,
+    private readonly httpsOptions?: HttpsOptions,
   ) {
     logger.info("Initializing the bot server server");
 
@@ -47,9 +50,15 @@ export class BotServer {
 
     const statusHandler = (
       res: Response<HealthDto>,
-      db: StatCore | null,
+      db: ServerStatCore | null,
     ): void => {
-      const status = new HealthModel(this.version, this.isHttps, this.threadId);
+      const isHttps = Boolean(this.httpsOptions);
+      const status = new HealthModel(
+        this.version,
+        isHttps,
+        this.threadId,
+        this.serverName,
+      );
       if (this.isIdle) {
         status.setMessage("App is not connected to the Telegram server");
         res.status(400).send(status.getDto());
@@ -95,13 +104,13 @@ export class BotServer {
     });
   }
 
-  public setStat(stat: StatCore): this {
+  public setStat(stat: ServerStatCore): this {
     this.stat = stat;
     this.uptimeDaemon.setStat(stat);
     return this;
   }
 
-  public setThreadId(threadId = 0): this {
+  public setThreadId(threadId: number): this {
     this.threadId = threadId;
     return this;
   }
@@ -203,9 +212,10 @@ export class BotServer {
   }
 
   public start(): Promise<VoidPromise> {
-    logger.info(`Starting ${Logger.y(sSuffix("http", this.isHttps))} server`);
+    const isHttps = Boolean(this.httpsOptions);
+    logger.info(`Starting ${Logger.y(sSuffix("http", isHttps))} server`);
 
-    const server = this.isHttps
+    const server = this.httpsOptions
       ? createHttps(this.httpsOptions, this.app)
       : createHttp(this.app);
 
@@ -237,7 +247,7 @@ export class BotServer {
     });
   }
 
-  public applyHostLocation(timeoutMs = 0): Promise<void> {
+  public async applyHostLocation(timeoutMs = 0): Promise<void> {
     logger.info("Setting up bot hooks");
     return Promise.all(
       this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs)),
@@ -247,7 +257,7 @@ export class BotServer {
     });
   }
 
-  public triggerDaemon(
+  public async triggerDaemon(
     nextReplicaUrl: string,
     lifecycleInterval: number,
     timeoutMs = 0,
