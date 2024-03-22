@@ -6,7 +6,6 @@ export type ServerStatCore = ReturnType<typeof getDb>;
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface BotServerModel {
-  readonly serverName: string;
   start(): Promise<VoidPromise | VoidFunction>;
   applyHostLocation(launchDelay?: number): Promise<void>;
   triggerDaemon(

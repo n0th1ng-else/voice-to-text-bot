@@ -3,9 +3,9 @@ import { createServer as createHttps } from "node:https";
 import express, { type Response } from "express";
 import { Logger } from "../logger/index.js";
 import { sSuffix } from "../text/utils.js";
-import { UptimeDaemon } from "./uptime.js";
-import { flattenPromise } from "../common/helpers.js";
+import { BotServerBase } from "./bot-server-base.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
+import { flattenPromise } from "../common/helpers.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
@@ -21,9 +21,8 @@ import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("server");
 
-export class BotServer implements BotServerModel {
+export class BotServer extends BotServerBase implements BotServerModel {
   private readonly app = express();
-  private readonly uptimeDaemon: UptimeDaemon;
 
   private stat: ServerStatCore | null = null;
   private bots: TelegramBotModel[] = [];
@@ -31,17 +30,13 @@ export class BotServer implements BotServerModel {
   private selfUrl = "";
   private threadId = 0;
 
-  public readonly serverName = "ExpressJS";
-
   constructor(
-    private readonly port: number,
-    private readonly version: string,
+    port: number,
+    version: string,
     private readonly webhookDoNotWait: boolean,
     private readonly httpsOptions?: HttpsOptions,
   ) {
-    logger.info("Initializing the bot server server");
-
-    this.uptimeDaemon = new UptimeDaemon(version);
+    super("ExpressJS", port, version);
 
     initSentry(this.app);
     trackAPIHandlers(this.app);

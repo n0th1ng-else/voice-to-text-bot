@@ -1,7 +1,7 @@
 import { fastify, type FastifyInstance } from "fastify";
 import { Logger } from "../logger/index.js";
-import { UptimeDaemon } from "./uptime.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
+import { BotServerBase } from "./bot-server-base.js";
 import { initSentryNew, trackAPIHandlersNew } from "../monitoring/sentry.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { sSuffix } from "../text/utils.js";
@@ -21,9 +21,8 @@ import type { TelegramBotModel } from "../telegram/bot.js";
 
 const logger = new Logger("server");
 
-export class BotServerNew implements BotServerModel {
+export class BotServerNew extends BotServerBase implements BotServerModel {
   private readonly app: FastifyInstance;
-  private readonly uptimeDaemon: UptimeDaemon;
   private readonly isHttps: boolean;
 
   private stat: ServerStatCore | null = null;
@@ -32,17 +31,14 @@ export class BotServerNew implements BotServerModel {
   private selfUrl = "";
   private threadId = 0;
 
-  public readonly serverName = "Fastify";
-
   constructor(
-    private readonly port: number,
-    private readonly version: string,
+    port: number,
+    version: string,
     private readonly webhookDoNotWait: boolean,
     httpsOptions?: HttpsOptions,
   ) {
-    logger.info("Initializing the bot server server");
+    super("Fastify", port, version);
 
-    this.uptimeDaemon = new UptimeDaemon(this.version);
     this.isHttps = Boolean(httpsOptions);
 
     const httpsOpts = this.isHttps
@@ -241,26 +237,37 @@ export class BotServerNew implements BotServerModel {
     return this;
   }
 
-  public async start(): Promise<VoidPromise> {
-    logger.info(`Starting ${Logger.y(sSuffix("http", this.isHttps))} server`);
-    const fullUrl = await this.app.listen({ port: this.port });
-    logger.info(`The bot server is deployed on ${Logger.y(fullUrl)}`);
+  public start(): Promise<VoidPromise> {
+    logger.info(
+      `Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`,
+    );
 
-    return async () => {
-      logger.warn("Shutting down the server instance");
-      if (this.uptimeDaemon.isRunning) {
-        logger.warn("Stopping the daemon");
-        this.uptimeDaemon.stop();
-      }
+    return new Promise((resolve) => {
+      this.app.listen({ port: this.port, host: this.selfUrl }, () => {
+        logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
+        resolve(
+          () =>
+            new Promise((resolveFn, rejectFn) => {
+              logger.warn("Shutting down the server instance");
+              if (this.uptimeDaemon.isRunning) {
+                logger.warn("Stopping the daemon");
+                this.uptimeDaemon.stop();
+              }
 
-      try {
-        await this.app.close();
-        logger.warn("The bot server has stopped");
-      } catch (err) {
-        logger.error("Unable to stop the bot server", err);
-        return Promise.reject(err);
-      }
-    };
+              this.app
+                .close()
+                .then(() => {
+                  logger.warn("The bot server has stopped");
+                  resolveFn();
+                })
+                .catch((err) => {
+                  logger.error("Unable to stop the bot server", err);
+                  rejectFn(err);
+                });
+            }),
+        );
+      });
+    });
   }
 
   public async triggerDaemon(
