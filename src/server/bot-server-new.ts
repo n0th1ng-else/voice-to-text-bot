@@ -29,7 +29,6 @@ export class BotServerNew extends BotServerBase implements BotServerModel {
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
-  private threadId = 0;
 
   constructor(
     port: number,
@@ -232,18 +231,13 @@ export class BotServerNew extends BotServerBase implements BotServerModel {
     return this;
   }
 
-  public setThreadId(threadId: number): this {
-    this.threadId = threadId;
-    return this;
-  }
-
   public start(): Promise<VoidPromise> {
     logger.info(
       `Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`,
     );
 
     return new Promise((resolve) => {
-      this.app.listen({ port: this.port, host: this.selfUrl }, () => {
+      this.app.listen({ port: this.port, host: "0.0.0.0" }, () => {
         logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
         resolve(
           () =>

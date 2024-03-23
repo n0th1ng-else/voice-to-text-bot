@@ -28,7 +28,6 @@ export class BotServer extends BotServerBase implements BotServerModel {
   private bots: TelegramBotModel[] = [];
   private isIdle = true;
   private selfUrl = "";
-  private threadId = 0;
 
   constructor(
     port: number,
@@ -102,11 +101,6 @@ export class BotServer extends BotServerBase implements BotServerModel {
   public setStat(stat: ServerStatCore): this {
     this.stat = stat;
     this.uptimeDaemon.setStat(stat);
-    return this;
-  }
-
-  public setThreadId(threadId: number): this {
-    this.threadId = threadId;
     return this;
   }
 
