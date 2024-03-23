@@ -5,6 +5,7 @@ const logger = new Logger("server");
 
 export class BotServerBase {
   protected readonly uptimeDaemon: UptimeDaemon;
+  protected threadId = 0;
 
   constructor(
     protected readonly serverName: string,
@@ -14,5 +15,10 @@ export class BotServerBase {
     logger.info(`Initializing ${Logger.y(this.serverName)} bot server`);
 
     this.uptimeDaemon = new UptimeDaemon(version);
+  }
+
+  public setThreadId(threadId: number): this {
+    this.threadId = threadId;
+    return this;
   }
 }
