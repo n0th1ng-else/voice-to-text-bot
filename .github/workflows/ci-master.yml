@@ -21,3 +21,4 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prerelease.outputs.version }}
+      sha: ${{ github.sha }}
