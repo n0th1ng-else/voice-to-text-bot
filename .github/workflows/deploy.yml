@@ -7,6 +7,10 @@ on:
         type: string
         description: "Version tag"
         required: true
+      sha:
+        type: string
+        default: "Commit sha"
+        required: true
 
 jobs:
   deploy:
@@ -15,6 +19,7 @@ jobs:
     with:
       docker-tag: latest
       version: ${{ inputs.version }}
+      sha: ${{ inputs.sha }}
 
   heroku:
     runs-on: ubuntu-latest

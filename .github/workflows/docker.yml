@@ -10,6 +10,11 @@ on:
         type: string
         description: "Version tag"
         required: true
+      sha:
+        type: string
+        default: "Commit sha"
+        required: true
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -17,7 +22,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: App version
-        run: echo "Picked the app version ${GITHUB_SHA}"
+        run: echo "Picked the app version ${{ inputs.sha }}"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +41,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ github.sha }}
+            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ inputs.sha }}
           build-args: APP_VERSION=${{ inputs.version }}
 
       - name: Publish to Registry and extra tag
@@ -47,5 +52,28 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ inputs.docker-tag }}
-            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ github.sha }}
+            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ inputs.sha }}
           build-args: APP_VERSION=${{ inputs.version }}
+
+      - name: Add image reference
+        uses: actions/github-script@v7
+        env:
+          COMMIT_SHA: ${{ inputs.sha }}
+        with:
+          script: |
+            const container = 'voice-to-speech-app'
+            const sha = process.env.COMMIT_SHA
+            const { owner, repo } = context.issue;
+            const target_url = `https://github.com/${owner}/${repo}/pkgs/container/${encodeURIComponent(`${repo}/${container}`)}`
+            const description = `${container}:${sha}`;
+            const api = `/repos/${owner}/${repo}/statuses/${sha}`;
+
+            await github.request(`POST ${api}`, {
+              owner,
+              repo,
+              sha,
+              target_url,
+              state: 'success',
+              description,
+              context: 'Docker image'
+            });
