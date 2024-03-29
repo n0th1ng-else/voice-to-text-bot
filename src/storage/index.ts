@@ -1,10 +1,11 @@
 import { resolve as resolvePath } from "node:path";
 import { readdirSync, statSync } from "node:fs";
 import { Logger } from "../logger/index.js";
+import { getMB } from "../memory/index.js";
 
 const logger = new Logger("storage");
 
-export const printCurrentStorageUsage = (dir: string): Promise<void> => {
+export const printCurrentStorageUsage = async (dir: string): Promise<void> => {
   return Promise.resolve().then(() => {
     try {
       const folder = resolvePath(process.cwd(), dir);
@@ -15,7 +16,7 @@ export const printCurrentStorageUsage = (dir: string): Promise<void> => {
         (sum, file) => sum + statSync(resolvePath(folder, file)).size,
         0,
       );
-      const cacheSizeMBytes = Math.ceil(cacheSizeBytes / (1024 * 1000));
+      const cacheSizeMBytes = Math.ceil(cacheSizeBytes / getMB(1));
       const size =
         cacheSizeMBytes < 1 ? "almost empty" : `[size=${cacheSizeMBytes}Mb]`;
       const list = files.length ? `[files=${files.join(",")}]` : "no files";

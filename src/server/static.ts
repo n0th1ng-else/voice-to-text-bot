@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import Fastify, { type FastifyInstance } from "fastify";
 import { httpsOptions } from "../../certs/index.js";
 import { enableSSL } from "../env.js";
+import { getMB } from "../memory/index.js";
 
 export type FastifyStaticRoute<Body = void, Query = void, Reply = void> = {
   Body: Body;
@@ -28,7 +29,7 @@ export const initStaticServer = (
 
   const app = Fastify({
     ...httpsOpts,
-    bodyLimit: 1024 * 1024 * 100, // 100 MB
+    bodyLimit: getMB(100), // 100 MB
   });
 
   app.get("/", async (_, res) => {

@@ -8,12 +8,12 @@ import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";
 import { flattenPromise } from "../common/helpers.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
+import { getMB } from "../memory/index.js";
 import {
   type BotServerModel,
   type HealthDto,
-  HealthModel,
-  type ServerStatCore,
   type NotFoundDto,
+  HealthModel,
 } from "./types.js";
 import type { VoidPromise } from "../common/types.js";
 import type { HttpsOptions } from "../../certs/index.js";
@@ -21,35 +21,17 @@ import type { TelegramBotModel } from "../telegram/bot.js";
 
 const logger = new Logger("server");
 
-export class BotServerNew extends BotServerBase implements BotServerModel {
-  private readonly app: FastifyInstance;
-  private readonly isHttps: boolean;
-
-  private stat: ServerStatCore | null = null;
-  private bots: TelegramBotModel[] = [];
-  private isIdle = true;
-  private selfUrl = "";
-
+export class BotServerNew
+  extends BotServerBase<FastifyInstance>
+  implements BotServerModel
+{
   constructor(
     port: number,
     version: string,
-    private readonly webhookDoNotWait: boolean,
+    webhookDoNotWait: boolean,
     httpsOptions?: HttpsOptions,
   ) {
-    super("Fastify", port, version);
-
-    this.isHttps = Boolean(httpsOptions);
-
-    const httpsOpts = this.isHttps
-      ? {
-          https: httpsOptions,
-        }
-      : {};
-
-    this.app = fastify({
-      ...httpsOpts,
-      bodyLimit: 1024 * 1024 * 100, // 100 MB
-    });
+    super("Fastify", port, version, webhookDoNotWait, httpsOptions);
 
     initSentryNew();
     trackAPIHandlersNew(this.app);
@@ -139,8 +121,7 @@ export class BotServerNew extends BotServerBase implements BotServerModel {
   }
 
   public setBots(bots: TelegramBotModel[] = []): this {
-    this.bots = bots;
-    logger.info(`Requested ${Logger.y(sSuffix("bot", bots.length))} to set up`);
+    super.setBots(bots);
 
     bots.forEach((bot) => {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
@@ -217,17 +198,6 @@ export class BotServerNew extends BotServerBase implements BotServerModel {
       );
     });
 
-    return this;
-  }
-
-  public setSelfUrl(url: string): this {
-    this.selfUrl = url;
-    return this;
-  }
-
-  public setStat(stat: ServerStatCore): this {
-    this.stat = stat;
-    this.uptimeDaemon.setStat(stat);
     return this;
   }
 
@@ -336,5 +306,18 @@ export class BotServerNew extends BotServerBase implements BotServerModel {
       status.setMessage(errMessage, true);
       return [400, status.getDto()];
     }
+  }
+
+  protected getServerInstance(): FastifyInstance {
+    const httpsOpts = this.isHttps
+      ? {
+          https: this.httpsOptions,
+        }
+      : {};
+
+    return fastify({
+      ...httpsOpts,
+      bodyLimit: getMB(100), // 100 MB
+    });
   }
 }

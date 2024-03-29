@@ -1,6 +1,6 @@
 import { createServer as createHttp } from "node:http";
 import { createServer as createHttps } from "node:https";
-import express, { type Response } from "express";
+import express, { type Response, type Express } from "express";
 import { Logger } from "../logger/index.js";
 import { sSuffix } from "../text/utils.js";
 import { BotServerBase } from "./bot-server-base.js";
@@ -12,8 +12,8 @@ import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
 import {
   type BotServerModel,
   type HealthDto,
-  HealthModel,
   type ServerStatCore,
+  HealthModel,
 } from "./types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import type { HttpsOptions } from "../../certs/index.js";
@@ -21,35 +21,30 @@ import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("server");
 
-export class BotServer extends BotServerBase implements BotServerModel {
-  private readonly app = express();
-
-  private stat: ServerStatCore | null = null;
-  private bots: TelegramBotModel[] = [];
-  private isIdle = true;
-  private selfUrl = "";
-
+export class BotServer
+  extends BotServerBase<Express>
+  implements BotServerModel
+{
   constructor(
     port: number,
     version: string,
-    private readonly webhookDoNotWait: boolean,
-    private readonly httpsOptions?: HttpsOptions,
+    webhookDoNotWait: boolean,
+    httpsOptions?: HttpsOptions,
   ) {
-    super("ExpressJS", port, version);
+    super("ExpressJS", port, version, webhookDoNotWait, httpsOptions);
 
     initSentry(this.app);
     trackAPIHandlers(this.app);
-    this.app.use(express.json());
+
     this.app.use("/static", express.static("assets/v2"));
 
     const statusHandler = (
       res: Response<HealthDto>,
       db: ServerStatCore | null,
     ): void => {
-      const isHttps = Boolean(this.httpsOptions);
       const status = new HealthModel(
         this.version,
-        isHttps,
+        this.isHttps,
         this.threadId,
         this.serverName,
       );
@@ -98,15 +93,8 @@ export class BotServer extends BotServerBase implements BotServerModel {
     });
   }
 
-  public setStat(stat: ServerStatCore): this {
-    this.stat = stat;
-    this.uptimeDaemon.setStat(stat);
-    return this;
-  }
-
   public setBots(bots: TelegramBotModel[] = []): this {
-    this.bots = bots;
-    logger.info(`Requested ${Logger.y(sSuffix("bot", bots.length))} to set up`);
+    super.setBots(bots);
 
     bots.forEach((bot) => {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
@@ -195,11 +183,6 @@ export class BotServer extends BotServerBase implements BotServerModel {
     return this;
   }
 
-  public setSelfUrl(url: string): this {
-    this.selfUrl = url;
-    return this;
-  }
-
   public start(): Promise<VoidPromise> {
     const isHttps = Boolean(this.httpsOptions);
     logger.info(`Starting ${Logger.y(sSuffix("http", isHttps))} server`);
@@ -282,5 +265,11 @@ export class BotServer extends BotServerBase implements BotServerModel {
         .updateNodeState(this.selfUrl, true, this.version)
         .then(flattenPromise);
     });
+  }
+
+  protected getServerInstance(): Express {
+    const app = express();
+    app.use(express.json());
+    return app;
   }
 }
