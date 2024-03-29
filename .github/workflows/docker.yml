@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Push docker image
     timeout-minutes: 5
+    env:
+      CONTAINER_NAME: voice-to-speech-app
+      CONTAINER_REGISTRY: ghcr.io
     steps:
       - name: App version
         run: echo "Picked the app version ${{ inputs.sha }}"
@@ -30,29 +33,33 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ secrets.DOCKER_USERNAME }}
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Publish to Registry
         if: inputs.docker-tag == ''
         uses: docker/build-push-action@v5
+        env:
+          CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ inputs.sha }}
+            ${{ env.CONTAINER_PATH }}:${{ inputs.sha }}
           build-args: APP_VERSION=${{ inputs.version }}
 
       - name: Publish to Registry and extra tag
         if: inputs.docker-tag != ''
         uses: docker/build-push-action@v5
+        env:
+          CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ inputs.docker-tag }}
-            ghcr.io/${{ secrets.DOCKER_USERNAME }}/voice-to-text-bot/voice-to-speech-app:${{ inputs.sha }}
+            ${{ env.CONTAINER_PATH }}:${{ inputs.docker-tag }}
+            ${{ env.CONTAINER_PATH }}:${{ inputs.sha }}
           build-args: APP_VERSION=${{ inputs.version }}
 
       - name: Add image reference
@@ -61,8 +68,7 @@ jobs:
           COMMIT_SHA: ${{ inputs.sha }}
         with:
           script: |
-            const container = 'voice-to-speech-app'
-            const sha = process.env.COMMIT_SHA
+            const { COMMIT_SHA: sha, CONTAINER_NAME: container } = process.env
             const { owner, repo } = context.issue;
             const target_url = `https://github.com/${owner}/${repo}/pkgs/container/${encodeURIComponent(`${repo}/${container}`)}`
             const description = `${container}:${sha}`;
