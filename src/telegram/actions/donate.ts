@@ -10,6 +10,7 @@ import { LabelId } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { BOT_LOGO, donationLevels } from "../../const.js";
+import { SIZE_UNIT } from "../../memory/index.js";
 import { toCurrency } from "../../text/utils.js";
 import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
@@ -218,8 +219,8 @@ export class DonateAction extends GenericAction {
       payload: getDonationDtoString(donationId, chatId, prefix.id),
       photo: {
         url: BOT_LOGO,
-        height: 1024,
-        width: 1024,
+        height: SIZE_UNIT,
+        width: SIZE_UNIT,
       },
       forumThreadId,
     };

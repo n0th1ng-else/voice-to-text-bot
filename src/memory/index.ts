@@ -2,6 +2,12 @@ import { Logger } from "../logger/index.js";
 
 const logger = new Logger("memory");
 
+export const SIZE_UNIT = 1024;
+
+export const getMB = (mb: number): number => {
+  return SIZE_UNIT * SIZE_UNIT * mb;
+};
+
 export const printCurrentMemoryStat = (
   limit?: number,
   offset = 15,
@@ -52,6 +58,6 @@ const getMemoryUsageMb = (): NodeJS.MemoryUsage => {
 };
 
 const getMb = (stat: number): number => {
-  const mb = 1024 * 1024;
+  const mb = getMB(1);
   return Math.ceil(stat / mb);
 };

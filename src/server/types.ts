@@ -5,7 +5,7 @@ import type { getDb } from "../db/index.js";
 export type ServerStatCore = ReturnType<typeof getDb>;
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export interface BotServerModel {
+export interface BotServerModel extends BotServerModelBase {
   start(): Promise<VoidPromise | VoidFunction>;
   applyHostLocation(launchDelay?: number): Promise<void>;
   triggerDaemon(
@@ -13,10 +13,14 @@ export interface BotServerModel {
     lifecycleInterval: number,
     timeoutMs: number,
   ): void;
-  setSelfUrl(url: string): this;
   setBots(bots: TelegramBotModel[]): this;
-  setStat(stat: ServerStatCore): this;
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface BotServerModelBase {
   setThreadId(threadId: number): this;
+  setStat(stat: ServerStatCore): this;
+  setSelfUrl(url: string): this;
 }
 
 export type NotFoundDto = {
