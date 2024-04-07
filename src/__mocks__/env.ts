@@ -1,7 +1,5 @@
 import { randomIntFromInterval } from "../common/timer.js";
 
-process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegram-bot-api" package
-
 export const appPort = 3000;
 
 export const appVersion = `BotVersion-${randomIntFromInterval(1, 10000)}`;

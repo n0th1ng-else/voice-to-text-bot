@@ -1,5 +1,3 @@
-process.env.NTBA_FIX_319 = "true"; // Disable some weird logic from "node-telegram-bot-api" package
-
 export const appPort: number = Number(process.env.PORT) || 3000;
 
 export const appVersion: string = process.env.APP_VERSION || "dev";
