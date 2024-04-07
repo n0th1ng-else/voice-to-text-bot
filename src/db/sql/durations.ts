@@ -15,15 +15,13 @@ export class DurationsDb {
 
   constructor(private readonly pool: Pool) {}
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     const query = DurationsSql.createTable;
-    const values = [];
-    return this.pool.query(query, values).then(() => {
-      this.initialized = true;
-    });
+    await this.pool.query(query);
+    this.initialized = true;
   }
 
-  public createRow(
+  public async createRow(
     chatId: number,
     duration: number,
   ): Promise<DurationRowScheme> {
@@ -37,15 +35,12 @@ export class DurationsDb {
     const createdAt = new Date();
     const updatedAt = createdAt;
     const values = [durationId, chatId, duration, createdAt, updatedAt];
-    return this.pool
-      .query<DurationRowScheme>(query, values)
-      .then((queryData) => {
-        const row = queryData.rows.shift();
-        if (!row) {
-          return Promise.reject(new Error("Unable to get created row info"));
-        }
-        return row;
-      });
+    const queryData = await this.pool.query<DurationRowScheme>(query, values);
+    const row = queryData.rows.shift();
+    if (!row) {
+      return Promise.reject(new Error("Unable to get created row info"));
+    }
+    return row;
   }
 
   public getId(row: DurationRowScheme): string {

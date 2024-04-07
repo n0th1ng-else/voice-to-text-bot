@@ -14,15 +14,14 @@ export class IgnoredChatsDb {
 
   constructor(private readonly pool: Pool) {}
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     const query = IgnoredChatsSql.createTable;
-    const values = [];
-    return this.pool.query(query, values).then(() => {
+    return this.pool.query(query).then(() => {
       this.initialized = true;
     });
   }
 
-  public getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
+  public async getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table ignoredchats is not initialized yet"),
