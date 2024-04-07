@@ -13,15 +13,14 @@ export class UsedEmailDb {
 
   constructor(private readonly pool: Pool) {}
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     const query = UsedEmailsSql.createTable;
-    const values = [];
-    return this.pool.query(query, values).then(() => {
+    return this.pool.query(query).then(() => {
       this.initialized = true;
     });
   }
 
-  public createRow(email: string): Promise<UsedEmailRowScheme> {
+  public async createRow(email: string): Promise<UsedEmailRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table usedemails is not initialized yet"),
@@ -42,7 +41,7 @@ export class UsedEmailDb {
       });
   }
 
-  public updateRow(emailId: number): Promise<UsedEmailRowScheme> {
+  public async updateRow(emailId: number): Promise<UsedEmailRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table usedemails is not initialized yet"),
@@ -63,7 +62,7 @@ export class UsedEmailDb {
       });
   }
 
-  public getRows(email: string): Promise<UsedEmailRowScheme[]> {
+  public async getRows(email: string): Promise<UsedEmailRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table usedemails is not initialized yet"),

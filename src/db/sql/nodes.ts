@@ -16,15 +16,14 @@ export class NodesDb {
 
   constructor(private readonly pool: Pool) {}
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     const query = NodesSql.createTable;
-    const values = [];
-    return this.pool.query(query, values).then(() => {
+    return this.pool.query(query).then(() => {
       this.initialized = true;
     });
   }
 
-  public createRow(
+  public async createRow(
     selfUrl: string,
     isActive: boolean,
     version: string,
@@ -48,7 +47,7 @@ export class NodesDb {
     });
   }
 
-  public updateRow(
+  public async updateRow(
     nodeId: string,
     isActive: boolean,
     version: string,
@@ -70,7 +69,7 @@ export class NodesDb {
     });
   }
 
-  public getRows(selfUrl: string): Promise<NodeRowScheme[]> {
+  public async getRows(selfUrl: string): Promise<NodeRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table nodes is not initialized yet"),

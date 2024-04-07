@@ -22,12 +22,10 @@ export class DonationsDb {
 
   constructor(private readonly pool: Pool) {}
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     const query = DonationsSql.createTable;
-    const values = [];
-    return this.pool.query(query, values).then(() => {
-      this.initialized = true;
-    });
+    await this.pool.query(query);
+    this.initialized = true;
   }
 
   public createRow(chatId: number, price: number): Promise<DonationRowScheme> {

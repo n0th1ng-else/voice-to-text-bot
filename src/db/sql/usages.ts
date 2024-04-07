@@ -17,15 +17,14 @@ export class UsagesDb {
 
   constructor(private readonly pool: Pool) {}
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     const query = UsagesSql.createTable;
-    const values = [];
-    return this.pool.query(query, values).then(() => {
+    return this.pool.query(query).then(() => {
       this.initialized = true;
     });
   }
 
-  public createRow(
+  public async createRow(
     chatId: number,
     langId: string,
     username: string,
@@ -59,7 +58,7 @@ export class UsagesDb {
     });
   }
 
-  public updateRow(
+  public async updateRow(
     usageId: string,
     langId: string,
     usageCount: number,
@@ -85,7 +84,7 @@ export class UsagesDb {
   /**
    * @deprecated Use it only for migration
    */
-  public updateRowWithDate(
+  public async updateRowWithDate(
     usageId: string,
     langId: string,
     usageCount: number,
@@ -116,7 +115,7 @@ export class UsagesDb {
     });
   }
 
-  public getRows(chatId: number): Promise<UsageRowScheme[]> {
+  public async getRows(chatId: number): Promise<UsageRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table usages is not initialized yet"),
@@ -137,7 +136,7 @@ export class UsagesDb {
   /**
    * @deprecated Use it only for chart
    */
-  public statRows(
+  public async statRows(
     from: Date,
     to: Date,
     usageCountFrom: number,
