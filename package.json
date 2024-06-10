@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@amplitude/node": "1.10.2",
-    "@google-cloud/speech": "4.5.5",
+    "@google-cloud/speech": "6.6.0",
     "@sentry/node": "7.109.0",
     "@sentry/profiling-node": "7.109.0",
     "aws-sdk": "2.1310.0",
