@@ -8,7 +8,7 @@ import { AnalyticsData } from "../analytics/ga/types.js";
 import { flattenPromise } from "../common/helpers.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
-import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
+import { initSentry } from "../monitoring/sentry.js";
 import {
   type BotServerModel,
   type HealthDto,
@@ -33,8 +33,7 @@ export class BotServer
   ) {
     super("ExpressJS", port, version, webhookDoNotWait, httpsOptions);
 
-    initSentry(this.app);
-    trackAPIHandlers(this.app);
+    initSentry();
 
     this.app.use("/static", express.static("assets/v2"));
 

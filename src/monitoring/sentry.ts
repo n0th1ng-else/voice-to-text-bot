@@ -1,15 +1,12 @@
-import type { Express } from "express";
 import {
   init as initSentryGlobal,
-  Integrations,
-  Handlers,
-  autoDiscoverNodePerformanceMonitoringIntegrations,
   captureException,
   getCurrentScope,
-  runWithAsyncContext,
+  withIsolationScope,
+  setupFastifyErrorHandler,
 } from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
-import { ProfilingIntegration } from "@sentry/profiling-node";
 import { appVersion, nodeEnvironment, sentryDsn } from "../env.js";
 import { isDevelopment } from "../common/environment.js";
 
@@ -17,7 +14,7 @@ const isEnabled = (): boolean => {
   return Boolean(sentryDsn);
 };
 
-export const initSentry = (app: Express): void => {
+export const initSentry = (): void => {
   if (!isEnabled()) {
     return;
   }
@@ -26,14 +23,8 @@ export const initSentry = (app: Express): void => {
     environment: nodeEnvironment,
     release: appVersion,
     integrations: [
-      // enable HTTP calls tracing
-      new Integrations.Http({ tracing: true }),
-      // enable Express.js middleware tracing
-      new Integrations.Express({ app }),
-      // Automatically instrument Node.js libraries and frameworks
-      ...autoDiscoverNodePerformanceMonitoringIntegrations(),
       // Add profiling
-      new ProfilingIntegration(),
+      nodeProfilingIntegration(),
     ],
 
     // Set tracesSampleRate to 1.0 to capture 100%
@@ -42,17 +33,6 @@ export const initSentry = (app: Express): void => {
     tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
     profilesSampleRate: 1.0,
   });
-};
-
-export const trackAPIHandlers = (app: Express): void => {
-  if (!isEnabled()) {
-    return;
-  }
-  // RequestHandler creates a separate execution context, so that all
-  // transactions/spans/breadcrumbs are isolated across requests
-  app.use(Handlers.requestHandler());
-  // TracingHandler creates a trace for every incoming request
-  app.use(Handlers.tracingHandler());
 };
 
 export const captureError = (err: unknown): void => {
@@ -98,7 +78,7 @@ const fastifyRequestPlugin = (app: FastifyInstance): void => {
       0,
     );
 
-    runWithAsyncContext(() => {
+    withIsolationScope(() => {
       getCurrentScope().setSDKProcessingMetadata({
         url: routeOptions.url,
         method: routeOptions.method,
@@ -111,13 +91,6 @@ const fastifyRequestPlugin = (app: FastifyInstance): void => {
   });
 };
 
-const fastifyErrorPlugin = (app: FastifyInstance): void => {
-  app.addHook("onError", (_request, _reply, error, done) => {
-    captureException(error);
-    done();
-  });
-};
-
 export const initSentryNew = (): void => {
   if (!isEnabled()) {
     return;
@@ -127,12 +100,8 @@ export const initSentryNew = (): void => {
     environment: nodeEnvironment,
     release: appVersion,
     integrations: [
-      // enable HTTP calls tracing
-      new Integrations.Http({ tracing: true }),
-      // Automatically instrument Node.js libraries and frameworks
-      ...autoDiscoverNodePerformanceMonitoringIntegrations(),
       // Add profiling
-      new ProfilingIntegration(),
+      nodeProfilingIntegration(),
     ],
 
     // Set tracesSampleRate to 1.0 to capture 100%
@@ -148,5 +117,5 @@ export const trackAPIHandlersNew = (app: FastifyInstance): void => {
     return;
   }
   fastifyRequestPlugin(app);
-  fastifyErrorPlugin(app);
+  setupFastifyErrorHandler(app);
 };
