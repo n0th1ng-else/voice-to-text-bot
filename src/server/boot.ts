@@ -16,6 +16,7 @@ import { StopListener } from "../process/index.js";
 import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
+import { parseMultilineEnvVariable } from "../common/environment.js";
 import type { VoiceConverterOptions } from "../recognition/types.js";
 import type { BotServerModel } from "./types.js";
 
@@ -60,7 +61,7 @@ export const prepareInstance = async (
         host: envy.dbPostgres.host,
         database: envy.dbPostgres.database,
         port: envy.dbPostgres.port,
-        certificate: envy.dbPostgres.cert,
+        certificate: parseMultilineEnvVariable(envy.dbPostgres.cert),
       },
       {
         user: envy.dbPostgres2.user,
@@ -68,7 +69,7 @@ export const prepareInstance = async (
         host: envy.dbPostgres2.host,
         database: envy.dbPostgres2.database,
         port: envy.dbPostgres2.port,
-        certificate: envy.dbPostgres2.cert,
+        certificate: parseMultilineEnvVariable(envy.dbPostgres2.cert),
       },
     ].filter((cfg) => isDBConfigValid(cfg)),
     threadId,

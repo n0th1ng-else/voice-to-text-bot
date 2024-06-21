@@ -14,7 +14,6 @@ RUN npm ci && npm cache clean --force
 COPY ./assets $APP_DIR/assets
 COPY ./certs $APP_DIR/certs
 COPY ./video-temp $APP_DIR/video-temp
-COPY ./init.cjs $APP_DIR/init.cjs
 COPY ./src $APP_DIR/src
 
 RUN npm run build
@@ -39,7 +38,6 @@ WORKDIR $APP_DIR
 
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/video-temp $APP_DIR/video-temp
-COPY --from=builder $APP_DIR/init.cjs $APP_DIR/init.cjs
 COPY --from=builder $APP_DIR/package.json $APP_DIR
 COPY --from=builder $APP_DIR/package-lock.json $APP_DIR
 RUN npm pkg delete scripts.prepare
