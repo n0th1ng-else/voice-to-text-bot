@@ -1,4 +1,4 @@
-FROM node:20.11.0 AS builder
+FROM node:20.15.0 AS builder
 
 ENV NODE_ENV production
 
@@ -19,7 +19,7 @@ COPY ./src $APP_DIR/src
 
 RUN npm run build
 
-FROM node:20.11.0
+FROM node:20.51.0
 
 EXPOSE 8080
 
