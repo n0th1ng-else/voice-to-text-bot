@@ -705,7 +705,7 @@ describe("[default language - english]", () => {
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
-        return done && done();
+        return done?.();
       });
     });
 
@@ -717,7 +717,7 @@ describe("[default language - english]", () => {
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
-        return done && done();
+        return done?.();
       });
     });
 
@@ -737,7 +737,7 @@ describe("[default language - english]", () => {
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
-        return done && done();
+        return done?.();
       });
     });
 
@@ -757,7 +757,7 @@ describe("[default language - english]", () => {
       sendTelegramMessage(host, bot, tgMessage).then(() => {
         expect(nock.pendingMocks()).toHaveLength(1);
         nock.cleanAll();
-        return done && done();
+        return done?.();
       });
     });
 

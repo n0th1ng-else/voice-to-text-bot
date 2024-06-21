@@ -12,7 +12,7 @@ import {
   InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
-import { SpiedFunction } from "jest-mock";
+import type { SpiedFunction } from "jest-mock";
 import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(

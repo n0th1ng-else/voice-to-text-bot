@@ -1,4 +1,4 @@
-FROM node:20.15.0 AS builder
+FROM node:20.14-slim AS builder
 
 ENV NODE_ENV production
 
@@ -7,18 +7,19 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
-COPY package.json package-lock.json tsconfig.json $APP_DIR
+RUN npm install -g pnpm@9
+COPY package.json pnpm-lock.yaml tsconfig.json $APP_DIR
 RUN npm pkg delete scripts.prepare
-RUN npm ci && npm cache clean --force
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./assets $APP_DIR/assets
 COPY ./certs $APP_DIR/certs
 COPY ./video-temp $APP_DIR/video-temp
 COPY ./src $APP_DIR/src
 
-RUN npm run build
+RUN pnpm run build
 
-FROM node:20.51.0
+FROM node:20.14-slim
 
 EXPOSE 8080
 
@@ -36,15 +37,16 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
+RUN npm install -g pnpm@9
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/video-temp $APP_DIR/video-temp
 COPY --from=builder $APP_DIR/package.json $APP_DIR
-COPY --from=builder $APP_DIR/package-lock.json $APP_DIR
+COPY --from=builder $APP_DIR/pnpm-lock.yaml $APP_DIR
 RUN npm pkg delete scripts.prepare
-RUN npm ci --omit=dev && npm cache clean --force
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
 
 USER node
 
-CMD ["npm", "run", "cluster:js"]
+CMD ["pnpm", "run", "cluster:js"]

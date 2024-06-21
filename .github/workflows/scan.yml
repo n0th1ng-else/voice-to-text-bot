@@ -19,7 +19,7 @@ jobs:
         uses: ./.github/actions/npm
 
       - name: Run tests
-        run: npm test
+        run: pnpm test
 
       - name: Store test coverage results
         uses: actions/upload-artifact@v4
@@ -47,7 +47,7 @@ jobs:
         uses: ./.github/actions/npm
 
       - name: Run validation
-        run: npm run ${{ env.COMMAND }}
+        run: pnpm ${{ env.COMMAND }}
 
   sonar-cloud:
     runs-on: ubuntu-latest
