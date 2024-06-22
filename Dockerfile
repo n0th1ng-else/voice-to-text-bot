@@ -38,6 +38,7 @@ RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
 RUN npm install -g pnpm@9
+RUN touch $APP_DIR/.env
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/video-temp $APP_DIR/video-temp
 COPY --from=builder $APP_DIR/package.json $APP_DIR
