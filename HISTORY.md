@@ -262,3 +262,21 @@ I saw messages that the bot is not allowed to send messages, so it is in the gro
 it is not an error of the application itself, it should not overwhelm the logs. As a solution, not if the
 bot faces it is not allowed to send messages - it leave the group by itself. You can always re-add it to
 the group if you want to give us second chance. Cheers!
+
+### I have remove the server-less implementation from the codebase
+
+Long story short, when I just started with the Voice to Text bot, I wanted to explore new tech as well. I mean,
+new tech for me. So I started with serverless approach, created a bunch of functions, that transfer the data
+using the PubSub protocol. Then I deployed them in the Google Cloud. It worked pretty well, the only thing was -
+latency. WHen you create lambda functions, each of them is spinning up its own sandbox environment, and this takes
+time. You can feel it. I would guess they have always ON environments, but my constraint was (and still is) to
+create the applications that takes as less money as possible (turns out make the production ready system for free
+is not possible these days). Hence I could only use the free credits and small instances.
+I quickly realized it was a bad idea due to enormous waiting time for the text. Taking this into account, I have
+implemented the bot using the classic server approach - we have a NodeJS server, and it stays alive 24/7. This gave
+me better timings for the file transformation.
+By the way, I am celebrating the very first Donate I have received this week. This happened 2 years after I have added
+the donation links in the bot's menu. I do not promote donating but I really appreciate that people find the bot
+useful. VoiceToText bot is really small application, but you can only guess how difficult to maintain it and keep it
+alive (almost-)24/7. 4 years in the Business and the user base, 170000 users installed and tried at least once.
+There are people and groups who use the bot every day. Amazing achievement!

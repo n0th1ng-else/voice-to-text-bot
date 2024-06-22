@@ -9,7 +9,7 @@ import {
 } from "@jest/globals";
 import { nanoid } from "nanoid";
 import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
-import { Mock } from "jest-mock";
+import type { Mock } from "jest-mock";
 import type { VoidPromise } from "../common/types.js";
 
 jest.unstable_mockModule(

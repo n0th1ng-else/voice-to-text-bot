@@ -8,6 +8,8 @@ runs:
       with:
         node-version-file: ".nvmrc"
 
-    - name: Install npm dependencies
-      shell: bash
-      run: npm ci
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9
+        run_install: |
+          args: [--frozen-lockfile]
