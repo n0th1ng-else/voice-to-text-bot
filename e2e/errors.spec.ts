@@ -46,7 +46,6 @@ describe("error cases", () => {
       const initTest = await injectTestDependencies();
 
       const mockGoogleAuth = initTest.mockGoogleAuth;
-      const getMockCertificate = initTest.getMockCertificate;
       const getVoiceConverterInstance = init.getVoiceConverterInstance;
       const getVoiceConverterProvider = init.getVoiceConverterProvider;
       const DbClient = init.DbClient;
@@ -63,16 +62,9 @@ describe("error cases", () => {
 
       mockGoogleAuth();
 
-      const converterOptions = {
-        isTestEnv: true,
-        googlePrivateKey: getMockCertificate(),
-        googleProjectId: "some-project",
-        googleClientEmail: "some-email",
-      };
-
       const converter = getVoiceConverterInstance(
         getVoiceConverterProvider("GOOGLE"),
-        converterOptions,
+        initTest.getConverterOptions(),
       );
 
       const hostUrl = `${localhostUrl}:${appPort}`;

@@ -1,9 +1,8 @@
 import { BotCommand, BotCommandOption } from "./types.js";
-import { LabelId } from "../text/types.js";
 
-export const botCommands: BotCommandOption[] = [
-  new BotCommandOption(BotCommand.Support, LabelId.SupportCommandDescription),
-  new BotCommandOption(BotCommand.Donate, LabelId.DonateCommandDescription),
-  new BotCommandOption(BotCommand.Language, LabelId.LanguageCommandDescription),
-  new BotCommandOption(BotCommand.Start, LabelId.StartCommandDescription),
+export const getBotMenuCommands = (): BotCommandOption[] => [
+  new BotCommandOption(BotCommand.Support),
+  new BotCommandOption(BotCommand.Donate),
+  new BotCommandOption(BotCommand.Language),
+  new BotCommandOption(BotCommand.Start),
 ];

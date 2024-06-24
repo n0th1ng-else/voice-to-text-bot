@@ -1,7 +1,7 @@
 import { GenericAction } from "./common.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
-import { LabelId } from "../../text/types.js";
+import { TranslationKeys } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import {
   type BotMessageModel,
@@ -56,9 +56,9 @@ export class VoiceFormatAction extends GenericAction {
           model.chatId,
           model.id,
           [
-            LabelId.AudioNotSupportedMessage,
-            LabelId.SupportedFormatsMessage,
-            LabelId.SupportedFormatsMessageExplanation,
+            TranslationKeys.AudioNotSupportedMessage,
+            TranslationKeys.SupportedFormatsMessage,
+            TranslationKeys.SupportedFormatsMessageExplanation,
           ],
           {
             lang,

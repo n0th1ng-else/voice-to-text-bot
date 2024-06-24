@@ -71,7 +71,6 @@ describe("ignore chats", () => {
 
     trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const DbClient = init.DbClient;
@@ -86,16 +85,9 @@ describe("ignore chats", () => {
 
     mockGoogleAuth();
 
-    const converterOptions = {
-      isTestEnv: true,
-      googlePrivateKey: getMockCertificate(),
-      googleProjectId: "some-project",
-      googleClientEmail: "some-email",
-    };
-
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions,
+      initTest.getConverterOptions(),
     );
 
     const hostUrl = `${localhostUrl}:${appPort}`;

@@ -81,15 +81,15 @@ describe("text/utils", () => {
 
   describe("getMaxDuration", () => {
     it("should return seconds if max is less than 1min", () => {
-      expect(getMaxDuration("m", "s", 47)).toBe("47 s");
+      expect(getMaxDuration(47)).toEqual([0, 47]);
     });
 
     it("should return only minutes if no seconds left", () => {
-      expect(getMaxDuration("m", "s", 120)).toBe("2 m");
+      expect(getMaxDuration(120)).toEqual([2, 0]);
     });
 
     it("should return full time", () => {
-      expect(getMaxDuration("m", "s", 187)).toBe("3 m 7 s");
+      expect(getMaxDuration(187)).toEqual([3, 7]);
     });
   });
 

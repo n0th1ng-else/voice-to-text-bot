@@ -1,7 +1,7 @@
 import { GenericAction } from "./common.js";
 import { isVoiceMessage, isVoiceMessageLong } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
-import { LabelId } from "../../text/types.js";
+import { TranslationKeys } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import {
   type BotMessageModel,
@@ -58,7 +58,7 @@ export class VoiceLengthAction extends GenericAction {
         this.sendMessage(
           model.chatId,
           model.id,
-          LabelId.LongVoiceMessage,
+          TranslationKeys.LongVoiceMessage,
           {
             lang,
           },

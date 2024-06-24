@@ -4,7 +4,6 @@ import {
   VoiceConverter,
   type ConverterMeta,
   type LanguageCode,
-  type VoiceConverterOptions,
 } from "../types.js";
 import { getWav } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
@@ -15,19 +14,23 @@ import { addAttachment } from "../../monitoring/sentry.js";
 
 const logger = new Logger("wit-ai-recognition");
 
+type LanguageTokens = Record<LanguageCode, string>;
+
+type WitAiVoiceProviderOptions = {
+  tokens: LanguageTokens;
+};
+
 export class WithAiProvider extends VoiceConverter {
   public static readonly url = "https://api.wit.ai";
   public static readonly timeout = 10_000;
   private static readonly apiVersion = "20230215";
-  private readonly tokenEn: string;
-  private readonly tokenRu: string;
+  private readonly tokens: LanguageTokens;
 
-  constructor(options: VoiceConverterOptions) {
+  constructor(options: WitAiVoiceProviderOptions) {
     super();
 
     logger.info("Using Wit.ai");
-    this.tokenEn = options.witAiTokenEn ?? "";
-    this.tokenRu = options.witAiTokenRu ?? "";
+    this.tokens = options.tokens;
   }
 
   public async transformToText(
@@ -173,12 +176,7 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private getApiToken(lang: LanguageCode): string {
-    switch (lang) {
-      case "ru-RU":
-        return this.tokenRu;
-      default:
-        return this.tokenEn;
-    }
+    return this.tokens[lang];
   }
 }
 

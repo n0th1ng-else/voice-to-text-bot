@@ -1,6 +1,6 @@
 import { GenericAction } from "./common.js";
 import { isSupportMessage } from "../helpers.js";
-import { LabelId } from "../../text/types.js";
+import { TranslationKeys } from "../../text/types.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -44,17 +44,17 @@ export class SupportAction extends GenericAction {
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
         const issueBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.GithubIssues, lang),
+          text: this.text.t(TranslationKeys.GithubIssues, lang),
           url: githubUrl,
         };
 
         const newsBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.OfficialChannel, lang),
+          text: this.text.t(TranslationKeys.OfficialChannel, lang),
           url: officialChannelAccount,
         };
 
         const authorBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.ContactAuthor, lang),
+          text: this.text.t(TranslationKeys.ContactAuthor, lang),
           url: this.authorUrl,
         };
 
@@ -65,7 +65,7 @@ export class SupportAction extends GenericAction {
         return this.sendMessage(
           model.chatId,
           model.id,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           {
             lang,
             options: { buttons },

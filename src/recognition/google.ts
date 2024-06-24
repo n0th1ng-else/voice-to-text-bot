@@ -1,20 +1,26 @@
 import { v1 } from "@google-cloud/speech";
 import type { google } from "@google-cloud/speech/build/protos/protos.js";
 import {
-  ConverterMeta,
-  LanguageCode,
+  type ConverterMeta,
+  type LanguageCode,
   VoiceConverter,
-  VoiceConverterOptions,
 } from "./types.js";
 import { Logger } from "../logger/index.js";
 import { getWav } from "../ffmpeg/index.js";
 
 const logger = new Logger("google-recognition");
 
+type GoogleVoiceProviderOptions = {
+  isTestEnv?: boolean;
+  googleProjectId?: string;
+  googleClientEmail?: string;
+  googlePrivateKey?: string;
+};
+
 export class GoogleProvider extends VoiceConverter {
   private readonly service: v1.SpeechClient;
 
-  constructor(options: VoiceConverterOptions) {
+  constructor(options: GoogleVoiceProviderOptions) {
     super();
 
     logger.info("Using Google");

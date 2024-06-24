@@ -5,16 +5,11 @@ import {
 } from "../const.js";
 
 export const getMaxDuration = (
-  minutes: string,
-  seconds: string,
   duration = durationLimitSec,
-): string => {
-  if (duration < secondsInOneMinute) {
-    return `${duration} ${seconds}`;
-  }
+): [number, number] => {
   const mins = Math.floor(duration / secondsInOneMinute);
   const secs = duration - mins * secondsInOneMinute;
-  return secs ? `${mins} ${minutes} ${secs} ${seconds}` : `${mins} ${minutes}`;
+  return [mins, secs];
 };
 
 export const getSupportedAudioFormats = (

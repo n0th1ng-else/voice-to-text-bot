@@ -60,7 +60,7 @@ let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
 let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
-let LabelId: InjectedFn["LabelId"];
+let TranslationKeys: InjectedFn["TranslationKeys"];
 let BotCommand: InjectedFn["BotCommand"];
 let mockTgReceiveMessages: InjectedTestFn["mockTgReceiveMessages"];
 let TelegramMessageMetaItem: InjectedTestFn["TelegramMessageMetaItem"];
@@ -90,7 +90,7 @@ describe("[russian language]", () => {
     mockGetBotStatItem = initTest.mockGetBotStatItem;
     sendTelegramMessage = initTest.sendTelegramMessage;
     mockTgReceiveMessage = initTest.mockTgReceiveMessage;
-    LabelId = init.LabelId;
+    TranslationKeys = init.TranslationKeys;
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     BotStatRecordModel = initTest.BotStatRecordModel;
     randomIntFromInterval = init.randomIntFromInterval;
@@ -112,7 +112,6 @@ describe("[russian language]", () => {
 
     trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const DbClient = init.DbClient;
@@ -129,16 +128,9 @@ describe("[russian language]", () => {
 
     mockGoogleAuth();
 
-    const converterOptions = {
-      isTestEnv: true,
-      googlePrivateKey: getMockCertificate(),
-      googleProjectId: "some-project",
-      googleClientEmail: "some-email",
-    };
-
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions,
+      initTest.getConverterOptions(),
     );
     const hostUrl = `${localhostUrl}:${appPort}`;
 
@@ -219,7 +211,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent,
+          TranslationKeys.NoContent,
         ),
       ]);
     });
@@ -241,7 +233,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent,
+          TranslationKeys.NoContent,
         ),
       ]);
     });
@@ -263,10 +255,10 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           [
-            LabelId.WelcomeMessage,
-            LabelId.WelcomeMessageGroup,
-            LabelId.WelcomeMessageMore,
-            LabelId.DonateMessage,
+            TranslationKeys.WelcomeMessage,
+            TranslationKeys.WelcomeMessageGroup,
+            TranslationKeys.WelcomeMessageMore,
+            TranslationKeys.DonateMessage,
           ],
         ),
       ]);
@@ -288,19 +280,19 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           [
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.OfficialChannel,
+                TranslationKeys.OfficialChannel,
                 officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.GithubIssues,
+                TranslationKeys.GithubIssues,
                 githubUrl,
               ),
             ],
@@ -327,26 +319,26 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           [
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.OfficialChannel,
+                TranslationKeys.OfficialChannel,
                 officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.ContactAuthor,
+                TranslationKeys.ContactAuthor,
                 authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.GithubIssues,
+                TranslationKeys.GithubIssues,
                 githubUrl,
               ),
             ],
@@ -371,7 +363,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.ChangeLangTitle,
+          TranslationKeys.ChangeLangTitle,
           getLangButtons(),
         ),
       ]);
@@ -391,7 +383,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.ChangeLangTitle,
+          TranslationKeys.ChangeLangTitle,
           getLangButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -407,7 +399,7 @@ describe("[russian language]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang,
+            TranslationKeys.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -430,7 +422,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.DonateCommandMessage,
+          TranslationKeys.DonateCommandMessage,
           getDonateButtons(),
         ),
       ]);
@@ -459,7 +451,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.InProgress,
+          TranslationKeys.InProgress,
         ),
         mockTgReceiveRawMessage(
           telegramServer,
@@ -491,7 +483,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [LabelId.LongVoiceMessage],
+          [TranslationKeys.LongVoiceMessage],
         ),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -516,9 +508,9 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           [
-            LabelId.AudioNotSupportedMessage,
-            LabelId.SupportedFormatsMessage,
-            LabelId.SupportedFormatsMessageExplanation,
+            TranslationKeys.AudioNotSupportedMessage,
+            TranslationKeys.SupportedFormatsMessage,
+            TranslationKeys.SupportedFormatsMessageExplanation,
           ],
         ),
       ]);
@@ -546,7 +538,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.InProgress,
+          TranslationKeys.InProgress,
         ),
         mockTgReceiveRawMessage(
           telegramServer,
@@ -579,7 +571,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [LabelId.LongVoiceMessage],
+          [TranslationKeys.LongVoiceMessage],
         ),
       ]);
     });
@@ -608,9 +600,9 @@ describe("[russian language]", () => {
           tgMessage.chatId,
           statModel.langId,
           [
-            LabelId.AudioNotSupportedMessage,
-            LabelId.SupportedFormatsMessage,
-            LabelId.SupportedFormatsMessageExplanation,
+            TranslationKeys.AudioNotSupportedMessage,
+            TranslationKeys.SupportedFormatsMessage,
+            TranslationKeys.SupportedFormatsMessageExplanation,
           ],
         ),
       ]);
@@ -633,7 +625,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent,
+          TranslationKeys.NoContent,
         ),
       ]);
     });
@@ -660,7 +652,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.InProgress,
+          TranslationKeys.InProgress,
         ),
         mockTgReceiveRawMessage(
           telegramServer,
@@ -693,7 +685,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [LabelId.LongVoiceMessage],
+          [TranslationKeys.LongVoiceMessage],
         ),
       ]);
     });
@@ -715,7 +707,7 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.NoContent,
+          TranslationKeys.NoContent,
         ),
       ]);
     });

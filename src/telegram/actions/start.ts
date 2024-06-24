@@ -1,6 +1,6 @@
 import { GenericAction } from "./common.js";
 import { isHelloMessage } from "../helpers.js";
-import { LabelId } from "../../text/types.js";
+import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import {
@@ -40,10 +40,10 @@ export class StartAction extends GenericAction {
           model.chatId,
           model.id,
           [
-            LabelId.WelcomeMessage,
-            LabelId.WelcomeMessageGroup,
-            LabelId.WelcomeMessageMore,
-            LabelId.DonateMessage,
+            TranslationKeys.WelcomeMessage,
+            TranslationKeys.WelcomeMessageGroup,
+            TranslationKeys.WelcomeMessageMore,
+            TranslationKeys.DonateMessage,
           ],
           { lang },
           prefix,

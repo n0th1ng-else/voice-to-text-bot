@@ -5,34 +5,39 @@
 import axios from "axios";
 import AWS from "aws-sdk";
 import {
-  ConverterMeta,
-  LanguageCode,
+  type ConverterMeta,
+  type LanguageCode,
   VoiceConverter,
-  VoiceConverterOptions,
 } from "./types.js";
 import { getWav } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
 
 const logger = new Logger("aws-recognition");
 
+type AWSVoiceProviderOptions = {
+  bucketRegion?: string;
+  bucket?: string;
+  poolId: string;
+};
+
 export class AWSProvider extends VoiceConverter {
   private bucket: any;
   private storage: any;
   private service: any;
 
-  constructor(options: VoiceConverterOptions) {
+  constructor(options: AWSVoiceProviderOptions) {
     super();
 
     logger.info("Using AWS");
 
     AWS.config.update({
-      region: (options as any).AWS_BUCKET_REGION,
+      region: options.bucketRegion,
       credentials: new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: (options as any).AWS_POOL_ID,
+        IdentityPoolId: options.poolId,
       }),
     });
 
-    this.bucket = (options as any).AWS_BUCKET;
+    this.bucket = options.bucket;
     this.storage = new AWS.S3();
     this.service = new AWS.TranscribeService();
   }

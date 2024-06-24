@@ -14,11 +14,10 @@ import {
   isVideoMessage,
 } from "./helpers.js";
 import { Logger } from "../logger/index.js";
-import { TextModel } from "../text/index.js";
+import { getTranslator } from "../text/index.js";
 import { TgMessage, TgMessageOptions } from "./api/types.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
-import type { MenuLabel } from "../text/types.js";
 
 export enum VoiceContentReason {
   Ok = "Ok",
@@ -109,12 +108,9 @@ export class BotLangData {
 export class BotCommandOption {
   public readonly description: string;
 
-  constructor(
-    public readonly command: BotCommand,
-    textId: MenuLabel,
-  ) {
-    const textLib = new TextModel();
-    this.description = textLib.menu(textId);
+  constructor(public readonly command: BotCommand) {
+    const translator = getTranslator();
+    this.description = translator.menu(command);
   }
 }
 

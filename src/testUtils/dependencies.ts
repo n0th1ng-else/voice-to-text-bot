@@ -7,7 +7,7 @@ export const injectDependencies = async () => {
   const recognitionApi = await import("../recognition/index.js");
   const recognitionTypes = await import("../recognition/types.js");
   const constants = await import("../const.js");
-  const labels = await import("../text/types.js");
+  const translationKeys = await import("../text/types.js");
   const timer = await import("../common/timer.js");
   const getDb = await import("../db/index.js");
   const dbClient = await import("../db/client.js");
@@ -30,6 +30,8 @@ export const injectDependencies = async () => {
   const cache = await import("../statistic/cache.js");
   const scheduler = await import("../scheduler/index.js");
   const tunnel = await import("../server/tunnel.js");
+  const translator = await import("../text/index.js");
+  const translationsLoader = await import("../text/translations/loader.js");
 
   return {
     ...certs,
@@ -38,7 +40,9 @@ export const injectDependencies = async () => {
     ...recognitionApi,
     ...recognitionTypes,
     ...constants,
-    ...labels,
+    ...translationKeys,
+    ...translationsLoader,
+    ...translator,
     ...timer,
     ...tgApiTypes,
     ...tgApi,

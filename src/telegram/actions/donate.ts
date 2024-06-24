@@ -6,7 +6,7 @@ import {
   TelegramMessagePrefix,
 } from "../types.js";
 import { getDonationDtoString, isDonateMessage } from "../helpers.js";
-import { LabelId } from "../../text/types.js";
+import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { BOT_LOGO, donationLevels } from "../../const.js";
@@ -72,7 +72,7 @@ export class DonateAction extends GenericAction {
         return this.sendMessage(
           model.chatId,
           model.id,
-          LabelId.DonateCommandMessage,
+          TranslationKeys.DonateCommandMessage,
           {
             lang,
             options: { buttons },
@@ -204,9 +204,9 @@ export class DonateAction extends GenericAction {
     prefix: TelegramMessagePrefix,
     forumThreadId?: number,
   ): Promise<void> {
-    const title = this.text.t(LabelId.DonationTitle, lang);
-    const description = this.text.t(LabelId.DonationDescription, lang);
-    const label = this.text.t(LabelId.DonationLabel, lang);
+    const title = this.text.t(TranslationKeys.DonationTitle, lang);
+    const description = this.text.t(TranslationKeys.DonationDescription, lang);
+    const label = this.text.t(TranslationKeys.DonationLabel, lang);
 
     const invoice = {
       chatId,

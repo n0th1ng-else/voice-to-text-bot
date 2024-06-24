@@ -1,12 +1,25 @@
 import {
+  type LanguageCode,
   type VoiceConverter,
-  type VoiceConverterOptions,
   type VoiceConverterProvider,
   VoiceConverterProviderSchema,
 } from "./types.js";
 import { GoogleProvider } from "./google.js";
 import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
+
+// Subset of the env.js file
+export type SupportedEnvironment = {
+  witAiApi: {
+    tokens: Record<LanguageCode, string>;
+  };
+  googleApi: {
+    privateKey: string;
+    projectId: string;
+    clientEmail: string;
+    isTestEnv?: boolean;
+  };
+};
 
 export const getVoiceConverterProvider = (
   provider: string,
@@ -16,15 +29,27 @@ export const getVoiceConverterProvider = (
 
 export const getVoiceConverterInstance = (
   provider: VoiceConverterProvider,
-  options: VoiceConverterOptions,
+  environment: SupportedEnvironment,
 ): VoiceConverter => {
   switch (provider) {
     case "GOOGLE":
-      return new GoogleProvider(options);
+      return new GoogleProvider({
+        googlePrivateKey: environment.googleApi.privateKey,
+        googleProjectId: environment.googleApi.projectId,
+        googleClientEmail: environment.googleApi.clientEmail,
+        isTestEnv: environment.googleApi.isTestEnv,
+      });
     case "AWS":
-      return new AWSProvider(options);
+      // TODO aws is not supported now
+      return new AWSProvider({
+        bucket: "",
+        bucketRegion: "",
+        poolId: "",
+      });
     case "WITAI":
-      return new WithAiProvider(options);
+      return new WithAiProvider({
+        tokens: environment.witAiApi.tokens,
+      });
     default:
       throw new Error("Voice recognition provider is not specified");
   }

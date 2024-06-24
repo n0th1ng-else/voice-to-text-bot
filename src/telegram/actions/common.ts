@@ -1,5 +1,5 @@
 import { Logger } from "../../logger/index.js";
-import { TextModel } from "../../text/index.js";
+import { getTranslator } from "../../text/index.js";
 import { splitTextIntoParts } from "../../common/helpers.js";
 import {
   TELEGRAM_API_MAX_MESSAGE_SIZE,
@@ -13,12 +13,12 @@ import type {
 } from "../types.js";
 import type { getDb } from "../../db/index.js";
 import type { LanguageCode } from "../../recognition/types.js";
-import type { LabelWithNoMenu } from "../../text/types.js";
+import type { TranslationKey } from "../../text/types.js";
 
 const logger = new Logger("telegram-bot");
 
 export abstract class GenericAction {
-  protected readonly text = new TextModel();
+  protected readonly text = getTranslator();
 
   constructor(
     protected readonly stat: ReturnType<typeof getDb>,
@@ -51,14 +51,14 @@ export abstract class GenericAction {
         const errorMessage = "Unable to get the lang";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.addError(errorMessage);
-        return this.text.fallbackLanguage;
+        return this.text.getFallbackLanguage();
       });
   }
 
   public async sendMessage(
     chatId: number,
     messageId: number,
-    ids: LabelWithNoMenu | LabelWithNoMenu[],
+    ids: TranslationKey | TranslationKey[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
     forumThreadId?: number,
@@ -94,7 +94,7 @@ export abstract class GenericAction {
     chatId: number,
     messageId: number,
     meta: MessageOptions,
-    id: LabelWithNoMenu,
+    id: TranslationKey,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.bot

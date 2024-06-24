@@ -1,3 +1,5 @@
+import type { LanguageCode } from "./recognition/types.js";
+
 export const appPort: number = Number(process.env.PORT) || 3000;
 
 export const appVersion: string = process.env.APP_VERSION || "dev";
@@ -62,9 +64,11 @@ export const analytics = {
   measurementId: process.env.GA_V4_MEASUREMENT_ID || "",
 };
 
-export const witAiApi = {
-  tokenEn: process.env.WIT_AI_TOKEN_EN || "",
-  tokenRu: process.env.WIT_AI_TOKEN_RU || "",
+export const witAiApi: { tokens: Record<LanguageCode, string> } = {
+  tokens: {
+    "en-US": process.env.WIT_AI_TOKEN_EN || "",
+    "ru-RU": process.env.WIT_AI_TOKEN_RU || "",
+  },
 };
 
 export const isDebug = process.env.DEBUG === "true";

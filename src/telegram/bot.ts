@@ -6,13 +6,13 @@ import {
 } from "./api/types.js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter } from "../recognition/types.js";
-import { LabelId } from "../text/types.js";
+import { TranslationKeys } from "../text/types.js";
 import { BotMessageModel, TelegramMessagePrefix } from "./types.js";
 import { isMessageSupported } from "./helpers.js";
 import { runPromiseWithRetry } from "../common/helpers.js";
 import { getMd5Hash } from "../common/hash.js";
 import { BotActions } from "./actions/index.js";
-import { botCommands } from "./data.js";
+import { getBotMenuCommands } from "./data.js";
 import { TelegramApi } from "./api/tgapi.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
@@ -84,7 +84,7 @@ export class TelegramBotModel {
       timeoutMs,
     ).then(() =>
       runPromiseWithRetry("bot.setMyCommands", () =>
-        this.bot.setMyCommands(botCommands),
+        this.bot.setMyCommands(getBotMenuCommands()),
       ),
     );
   }
@@ -206,7 +206,7 @@ export class TelegramBotModel {
         this.actions.core.sendMessage(
           model.chatId,
           model.id,
-          LabelId.NoContent,
+          TranslationKeys.NoContent,
           { lang },
           prefix,
           model.forumThreadId,
