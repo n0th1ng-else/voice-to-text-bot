@@ -123,10 +123,19 @@ describe("[default language - english]", () => {
     mockGoogleAuth();
 
     const converterOptions = {
-      isTestEnv: true,
-      googlePrivateKey: getMockCertificate(),
-      googleProjectId: "some-project",
-      googleClientEmail: "some-email",
+      witAiApi: {
+        tokens: {
+          "en-US": "en-token",
+          "ru-RU": "ru-token",
+          uk: "uk-token",
+        },
+      },
+      googleApi: {
+        privateKey: getMockCertificate(),
+        projectId: "some-project",
+        clientEmail: "some-email",
+        isTestEnv: true,
+      },
     };
 
     const converter = getVoiceConverterInstance(
