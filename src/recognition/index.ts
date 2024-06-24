@@ -9,7 +9,7 @@ import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
 
 // Subset of the env.js file
-type SupportedEnvironment = {
+export type SupportedEnvironment = {
   witAiApi: {
     tokens: Record<LanguageCode, string>;
   };

@@ -21,6 +21,7 @@ import {
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/types.js";
 import type { VoidPromise } from "../src/common/types.js";
+import { getConverterOptions } from "./helpers.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -71,7 +72,6 @@ describe("ignore chats", () => {
 
     trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const DbClient = init.DbClient;
@@ -86,16 +86,9 @@ describe("ignore chats", () => {
 
     mockGoogleAuth();
 
-    const converterOptions = {
-      isTestEnv: true,
-      googlePrivateKey: getMockCertificate(),
-      googleProjectId: "some-project",
-      googleClientEmail: "some-email",
-    };
-
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions,
+      getConverterOptions(),
     );
 
     const hostUrl = `${localhostUrl}:${appPort}`;

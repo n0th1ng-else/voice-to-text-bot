@@ -5,7 +5,7 @@ import { LabelId } from "../src/text/types.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
 import {
   TelegramButtonModel,
-  TelegramButtonType,
+  type TelegramButtonType,
 } from "../src/telegram/types.js";
 import { donationLevels } from "../src/const.js";
 import { toCurrency } from "../src/text/utils.js";
@@ -16,6 +16,7 @@ import type {
 } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { LabelWithNoMenu } from "../src/text/types.js";
+import { SupportedEnvironment } from "../src/recognition/index.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -281,4 +282,24 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
       ),
     ],
   ];
+};
+
+export const getConverterOptions = (): SupportedEnvironment & {
+  googleApi: { isTestEnv: true };
+} => {
+  return {
+    witAiApi: {
+      tokens: {
+        "en-US": "en-token",
+        "ru-RU": "ru-token",
+        uk: "uk-token",
+      },
+    },
+    googleApi: {
+      privateKey: getMockCertificate(),
+      projectId: "some-project",
+      clientEmail: "some-email",
+      isTestEnv: true,
+    },
+  };
 };

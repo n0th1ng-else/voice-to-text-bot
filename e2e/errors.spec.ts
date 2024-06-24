@@ -16,6 +16,7 @@ import {
 import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { VoidPromise } from "../src/common/types.js";
+import { getConverterOptions } from "./helpers.js";
 
 jest.unstable_mockModule(
   "../src/logger/index",
@@ -46,7 +47,6 @@ describe("error cases", () => {
       const initTest = await injectTestDependencies();
 
       const mockGoogleAuth = initTest.mockGoogleAuth;
-      const getMockCertificate = initTest.getMockCertificate;
       const getVoiceConverterInstance = init.getVoiceConverterInstance;
       const getVoiceConverterProvider = init.getVoiceConverterProvider;
       const DbClient = init.DbClient;
@@ -63,16 +63,9 @@ describe("error cases", () => {
 
       mockGoogleAuth();
 
-      const converterOptions = {
-        isTestEnv: true,
-        googlePrivateKey: getMockCertificate(),
-        googleProjectId: "some-project",
-        googleClientEmail: "some-email",
-      };
-
       const converter = getVoiceConverterInstance(
         getVoiceConverterProvider("GOOGLE"),
-        converterOptions,
+        getConverterOptions(),
       );
 
       const hostUrl = `${localhostUrl}:${appPort}`;
