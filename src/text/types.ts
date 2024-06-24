@@ -29,6 +29,7 @@ export enum LabelId {
   DonationTitle = 28,
   DonationDescription = 29,
   DonationLabel = 30,
+  BtnUkrainian = 31,
 }
 
 export type MenuLabel =

@@ -2,7 +2,7 @@ import { GenericAction } from "./common.js";
 import {
   BotCommand,
   BotLangData,
-  BotMessageModel,
+  type BotMessageModel,
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
@@ -11,7 +11,7 @@ import {
   getRawUserLanguage,
   isLangMessage,
 } from "../helpers.js";
-import { LabelId } from "../../text/types.js";
+import { LabelId, type LabelWithNoMenu } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
@@ -20,10 +20,19 @@ import type {
   TgInlineKeyboardButton,
   TgMessage,
 } from "../api/types.js";
-import type { LanguageCode } from "../../recognition/types.js";
+import {
+  type LanguageCode,
+  SUPPORTED_LANGUAGES,
+} from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 
 const logger = new Logger("telegram-bot");
+
+const languageButtonLabel: Record<LanguageCode, LabelWithNoMenu> = {
+  "en-US": LabelId.BtnEnglish,
+  "ru-RU": LabelId.BtnRussian,
+  uk: LabelId.BtnUkrainian,
+};
 
 export class LangAction extends GenericAction {
   public runAction(
@@ -184,28 +193,21 @@ export class LangAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const ruData = new TelegramButtonModel<LanguageCode>(
-          "l",
-          "ru-RU",
-          prefix.id,
-        );
-        const enData = new TelegramButtonModel<LanguageCode>(
-          "l",
-          "en-US",
-          prefix.id,
-        );
+        const buttons = SUPPORTED_LANGUAGES.map((supportedLanguage) => {
+          const data = new TelegramButtonModel<LanguageCode>(
+            "l",
+            supportedLanguage,
+            prefix.id,
+          );
 
-        const ruBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.BtnRussian, lang),
-          callback_data: ruData.getDtoString(),
-        };
+          const label = languageButtonLabel[supportedLanguage];
+          const btn: TgInlineKeyboardButton = {
+            text: this.text.t(label, lang),
+            callback_data: data.getDtoString(),
+          };
 
-        const enBtn: TgInlineKeyboardButton = {
-          text: this.text.t(LabelId.BtnEnglish, lang),
-          callback_data: enData.getDtoString(),
-        };
-
-        const buttons: TgInlineKeyboardButton[][] = [[ruBtn], [enBtn]];
+          return [btn];
+        });
 
         return this.sendMessage(
           model.chatId,

@@ -17,7 +17,6 @@ import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
-import type { VoiceConverterOptions } from "../recognition/types.js";
 import type { BotServerModel } from "./types.js";
 
 const logger = new Logger("boot-server");
@@ -40,18 +39,9 @@ export const prepareInstance = async (
         sslOptions,
       );
 
-  const converterOptions: VoiceConverterOptions = {
-    googlePrivateKey: envy.googleApi.privateKey,
-    googleProjectId: envy.googleApi.projectId,
-    googleClientEmail: envy.googleApi.clientEmail,
-    witAiTokenEn: envy.witAiApi.tokenEn,
-    witAiTokenRu: envy.witAiApi.tokenRu,
-  };
+  const parsedProvider = getVoiceConverterProvider(envy.provider);
 
-  const converter = getVoiceConverterInstance(
-    getVoiceConverterProvider(envy.provider),
-    converterOptions,
-  );
+  const converter = getVoiceConverterInstance(parsedProvider, envy);
 
   const db = getDb(
     [

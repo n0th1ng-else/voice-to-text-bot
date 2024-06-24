@@ -28,6 +28,7 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.ChangeLang]: "Язык изменен 🆗",
     [LabelId.BtnRussian]: "🇷🇺 Русский",
     [LabelId.BtnEnglish]: "🇺🇸 Английский",
+    [LabelId.BtnUkrainian]: "🇺🇦 Украинский",
     [LabelId.UpdateLanguageError]:
       "Не удалось обновить язык. Пожалуйста, попробуйте позже 😔",
     // "support" command
@@ -92,6 +93,74 @@ export const labels: Record<LanguageCode, Record<LabelWithNoMenu, string>> = {
     [LabelId.ChangeLang]: "Language has been changed 🆗",
     [LabelId.BtnRussian]: "🇷🇺 Russian",
     [LabelId.BtnEnglish]: "🇺🇸 English",
+    [LabelId.BtnUkrainian]: "🇺🇦 Ukraine",
+    [LabelId.UpdateLanguageError]:
+      "Failed to update the language. Please try again later 😔",
+    // "support" command
+    [LabelId.SupportCommand]:
+      "If you have any questions, you can contact the author using one of the following options",
+    [LabelId.OfficialChannel]: "News and discussions",
+    [LabelId.ContactAuthor]: "Chat with the author",
+    [LabelId.GithubIssues]: "Report an issue",
+
+    [LabelId.NoContent]: "No voice track found in the message 🌚",
+    [LabelId.InProgress]: "🎙 Processing voice message",
+    [LabelId.RecognitionFailed]: "Unable to convert voice 😔",
+    // "donate" command
+    [LabelId.DonateCommandMessage]:
+      "This bot is a non-commercial project. Nevertheless, it requires resources to keep converting voice into text." +
+      "\n\n" +
+      "I would love to ask you to support the project and donate some money so I can pay for the infrastructure, thus keep making the bot available 24/7. " +
+      "Contact me (the author) if you have any donations-related questions." +
+      "\n\n" +
+      "All donations are non-refundable. " +
+      "You will not get any extra bonuses by donating me some money, but you will take part in having the bot up all day long." +
+      "\n\n" +
+      "Thank you for supporting the project!" +
+      "\n\n" +
+      'We use <a href="https://stripe.com">Stripe</a>, the world-leading payments provider to make sure the donation process ' +
+      "is safe and secure",
+    [LabelId.PaymentDescription]:
+      "AudioMessBot telegram bot donation. Non-refundable. Appreciate your support!" +
+      "\n\n" +
+      "We use Stripe as our payment provider, all transactions are safe and secure",
+    [LabelId.DonationTitle]: "Support AudioMessBot",
+    [LabelId.DonationDescription]:
+      "I invite you to make a small one-time donation to support my project. " +
+      "We use Stripe as our payment provider, all transactions are safe and secure",
+    [LabelId.DonationLabel]: "One-time donation",
+
+    // voice recognition
+    [LabelId.LongVoiceMessage]: `I do not support messages longer than ${getMaxDuration(
+      "min",
+      "sec",
+    )} at the moment 🌚`,
+    [LabelId.AudioNotSupportedMessage]:
+      "The audio file format is not supported at the moment 🌚",
+    [LabelId.SupportedFormatsMessage]: `I work with these formats: ${getSupportedAudioFormats()}`,
+    [LabelId.SupportedFormatsMessageExplanation]:
+      "Typically, most messengers record voice in one of these formats. Contact the author if you experience any problems",
+    [LabelId.RecognitionEmpty]: "I could not find any text in the message 🤔",
+  },
+  // Ukrainian
+  ["uk"]: {
+    // "start" command
+    [LabelId.WelcomeMessage]:
+      "👋🏽 Hey there! Send me a voice message and I will show what they are talking about in plain text",
+    [LabelId.WelcomeMessageGroup]:
+      "You can add me to a group so I will convert voice messages from all the participants!" +
+      "\n\n" +
+      "Even better, I can recognise video notes (Telegram video circles) as well 🎉",
+    [LabelId.WelcomeMessageMore]:
+      "Do not forget to select the language you want to recognise by typing the /lang command",
+    [LabelId.DonateMessage]:
+      "Support this project. Run /donate command for details",
+    // "lang" command
+    [LabelId.ChangeLangTitle]: "Select the language 🔮",
+    [LabelId.ChangeLang]: "Language has been changed 🆗",
+    [LabelId.BtnRussian]: "🇷🇺 Russian",
+    [LabelId.BtnEnglish]: "🇺🇸 English",
+    [LabelId.BtnUkrainian]: "🇺🇦 Ukraine",
     [LabelId.UpdateLanguageError]:
       "Failed to update the language. Please try again later 😔",
     // "support" command
