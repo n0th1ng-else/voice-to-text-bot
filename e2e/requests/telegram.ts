@@ -10,16 +10,16 @@ import {
   TelegramMessageMetaType,
   TelegramMessageModel,
 } from "../helpers.js";
-import { TextModel } from "../../src/text/index.js";
-import { LabelId, type LabelWithNoMenu } from "../../src/text/types.js";
-import { botCommands } from "../../src/telegram/data.js";
+import { getTranslator, isTranslationKey } from "../../src/text/index.js";
+import { type TranslationKey, TranslationKeys } from "../../src/text/types.js";
+import { getBotMenuCommands } from "../../src/telegram/data.js";
 import { flattenPromise } from "../../src/common/helpers.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
 import { parseDonationPayload } from "../../src/telegram/helpers.js";
 import type { TgUpdate } from "../../src/telegram/api/types.js";
 import type { LanguageCode } from "../../src/recognition/types.js";
 
-const text = new TextModel();
+const text = getTranslator();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
 
 const makeTelegramResponse = <D>(result: D) => {
@@ -67,9 +67,11 @@ export const mockTgSetCommands = (host: nock.Scope): void => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.commands).toBeDefined();
     const commands = answer.commands;
-    expect(commands).toHaveLength(botCommands.length);
 
-    botCommands.forEach((botCommand, ind) => {
+    const menuCommands = getBotMenuCommands();
+    expect(commands).toHaveLength(menuCommands.length);
+
+    menuCommands.forEach((botCommand, ind) => {
       expect(commands[ind].command).toBe(botCommand.command);
       expect(commands[ind].description).toBe(botCommand.description);
     });
@@ -128,7 +130,7 @@ export const mockTgReceiveMessage = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
-  textId: LabelWithNoMenu,
+  textId: TranslationKey,
   expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
@@ -155,9 +157,9 @@ export const mockTgReceiveMessage = (
             expect(expectedItem).toBeDefined();
 
             expect(receivedItem.text).toBe(
-              typeof expectedItem.title === "string"
-                ? expectedItem.title
-                : text.t(expectedItem.title, lang),
+              isTranslationKey(expectedItem.title)
+                ? text.t(expectedItem.title, lang)
+                : expectedItem.title,
             );
 
             if (expectedItem.type === TelegramMessageMetaType.Button) {
@@ -189,7 +191,7 @@ export const mockTgReceiveMessages = (
   host: nock.Scope,
   chatId: number,
   lang: LanguageCode,
-  textIds: LabelWithNoMenu[],
+  textIds: TranslationKey[],
 ): Promise<void> => {
   return Promise.all(
     textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)),
@@ -223,7 +225,7 @@ export const mockTgReceiveCallbackMessage = (
   chatId: number,
   messageId: number,
   langId: LanguageCode,
-  textId: LabelWithNoMenu,
+  textId: TranslationKey,
   expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<void> => {
   return new Promise((resolve) => {
@@ -253,9 +255,9 @@ export const mockTgReceiveCallbackMessage = (
               expect(expectedItem).toBeDefined();
 
               expect(receivedItem.text).toBe(
-                typeof expectedItem.title === "string"
-                  ? expectedItem.title
-                  : text.t(expectedItem.title, langId),
+                isTranslationKey(expectedItem.title)
+                  ? text.t(expectedItem.title, langId)
+                  : expectedItem.title,
               );
 
               if (expectedItem.type === TelegramMessageMetaType.Button) {
@@ -304,14 +306,14 @@ export const mockTgReceiveInvoiceMessage = (
       expect(payload.donationId).toBe(donationId);
       expect(payload.prefix).toBeDefined();
 
-      expect(answer.title).toBe(text.t(LabelId.DonationTitle, langId));
+      expect(answer.title).toBe(text.t(TranslationKeys.DonationTitle, langId));
       expect(answer.description).toBe(
-        text.t(LabelId.DonationDescription, langId),
+        text.t(TranslationKeys.DonationDescription, langId),
       );
       expect(answer.prices).toHaveLength(1);
       expect(answer.prices[0].amount).toBe(price * 100);
       expect(answer.prices[0].label).toBe(
-        text.t(LabelId.DonationLabel, langId),
+        text.t(TranslationKeys.DonationLabel, langId),
       );
 
       resolve();

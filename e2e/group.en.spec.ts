@@ -20,7 +20,6 @@ import {
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/types.js";
-import { VoiceConverterOptions } from "../src/recognition/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
@@ -56,7 +55,6 @@ let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 // Define dependencies
-let converterOptions: VoiceConverterOptions;
 let converter: InstanceType<InjectedFn["VoiceConverter"]>;
 let hostUrl: string;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
@@ -76,7 +74,7 @@ let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let BotCommand: InjectedFn["BotCommand"];
-let LabelId: InjectedFn["LabelId"];
+let TranslationKeys: InjectedFn["TranslationKeys"];
 let mockTgReceiveMessages: InjectedTestFn["mockTgReceiveMessages"];
 let telegramBotName: InjectedFn["telegramBotName"];
 let TelegramMessageMetaItem: InjectedTestFn["TelegramMessageMetaItem"];
@@ -109,7 +107,7 @@ describe("[default language - english]", () => {
     randomIntFromInterval = init.randomIntFromInterval;
     TelegramMessageModel = initTest.TelegramMessageModel;
     BotCommand = init.BotCommand;
-    LabelId = init.LabelId;
+    TranslationKeys = init.TranslationKeys;
     mockTgReceiveMessages = initTest.mockTgReceiveMessages;
     telegramBotName = init.telegramBotName;
     TelegramMessageMetaItem = initTest.TelegramMessageMetaItem;
@@ -130,7 +128,6 @@ describe("[default language - english]", () => {
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const mockTgSetWebHook = initTest.mockTgSetWebHook;
     const mockTgSetCommands = initTest.mockTgSetCommands;
-    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const BotServer = init.BotServer;
@@ -142,15 +139,10 @@ describe("[default language - english]", () => {
     const getDb = init.getDb;
 
     mockGoogleAuth();
-    converterOptions = {
-      isTestEnv: true,
-      googlePrivateKey: getMockCertificate(),
-      googleProjectId: "some-project",
-      googleClientEmail: "some-email",
-    };
+
     converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions,
+      initTest.getConverterOptions(),
     );
     hostUrl = `${localhostUrl}:${appPort}`;
     const mainDb = new DbClient(dbConfig, 0, testPool);
@@ -215,10 +207,10 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           [
-            LabelId.WelcomeMessage,
-            LabelId.WelcomeMessageGroup,
-            LabelId.WelcomeMessageMore,
-            LabelId.DonateMessage,
+            TranslationKeys.WelcomeMessage,
+            TranslationKeys.WelcomeMessageGroup,
+            TranslationKeys.WelcomeMessageMore,
+            TranslationKeys.DonateMessage,
           ],
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -239,10 +231,10 @@ describe("[default language - english]", () => {
           tgMessage.chatId,
           statModel.langId,
           [
-            LabelId.WelcomeMessage,
-            LabelId.WelcomeMessageGroup,
-            LabelId.WelcomeMessageMore,
-            LabelId.DonateMessage,
+            TranslationKeys.WelcomeMessage,
+            TranslationKeys.WelcomeMessageGroup,
+            TranslationKeys.WelcomeMessageMore,
+            TranslationKeys.DonateMessage,
           ],
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -259,19 +251,19 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           [
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.OfficialChannel,
+                TranslationKeys.OfficialChannel,
                 officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.GithubIssues,
+                TranslationKeys.GithubIssues,
                 githubUrl,
               ),
             ],
@@ -294,19 +286,19 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           [
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.OfficialChannel,
+                TranslationKeys.OfficialChannel,
                 officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.GithubIssues,
+                TranslationKeys.GithubIssues,
                 githubUrl,
               ),
             ],
@@ -328,26 +320,26 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           [
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.OfficialChannel,
+                TranslationKeys.OfficialChannel,
                 officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.ContactAuthor,
+                TranslationKeys.ContactAuthor,
                 authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.GithubIssues,
+                TranslationKeys.GithubIssues,
                 githubUrl,
               ),
             ],
@@ -373,26 +365,26 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.SupportCommand,
+          TranslationKeys.SupportCommand,
           [
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.OfficialChannel,
+                TranslationKeys.OfficialChannel,
                 officialChannelAccount,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.ContactAuthor,
+                TranslationKeys.ContactAuthor,
                 authorUrl,
               ),
             ],
             [
               new TelegramMessageMetaItem(
                 TelegramMessageMetaType.Link,
-                LabelId.GithubIssues,
+                TranslationKeys.GithubIssues,
                 githubUrl,
               ),
             ],
@@ -412,7 +404,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.ChangeLangTitle,
+          TranslationKeys.ChangeLangTitle,
           getLangButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -432,7 +424,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.ChangeLangTitle,
+          TranslationKeys.ChangeLangTitle,
           getLangButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -449,7 +441,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.ChangeLangTitle,
+          TranslationKeys.ChangeLangTitle,
           getLangButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -465,7 +457,7 @@ describe("[default language - english]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang,
+            TranslationKeys.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -484,7 +476,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.ChangeLangTitle,
+          TranslationKeys.ChangeLangTitle,
           getLangButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -500,7 +492,7 @@ describe("[default language - english]", () => {
             tgMessage.chatId,
             cbMessage.messageId,
             newLangId,
-            LabelId.ChangeLang,
+            TranslationKeys.ChangeLang,
           ),
           mockUpdateBotStatLang(testPool, statModel, newLangId),
         ]);
@@ -569,7 +561,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.DonateCommandMessage,
+          TranslationKeys.DonateCommandMessage,
           getDonateButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),
@@ -589,7 +581,7 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          LabelId.DonateCommandMessage,
+          TranslationKeys.DonateCommandMessage,
           getDonateButtons(),
         ),
         sendTelegramMessage(host, bot, tgMessage),

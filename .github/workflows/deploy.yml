@@ -3,6 +3,12 @@ name: App Deploy
 on:
   workflow_call:
     inputs:
+      servers:
+        type: string
+        description: "The JSON list of servers to deploy the application"
+        default: '["Production β", "Production Ω"]'
+        # Will deploy into all available servers if not specified
+        required: false
       version:
         type: string
         description: "Version tag"
@@ -29,8 +35,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        #        environment: ["Production β"]
-        environment: ["Production β", "Production Ω"]
+        environment: ${{ fromJSON(inputs.servers) }}
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"

@@ -71,7 +71,7 @@ let BotCommand: InjectedFn["BotCommand"];
 let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
-let LabelId: InjectedFn["LabelId"];
+let TranslationKeys: InjectedFn["TranslationKeys"];
 let getDonateButtons: InjectedTestFn["getDonateButtons"];
 let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
 let mockTgReceiveInvoiceMessage: InjectedTestFn["mockTgReceiveInvoiceMessage"];
@@ -91,7 +91,7 @@ describe("[default language - english] donate", () => {
     mockGetBotStatItem = initTest.mockGetBotStatItem;
     sendTelegramMessage = initTest.sendTelegramMessage;
     mockTgReceiveMessage = initTest.mockTgReceiveMessage;
-    LabelId = init.LabelId;
+    TranslationKeys = init.TranslationKeys;
     getDonateButtons = initTest.getDonateButtons;
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     mockTgReceiveInvoiceMessage = initTest.mockTgReceiveInvoiceMessage;
@@ -101,7 +101,6 @@ describe("[default language - english] donate", () => {
 
     trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getMockCertificate = initTest.getMockCertificate;
     const getVoiceConverterInstance = init.getVoiceConverterInstance;
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const DbClient = init.DbClient;
@@ -116,15 +115,9 @@ describe("[default language - english] donate", () => {
 
     mockGoogleAuth();
 
-    const converterOptions = {
-      isTestEnv: true,
-      googlePrivateKey: getMockCertificate(),
-      googleProjectId: "some-project",
-      googleClientEmail: "some-email",
-    };
     const converter = getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
-      converterOptions,
+      initTest.getConverterOptions(),
     );
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
@@ -195,7 +188,7 @@ describe("[default language - english] donate", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.DonateCommandMessage,
+            TranslationKeys.DonateCommandMessage,
             getDonateButtons(),
           ),
           sendTelegramMessage(host, bot, tgMessage),
@@ -244,7 +237,7 @@ describe("[default language - english] donate", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.DonateCommandMessage,
+            TranslationKeys.DonateCommandMessage,
             getDonateButtons(),
           ),
           sendTelegramMessage(host, bot, tgMessage),
@@ -297,7 +290,7 @@ describe("[default language - english] donate", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.DonateCommandMessage,
+            TranslationKeys.DonateCommandMessage,
             getDonateButtons(),
           ),
           sendTelegramMessage(host, bot, tgMessage),
@@ -346,7 +339,7 @@ describe("[default language - english] donate", () => {
             telegramServer,
             tgMessage.chatId,
             statModel.langId,
-            LabelId.DonateCommandMessage,
+            TranslationKeys.DonateCommandMessage,
             getDonateButtons(),
           ),
           sendTelegramMessage(host, bot, tgMessage),

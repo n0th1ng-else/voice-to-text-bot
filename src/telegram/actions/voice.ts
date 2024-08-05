@@ -1,7 +1,7 @@
 import { GenericAction } from "./common.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
-import { LabelId } from "../../text/types.js";
+import { TranslationKeys } from "../../text/types.js";
 import { type LanguageCode, VoiceConverter } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
@@ -84,7 +84,7 @@ export class VoiceAction extends GenericAction {
           return this.sendMessage(
             model.chatId,
             model.id,
-            LabelId.RecognitionEmpty,
+            TranslationKeys.RecognitionEmpty,
             {
               lang,
             },
@@ -131,7 +131,7 @@ export class VoiceAction extends GenericAction {
         return this.sendMessage(
           model.chatId,
           model.id,
-          LabelId.RecognitionFailed,
+          TranslationKeys.RecognitionFailed,
           {
             lang,
           },
@@ -174,7 +174,7 @@ export class VoiceAction extends GenericAction {
     return this.sendMessage(
       model.chatId,
       model.id,
-      LabelId.InProgress,
+      TranslationKeys.InProgress,
       {
         lang,
       },

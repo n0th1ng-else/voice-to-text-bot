@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
-import { LabelId } from "../src/text/types.js";
+import { TranslationKeys } from "../src/text/types.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
 import {
   TelegramButtonModel,
-  TelegramButtonType,
+  type TelegramButtonType,
 } from "../src/telegram/types.js";
 import { donationLevels } from "../src/const.js";
 import { toCurrency } from "../src/text/utils.js";
@@ -15,7 +15,7 @@ import type {
   TgMessage,
 } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
-import type { LabelWithNoMenu } from "../src/text/types.js";
+import type { SupportedEnvironment } from "../src/recognition/index.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -208,7 +208,7 @@ export enum TelegramMessageMetaType {
 export class TelegramMessageMetaItem {
   constructor(
     public readonly type: TelegramMessageMetaType,
-    public readonly title: LabelWithNoMenu | string,
+    public readonly title: string,
     public readonly data: string,
     public readonly btnType: TelegramButtonType = "d",
   ) {}
@@ -267,18 +267,35 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
     [
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
-        LabelId.BtnRussian,
-        "ru-RU",
+        TranslationKeys.BtnEnglish,
+        "en-US",
         "l",
       ),
     ],
     [
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
-        LabelId.BtnEnglish,
-        "en-US",
+        TranslationKeys.BtnRussian,
+        "ru-RU",
         "l",
       ),
     ],
   ];
+};
+
+export const getConverterOptions = (): SupportedEnvironment => {
+  return {
+    witAiApi: {
+      tokens: {
+        "en-US": "en-token",
+        "ru-RU": "ru-token",
+      },
+    },
+    googleApi: {
+      privateKey: getMockCertificate(),
+      projectId: "some-project",
+      clientEmail: "some-email",
+      isTestEnv: true,
+    },
+  };
 };
