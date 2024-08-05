@@ -69,6 +69,11 @@ export const initializeTranslationsForLocale = (
   if (!existsSync(fullPath)) {
     throw new Error(
       `the translations file does not exists for "${lang}" locale`,
+      {
+        cause: {
+          translationFile: fullPath,
+        },
+      },
     );
   }
   const content = readFileSync(fullPath, { encoding: "utf-8" });
