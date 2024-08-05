@@ -1,7 +1,7 @@
 import * as envy from "../env.js";
 import { BotServer } from "./bot-server.js";
 import { BotServerNew } from "./bot-server-new.js";
-import { httpsOptions } from "../../certs/index.js";
+import { httpsOptions } from "../localCerts/index.js";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,

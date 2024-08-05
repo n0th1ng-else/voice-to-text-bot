@@ -23,7 +23,7 @@
     "lint": "eslint",
     "lint:all": "eslint .",
     "typecheck": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc && node ./dist/src/staticFiles.js",
     "locale:sync": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/scripts/locale.ts",
     "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\" jest",
     "test:load": "artillery run load.yml --insecure",

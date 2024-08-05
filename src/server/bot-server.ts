@@ -16,7 +16,7 @@ import {
   HealthModel,
 } from "./types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
-import type { HttpsOptions } from "../../certs/index.js";
+import type { HttpsOptions } from "../localCerts/index.js";
 import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("server");

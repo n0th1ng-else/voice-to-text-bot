@@ -1,5 +1,5 @@
 export const injectDependencies = async () => {
-  const certs = await import("../../certs/index.js");
+  const certs = await import("../localCerts/index.js");
   const botModel = await import("../telegram/bot.js");
   const botCommands = await import("../telegram/types.js");
   const tgApiTypes = await import("../telegram/api/types.js");

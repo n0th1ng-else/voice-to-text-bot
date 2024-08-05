@@ -3,7 +3,7 @@ import { Logger } from "../logger/index.js";
 import { sSuffix } from "../text/utils.js";
 import type { BotServerModelBase, ServerStatCore } from "./types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
-import type { HttpsOptions } from "../../certs/index.js";
+import type { HttpsOptions } from "../localCerts/index.js";
 
 const logger = new Logger("server");
 

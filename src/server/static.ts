@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 import { resolve as resolvePath } from "node:path";
 import { readFileSync } from "node:fs";
 import Fastify, { type FastifyInstance } from "fastify";
-import { httpsOptions } from "../../certs/index.js";
+import { httpsOptions } from "../localCerts/index.js";
 import { enableSSL } from "../env.js";
 import { getMB } from "../memory/index.js";
 

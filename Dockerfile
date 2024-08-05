@@ -13,12 +13,10 @@ RUN npm pkg delete scripts.prepare
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY ./assets $APP_DIR/assets
-COPY ./certs $APP_DIR/certs
 COPY ./video-temp $APP_DIR/video-temp
 COPY ./src $APP_DIR/src
 
 RUN pnpm run build
-COPY ./src/text/translations/bundles $APP_DIR/dist/src/text/translations/bundles
 
 FROM node:20.14-slim
 
