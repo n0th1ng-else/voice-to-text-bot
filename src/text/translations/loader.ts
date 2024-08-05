@@ -41,7 +41,7 @@ const createRequiredObjSchema = <K extends string, V extends z.ZodTypeAny>(
     );
 };
 
-const CURRENT_DIR = fileURLToPath(new URL(".", import.meta.url));
+const TRANSLATIONS_DIR = fileURLToPath(new URL("./bundles", import.meta.url));
 
 const getTranslationsFileSchema = (filename: string) =>
   createRequiredObjSchema(filename, getTranslationKeysSchema(), z.string());
@@ -65,7 +65,7 @@ export const initializeMenuLabels = (): Record<BotCommand, string> => {
 export const initializeTranslationsForLocale = (
   lang: LanguageCode,
 ): TranslationsFileType => {
-  const fullPath = resolve(CURRENT_DIR, getTranslationFilename(lang));
+  const fullPath = resolve(TRANSLATIONS_DIR, getTranslationFilename(lang));
   if (!existsSync(fullPath)) {
     throw new Error(
       `the translations file does not exists for "${lang}" locale`,
@@ -79,7 +79,7 @@ export const initializeTranslationsForLocale = (
 };
 
 export const createTranslationsFileForLocale = (lang: string): void => {
-  const fullPath = resolve(CURRENT_DIR, getTranslationFilename(lang));
+  const fullPath = resolve(TRANSLATIONS_DIR, getTranslationFilename(lang));
 
   const oldContent = existsSync(fullPath)
     ? readFileSync(fullPath, { encoding: "utf-8" })

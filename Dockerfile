@@ -47,6 +47,7 @@ RUN npm pkg delete scripts.prepare
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
+COPY --from=builder $APP_DIR/src/text/translations/bundles $APP_DIR/dist/text/translations/bundles
 
 USER node
 
