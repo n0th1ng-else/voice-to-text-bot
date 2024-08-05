@@ -18,7 +18,7 @@ COPY ./video-temp $APP_DIR/video-temp
 COPY ./src $APP_DIR/src
 
 RUN pnpm run build
-COPY ./src/text/translations/bundles $APP_DIR/dist/text/translations/bundles
+COPY ./src/text/translations/bundles $APP_DIR/dist/src/text/translations/bundles
 
 FROM node:20.14-slim
 
