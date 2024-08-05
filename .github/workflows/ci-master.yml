@@ -22,3 +22,5 @@ jobs:
     with:
       version: ${{ needs.prerelease.outputs.version }}
       sha: ${{ github.sha }}
+      # Enable if you want to test on one environment
+      servers: '["Production β"]'
