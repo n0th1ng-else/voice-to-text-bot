@@ -37,8 +37,8 @@
   "dependencies": {
     "@amplitude/node": "1.10.2",
     "@google-cloud/speech": "4.5.5",
-    "@sentry/node": "8.11.0",
-    "@sentry/profiling-node": "8.11.0",
+    "@sentry/node": "8.24.0",
+    "@sentry/profiling-node": "8.24.0",
     "aws-sdk": "2.1310.0",
     "axios": "1.7.2",
     "express": "4.19.2",
