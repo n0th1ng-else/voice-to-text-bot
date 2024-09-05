@@ -6,7 +6,7 @@ import {
   VoiceConverter,
 } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { getWav } from "../ffmpeg/index.js";
+import { getWavBuffer } from "../ffmpeg/index.js";
 
 const logger = new Logger("google-recognition");
 
@@ -37,13 +37,13 @@ export class GoogleProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
-    isVideo: boolean,
+    _isVideo: boolean,
     lang: LanguageCode,
     opts: ConverterMeta,
   ): Promise<string> {
     const name = `${opts.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
-    return getWav(fileLink, isVideo)
+    return getWavBuffer(fileLink)
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         return this.service.recognize({

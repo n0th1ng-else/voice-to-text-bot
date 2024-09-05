@@ -99,7 +99,7 @@ export const prepareStopListener = (): StopListener => {
     printCurrentMemoryStat(envy.memoryLimit),
   ).start();
   const storageDaemon = new ScheduleDaemon("storage", () =>
-    printCurrentStorageUsage("video-temp"),
+    printCurrentStorageUsage("file-temp"),
   ).start();
 
   const stopListener = new StopListener().addTrigger(() => {

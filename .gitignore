@@ -113,5 +113,7 @@ coverage-unit
 *.wav
 
 # keep temp folder clear
-video-temp/*.tmp
+file-temp/*
+!file-temp/.gitkeep
+
 .VERSION

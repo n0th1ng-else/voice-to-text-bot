@@ -5,7 +5,7 @@ import {
   type ConverterMeta,
   type LanguageCode,
 } from "../types.js";
-import { getWav } from "../../ffmpeg/index.js";
+import { getWavBuffer } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { wavSampleRate } from "../../const.js";
@@ -35,14 +35,14 @@ export class WithAiProvider extends VoiceConverter {
 
   public async transformToText(
     fileLink: string,
-    isVideo: boolean,
+    _isVideo: boolean,
     lang: LanguageCode,
     logData: ConverterMeta,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    return getWav(fileLink, isVideo)
+    return getWavBuffer(fileLink)
       .then((bufferData) => {
         logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
         const token = this.getApiToken(lang);

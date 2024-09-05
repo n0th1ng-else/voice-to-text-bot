@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 export const VoiceConverterProviderSchema = z
-  .union([z.literal("WITAI"), z.literal("AWS"), z.literal("GOOGLE")])
+  .union([
+    z.literal("WITAI"),
+    z.literal("AWS"),
+    z.literal("GOOGLE"),
+    z.literal("WHISPER"),
+  ])
   .catch("WITAI")
   .describe("Validation schema for the Voice converter providers we support");
 
@@ -14,7 +19,7 @@ export abstract class VoiceConverter {
     fileLink: string,
     isVideo: boolean,
     lang: LanguageCode,
-    opts: ConverterMeta,
+    logData: ConverterMeta,
   ): Promise<string>;
 }
 
