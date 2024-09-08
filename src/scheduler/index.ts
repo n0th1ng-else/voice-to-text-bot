@@ -4,7 +4,6 @@ import type { VoidPromise } from "../common/types.js";
 const logger = new Logger("daemon");
 
 export class ScheduleDaemon<TickData> {
-  private readonly interval = 60_000;
   private readonly printId: string;
   private handler: NodeJS.Timeout | null = null;
   private shouldStop?: (data: TickData) => boolean;
@@ -17,6 +16,7 @@ export class ScheduleDaemon<TickData> {
   constructor(
     private readonly id: string,
     private readonly onTick: () => Promise<TickData>,
+    private readonly interval = 60_000,
   ) {
     this.printId = `[${this.id}]`;
   }

@@ -17,3 +17,4 @@ spmlogs
 HISTORY.md
 /**/*/*.spec.ts
 /**/__mocks__/*
+*.bin

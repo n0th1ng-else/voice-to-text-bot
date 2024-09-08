@@ -117,3 +117,4 @@ file-temp/*
 !file-temp/.gitkeep
 
 .VERSION
+*.bin
