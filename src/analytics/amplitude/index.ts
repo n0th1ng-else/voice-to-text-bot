@@ -1,19 +1,21 @@
 import { init as initAmplitude } from "@amplitude/node";
 import { customAlphabet } from "nanoid";
-
-import { AnalyticsEventExt } from "../ga/types.js";
+import type { AnalyticsEventExt } from "../ga/types.js";
 import { Logger } from "../../logger/index.js";
 import { amplitudeToken } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
 
 const logger = new Logger("analytics:amplitude");
 
-export const collectEvents = (chatId: number, events: AnalyticsEventExt[]) => {
+export const collectEvents = async (
+  chatId: number,
+  events: AnalyticsEventExt[],
+) => {
   if (!amplitudeToken) {
     if (!isDevelopment()) {
       logger.error(
-        "Amplitude analytics token is not provided!",
-        new Error("Amplitude analytics token is not provided"),
+        "Amplitude Analytics Token is not provided!",
+        new Error("Amplitude Analytics Token is not provided"),
       );
     }
     return Promise.resolve();

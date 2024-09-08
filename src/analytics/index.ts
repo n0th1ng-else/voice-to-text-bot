@@ -7,7 +7,7 @@ import { AnalyticsData } from "./ga/types.js";
 const logger = new Logger("analytics");
 
 export const collectAnalytics = (analytics: AnalyticsData): Promise<void> => {
-  logger.info("Collecting analytic data");
+  logger.debug("Collecting analytic data");
   const evts = analytics.getEvents();
   const id = analytics.getId();
 

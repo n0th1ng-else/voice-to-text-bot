@@ -1,20 +1,20 @@
 import axios from "axios";
 import { Logger } from "../../logger/index.js";
-import { AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
+import { type AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
 import { analytics } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
 
 const logger = new Logger("analytics:ga");
 
-export const collectEvents = (
+export const collectEvents = async (
   chatId: number,
   events: AnalyticsEventExt[],
 ): Promise<void> => {
   if (!analytics.measurementId || !analytics.apiSecret) {
     if (!isDevelopment()) {
       logger.error(
-        "ga analytics Token is not provided!",
-        new Error("ga analytics Token is not provided"),
+        "Google analytics Token is not provided!",
+        new Error("Google analytics Token is not provided"),
       );
     }
     return Promise.resolve();
