@@ -7,6 +7,7 @@ import {
 import { GoogleProvider } from "./google.js";
 import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
+import { WhisperProvider } from "./whisper.js";
 
 // Subset of the env.js file
 export type SupportedEnvironment = {
@@ -50,6 +51,8 @@ export const getVoiceConverterInstance = (
       return new WithAiProvider({
         tokens: environment.witAiApi.tokens,
       });
+    case "WHISPER":
+      return new WhisperProvider();
     default:
       throw new Error("Voice recognition provider is not specified");
   }

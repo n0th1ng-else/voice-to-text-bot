@@ -9,7 +9,7 @@ import {
   type LanguageCode,
   VoiceConverter,
 } from "./types.js";
-import { getWav } from "../ffmpeg/index.js";
+import { getWavBuffer } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
 
 const logger = new Logger("aws-recognition");
@@ -44,8 +44,8 @@ export class AWSProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
-    isVideo: boolean,
-    lang: LanguageCode,
+    _isVideo: boolean,
+    _lang: LanguageCode,
     logData: ConverterMeta,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
@@ -58,7 +58,7 @@ export class AWSProvider extends VoiceConverter {
             return this.getJobWithDelay(name, data.job);
           }
 
-          return this.processFile(fileLink, name, isVideo);
+          return this.processFile(fileLink, name);
         })
         // .then((job) => fetch(job.TranscriptionJob.Transcript.TranscriptFileUri))
         .then((job) =>
@@ -81,12 +81,8 @@ export class AWSProvider extends VoiceConverter {
     );
   }
 
-  private processFile(
-    fileLink: string,
-    name: string,
-    isVideo: boolean,
-  ): Promise<any> {
-    return getWav(fileLink, isVideo)
+  private processFile(fileLink: string, name: string): Promise<any> {
+    return getWavBuffer(fileLink)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));

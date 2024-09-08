@@ -6,6 +6,7 @@ describe("getVoiceConverterProvider", () => {
     ["WITAI", "WITAI"],
     ["GOOGLE", "GOOGLE"],
     ["AWS", "AWS"],
+    ["WHISPER", "WHISPER"],
     [undefined, "WITAI"],
     [42, "WITAI"],
     ["WRONG-STRING", "WITAI"],
