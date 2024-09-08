@@ -1,4 +1,4 @@
-import { BotCommand } from "../../telegram/types.js";
+import type { BotCommand } from "../../telegram/types.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { TelegramApi } from "../../telegram/api/tgapi.js";
 

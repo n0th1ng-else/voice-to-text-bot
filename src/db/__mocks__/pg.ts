@@ -16,6 +16,14 @@ export class Pool extends EventEmitter implements pg.Pool {
   public readonly totalCount = 0;
   public readonly waitingCount = 0;
 
+  public readonly options: pg.PoolOptions = {
+    allowExitOnIdle: false,
+    idleTimeoutMillis: null,
+    max: 1,
+    maxLifetimeSeconds: 10,
+    maxUses: 0,
+  } as const;
+
   private mockQueue: MockSql[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
