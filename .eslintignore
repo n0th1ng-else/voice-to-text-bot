@@ -13,3 +13,4 @@ coverage-unit
 package.json
 package-lock.json
 pnpm-lock.yaml
+*.bin

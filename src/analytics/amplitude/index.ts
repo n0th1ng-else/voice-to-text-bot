@@ -51,8 +51,10 @@ export const collectEvents = async (
         ),
       );
     })
-    .then(() => logger.info("Analytic data Amplitude has been collected"))
-    .catch((err) =>
-      logger.warn("Failed to collect analytic data Amplitude", err),
-    );
+    .then(() => {
+      logger.debug("Analytic data Amplitude has been collected");
+    })
+    .catch((err) => {
+      logger.error("Failed to collect analytic data Amplitude", err);
+    });
 };

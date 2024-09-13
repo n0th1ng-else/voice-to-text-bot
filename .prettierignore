@@ -6,3 +6,4 @@ tsconfig.json
 dist/
 assets/
 coverage/
+*.bin
