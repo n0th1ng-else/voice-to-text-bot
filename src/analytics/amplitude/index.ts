@@ -8,7 +8,7 @@ import { isDevelopment } from "../../common/environment.js";
 const logger = new Logger("analytics:amplitude");
 
 export const collectEvents = async (
-  chatId: number,
+  chatId: number | "system_executor",
   events: AnalyticsEventExt[],
 ) => {
   if (!amplitudeToken) {

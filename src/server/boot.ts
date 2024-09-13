@@ -10,8 +10,14 @@ import { getDb } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
 import { TelegramBotModel } from "../telegram/bot.js";
 import { ScheduleDaemon } from "../scheduler/index.js";
-import { printCurrentMemoryStat } from "../memory/index.js";
-import { printCurrentStorageUsage } from "../storage/index.js";
+import {
+  printCurrentMemoryStat,
+  sendMemoryStatAnalytics,
+} from "../memory/index.js";
+import {
+  printCurrentStorageUsage,
+  sendStorageStatAnalytics,
+} from "../storage/index.js";
 import { StopListener } from "../process/index.js";
 import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
@@ -95,12 +101,14 @@ export const prepareInstance = async (
 };
 
 export const prepareStopListener = (): StopListener => {
-  const memoryDaemon = new ScheduleDaemon("memory", () =>
-    printCurrentMemoryStat(envy.memoryLimit),
-  ).start();
-  const storageDaemon = new ScheduleDaemon("storage", () =>
-    printCurrentStorageUsage("file-temp"),
-  ).start();
+  const memoryDaemon = new ScheduleDaemon("memory", async () => {
+    const value = await printCurrentMemoryStat(envy.memoryLimit);
+    await sendMemoryStatAnalytics(value, envy.appVersion);
+  }).start();
+  const storageDaemon = new ScheduleDaemon("storage", async () => {
+    const value = await printCurrentStorageUsage("file-temp");
+    await sendStorageStatAnalytics(value, envy.appVersion);
+  }).start();
 
   const stopListener = new StopListener().addTrigger(() => {
     memoryDaemon.stop();
