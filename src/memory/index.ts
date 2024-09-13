@@ -75,7 +75,7 @@ export const sendMemoryStatAnalytics = async (
     params: {
       size: sizeMb,
       app_version: appVersion,
-      page_location: "system/internal",
+      page_location: "system/internal/ram",
       page_title: `Internal system metrics`,
       thread_id: 0,
       engagement_time_msec: 0,
