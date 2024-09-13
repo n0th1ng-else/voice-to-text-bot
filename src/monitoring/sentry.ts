@@ -108,7 +108,8 @@ export const initSentryNew = (): void => {
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
-    profilesSampleRate: 1.0,
+    profilesSampleRate: isDevelopment() ? 1.0 : 0.2,
+    sampleRate: isDevelopment() ? 1.0 : 0.5,
   });
 };
 
