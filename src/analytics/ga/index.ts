@@ -50,6 +50,10 @@ export const collectEvents = async (
         events,
       },
     })
-    .then(() => logger.info("Analytic data ga has been collected"))
-    .catch((err) => logger.warn("Failed to collect analytic data ga", err));
+    .then(() => {
+      logger.debug("Analytic data ga has been collected");
+    })
+    .catch((err) => {
+      logger.error("Failed to collect analytic data ga", err);
+    });
 };
