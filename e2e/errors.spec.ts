@@ -11,7 +11,7 @@ import request from "supertest";
 import nock from "nock";
 import {
   injectDependencies,
-  InjectedFn,
+  type InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";

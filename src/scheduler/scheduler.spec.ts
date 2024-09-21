@@ -8,7 +8,10 @@ import {
   beforeAll,
 } from "@jest/globals";
 import { nanoid } from "nanoid";
-import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
+import {
+  injectDependencies,
+  type InjectedFn,
+} from "../testUtils/dependencies.js";
 import type { Mock } from "jest-mock";
 import type { VoidPromise } from "../common/types.js";
 

@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:events";
-import pg from "pg";
+import type pg from "pg";
 import { nanoid } from "nanoid";
 import { NodesSql } from "../sql/nodes.sql.js";
 import { UsagesSql } from "../sql/usages.sql.js";

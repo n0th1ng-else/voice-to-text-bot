@@ -12,10 +12,10 @@ import {
 } from "@jest/globals";
 import {
   injectDependencies,
-  InjectedFn,
+  type InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import {
-  InjectedTestFn,
+  type InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";

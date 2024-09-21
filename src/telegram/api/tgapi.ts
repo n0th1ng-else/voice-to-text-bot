@@ -1,22 +1,22 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
-import { z } from "zod";
+import axios, { type AxiosError, type AxiosInstance } from "axios";
+import { type z } from "zod";
 import {
-  ApiErrorReflector,
-  BotCommandDto,
-  BotCommandListDto,
-  EditMessageDto,
-  FileDto,
-  InvoiceDto,
-  MessageDto,
-  PreCheckoutQueryDto,
-  TgCore,
-  TgFile,
-  TgInvoice,
+  type ApiErrorReflector,
+  type BotCommandDto,
+  type BotCommandListDto,
+  type EditMessageDto,
+  type FileDto,
+  type InvoiceDto,
+  type MessageDto,
+  type PreCheckoutQueryDto,
+  type TgCore,
+  type TgFile,
+  type TgInvoice,
   TgLeaveChatSchema,
-  TgMessage,
-  TgMessageOptions,
+  type TgMessage,
+  type TgMessageOptions,
   TgSetWebHookSchema,
-  TgWebHook,
+  type TgWebHook,
   TgWebHookSchema,
 } from "./types.js";
 import { TgError } from "./tgerror.js";
