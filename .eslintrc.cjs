@@ -17,6 +17,10 @@ module.exports = {
     "prettier",
   ],
   rules: {
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      { fixStyle: "inline-type-imports" },
+    ],
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
     "@typescript-eslint/prefer-nullish-coalescing": "off",
     "@typescript-eslint/no-misused-promises": "off",

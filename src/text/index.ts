@@ -1,4 +1,4 @@
-import { TranslationKey, TranslationKeys } from "./types.js";
+import { type TranslationKey, TranslationKeys } from "./types.js";
 import {
   DEFAULT_LANGUAGE,
   SUPPORTED_LANGUAGES,

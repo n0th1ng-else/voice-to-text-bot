@@ -6,7 +6,7 @@ import {
   isMessageNotModified,
   isKickedFromSupergroup,
 } from "./tgerror.js";
-import { TgCore } from "./types.js";
+import { type TgCore } from "./types.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
 
 describe("tgerror", () => {

@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
-import { DurationRowScheme, DurationsDb } from "./sql/durations.js";
+import { type DurationRowScheme, DurationsDb } from "./sql/durations.js";
 
 const logger = new Logger("postgres-durations");
 
