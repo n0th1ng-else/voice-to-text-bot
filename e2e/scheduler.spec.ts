@@ -9,13 +9,9 @@ import {
 } from "@jest/globals";
 import {
   injectDependencies,
-  type InjectedFn,
+  InjectedFn,
 } from "../src/testUtils/dependencies.js";
-import {
-  type HealthDto,
-  HealthSsl,
-  HealthStatus,
-} from "../src/server/types.js";
+import { HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
 import type { SpiedFunction } from "jest-mock";
 import type { VoidPromise } from "../src/common/types.js";
 

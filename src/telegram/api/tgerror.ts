@@ -1,4 +1,4 @@
-import { type TgCore } from "./types.js";
+import { TgCore } from "./types.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
 import { getRegExpFromString } from "../../common/helpers.js";
 

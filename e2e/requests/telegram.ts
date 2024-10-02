@@ -1,14 +1,14 @@
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "@jest/globals";
-import type request from "supertest";
-import type nock from "nock";
+import request from "supertest";
+import nock from "nock";
 import querystring from "query-string";
-import { type TelegramBotModel } from "../../src/telegram/bot.js";
+import { TelegramBotModel } from "../../src/telegram/bot.js";
 import {
-  type TelegramMessageMetaItem,
+  TelegramMessageMetaItem,
   TelegramMessageMetaType,
-  type TelegramMessageModel,
+  TelegramMessageModel,
 } from "../helpers.js";
 import { getTranslator, isTranslationKey } from "../../src/text/index.js";
 import { type TranslationKey, TranslationKeys } from "../../src/text/types.js";

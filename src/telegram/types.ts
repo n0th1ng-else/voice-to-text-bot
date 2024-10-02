@@ -15,8 +15,8 @@ import {
 } from "./helpers.js";
 import { Logger } from "../logger/index.js";
 import { getTranslator } from "../text/index.js";
-import { type TgMessage, type TgMessageOptions } from "./api/types.js";
-import { type AnalyticsData } from "../analytics/ga/types.js";
+import { TgMessage, TgMessageOptions } from "./api/types.js";
+import { AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
 
 export enum VoiceContentReason {

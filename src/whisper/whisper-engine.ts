@@ -3,17 +3,11 @@ import { join as joinPath } from "node:path";
 import type { LanguageCode } from "../recognition/types.js";
 import getWhisper from "./whisper-addon.cjs";
 
-type WhisperSupportedLanguage =
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  import("./whisper-addon.cjs").WhisperSupportedLanguage;
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-type WhisperOptions = import("./whisper-addon.cjs").WhisperOptions;
-
 const CURRENT_DIR = fileURLToPath(new URL(".", import.meta.url));
 
 const mapAppLanguageToWhisperLanguage = (
   languageCode: LanguageCode,
-): WhisperSupportedLanguage => {
+): import("./whisper-addon.cjs").WhisperSupportedLanguage => {
   switch (languageCode) {
     case "ru-RU":
       return "ru";
@@ -44,12 +38,12 @@ export const runWhisper = async (
 ): Promise<string> => {
   const modelPath = joinPath(
     CURRENT_DIR,
-    "./generated/ggml-model-whisper-large-q5_0.bin",
+    "./ggml-model-whisper-small-q5_1.bin",
   );
   const runWhisperAsync = getWhisper();
   const language = mapAppLanguageToWhisperLanguage(languageCode);
 
-  const whisperParams: WhisperOptions = {
+  const whisperParams: import("./whisper-addon.cjs").WhisperOptions = {
     language,
     model: modelPath,
     fname_inp: wavPath,
