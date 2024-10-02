@@ -13,10 +13,10 @@ import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import {
   injectDependencies,
-  type InjectedFn,
+  InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import {
-  type InjectedTestFn,
+  InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import type { VoidPromise } from "../src/common/types.js";

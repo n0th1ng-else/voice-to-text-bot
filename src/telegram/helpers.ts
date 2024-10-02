@@ -1,18 +1,14 @@
 import {
   BotCommand,
-  type BotMessageModel,
-  type DonationDto,
-  type DonationPayload,
+  BotMessageModel,
+  DonationDto,
+  DonationPayload,
   DonationSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
 } from "./types.js";
 import { telegramBotName } from "../env.js";
-import {
-  type TgCallbackQuery,
-  type TgMedia,
-  type TgMessage,
-} from "./api/types.js";
+import { TgCallbackQuery, TgMedia, TgMessage } from "./api/types.js";
 import {
   DEFAULT_LANGUAGE,
   type LanguageCode,

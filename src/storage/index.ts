@@ -7,16 +7,6 @@ import { collectEvents } from "../analytics/amplitude/index.js";
 
 const logger = new Logger("storage");
 
-const safeSize = (path: string): number => {
-  try {
-    const { size } = statSync(path);
-    return size;
-  } catch (err) {
-    // The file was most likely deleted, hence 0
-    return 0;
-  }
-};
-
 export const printCurrentStorageUsage = async (
   dir: string,
 ): Promise<number> => {
@@ -27,7 +17,7 @@ export const printCurrentStorageUsage = async (
         (file) => !file.includes("gitkeep"),
       );
       const cacheSizeBytes = files.reduce(
-        (sum, file) => sum + safeSize(resolvePath(folder, file)),
+        (sum, file) => sum + statSync(resolvePath(folder, file)).size,
         0,
       );
       const cacheSizeMBytes = Math.ceil(cacheSizeBytes / getMB(1));

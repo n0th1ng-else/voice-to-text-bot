@@ -1,23 +1,23 @@
 import axios, {
   AxiosHeaders,
-  type AxiosError,
-  type AxiosRequestConfig,
-  type CreateAxiosDefaults,
+  AxiosError,
+  AxiosRequestConfig,
+  CreateAxiosDefaults,
 } from "axios";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { nanoid } from "nanoid";
 import {
-  type BotCommandDto,
-  type TgCore,
-  type TgFile,
-  type TgInlineKeyboardButton,
-  type TgInvoice,
-  type TgLeaveChatSchema,
-  type TgMessage,
-  type TgWebHook,
+  BotCommandDto,
+  TgCore,
+  TgFile,
+  TgInlineKeyboardButton,
+  TgInvoice,
+  TgLeaveChatSchema,
+  TgMessage,
+  TgWebHook,
 } from "./types.js";
 import { TelegramApi } from "./tgapi.js";
-import { type TgError } from "./tgerror.js";
+import { TgError } from "./tgerror.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
 
 const getApiResponse = <Response>(
