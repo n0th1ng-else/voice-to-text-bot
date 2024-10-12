@@ -5,7 +5,7 @@ import getWhisper from "./whisper-addon.cjs";
 
 const CURRENT_DIR = fileURLToPath(new URL(".", import.meta.url));
 
-const mapAppLanguageToWhisperLanguage = (
+export const mapAppLanguageToWhisperLanguage = (
   languageCode: LanguageCode,
 ): import("./whisper-addon.cjs").WhisperSupportedLanguage => {
   switch (languageCode) {
@@ -38,7 +38,7 @@ export const runWhisper = async (
 ): Promise<string> => {
   const modelPath = joinPath(
     CURRENT_DIR,
-    "./ggml-model-whisper-small-q5_1.bin",
+    "./generated/ggml-model-whisper-large-q5_0.bin",
   );
   const runWhisperAsync = getWhisper();
   const language = mapAppLanguageToWhisperLanguage(languageCode);
