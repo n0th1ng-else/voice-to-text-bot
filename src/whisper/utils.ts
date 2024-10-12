@@ -1,9 +1,13 @@
 import type { LanguageCode } from "../recognition/types.js";
 import { isFileExist, readDirectoryFiles } from "../files/index.js";
 
-type WhisperSupportedLanguage =
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  import("./whisper-addon.cjs").WhisperSupportedLanguage;
+/**
+ * Whisper-compatible languages. We only added the languages we support atm.
+ * See the whole list here:
+ * - https://github.com/n0th1ng-else/whisper.cpp/blob/master/src/whisper.cpp#L278
+ *
+ */
+export type WhisperSupportedLanguage = "en" | "ru";
 
 export const mapAppLanguageToWhisperLanguage = (
   languageCode: LanguageCode,

@@ -52,7 +52,7 @@ export const getVoiceConverterInstance = async (
         tokens: environment.witAiApi.tokens,
       });
     case "WHISPER":
-      return await WhisperProvider.factory();
+      return await WhisperProvider.factory("v2");
     default:
       throw new Error("Voice recognition provider is not specified");
   }
