@@ -8,7 +8,10 @@ import {
   jest,
 } from "@jest/globals";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { injectDependencies, InjectedFn } from "../testUtils/dependencies.js";
+import {
+  injectDependencies,
+  type InjectedFn,
+} from "../testUtils/dependencies.js";
 
 jest.unstable_mockModule(
   "../logger/index",

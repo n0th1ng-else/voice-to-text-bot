@@ -1,7 +1,7 @@
 import { describe, it, expect, jest } from "@jest/globals";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { requestHealthData } from "./api.js";
-import { HealthDto, HealthSsl, HealthStatus } from "./types.js";
+import { type HealthDto, HealthSsl, HealthStatus } from "./types.js";
 
 const mockRequest = (
   fn: (config?: AxiosRequestConfig) => Promise<HealthDto>,

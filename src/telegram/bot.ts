@@ -1,11 +1,11 @@
 import {
-  TgCallbackQuery,
-  TgCheckoutQuery,
-  TgMessage,
-  TgUpdate,
+  type TgCallbackQuery,
+  type TgCheckoutQuery,
+  type TgMessage,
+  type TgUpdate,
 } from "./api/types.js";
 import { Logger } from "../logger/index.js";
-import { VoiceConverter } from "../recognition/types.js";
+import { type VoiceConverter } from "../recognition/types.js";
 import { TranslationKeys } from "../text/types.js";
 import { BotMessageModel, TelegramMessagePrefix } from "./types.js";
 import { isMessageSupported } from "./helpers.js";
@@ -15,8 +15,8 @@ import { BotActions } from "./actions/index.js";
 import { getBotMenuCommands } from "./data.js";
 import { TelegramApi } from "./api/tgapi.js";
 import { collectAnalytics } from "../analytics/index.js";
-import { AnalyticsData } from "../analytics/ga/types.js";
-import { PaymentService } from "../donate/types.js";
+import { type AnalyticsData } from "../analytics/ga/types.js";
+import { type PaymentService } from "../donate/types.js";
 import { initTgReflector } from "./reflector.js";
 import type { getDb } from "../db/index.js";
 

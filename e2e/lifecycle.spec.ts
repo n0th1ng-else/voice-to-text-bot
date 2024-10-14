@@ -12,11 +12,11 @@ import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import {
   injectDependencies,
-  InjectedFn,
+  type InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import {
   injectTestDependencies,
-  InjectedTestFn,
+  type InjectedTestFn,
 } from "./helpers/dependencies.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";

@@ -13,10 +13,10 @@ import request from "supertest";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import {
   injectDependencies,
-  InjectedFn,
+  type InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import {
-  InjectedTestFn,
+  type InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import type { TgChatType } from "../src/telegram/api/types.js";
