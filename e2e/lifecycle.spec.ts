@@ -74,7 +74,7 @@ describe("[lifecycle]", () => {
 
     mockGoogleAuth();
 
-    const converter = getVoiceConverterInstance(
+    const converter = await getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
       initTest.getConverterOptions(),
     );
@@ -99,16 +99,15 @@ describe("[lifecycle]", () => {
     host = request(`${localhostUrl}:${appPort}`);
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     server = new BotServer(appPort, appVersion, webhookDoNotWait);
-    return server.start().then((stopFn) => (stopHandler = stopFn));
+    stopHandler = await server.start();
   });
 
-  afterEach(() => {
-    return stopHandler().then(() => {
-      expect(telegramServer.isDone()).toBe(true);
-      expect(testPool.isDone()).toBe(true);
-    });
+  afterEach(async () => {
+    await stopHandler();
+    expect(telegramServer.isDone()).toBe(true);
+    expect(testPool.isDone()).toBe(true);
   });
 
   it("initial api access", () => {

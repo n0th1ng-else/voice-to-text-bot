@@ -1,5 +1,6 @@
 import { promises, createWriteStream } from "node:fs";
 import type { IncomingMessage } from "node:http";
+import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { nanoid } from "nanoid";
 import { Logger } from "../logger/index.js";
@@ -93,4 +94,10 @@ export const saveStreamToFile = async (
 export const readFileIntoBuffer = async (fileName: string): Promise<Buffer> => {
   const buffer = await promises.readFile(fileName);
   return buffer;
+};
+
+export const readDirectoryFiles = async (dir: URL): Promise<string[]> => {
+  const files = await promises.readdir(dir);
+  const folder = fileURLToPath(dir);
+  return files.map((file) => resolve(folder, file));
 };

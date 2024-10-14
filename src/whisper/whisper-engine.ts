@@ -1,28 +1,9 @@
-import { fileURLToPath } from "node:url";
-import { join as joinPath } from "node:path";
 import type { LanguageCode } from "../recognition/types.js";
+import { mapAppLanguageToWhisperLanguage } from "./utils.js";
 import getWhisper from "./whisper-addon.cjs";
 
-type WhisperSupportedLanguage =
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  import("./whisper-addon.cjs").WhisperSupportedLanguage;
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type WhisperOptions = import("./whisper-addon.cjs").WhisperOptions;
-
-const CURRENT_DIR = fileURLToPath(new URL(".", import.meta.url));
-
-const mapAppLanguageToWhisperLanguage = (
-  languageCode: LanguageCode,
-): WhisperSupportedLanguage => {
-  switch (languageCode) {
-    case "ru-RU":
-      return "ru";
-    case "en-US":
-      return "en";
-    default:
-      throw new Error(`The language code "${languageCode}" is not supported?`);
-  }
-};
 
 /**
  *
@@ -32,20 +13,17 @@ const mapAppLanguageToWhisperLanguage = (
  * - Original: https://github.com/ggerganov/whisper.cpp/tree/master/examples/addon.node
  * - Fork: https://github.com/n0th1ng-else/whisper.cpp/tree/master/examples/addon.node
  *
+ * @param modelPath {string} - Whisper model file
  * @param wavPath {string} - file path
  * @param languageCode {import("../recognition/types").LanguageCode} - language code for recognition
  *
  * @return {Promise<string>}
  */
-
 export const runWhisper = async (
+  modelPath: string,
   wavPath: string,
   languageCode: LanguageCode,
 ): Promise<string> => {
-  const modelPath = joinPath(
-    CURRENT_DIR,
-    "./generated/ggml-model-whisper-large-q5_0.bin",
-  );
   const runWhisperAsync = getWhisper();
   const language = mapAppLanguageToWhisperLanguage(languageCode);
 

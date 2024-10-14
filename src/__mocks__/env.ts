@@ -70,3 +70,5 @@ export const sentryDsn = "";
 export const logLevel = "debug";
 
 export const webhookDoNotWait = false;
+
+export const whisperModelFile = "";

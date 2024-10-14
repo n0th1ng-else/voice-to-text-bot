@@ -47,7 +47,7 @@ export const prepareInstance = async (
 
   const parsedProvider = getVoiceConverterProvider(envy.provider);
 
-  const converter = getVoiceConverterInstance(parsedProvider, envy);
+  const converter = await getVoiceConverterInstance(parsedProvider, envy);
 
   const db = getDb(
     [
