@@ -145,7 +145,7 @@ describe("[russian language]", () => {
 
     mockGoogleAuth();
 
-    converter = getVoiceConverterInstance(
+    converter = await getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
       initTest.getConverterOptions(),
     );

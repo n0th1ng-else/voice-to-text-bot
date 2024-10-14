@@ -121,7 +121,7 @@ describe("[default language - english]", () => {
 
     mockGoogleAuth();
 
-    const converter = getVoiceConverterInstance(
+    const converter = await getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
       initTest.getConverterOptions(),
     );

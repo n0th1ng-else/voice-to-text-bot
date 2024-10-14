@@ -115,7 +115,7 @@ describe("[default language - english] donate", () => {
 
     mockGoogleAuth();
 
-    const converter = getVoiceConverterInstance(
+    const converter = await getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
       initTest.getConverterOptions(),
     );

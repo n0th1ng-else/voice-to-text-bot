@@ -140,7 +140,7 @@ describe("[default language - english]", () => {
 
     mockGoogleAuth();
 
-    converter = getVoiceConverterInstance(
+    converter = await getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
       initTest.getConverterOptions(),
     );

@@ -78,7 +78,7 @@ describe("[health]", () => {
 
     mockGoogleAuth();
 
-    const converter = getVoiceConverterInstance(
+    const converter = await getVoiceConverterInstance(
       getVoiceConverterProvider("GOOGLE"),
       initTest.getConverterOptions(),
     );
@@ -101,9 +101,9 @@ describe("[health]", () => {
     host = request(`${localhostUrl}:${appPort}`);
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     server = new BotServer(appPort, appVersion, webhookDoNotWait);
-    return server.start().then((stopFn) => (stopHandler = stopFn));
+    stopHandler = await server.start();
   });
 
   afterEach(() => {

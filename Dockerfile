@@ -15,6 +15,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY ./assets $APP_DIR/assets
 COPY ./certs $APP_DIR/certs
 COPY ./file-temp $APP_DIR/file-temp
+COPY ./model-cache $APP_DIR/model-cache
 COPY ./src $APP_DIR/src
 
 RUN pnpm run build
@@ -41,6 +42,7 @@ WORKDIR $APP_DIR
 RUN npm install -g pnpm@9 && touch "$APP_DIR/.env"
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/file-temp $APP_DIR/file-temp
+COPY --from=builder $APP_DIR/model-cache $APP_DIR/model-cache
 COPY --from=builder $APP_DIR/package.json $APP_DIR
 COPY --from=builder $APP_DIR/pnpm-lock.yaml $APP_DIR
 RUN npm pkg delete scripts.prepare

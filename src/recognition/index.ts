@@ -28,10 +28,10 @@ export const getVoiceConverterProvider = (
   return VoiceConverterProviderSchema.parse(provider);
 };
 
-export const getVoiceConverterInstance = (
+export const getVoiceConverterInstance = async (
   provider: VoiceConverterProvider,
   environment: SupportedEnvironment,
-): VoiceConverter => {
+): Promise<VoiceConverter> => {
   switch (provider) {
     case "GOOGLE":
       return new GoogleProvider({
@@ -52,7 +52,7 @@ export const getVoiceConverterInstance = (
         tokens: environment.witAiApi.tokens,
       });
     case "WHISPER":
-      return new WhisperProvider();
+      return await WhisperProvider.factory();
     default:
       throw new Error("Voice recognition provider is not specified");
   }
