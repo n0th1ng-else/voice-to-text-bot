@@ -1,0 +1,64 @@
+# DEPLOYING THE APP ON LINUX VIRTUAL MACHINE WITH BLUE GREEN DEPLOYMENT STRATEGY
+
+name: Deploy to Cloud VM
+
+on:
+  workflow_dispatch:
+    inputs:
+      dockerimage:
+        type: string
+        description: "Docker image to deploy"
+        required: true
+
+env:
+  VM_SSH_PORT: 22
+  FOLDER_NAME: vtt-application
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: "Virtual-machine"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Updating Env Variables From Github Secrets Into Frontend Env File On VM
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: "ubuntu"
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ env.VM_SSH_PORT }}
+          # Update environment variables for frontend project inside this github secret before running the pipeline
+          script: |
+            cd "./${{ env.FOLDER_NAME }}"
+            echo "${{ secrets.FRONTEND_ENVIRONMENT_VARIABLES }}" > /home/ubuntu/${{ env.FOLDER_NAME }}/app.env
+
+      - name: Update Docker Image And Environment Variables For The Swarm Services In VM
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: "ubuntu"
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ env.VM_SSH_PORT }}
+          # The following line will call the update_service function inside the update-services.sh
+          # Syntax - update_service "<stack_name>" "<service_name>" "<image_name>" "<env_file_name>"
+          script: |
+            cd "./${{ env.FOLDER_NAME }}"
+            source update-services.sh
+            update_service "voice-to-text-app" "bot" "${{ inputs.dockerimage }}" "app.env"
+
+      - name: Rolling Out Updates in VM
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: "ubuntu"
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ env.VM_SSH_PORT }}
+          # This script will deploy the new version, verify healthcheck and rollback if healthcheck fails
+          script: |
+            cd "./${{ env.FOLDER_NAME }}"
+            sudo chmod +x deploy-app.sh
+            sudo ./deploy-app.sh
+            sudo docker system prune -af
