@@ -1,3 +1,4 @@
+import { arch } from "node:os";
 import {
   type ConverterMeta,
   type LanguageCode,
@@ -8,17 +9,22 @@ import { addAttachment } from "../monitoring/sentry.js";
 import { getWavFilePath } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 import { runWhisper } from "../whisper/whisper-engine.js";
-import { lookupModel } from "../whisper/utils.js";
+import {
+  lookupModel,
+  type WhisperAddonArchitecture,
+} from "../whisper/utils.js";
 import { whisperEnableGpu, whisperModelFile } from "../env.js";
 
 const logger = new Logger("whisper-recognition");
 
 export class WhisperProvider extends VoiceConverter {
   private modelPath: string | undefined;
+  private readonly architecture: WhisperAddonArchitecture;
 
   private constructor() {
     super();
-    logger.info("Using Whisper");
+    this.architecture = arch().includes("x64") ? "x64" : "arm";
+    logger.info(`Using [${this.architecture}] Whisper`);
   }
 
   private async init(): Promise<void> {
@@ -53,6 +59,7 @@ export class WhisperProvider extends VoiceConverter {
       this.modelPath,
       filePath,
       lang,
+      this.architecture,
       whisperEnableGpu,
     );
     await deleteFileIfExists(filePath);

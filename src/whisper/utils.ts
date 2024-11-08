@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { LanguageCode } from "../recognition/types.js";
 import { isFileExist, readDirectoryFiles } from "../files/index.js";
 
@@ -62,3 +63,12 @@ export const lookupModel = async (
 
   return modelFile;
 };
+
+export const WhisperAddonArchitectureSchema = z
+  .union([z.literal("x64"), z.literal("arm")])
+  .catch("arm")
+  .describe("Supported Whisper addon architectures");
+
+export type WhisperAddonArchitecture = z.infer<
+  typeof WhisperAddonArchitectureSchema
+>;
