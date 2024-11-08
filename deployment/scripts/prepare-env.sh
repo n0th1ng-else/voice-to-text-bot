@@ -81,6 +81,15 @@ else
   echo "Nginx is already installed."
 fi
 
+# Check if Certbot is installed
+if ! command -v certbot &> /dev/null; then
+  echo "Installing Certbot..."
+  sudo snap install --classic certbot
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+else
+  echo "Certbot is already installed."
+fi
+
 #### STEP 5 ####
 
 echo "Now you need to apply the nginx config manually and reload the nginx:"
