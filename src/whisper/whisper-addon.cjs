@@ -30,12 +30,16 @@ const { promisify } = require("node:util");
 /**
  * Initialize the Whisper as an addon. The easiest way is to just require it in the CommonJS module.
  * Then we can use it everywhere.
+ * @param addonArchitecture {import("./utils.js").WhisperAddonArchitecture} - language code for recognition
  *
  * @return {(opts: WhisperOptions) => Promise<WhisperResultItem[]>}
  */
-module.exports = () => {
-  // Addon version: 5236f0278420ab776d1787c4330678d80219b4b6
-  const addOnPath = path.join(__dirname, "./whisper-processor");
+module.exports = (addonArchitecture) => {
+  // Addon version: 31aea563a83803c710691fed3e8d700e06ae6788
+  const addOnPath = path.join(
+    __dirname,
+    `./addons/whisper-processor.${addonArchitecture}.node`,
+  );
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { whisper } = require(addOnPath);
   return promisify(whisper);
