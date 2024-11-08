@@ -81,6 +81,8 @@ else
   echo "Nginx is already installed."
 fi
 
+#### STEP 5 ####
+
 # Check if Certbot is installed
 if ! command -v certbot &> /dev/null; then
   echo "Installing Certbot..."
@@ -90,7 +92,7 @@ else
   echo "Certbot is already installed."
 fi
 
-#### STEP 5 ####
+#### STEP 6 ####
 
 echo "Now you need to apply the nginx config manually and reload the nginx:"
 echo "Change the configuration for /etc/nginx/sites-available/default"
