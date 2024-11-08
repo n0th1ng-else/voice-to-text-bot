@@ -23,6 +23,7 @@ export const runWhisper = async (
   modelPath: string,
   wavPath: string,
   languageCode: LanguageCode,
+  useGpu: boolean,
 ): Promise<string> => {
   const runWhisperAsync = getWhisper();
   const language = mapAppLanguageToWhisperLanguage(languageCode);
@@ -31,7 +32,7 @@ export const runWhisper = async (
     language,
     model: modelPath,
     fname_inp: wavPath,
-    use_gpu: true,
+    use_gpu: useGpu,
     flash_attn: false,
     no_prints: true,
     comma_in_time: false,

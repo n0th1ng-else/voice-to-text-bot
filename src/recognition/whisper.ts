@@ -9,7 +9,7 @@ import { getWavFilePath } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 import { runWhisper } from "../whisper/whisper-engine.js";
 import { lookupModel } from "../whisper/utils.js";
-import { whisperModelFile } from "../env.js";
+import { whisperEnableGpu, whisperModelFile } from "../env.js";
 
 const logger = new Logger("whisper-recognition");
 
@@ -49,7 +49,12 @@ export class WhisperProvider extends VoiceConverter {
 
     const filePath = await getWavFilePath(fileLink);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
-    const text = await runWhisper(this.modelPath, filePath, lang);
+    const text = await runWhisper(
+      this.modelPath,
+      filePath,
+      lang,
+      whisperEnableGpu,
+    );
     await deleteFileIfExists(filePath);
     return text;
   }
