@@ -21,9 +21,8 @@ More in the article https://www.geeksforgeeks.org/blue-green-deployments-with-do
 10. Open the ports
     - Add the rules in the `sudo nano /etc/iptables/rules.v4` after SSH rule (port 22)
     - `-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT`
-    - `-A INPUT -p tcp -m state --state NEW -m tcp --dport 3333 -j ACCEPT`
+    - `-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT`
     - Apply rules `sudo iptables-restore < /etc/iptables/rules.v4`
     - Check the rules applied `sudo iptables -L INPUT`
     - Do same in OCI console: `Virtual cloud network > subnets > security lists > ingress rules`
-    - `0.0.0.0/0, All ports to 80`
-    - `0.0.0.0/0 3333 to 3333`
+    - `0.0.0.0/0, All ports to 443` # Try port 80 first and see the NGINX home page
