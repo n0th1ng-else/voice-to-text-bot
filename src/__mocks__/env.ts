@@ -47,14 +47,25 @@ export const dbPostgres = {
   cert: "",
 };
 
+export const dbPostgres2 = {
+  user: "",
+  password: "",
+  host: "",
+  database: "",
+  port: 5432,
+  cert: "",
+};
+
 export const analytics = {
   apiSecret: `v4-secret-${randomIntFromInterval(1, 1000)}`,
   measurementId: `v4-${randomIntFromInterval(1, 1000)}`,
 };
 
 export const witAiApi = {
-  tokenEn: "",
-  tokenRu: "",
+  tokens: {
+    "en-US": "",
+    "ru-RU": "",
+  },
 };
 
 export const isDebug = false;
@@ -71,4 +82,8 @@ export const logLevel = "debug";
 
 export const webhookDoNotWait = false;
 
+export const newRouter = false;
+
 export const whisperModelFile = "";
+
+export const whisperEnableGpu = false;

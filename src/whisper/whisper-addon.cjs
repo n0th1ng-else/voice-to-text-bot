@@ -11,18 +11,10 @@ const { promisify } = require("node:util");
  */
 
 /**
- * Whisper-compatible languages. We only added the languages we support atm.
- * See the whole list here:
- * - https://github.com/n0th1ng-else/whisper.cpp/blob/master/src/whisper.cpp#L278
- *
- * @typedef {'en' | 'ru'} WhisperSupportedLanguage
- */
-
-/**
  * Whisper input Parameters.
  *
  * @typedef {Object} WhisperOptions
- * @property {WhisperSupportedLanguage} language - The recognition language
+ * @property {import("./utils.ts").WhisperSupportedLanguage} language - The recognition language
  * @property {string} model - The absolute file path for the trained model
  * @property {string} [fname_inp] - The absolute file path for the WAV file
  * @property {Buffer} [pcmf32] - Raw pcm32 Buffer instead of fname_inp

@@ -29,13 +29,18 @@ jobs:
 
   validate:
     runs-on: ubuntu-latest
-    name: Run check
+    name: Run ${{ matrix.arrays.label }}
     timeout-minutes: 3
     strategy:
       matrix:
-        command: [typecheck, "lint:all", "format:check"]
+        arrays:
+          [
+            { command: "typecheck", label: "typecheck" },
+            { command: "lint:all", label: "lint" },
+            { command: "format:check", label: "code formatting check" },
+          ]
     env:
-      COMMAND: ${{ matrix.command }}
+      COMMAND: ${{ matrix.arrays.command }}
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
