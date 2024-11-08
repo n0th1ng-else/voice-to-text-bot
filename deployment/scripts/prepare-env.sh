@@ -4,8 +4,9 @@
 
 # Define the folder name
 FOLDER_NAME="vtt-application"
+SERVICE_CACHE_FOLDER_NAME="vtt-cache"
 
-# Check if the folder exists
+# Check if the project folder exists
 if [ ! -d "./$FOLDER_NAME" ]; then
   # If the folder does not exist, create it
   mkdir "./$FOLDER_NAME"
@@ -13,6 +14,18 @@ if [ ! -d "./$FOLDER_NAME" ]; then
 else
   # If the folder exists, print a message
   echo "Folder '$FOLDER_NAME' already exists."
+fi
+
+cd "./$FOLDER_NAME"
+
+# Check if the cache folder exists
+if [ ! -d "./$SERVICE_CACHE_FOLDER_NAME" ]; then
+  # If the folder does not exist, create it
+  mkdir "./$SERVICE_CACHE_FOLDER_NAME"
+  echo "Folder '$FOLDER_NAME/$SERVICE_CACHE_FOLDER_NAME' created."
+else
+  # If the folder exists, print a message
+  echo "Folder '$FOLDER_NAME/$SERVICE_CACHE_FOLDER_NAME' already exists."
 fi
 
 #### STEP 2 ####
@@ -71,6 +84,6 @@ fi
 #### STEP 5 ####
 
 echo "Now you need to apply the nginx config manually and reload the nginx:"
-echo "- sudo ln -s /etc/nginx/sites-available/* /etc/nginx/sites-enabled/"
+echo "Change the configuration for /etc/nginx/sites-available/default"
 echo "- sudo systemctl reload nginx"
 
