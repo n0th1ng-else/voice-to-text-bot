@@ -40,6 +40,7 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
+RUN apt-get update && apt-get install -y binutils
 RUN apt-get update && apt-get install -y libgomp1
 RUN apt-get update && apt-get install -y libstdc++6
 
