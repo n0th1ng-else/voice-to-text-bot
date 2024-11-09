@@ -41,6 +41,7 @@ RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
 RUN apt-get update && apt-get install -y libgomp1
+RUN apt-get update && apt-get install -y libstdc++6
 
 RUN npm install -g pnpm@9 && touch "$APP_DIR/.env"
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
