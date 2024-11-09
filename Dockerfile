@@ -1,4 +1,4 @@
-FROM node:20.14-slim AS builder
+FROM node:20.14-bullseye-slim AS builder
 
 ENV NODE_ENV production
 
@@ -22,7 +22,7 @@ RUN pnpm run build
 COPY ./src/text/translations/bundles $APP_DIR/dist/src/text/translations/bundles
 COPY ./src/whisper/addons $APP_DIR/dist/src/whisper/addons
 
-FROM node:20.14-bullseye
+FROM node:20.14-bullseye-slim
 
 EXPOSE 8080
 
