@@ -22,7 +22,7 @@ RUN pnpm run build
 COPY ./src/text/translations/bundles $APP_DIR/dist/src/text/translations/bundles
 COPY ./src/whisper/addons $APP_DIR/dist/src/whisper/addons
 
-FROM node:20.14-bullseye-slim
+FROM node:20.14-bookworm
 
 EXPOSE 8080
 
