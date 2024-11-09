@@ -51,6 +51,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
 
+ENV LD_LIBRARY_PATH=/usr/src/app/dist/src/whisper/addons/x64:${LD_LIBRARY_PATH}
+
 USER node
 
 CMD ["pnpm", "run", "cluster:js"]
