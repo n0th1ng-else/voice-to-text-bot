@@ -42,7 +42,7 @@ module.exports = (addonArchitecture) => {
     __dirname,
     `./addons/whisper-processor.${addonArchitecture}.node`,
   );
-  console.log('Whisper binary path', addOnPath)
+  console.log("Whisper binary path", addOnPath);
   if (!existsSync(addOnPath)) {
     throw new Error(`The file ${addOnPath} does not exist`);
   }
