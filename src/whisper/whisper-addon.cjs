@@ -2,6 +2,8 @@
 const path = require("node:path");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { promisify } = require("node:util");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { existsSync } = require("node:fs");
 
 /**
  * Whisper output.
@@ -40,6 +42,10 @@ module.exports = (addonArchitecture) => {
     __dirname,
     `./addons/whisper-processor.${addonArchitecture}.node`,
   );
+  console.log('Whisper binary path', addOnPath)
+  if (!existsSync(addOnPath)) {
+    throw new Error(`The file ${addOnPath} does not exist`);
+  }
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { whisper } = require(addOnPath);
   return promisify(whisper);
