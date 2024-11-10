@@ -1,4 +1,4 @@
-FROM node:22.11-bookworm-slim AS builder
+FROM node:22.11-bookworm AS builder
 
 ENV NODE_ENV production
 
@@ -22,7 +22,7 @@ RUN pnpm run build
 COPY ./src/text/translations/bundles $APP_DIR/dist/src/text/translations/bundles
 COPY ./src/whisper/addons $APP_DIR/dist/src/whisper/addons
 
-FROM node:22.11-bookworm-slim
+FROM node:22.11-bookworm
 
 EXPOSE 8080
 
