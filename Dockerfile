@@ -17,7 +17,7 @@ COPY ./certs $APP_DIR/certs
 COPY ./file-temp $APP_DIR/file-temp
 COPY ./model-cache $APP_DIR/model-cache
 COPY ./src $APP_DIR/src
-COPY ./copy-files.js $APP_DIR
+COPY ./copy-files.ts $APP_DIR
 
 RUN pnpm run build
 
