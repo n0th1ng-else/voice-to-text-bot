@@ -24,7 +24,7 @@
     "lint:all": "eslint .",
     "typecheck": "tsc --noEmit",
     "build": "tsc && pnpm run copy-assets",
-    "copy-assets": "node ./copy-files.js",
+    "copy-assets": "node ./dist/copy-files.js",
     "locale:sync": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/scripts/locale.ts",
     "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\" jest",
     "test:load": "artillery run load.yml --insecure",
