@@ -1,4 +1,4 @@
-FROM node:20.14-slim AS builder
+FROM node:21.7.3-slim AS builder
 
 ENV NODE_ENV production
 
@@ -17,12 +17,11 @@ COPY ./certs $APP_DIR/certs
 COPY ./file-temp $APP_DIR/file-temp
 COPY ./model-cache $APP_DIR/model-cache
 COPY ./src $APP_DIR/src
+COPY ./copy-files.ts $APP_DIR
 
 RUN pnpm run build
-COPY ./src/text/translations/bundles $APP_DIR/dist/src/text/translations/bundles
-COPY ./src/whisper/addons $APP_DIR/dist/src/whisper/addons
 
-FROM node:20.14-slim
+FROM node:21.7.3-slim
 
 EXPOSE 8080
 
