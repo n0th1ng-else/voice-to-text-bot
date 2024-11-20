@@ -51,6 +51,7 @@ jobs:
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
+          no-cache: true
           context: .
           push: true
           tags: |
@@ -63,6 +64,7 @@ jobs:
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
+          no-cache: true
           context: .
           push: true
           tags: |

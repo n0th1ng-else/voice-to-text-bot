@@ -1,4 +1,4 @@
-FROM node:20.14-slim AS builder
+FROM node:22.11-bookworm AS builder
 
 ENV NODE_ENV production
 
@@ -21,7 +21,7 @@ COPY ./copy-files.ts $APP_DIR
 
 RUN pnpm run build
 
-FROM node:20.14-slim
+FROM node:22.11-bookworm
 
 EXPOSE 8080
 
@@ -39,6 +39,10 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
+RUN apt-get update && apt-get install -y binutils
+RUN apt-get update && apt-get install -y libgomp1
+RUN apt-get update && apt-get install -y libstdc++6
+
 RUN npm install -g pnpm@9 && touch "$APP_DIR/.env"
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/file-temp $APP_DIR/file-temp
@@ -49,6 +53,8 @@ RUN npm pkg delete scripts.prepare
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
+
+ENV LD_LIBRARY_PATH=/usr/src/app/dist/src/whisper/addons/x64:${LD_LIBRARY_PATH}
 
 USER node
 

@@ -1,0 +1,28 @@
+# THIS IS THE COMPOSE FILE WHICH CONTAINS CONFIGURATIONS OF THE SERVICE
+# THIS COMPOSE WILL BE USED TO START THE SERVICE FOR THE FIRST TIME
+# COMMAND TO DEPLOY THIS STACK:
+# - sudo docker stack deploy -c <compose_file_name> -d --with-registry-auth <stack name>
+
+version: "3.9" # Choose a version that supports docker swarm
+services:
+  # SERVICE INSTANCES (service name = bot)
+
+  bot_blue:
+    image: ghcr.io/n0th1ng-else/voice-to-text-bot/voice-to-speech-app:latest # This image will be only used for the first deployment
+    env_file:
+      - app.env # This file contains environment variables for the application
+    deploy:
+      mode: replicated
+      replicas: 1 # Set this to desired number of tasks
+    ports:
+      - "4200:3000" # We expose 4200 and map it on internal app port 3000
+
+  bot_green:
+    image: ghcr.io/n0th1ng-else/voice-to-text-bot/voice-to-speech-app:latest # This image will be only used for the first deployment
+    env_file:
+      - app.env # This file contains environment variables for the application
+    deploy:
+      mode: replicated
+      replicas: 1 # Set this to desired number of tasks
+    ports:
+      - "4201:3000" # We expose 4201 and map it on internal app port 3000
