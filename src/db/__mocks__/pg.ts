@@ -1,5 +1,4 @@
-import { EventEmitter } from "node:events";
-import type pg from "pg";
+import pg from "pg";
 import { nanoid } from "nanoid";
 import { NodesSql } from "../sql/nodes.sql.js";
 import { UsagesSql } from "../sql/usages.sql.js";
@@ -11,7 +10,7 @@ import { DurationsSql } from "../sql/durations.sql.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyTypeForMock = any;
 
-export class Pool extends EventEmitter implements pg.Pool {
+export class Pool extends pg.Pool {
   public readonly idleCount = 0;
   public readonly totalCount = 0;
   public readonly waitingCount = 0;
