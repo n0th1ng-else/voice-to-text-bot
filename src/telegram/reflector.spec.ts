@@ -97,7 +97,7 @@ describe("initTgReflector", () => {
 
   describe("unhappy flow", () => {
     beforeEach(() => {
-      res = Promise.reject("leave chat fails :(");
+      res = Promise.reject(new Error("leave chat fails :("));
     });
 
     it("should not fail if leave chat fails", () => {

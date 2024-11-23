@@ -119,7 +119,7 @@ export const run = async (): Promise<void> => {
   try {
     const fullUrl = await app.listen({ port: envy.appPort });
     logger.info(`Server is listening on ${Logger.y(fullUrl)}`);
-  } catch (err) {
+  } catch {
     process.exit(1);
   }
 };

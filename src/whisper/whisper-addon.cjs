@@ -1,6 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require("node:path");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { promisify } = require("node:util");
 
 /**
@@ -40,7 +40,7 @@ module.exports = (addonArchitecture) => {
     __dirname,
     `./addons/whisper-processor.${addonArchitecture}.node`,
   );
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { whisper } = require(addOnPath);
   return promisify(whisper);
 };

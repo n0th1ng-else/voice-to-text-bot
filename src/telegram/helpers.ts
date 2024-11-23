@@ -222,7 +222,7 @@ export const parseDonationPayload = (dtoString = ""): DonationPayload => {
       chatId: obj.c || 0,
       prefix: obj.l || "",
     };
-  } catch (err) {
+  } catch {
     return {
       donationId: 0,
       chatId: 0,

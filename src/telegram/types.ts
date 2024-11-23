@@ -137,7 +137,7 @@ export class TelegramButtonModel<V extends string = string> {
     try {
       const obj = ButtonSchema.parse(JSON.parse(dtoString));
       return new TelegramButtonModel(obj.i, obj.v, obj.l);
-    } catch (err) {
+    } catch {
       return new TelegramButtonModel("u", "", "");
     }
   }
