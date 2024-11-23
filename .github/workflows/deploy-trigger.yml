@@ -1,0 +1,40 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      server:
+        type: choice
+        options:
+          - "Production Ω"
+          - "Production β"
+        description: "What server to deploy the application on"
+        required: true
+      version:
+        type: string
+        description: "Version tag X.X.X"
+        required: true
+      sha:
+        type: string
+        description: "Commit sha"
+        required: true
+
+jobs:
+  trigger:
+    if: ${{ env.GITHUB_REPOSITORY_OWNER_ID == env.GITHUB_ACTOR_ID }}
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      version: ${{ inputs.version }}
+      sha: ${{ inputs.sha }}
+      servers: '["${{ inputs.server }}"]'
+
+  no-trigger:
+    if: ${{ env.GITHUB_REPOSITORY_OWNER_ID != env.GITHUB_ACTOR_ID }}
+    runs-on: ubuntu-latest
+    name: Run tests
+    steps:
+      - name: Send message
+        run: |
+          echo "::error::The actor ${{ env.ACTOR }} is not allowed to run the deployments"
+          exit 1

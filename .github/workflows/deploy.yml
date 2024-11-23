@@ -15,7 +15,7 @@ on:
         required: true
       sha:
         type: string
-        default: "Commit sha"
+        description: "Commit sha"
         required: true
 
 jobs:
