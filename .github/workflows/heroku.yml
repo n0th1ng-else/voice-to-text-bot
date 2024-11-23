@@ -1,0 +1,52 @@
+name: Deploy to Heroku
+
+on:
+  workflow_call:
+    inputs:
+      servers:
+        type: string
+        description: "The JSON list of servers to deploy the application"
+        required: true
+      version:
+        type: string
+        description: "Version tag"
+        required: true
+
+jobs:
+  heroku:
+    env:
+      APP_VERSION: ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    name: Deploy to Heroku
+    environment: ${{ matrix.environment }}
+    timeout-minutes: 5
+    strategy:
+      max-parallel: 1
+      matrix:
+        environment: ${{ fromJSON(inputs.servers) }}
+    steps:
+      - name: App version
+        run: echo "Picked the app version ${APP_VERSION}"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install NodeJS and NPM modules
+        uses: ./.github/actions/npm
+
+      - name: Login to Heroku Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.heroku.com
+          username: ${{ secrets.HEROKU_EMAIL }}
+          password: ${{ secrets.HEROKU_API_KEY }}
+
+      - name: Push docker image
+        run: heroku container:push web --app ${{ vars.HEROKU_APP }} --arg APP_VERSION=${{ env.D_VERSION }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          D_VERSION: ${{ inputs.version }}
+
+      - name: Release docker image
+        run: heroku container:release web --app ${{ vars.HEROKU_APP }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
