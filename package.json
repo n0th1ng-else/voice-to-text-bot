@@ -40,7 +40,7 @@
     "@google-cloud/speech": "4.5.5",
     "@sentry/node": "8.39.0",
     "@sentry/profiling-node": "8.39.0",
-    "aws-sdk": "2.1310.0",
+    "aws-sdk": "2.1692.0",
     "axios": "1.7.7",
     "express": "4.21.1",
     "fastify": "5.1.0",
