@@ -14,27 +14,22 @@ on:
         type: string
         description: "Version tag X.X.X"
         required: true
-      sha:
-        type: string
-        description: "Commit sha"
-        required: true
 
 jobs:
+  permissions:
+    runs-on: ubuntu-latest
+    name: Send not allowed message
+    steps:
+      - name: Not allowed to run
+        if: ${{ env.GITHUB_REPOSITORY_OWNER_ID != env.GITHUB_ACTOR_ID }}
+        run: |
+          echo "::error::The actor ${GITHUB_ACTOR_ID} is not allowed to run the deployments"
+          exit 1
+
   trigger:
-    if: ${{ env.GITHUB_REPOSITORY_OWNER_ID == env.GITHUB_ACTOR_ID }}
-    uses: ./.github/workflows/deploy.yml
+    needs: [permissions]
+    uses: ./.github/workflows/heroku.yml
     secrets: inherit
     with:
       version: ${{ inputs.version }}
-      sha: ${{ inputs.sha }}
       servers: '["${{ inputs.server }}"]'
-
-  no-trigger:
-    if: ${{ env.GITHUB_REPOSITORY_OWNER_ID != env.GITHUB_ACTOR_ID }}
-    runs-on: ubuntu-latest
-    name: Run tests
-    steps:
-      - name: Send message
-        run: |
-          echo "::error::The actor ${{ env.ACTOR }} is not allowed to run the deployments"
-          exit 1
