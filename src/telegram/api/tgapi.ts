@@ -192,12 +192,17 @@ export class TelegramApi {
     );
   }
 
-  private requestValidate<Schema extends z.ZodTypeAny, Data>(
+  private requestValidate<
+    Output,
+    Def extends z.ZodTypeDef = z.ZodTypeDef,
+    Input = Output,
+    Data = unknown,
+  >(
     methodName: string,
-    schema: Schema,
+    schema: z.ZodType<Output, Def, Input>,
     data?: Data,
     chatId?: number,
-  ): Promise<z.infer<Schema>> {
+  ): Promise<z.infer<z.ZodType<Output, Def, Input>>> {
     return this.request(methodName, data, chatId).then((result) => {
       return schema.parse(result);
     });
