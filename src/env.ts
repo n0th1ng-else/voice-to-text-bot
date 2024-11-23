@@ -90,3 +90,5 @@ export const newRouter = process.env.NEW_ROUTER === "true";
 export const whisperModelFile = process.env.WHISPER_MODEL_FILE || "";
 
 export const whisperEnableGpu = process.env.WHISPER_GPU === "true";
+
+export const nodeVersion = process.versions.node;

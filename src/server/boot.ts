@@ -96,7 +96,8 @@ export const prepareInstance = async (
         .setSelfUrl(host)
         .setBots([bot])
         .setStat(db)
-        .setThreadId(threadId);
+        .setThreadId(threadId)
+        .setNodeVersion(envy.nodeVersion);
     });
 };
 

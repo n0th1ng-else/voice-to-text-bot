@@ -25,6 +25,7 @@ const TEST_RESPONSE: HealthDto = {
   ssl: HealthSsl.Off,
   threadId: 0,
   serverName: "MockedServer",
+  nodeVersion: "1.0.0",
 };
 
 describe("requestHealthData", () => {

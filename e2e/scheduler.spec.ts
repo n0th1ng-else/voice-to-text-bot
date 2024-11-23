@@ -40,6 +40,7 @@ jest.unstable_mockModule("../src/server/api.js", () => {
         ssl: HealthSsl.Off,
         threadId: 0,
         serverName: "MockedServer",
+        nodeVersion: "1.0.0",
       };
       waiter.tick();
       return Promise.resolve(dto);

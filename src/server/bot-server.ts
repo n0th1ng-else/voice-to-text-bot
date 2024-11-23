@@ -46,6 +46,7 @@ export class BotServer
         this.isHttps,
         this.threadId,
         this.serverName,
+        this.nodeVersion,
       );
       if (this.isIdle) {
         status.setMessage("App is not connected to the Telegram server");

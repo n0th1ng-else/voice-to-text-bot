@@ -21,6 +21,7 @@ export interface BotServerModelBase {
   setThreadId(threadId: number): this;
   setStat(stat: ServerStatCore): this;
   setSelfUrl(url: string): this;
+  setNodeVersion(version: string): this;
 }
 
 export type NotFoundDto = {
@@ -37,6 +38,7 @@ export type HealthDto = {
   version: string;
   threadId: number;
   serverName: string;
+  nodeVersion: string;
 };
 
 export enum HealthStatus {
@@ -61,6 +63,7 @@ export class HealthModel {
     isHttps: boolean,
     private readonly threadId: number,
     private readonly serverName: string,
+    private readonly coreVersion: string,
   ) {
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
@@ -87,6 +90,7 @@ export class HealthModel {
       message: this.message,
       threadId: this.threadId,
       serverName: this.serverName,
+      nodeVersion: this.coreVersion,
     };
   }
 }
