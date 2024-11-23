@@ -15,6 +15,7 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
   protected selfUrl = "";
   protected bots: TelegramBotModel[] = [];
   protected isIdle = true;
+  protected nodeVersion = "";
   protected readonly isHttps: boolean;
 
   protected constructor(
@@ -44,6 +45,11 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
 
   public setSelfUrl(url: string): this {
     this.selfUrl = url;
+    return this;
+  }
+
+  public setNodeVersion(version: string): this {
+    this.nodeVersion = version;
     return this;
   }
 

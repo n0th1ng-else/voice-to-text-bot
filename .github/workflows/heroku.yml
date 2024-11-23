@@ -27,8 +27,11 @@ jobs:
     steps:
       - name: App version
         run: echo "Picked the app version ${APP_VERSION}"
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
 
       - name: Install NodeJS and NPM modules
         uses: ./.github/actions/npm
