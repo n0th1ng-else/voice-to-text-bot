@@ -21,7 +21,7 @@ export class WitAiError extends Error {
 
     try {
       this.response = JSON.parse(response);
-    } catch (err) {
+    } catch {
       this.response = { message: response };
     }
 

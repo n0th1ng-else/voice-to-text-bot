@@ -1,5 +1,8 @@
 import { fileURLToPath } from "node:url";
 import { cpSync } from "node:fs";
+import { Logger } from "./src/logger/index.js";
+
+const logger = new Logger("file-copy");
 
 const FOLDERS = ["text/translations/bundles", "whisper/addons"] as const;
 
@@ -11,5 +14,5 @@ FOLDERS.forEach((folder) => {
   const src = getAbsolutePath(folder, "../src");
   const dest = getAbsolutePath(folder, "./src");
   cpSync(src, dest, { recursive: true });
-  console.log(`[copy] Copied ${src} to ${dest}`);
+  logger.info(`[copy] Copied ${src} to ${dest}`);
 });

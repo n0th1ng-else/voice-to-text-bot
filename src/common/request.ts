@@ -12,7 +12,7 @@ export const parseChunkedResponse = <Dto>(body = ""): Dto[] => {
       try {
         const newChunk: Dto = JSON.parse(newPrev);
         return { prev: "", acc: [...acc, newChunk] };
-      } catch (err) {
+      } catch {
         return { prev: newPrev, acc };
       }
     },

@@ -23,35 +23,30 @@ export class Logger {
     this.additionalPrefix = prefix;
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  public debug(...messages: any[]): void {
+  public debug(...messages: unknown[]): void {
     this.output(...messages);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  public info(...messages: any[]): void {
+  public info(...messages: unknown[]): void {
     this.output(...messages);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public warn(...messages: any[]): void {
+  public warn(...messages: unknown[]): void {
     this.output(...messages);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public error(...messages: any[]): void {
+  public error(...messages: unknown[]): void {
     this.output(...messages);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  public output(...message: any[]): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public output(...message: unknown[]): void {
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     const prefix = `[${this.id}]`;
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     const additionalPrefix = this.additionalPrefix
       ? `[${this.additionalPrefix}]`
       : "";
-    // eslint-disable-next-line no-console
     // console.log(prefix, additionalPrefix, ...message);
   }
 }

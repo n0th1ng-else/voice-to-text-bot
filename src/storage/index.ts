@@ -11,7 +11,7 @@ const safeSize = (path: string): number => {
   try {
     const { size } = statSync(path);
     return size;
-  } catch (err) {
+  } catch {
     // The file was most likely deleted, hence 0
     return 0;
   }

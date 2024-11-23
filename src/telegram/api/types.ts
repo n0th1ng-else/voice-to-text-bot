@@ -176,6 +176,7 @@ export type TgInlineKeyboardButton = z.infer<
   typeof TgInlineKeyboardButtonSchema
 >;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgMessageOptionsSchema = z
   .object({
     buttons: z.optional(z.array(z.array(TgInlineKeyboardButtonSchema))),
@@ -194,6 +195,7 @@ const BotCommandSchema = z
 
 export type BotCommandDto = z.infer<typeof BotCommandSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BotCommandListSchema = z
   .object({
     commands: z.array(BotCommandSchema),
@@ -202,6 +204,7 @@ const BotCommandListSchema = z
 
 export type BotCommandListDto = z.infer<typeof BotCommandListSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MessageSchema = z
   .object({
     chat_id: z.number(),
@@ -237,6 +240,7 @@ const LabeledPriceSchema = z
 
 const TgCurrencySchema = z.literal("EUR").describe("Telegram currency schema");
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const InvoiceSchema = z
   .object({
     chat_id: z.number(),
@@ -256,6 +260,7 @@ const InvoiceSchema = z
 
 export type InvoiceDto = z.infer<typeof InvoiceSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PreCheckoutQuerySchema = z
   .object({
     pre_checkout_query_id: z.string(),
@@ -266,6 +271,7 @@ const PreCheckoutQuerySchema = z
 
 export type PreCheckoutQueryDto = z.infer<typeof PreCheckoutQuerySchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EditMessageSchema = z
   .object({
     chat_id: z.optional(z.union([z.number(), z.string()])),
@@ -276,6 +282,7 @@ const EditMessageSchema = z
 
 export type EditMessageDto = z.infer<typeof EditMessageSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const FileSchema = z
   .object({
     file_id: z.string(),
@@ -284,6 +291,7 @@ const FileSchema = z
 
 export type FileDto = z.infer<typeof FileSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgFileSchema = z
   .object({
     file_id: z.string(),
@@ -311,6 +319,7 @@ const TgPhotoSchema = z
 
 export type TgPhoto = z.infer<typeof TgPhotoSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgInvoiceSchema = z
   .intersection(
     LabeledPriceSchema,

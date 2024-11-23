@@ -137,7 +137,7 @@ describe("ignore chats", () => {
     expect(trackNotMatchedRoutes()).toBe(true);
   });
 
-  const chatTypes: Readonly<TgChatType[]> = [
+  const chatTypes: readonly TgChatType[] = [
     "private",
     "group",
     "supergroup",
