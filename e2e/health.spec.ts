@@ -106,11 +106,10 @@ describe("[health]", () => {
     stopHandler = await server.start();
   });
 
-  afterEach(() => {
-    return stopHandler().then(() => {
-      expect(telegramServer.isDone()).toBe(true);
-      expect(testPool.isDone()).toBe(true);
-    });
+  afterEach(async () => {
+    await stopHandler();
+    expect(telegramServer.isDone()).toBe(true);
+    expect(testPool.isDone()).toBe(true);
   });
 
   it("initial api access", () => {
