@@ -20,16 +20,18 @@ import { type AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
 
-export enum VoiceContentReason {
-  Ok = "Ok",
-  NoContent = "NoContent",
-  NoDuration = "NoDuration",
-  WrongMimeType = "WrongMimeType",
-}
+export const VoiceContentReason = {
+  Ok: "Ok",
+  NoContent: "NoContent",
+  NoDuration: "NoDuration",
+  WrongMimeType: "WrongMimeType",
+} as const;
+
+export type VoiceContentReasonType = ValueOf<typeof VoiceContentReason>;
 
 export class VoiceContentReasonModel {
   constructor(
-    public readonly type: VoiceContentReason,
+    public readonly type: VoiceContentReasonType,
     public readonly info?: string | number,
   ) {}
 }
