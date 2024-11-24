@@ -1,8 +1,8 @@
-import type { LanguageCode } from "../recognition/types.js";
+import type { LanguageCode } from "../recognition/types.ts";
 import {
   mapAppLanguageToWhisperLanguage,
   type WhisperAddonArchitecture,
-} from "./utils.js";
+} from "./utils.ts";
 import getWhisper from "./whisper-addon.cjs";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports

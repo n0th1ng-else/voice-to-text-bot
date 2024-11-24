@@ -2,7 +2,7 @@ import { it, describe, expect, jest, beforeAll } from "@jest/globals";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
+} from "../testUtils/dependencies.ts";
 
 jest.unstable_mockModule(
   "../logger/index",

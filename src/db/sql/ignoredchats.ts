@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { IgnoredChatsSql } from "./ignoredchats.sql.js";
+import { IgnoredChatsSql } from "./ignoredchats.sql.ts";
 
 export type IgnoredChatsRowScheme = {
   row_id: string;
@@ -11,8 +11,11 @@ export type IgnoredChatsRowScheme = {
 
 export class IgnoredChatsDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = IgnoredChatsSql.createTable;

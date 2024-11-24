@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import { nanoid } from "nanoid";
-import { NodesSql } from "./nodes.sql.js";
+import { NodesSql } from "./nodes.sql.ts";
 
 export type NodeRowScheme = {
   node_id: string;
@@ -13,8 +13,11 @@ export type NodeRowScheme = {
 
 export class NodesDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = NodesSql.createTable;

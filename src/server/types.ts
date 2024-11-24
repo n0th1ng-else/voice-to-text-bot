@@ -1,6 +1,6 @@
-import type { VoidPromise } from "../common/types.js";
-import type { TelegramBotModel } from "../telegram/bot.js";
-import type { getDb } from "../db/index.js";
+import type { VoidPromise } from "../common/types.ts";
+import type { TelegramBotModel } from "../telegram/bot.ts";
+import type { getDb } from "../db/index.ts";
 
 export type ServerStatCore = ReturnType<typeof getDb>;
 
@@ -41,30 +41,38 @@ export type HealthDto = {
   nodeVersion: string;
 };
 
-export enum HealthStatus {
-  Error = "ERROR",
-  InProgress = "IN_PROGRESS",
-  Online = "ONLINE",
-}
+export const HealthStatus = {
+  Error: "ERROR",
+  InProgress: "IN_PROGRESS",
+  Online: "ONLINE",
+} as const;
 
-export enum HealthSsl {
-  On = "ON",
-  Off = "OFF",
-}
+export const HealthSsl = {
+  On: "ON",
+  Off: "OFF",
+};
 
 export class HealthModel {
   private readonly ssl: HealthSsl;
   private status = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
+  private readonly version: string;
+  private readonly threadId: number;
+  private readonly serverName: string;
+  private readonly coreVersion: string;
 
   constructor(
-    private readonly version: string,
+    version: string,
     isHttps: boolean,
-    private readonly threadId: number,
-    private readonly serverName: string,
-    private readonly coreVersion: string,
+    threadId: number,
+    serverName: string,
+    coreVersion: string,
   ) {
+    this.version = version;
+    this.threadId = threadId;
+    this.serverName = serverName;
+    this.coreVersion = coreVersion;
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
 

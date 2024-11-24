@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { parseChunkedResponse } from "./request.js";
+import { parseChunkedResponse } from "./request.ts";
 
 describe("request", () => {
   describe("parseChunkedResponse", () => {

@@ -16,8 +16,11 @@ export class Logger {
   }
 
   private additionalPrefix = "";
+  private readonly id: string;
 
-  constructor(private readonly id = "") {}
+  constructor(id = "") {
+    this.id = id;
+  }
 
   public setAdditionalPrefix(prefix: string): void {
     this.additionalPrefix = prefix;

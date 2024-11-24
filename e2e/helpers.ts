@@ -1,21 +1,21 @@
 import { readFileSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TranslationKeys } from "../src/text/types.js";
-import { randomIntFromInterval } from "../src/common/timer.js";
+import { TranslationKeys } from "../src/text/types.ts";
+import { randomIntFromInterval } from "../src/common/timer.ts";
 import {
   TelegramButtonModel,
   type TelegramButtonType,
-} from "../src/telegram/types.js";
-import { donationLevels } from "../src/const.js";
-import { toCurrency } from "../src/text/utils.js";
+} from "../src/telegram/types.ts";
+import { donationLevels } from "../src/const.ts";
+import { toCurrency } from "../src/text/utils.ts";
 import type {
   TgCallbackQuery,
   TgChatType,
   TgMessage,
-} from "../src/telegram/api/types.js";
-import type { LanguageCode } from "../src/recognition/types.js";
-import type { SupportedEnvironment } from "../src/recognition/index.js";
+} from "../src/telegram/api/types.ts";
+import type { LanguageCode } from "../src/recognition/types.ts";
+import type { SupportedEnvironment } from "../src/recognition/index.ts";
 
 type UserNameOptions = {
   userName?: string;
@@ -37,11 +37,13 @@ export class TelegramMessageModel {
   private userLanguage = "";
   private contentType: "voice" | "audio" | "video_note" = "voice";
   private mimeType = "";
+  public readonly chatId: number;
+  public readonly chatType: TgChatType;
 
-  constructor(
-    public readonly chatId: number,
-    public readonly chatType: TgChatType,
-  ) {}
+  constructor(chatId: number, chatType: TgChatType) {
+    this.chatId = chatId;
+    this.chatType = chatType;
+  }
 
   public setName(
     messageId: number,
@@ -200,29 +202,41 @@ export class TelegramMessageModel {
   }
 }
 
-export enum TelegramMessageMetaType {
-  Button,
-  Link,
-}
+export const TelegramMessageMetaType = {
+  Button: 0,
+  Link: 1,
+} as const;
 
 export class TelegramMessageMetaItem {
+  public readonly type: TelegramMessageMetaType;
+  public readonly title: string;
+  public readonly data: string;
+  public readonly btnType: TelegramButtonType;
+
   constructor(
-    public readonly type: TelegramMessageMetaType,
-    public readonly title: string,
-    public readonly data: string,
-    public readonly btnType: TelegramButtonType = "d",
-  ) {}
+    type: TelegramMessageMetaType,
+    title: string,
+    data: string,
+    btnType: TelegramButtonType = "d",
+  ) {
+    this.type = type;
+    this.title = title;
+    this.data = data;
+    this.btnType = btnType;
+  }
 }
 
 export class BotStatRecordModel {
   public objectId?: string;
   public user = "";
   public usageCount = 0;
+  public chatId: number;
+  public langId: LanguageCode;
 
-  constructor(
-    public chatId: number,
-    public langId: LanguageCode = "en-US",
-  ) {}
+  constructor(chatId: number, langId: LanguageCode = "en-US") {
+    this.chatId = chatId;
+    this.langId = langId;
+  }
 
   public setObjectId(objectId: number): this {
     this.objectId = String(objectId);

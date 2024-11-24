@@ -1,5 +1,5 @@
-import { Logger } from "../logger/index.js";
-import type { VoidPromise } from "../common/types.js";
+import { Logger } from "../logger/index.ts";
+import type { VoidPromise } from "../common/types.ts";
 
 const logger = new Logger("daemon");
 
@@ -9,15 +9,16 @@ export class ScheduleDaemon<TickData> {
   private handler: NodeJS.Timeout | null = null;
   private shouldStop?: (data: TickData) => boolean;
   private onFinish?: VoidPromise;
+  private readonly onTick: () => Promise<TickData>;
+  private readonly id: string;
 
   public get isRunning(): boolean {
     return !!this.handler;
   }
 
-  constructor(
-    private readonly id: string,
-    private readonly onTick: () => Promise<TickData>,
-  ) {
+  constructor(id: string, onTick: () => Promise<TickData>) {
+    this.id = id;
+    this.onTick = onTick;
     this.printId = `[${this.id}]`;
   }
 

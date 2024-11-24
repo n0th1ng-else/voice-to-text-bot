@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../../testUtils/dependencies.js";
+} from "../../testUtils/dependencies.ts";
 
 const origFs = await import("node:fs");
 const origTypes = await import("../types.js");

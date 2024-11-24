@@ -12,8 +12,12 @@ const file = `${fileName}.${fileExt}`;
 const scriptPath = fileExt && fileName && resolve(currentDir, file);
 
 if (scriptPath && existsSync(scriptPath)) {
-  const scriptModule = await import(scriptPath);
-  await scriptModule.run();
+  try {
+    const scriptModule = await import(scriptPath);
+    await scriptModule.run();
+  } catch (err) {
+    console.error("ERROR", err);
+  }
 } else {
   throw new Error(`Unable to find script "${file}" in "${scriptPath}"`);
 }

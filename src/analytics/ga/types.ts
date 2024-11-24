@@ -1,6 +1,6 @@
-import type { BotCommand } from "../../telegram/types.js";
-import { TimeMeasure } from "../../common/timer.js";
-import { TelegramApi } from "../../telegram/api/tgapi.js";
+import type { BotCommand } from "../../telegram/types.ts";
+import { TimeMeasure } from "../../common/timer.ts";
+import { TelegramApi } from "../../telegram/api/tgapi.ts";
 
 type AnalyticsEventBaseParams = {
   app_version: string;
@@ -74,12 +74,14 @@ export class AnalyticsData {
   private commandTitle = "";
   private commandMeta = "";
   private title = "Audio Message Bot";
+  private readonly appVersion: string;
+  private readonly url: string;
+  private readonly threadId: number;
 
-  constructor(
-    private readonly appVersion: string,
-    private readonly url: string,
-    private readonly threadId: number,
-  ) {
+  constructor(appVersion: string, url: string, threadId: number) {
+    this.appVersion = appVersion;
+    this.url = url;
+    this.threadId = threadId;
     this.timer = new TimeMeasure();
   }
 

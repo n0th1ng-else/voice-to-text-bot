@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { splitTextIntoParts } from "./helpers.js";
+import { splitTextIntoParts } from "./helpers.ts";
 
 describe("common helpers", () => {
   describe("splitTextIntoParts", () => {

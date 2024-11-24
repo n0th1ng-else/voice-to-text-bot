@@ -1,9 +1,9 @@
-import { UptimeDaemon } from "./uptime.js";
-import { Logger } from "../logger/index.js";
-import { sSuffix } from "../text/utils.js";
-import type { BotServerModelBase, ServerStatCore } from "./types.js";
-import type { TelegramBotModel } from "../telegram/bot.js";
-import type { HttpsOptions } from "../../certs/index.js";
+import { UptimeDaemon } from "./uptime.ts";
+import { Logger } from "../logger/index.ts";
+import { sSuffix } from "../text/utils.ts";
+import type { BotServerModelBase, ServerStatCore } from "./types.ts";
+import type { TelegramBotModel } from "../telegram/bot.ts";
+import type { HttpsOptions } from "../../certs/index.ts";
 
 const logger = new Logger("server");
 
@@ -17,18 +17,28 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
   protected isIdle = true;
   protected nodeVersion = "";
   protected readonly isHttps: boolean;
+  protected readonly serverName: string;
+  protected readonly port: number;
+  protected readonly version: string;
+  protected readonly webhookDoNotWait: boolean;
+  protected readonly httpsOptions?: HttpsOptions;
 
   protected constructor(
-    protected readonly serverName: string,
-    protected readonly port: number,
-    protected readonly version: string,
-    protected readonly webhookDoNotWait: boolean,
-    protected readonly httpsOptions?: HttpsOptions,
+    serverName: string,
+    port: number,
+    version: string,
+    webhookDoNotWait: boolean,
+    httpsOptions?: HttpsOptions,
   ) {
+    this.serverName = serverName;
+    this.port = port;
+    this.version = version;
+    this.webhookDoNotWait = webhookDoNotWait;
+    this.httpsOptions = httpsOptions;
     logger.info(`Initializing ${Logger.y(this.serverName)} bot server`);
 
-    this.isHttps = Boolean(httpsOptions);
-    this.uptimeDaemon = new UptimeDaemon(version);
+    this.isHttps = Boolean(this.httpsOptions);
+    this.uptimeDaemon = new UptimeDaemon(this.version);
     this.app = this.getServerInstance();
   }
 

@@ -12,33 +12,36 @@ import {
   getVoiceFile,
   isChatGroup,
   isVideoMessage,
-} from "./helpers.js";
-import { Logger } from "../logger/index.js";
-import { getTranslator } from "../text/index.js";
-import { type TgMessage, type TgMessageOptions } from "./api/types.js";
-import { type AnalyticsData } from "../analytics/ga/types.js";
-import type { LanguageCode } from "../recognition/types.js";
+} from "./helpers.ts";
+import { Logger } from "../logger/index.ts";
+import { getTranslator } from "../text/index.ts";
+import { type TgMessage, type TgMessageOptions } from "./api/types.ts";
+import { type AnalyticsData } from "../analytics/ga/types.ts";
+import type { LanguageCode } from "../recognition/types.ts";
 
-export enum VoiceContentReason {
-  Ok = "Ok",
-  NoContent = "NoContent",
-  NoDuration = "NoDuration",
-  WrongMimeType = "WrongMimeType",
-}
+export const VoiceContentReason = {
+  Ok: "Ok",
+  NoContent: "NoContent",
+  NoDuration: "NoDuration",
+  WrongMimeType: "WrongMimeType",
+} as const;
 
 export class VoiceContentReasonModel {
-  constructor(
-    public readonly type: VoiceContentReason,
-    public readonly info?: string | number,
-  ) {}
+  public readonly type: VoiceContentReason;
+  public readonly info?: string | number;
+
+  constructor(type: VoiceContentReason, info?: string | number) {
+    this.type = type;
+    this.info = info;
+  }
 }
 
-export enum BotCommand {
-  Start = "/start",
-  Language = "/lang",
-  Support = "/support",
-  Donate = "/donate",
-}
+export const BotCommand = {
+  Start: "/start",
+  Language: "/lang",
+  Support: "/support",
+  Donate: "/donate",
+} as const;
 
 export class BotMessageModel {
   public readonly id: number;
@@ -88,10 +91,13 @@ export type MessageOptions = {
 };
 
 export class TelegramMessagePrefix {
-  constructor(
-    public readonly chatId: number,
-    public readonly id = nanoid(10),
-  ) {}
+  public readonly chatId: number;
+  public readonly id: string;
+
+  constructor(chatId: number, id = nanoid(10)) {
+    this.chatId = chatId;
+    this.id = id;
+  }
 
   public getPrefix(): string {
     return `[Id=${Logger.y(this.id)}] [ChatId=${Logger.y(this.chatId)}]`;
@@ -99,18 +105,23 @@ export class TelegramMessagePrefix {
 }
 
 export class BotLangData {
-  constructor(
-    public readonly langId: LanguageCode,
-    public readonly prefix: TelegramMessagePrefix,
-  ) {}
+  public readonly langId: LanguageCode;
+  public readonly prefix: TelegramMessagePrefix;
+
+  constructor(langId: LanguageCode, prefix: TelegramMessagePrefix) {
+    this.langId = langId;
+    this.prefix = prefix;
+  }
 }
 
 export class BotCommandOption {
   public readonly description: string;
+  public readonly command: BotCommand;
 
-  constructor(public readonly command: BotCommand) {
+  constructor(command: BotCommand) {
+    this.command = command;
     const translator = getTranslator();
-    this.description = translator.menu(command);
+    this.description = translator.menu(this.command);
   }
 }
 
@@ -142,11 +153,15 @@ export class TelegramButtonModel<V extends string = string> {
     }
   }
 
-  constructor(
-    public readonly id: TelegramButtonType,
-    public readonly value: V,
-    public readonly logPrefix: string,
-  ) {}
+  public readonly id: TelegramButtonType;
+  public readonly value: V;
+  public readonly logPrefix: string;
+
+  constructor(id: TelegramButtonType, value: V, logPrefix: string) {
+    this.id = id;
+    this.value = value;
+    this.logPrefix = logPrefix;
+  }
 
   public getDtoString(): string {
     const dto: BotButtonDto = {

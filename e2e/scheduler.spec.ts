@@ -10,14 +10,14 @@ import {
 import {
   injectDependencies,
   type InjectedFn,
-} from "../src/testUtils/dependencies.js";
+} from "../src/testUtils/dependencies.ts";
 import {
   type HealthDto,
   HealthSsl,
   HealthStatus,
-} from "../src/server/types.js";
+} from "../src/server/types.ts";
 import type { SpiedFunction } from "jest-mock";
-import type { VoidPromise } from "../src/common/types.js";
+import type { VoidPromise } from "../src/common/types.ts";
 
 jest.unstable_mockModule(
   "../src/logger/index",

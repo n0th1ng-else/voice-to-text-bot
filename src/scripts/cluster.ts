@@ -1,8 +1,8 @@
 import cluster from "node:cluster";
-import * as envy from "../env.js";
-import { Logger } from "../logger/index.js";
-import { run as runServer } from "./start.js";
-import { getHostName } from "../server/tunnel.js";
+import * as envy from "../env.ts";
+import { Logger } from "../logger/index.ts";
+import { run as runServer } from "./start.ts";
+import { getHostName } from "../server/tunnel.ts";
 
 const logger = new Logger("cluster");
 

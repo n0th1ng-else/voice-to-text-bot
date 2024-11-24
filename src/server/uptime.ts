@@ -1,10 +1,10 @@
-import { ScheduleDaemon } from "../scheduler/index.js";
-import { Logger } from "../logger/index.js";
-import { HealthStatus } from "./types.js";
-import { sSuffix } from "../text/utils.js";
-import { flattenPromise } from "../common/helpers.js";
-import { requestHealthData } from "./api.js";
-import type { getDb } from "../db/index.js";
+import { ScheduleDaemon } from "../scheduler/index.ts";
+import { Logger } from "../logger/index.ts";
+import { HealthStatus } from "./types.ts";
+import { sSuffix } from "../text/utils.ts";
+import { flattenPromise } from "../common/helpers.ts";
+import { requestHealthData } from "./api.ts";
+import type { getDb } from "../db/index.ts";
 
 const logger = new Logger("uptime");
 
@@ -17,12 +17,14 @@ export class UptimeDaemon {
   private lifecycleInterval = UptimeDaemon.minLifecycleInterval;
   private daysRunning: number[] = [];
   private stat: ReturnType<typeof getDb> | null = null;
+  private readonly version: string;
 
   public get isRunning(): boolean {
     return this.daemon.isRunning;
   }
 
-  constructor(private readonly version = "") {
+  constructor(version = "") {
+    this.version = version;
     this.daemon = new ScheduleDaemon("uptime", () =>
       this.onTick(),
     ).setStopHandler(

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
-import type { Logger } from "./index.js";
+import type { Logger } from "./index.ts";
 
 jest.unstable_mockModule(
   "node:cluster",

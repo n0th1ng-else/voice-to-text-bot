@@ -1,4 +1,4 @@
-import type { LanguageCode } from "../recognition/types.js";
+import type { LanguageCode } from "../recognition/types.ts";
 
 export type PaymentService = {
   readonly isReady: boolean;

@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
-import { Logger } from "../logger/index.js";
-import { type NodeRowScheme, NodesDb } from "./sql/nodes.js";
+import { Logger } from "../logger/index.ts";
+import { type NodeRowScheme, NodesDb } from "./sql/nodes.ts";
 
 const logger = new Logger("postgres-nodes");
 

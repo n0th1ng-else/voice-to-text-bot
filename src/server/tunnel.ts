@@ -1,6 +1,6 @@
 import { connect } from "ngrok";
-import { Logger } from "../logger/index.js";
-import { sSuffix } from "../text/utils.js";
+import { Logger } from "../logger/index.ts";
+import { sSuffix } from "../text/utils.ts";
 
 const logger = new Logger("tunnel");
 

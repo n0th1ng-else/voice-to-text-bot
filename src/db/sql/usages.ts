@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import { nanoid } from "nanoid";
-import { UsagesSql } from "./usages.sql.js";
+import { UsagesSql } from "./usages.sql.ts";
 
 export type UsageRowScheme = {
   usage_id: string;
@@ -14,8 +14,11 @@ export type UsageRowScheme = {
 
 export class UsagesDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = UsagesSql.createTable;

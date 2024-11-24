@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
-import { TranslationKeys } from "./types.js";
+import { TranslationKeys } from "./types.ts";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
+} from "../testUtils/dependencies.ts";
 
 jest.unstable_mockModule(
   "./translations/loader",

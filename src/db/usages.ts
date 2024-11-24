@@ -1,8 +1,8 @@
 import type { Pool } from "pg";
-import type { LanguageCode } from "../recognition/types.js";
-import { Logger } from "../logger/index.js";
-import { type UsageRowScheme, UsagesDb } from "./sql/usages.js";
-import { getLanguageByText } from "../telegram/helpers.js";
+import type { LanguageCode } from "../recognition/types.ts";
+import { Logger } from "../logger/index.ts";
+import { type UsageRowScheme, UsagesDb } from "./sql/usages.ts";
+import { getLanguageByText } from "../telegram/helpers.ts";
 
 const logger = new Logger("postgres-usages");
 

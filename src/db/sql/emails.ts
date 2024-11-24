@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { UsedEmailsSql } from "./emails.sql.js";
+import { UsedEmailsSql } from "./emails.sql.ts";
 
 export type UsedEmailRowScheme = {
   email_id: number;
@@ -10,8 +10,11 @@ export type UsedEmailRowScheme = {
 
 export class UsedEmailDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = UsedEmailsSql.createTable;

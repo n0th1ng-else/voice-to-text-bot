@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { getVoiceConverterProvider } from "./index.js";
+import { getVoiceConverterProvider } from "./index.ts";
 
 describe("getVoiceConverterProvider", () => {
   it.each([

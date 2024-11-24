@@ -1,12 +1,12 @@
 import type { Pool } from "pg";
-import { DonationsSql } from "./donations.sql.js";
+import { DonationsSql } from "./donations.sql.ts";
 
-export enum DonationStatus {
-  Initialized = "INITIALIZED",
-  Pending = "PENDING",
-  Canceled = "CANCELED",
-  Received = "RECEIVED",
-}
+export const DonationStatus = {
+  Initialized: "INITIALIZED",
+  Pending: "PENDING",
+  Canceled: "CANCELED",
+  Received: "RECEIVED",
+} as const;
 
 export type DonationRowScheme = {
   donation_id: number;
@@ -19,8 +19,11 @@ export type DonationRowScheme = {
 
 export class DonationsDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = DonationsSql.createTable;

@@ -11,9 +11,9 @@ import { nanoid } from "nanoid";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
+} from "../testUtils/dependencies.ts";
 import type { Mock } from "jest-mock";
-import type { VoidPromise } from "../common/types.js";
+import type { VoidPromise } from "../common/types.ts";
 
 jest.unstable_mockModule(
   "../logger/index",
