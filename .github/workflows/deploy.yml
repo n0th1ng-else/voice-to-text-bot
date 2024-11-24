@@ -18,9 +18,6 @@ on:
         description: "Commit sha"
         required: true
 
-env:
-  DEPLOY_VERSION_TAG: "v${{ inputs.version }}"
-
 jobs:
   deploy:
     uses: ./.github/workflows/docker.yml
@@ -34,5 +31,5 @@ jobs:
     uses: ./.github/workflows/heroku.yml
     secrets: inherit
     with:
-      version: ${{ env.DEPLOY_VERSION_TAG }}
+      version: v${{ inputs.version }}
       servers: ${{ inputs.servers }}
