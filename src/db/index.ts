@@ -2,7 +2,7 @@ import { DbClient } from "./client.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { UsageRowScheme } from "./sql/usages.js";
 import type { NodeRowScheme } from "./sql/nodes.js";
-import type { DonationRowScheme, DonationStatus } from "./sql/donations.js";
+import type { DonationRowScheme, DonationStatusType } from "./sql/donations.js";
 import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { DbConnectionConfig } from "./utils.js";
 
@@ -100,7 +100,7 @@ class DbCore {
 
   public async updateDonationRow(
     donationId: number,
-    status: DonationStatus,
+    status: DonationStatusType,
   ): Promise<DonationRowScheme> {
     const row = await this.main.donations.updateRow(donationId, status);
     return row;

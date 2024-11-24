@@ -1,12 +1,15 @@
 import type { Pool } from "pg";
 import { DonationsSql } from "./donations.sql.js";
+import type { ValueOf } from "../../common/types.js";
 
-export enum DonationStatus {
-  Initialized = "INITIALIZED",
-  Pending = "PENDING",
-  Canceled = "CANCELED",
-  Received = "RECEIVED",
-}
+export const DonationStatus = {
+  Initialized: "INITIALIZED",
+  Pending: "PENDING",
+  Canceled: "CANCELED",
+  Received: "RECEIVED",
+} as const;
+
+export type DonationStatusType = ValueOf<typeof DonationStatus>;
 
 export type DonationRowScheme = {
   donation_id: number;
@@ -57,7 +60,7 @@ export class DonationsDb {
 
   public updateRow(
     donationId: number,
-    status: DonationStatus,
+    status: DonationStatusType,
   ): Promise<DonationRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
@@ -78,7 +81,7 @@ export class DonationsDb {
       });
   }
 
-  public getRows(status: DonationStatus): Promise<DonationRowScheme[]> {
+  public getRows(status: DonationStatusType): Promise<DonationRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table donations is not initialized yet"),
