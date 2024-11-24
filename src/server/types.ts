@@ -31,7 +31,7 @@ export type NotFoundDto = {
 };
 
 export type HealthDto = {
-  status: HealthStatus;
+  status: HealthStatusType;
   ssl: HealthSslType;
   message: string;
   urls: string[];
@@ -41,11 +41,13 @@ export type HealthDto = {
   nodeVersion: string;
 };
 
-export enum HealthStatus {
-  Error = "ERROR",
-  InProgress = "IN_PROGRESS",
-  Online = "ONLINE",
-}
+export const HealthStatus = {
+  Error: "ERROR",
+  InProgress: "IN_PROGRESS",
+  Online: "ONLINE",
+} as const;
+
+export type HealthStatusType = ValueOf<typeof HealthStatus>;
 
 export const HealthSsl = {
   On: "ON",
@@ -56,7 +58,7 @@ export type HealthSslType = ValueOf<typeof HealthSsl>;
 
 export class HealthModel {
   private readonly ssl: HealthSslType;
-  private status = HealthStatus.InProgress;
+  private status: HealthStatusType = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
 
