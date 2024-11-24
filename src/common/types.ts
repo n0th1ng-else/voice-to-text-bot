@@ -3,3 +3,5 @@ export type Prettify<T> = {
 };
 
 export type VoidPromise = () => Promise<void>;
+
+export type ValueOf<T> = T[keyof T];

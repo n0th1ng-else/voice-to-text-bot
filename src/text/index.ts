@@ -9,12 +9,12 @@ import {
   initializeTranslationsForLocale,
   type TranslationsFileType,
 } from "./translations/loader.js";
-import type { BotCommand } from "../telegram/types.js";
+import type { BotCommandType } from "../telegram/types.js";
 import { getMaxDuration, getSupportedAudioFormats } from "./utils.js";
 
 type Translator = {
   getFallbackLanguage: () => LanguageCode;
-  menu: (command: BotCommand) => string;
+  menu: (command: BotCommandType) => string;
   t: (key: TranslationKey, locale: LanguageCode) => string;
 };
 
@@ -42,7 +42,7 @@ const initTranslations = (): Translator => {
 
   return {
     getFallbackLanguage,
-    menu: (command: BotCommand): string => menuLabels[command],
+    menu: (command: BotCommandType): string => menuLabels[command],
     t: (key: TranslationKey, locale: LanguageCode): string => {
       const str = getRawTranslation(key, locale);
 

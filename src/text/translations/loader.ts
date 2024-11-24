@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { type LanguageCode } from "../../recognition/types.js";
 import { type TranslationKey, TranslationKeys } from "../types.js";
-import { BotCommand } from "../../telegram/types.js";
+import { BotCommand, type BotCommandType } from "../../telegram/types.js";
 
 const getTranslationKeysSchema = () => {
   const values = Object.values(TranslationKeys);
@@ -52,8 +52,8 @@ export type TranslationsFileType = z.infer<
   ReturnType<typeof getTranslationsFileSchema>
 >;
 
-export const initializeMenuLabels = (): Record<BotCommand, string> => {
-  const labels: Record<BotCommand, string> = {
+export const initializeMenuLabels = (): Record<BotCommandType, string> => {
+  const labels: Record<BotCommandType, string> = {
     [BotCommand.Language]: "Switch the recognition language",
     [BotCommand.Support]: "Show support links",
     [BotCommand.Start]: "Say hello and see bot info",
