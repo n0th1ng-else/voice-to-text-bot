@@ -16,6 +16,7 @@ import type {
 } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
+import type { ValueOf } from "../src/common/types.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -200,14 +201,16 @@ export class TelegramMessageModel {
   }
 }
 
-export enum TelegramMessageMetaType {
-  Button,
-  Link,
-}
+export const TelegramMessageMetaType = {
+  Button: 0,
+  Link: 1,
+} as const;
+
+type TelegramMessageMeta = ValueOf<typeof TelegramMessageMetaType>;
 
 export class TelegramMessageMetaItem {
   constructor(
-    public readonly type: TelegramMessageMetaType,
+    public readonly type: TelegramMessageMeta,
     public readonly title: string,
     public readonly data: string,
     public readonly btnType: TelegramButtonType = "d",
