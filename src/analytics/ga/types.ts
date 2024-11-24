@@ -1,4 +1,4 @@
-import type { BotCommand } from "../../telegram/types.js";
+import type { BotCommandType } from "../../telegram/types.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { TelegramApi } from "../../telegram/api/tgapi.js";
 
@@ -63,7 +63,7 @@ export const EVENTS_LIMIT_GA = 25;
 
 const defaultLang = "not provided";
 
-type AnalyticsAction = BotCommand | "/voice" | "/app" | "/ignore";
+type AnalyticsAction = BotCommandType | "/voice" | "/app" | "/ignore";
 
 export class AnalyticsData {
   private readonly timer: TimeMeasure;

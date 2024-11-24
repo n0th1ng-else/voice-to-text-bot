@@ -18,27 +18,32 @@ import { getTranslator } from "../text/index.js";
 import { type TgMessage, type TgMessageOptions } from "./api/types.js";
 import { type AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
+import type { ValueOf } from "../common/types.js";
 
-export enum VoiceContentReason {
-  Ok = "Ok",
-  NoContent = "NoContent",
-  NoDuration = "NoDuration",
-  WrongMimeType = "WrongMimeType",
-}
+export const VoiceContentReason = {
+  Ok: "Ok",
+  NoContent: "NoContent",
+  NoDuration: "NoDuration",
+  WrongMimeType: "WrongMimeType",
+} as const;
+
+export type VoiceContentReasonType = ValueOf<typeof VoiceContentReason>;
 
 export class VoiceContentReasonModel {
   constructor(
-    public readonly type: VoiceContentReason,
+    public readonly type: VoiceContentReasonType,
     public readonly info?: string | number,
   ) {}
 }
 
-export enum BotCommand {
-  Start = "/start",
-  Language = "/lang",
-  Support = "/support",
-  Donate = "/donate",
-}
+export const BotCommand = {
+  Start: "/start",
+  Language: "/lang",
+  Support: "/support",
+  Donate: "/donate",
+} as const;
+
+export type BotCommandType = ValueOf<typeof BotCommand>;
 
 export class BotMessageModel {
   public readonly id: number;
@@ -108,7 +113,7 @@ export class BotLangData {
 export class BotCommandOption {
   public readonly description: string;
 
-  constructor(public readonly command: BotCommand) {
+  constructor(public readonly command: BotCommandType) {
     const translator = getTranslator();
     this.description = translator.menu(command);
   }

@@ -1,4 +1,4 @@
-import type { VoidPromise } from "../common/types.js";
+import type { ValueOf, VoidPromise } from "../common/types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import type { getDb } from "../db/index.js";
 
@@ -31,8 +31,8 @@ export type NotFoundDto = {
 };
 
 export type HealthDto = {
-  status: HealthStatus;
-  ssl: HealthSsl;
+  status: HealthStatusType;
+  ssl: HealthSslType;
   message: string;
   urls: string[];
   version: string;
@@ -41,20 +41,24 @@ export type HealthDto = {
   nodeVersion: string;
 };
 
-export enum HealthStatus {
-  Error = "ERROR",
-  InProgress = "IN_PROGRESS",
-  Online = "ONLINE",
-}
+export const HealthStatus = {
+  Error: "ERROR",
+  InProgress: "IN_PROGRESS",
+  Online: "ONLINE",
+} as const;
 
-export enum HealthSsl {
-  On = "ON",
-  Off = "OFF",
-}
+export type HealthStatusType = ValueOf<typeof HealthStatus>;
+
+export const HealthSsl = {
+  On: "ON",
+  Off: "OFF",
+} as const;
+
+export type HealthSslType = ValueOf<typeof HealthSsl>;
 
 export class HealthModel {
-  private readonly ssl: HealthSsl;
-  private status = HealthStatus.InProgress;
+  private readonly ssl: HealthSslType;
+  private status: HealthStatusType = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
 

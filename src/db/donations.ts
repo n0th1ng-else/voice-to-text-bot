@@ -4,6 +4,7 @@ import {
   type DonationRowScheme,
   DonationsDb,
   DonationStatus,
+  type DonationStatusType,
 } from "./sql/donations.js";
 
 const logger = new Logger("postgres-donations");
@@ -38,7 +39,7 @@ export class DonationsClient {
 
   public updateRow(
     donationId: number,
-    status: DonationStatus,
+    status: DonationStatusType,
   ): Promise<DonationRowScheme> {
     this.logInfo(`Updating the row with id=${donationId}`);
     return this.db

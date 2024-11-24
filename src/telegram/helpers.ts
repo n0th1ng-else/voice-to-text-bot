@@ -1,5 +1,6 @@
 import {
   BotCommand,
+  type BotCommandType,
   type BotMessageModel,
   type DonationDto,
   type DonationPayload,
@@ -43,7 +44,7 @@ export const isDonateMessage = (
 const isCommandMessage = (
   model: BotMessageModel,
   msg: TgMessage,
-  command: BotCommand,
+  command: BotCommandType,
 ): boolean => {
   if (!msg?.text) {
     return false;
