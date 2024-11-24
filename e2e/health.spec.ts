@@ -10,15 +10,15 @@ import {
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import {
   injectDependencies,
   type InjectedFn,
 } from "../src/testUtils/dependencies.js";
 import {
-  type InjectedTestFn,
   injectTestDependencies,
+  type InjectedTestFn,
 } from "./helpers/dependencies.js";
+import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
 jest.unstable_mockModule(
@@ -35,6 +35,11 @@ const appPort = 3300;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
+const path = "/health";
+
+let stopHandler: VoidPromise = () =>
+  Promise.reject(new Error("Server did not start"));
+
 let hostUrl: string;
 let server: InstanceType<InjectedFn["BotServer"]>;
 let telegramServer: nock.Scope;
@@ -48,11 +53,6 @@ let mockTgSetCommands: InjectedTestFn["mockTgSetCommands"];
 let mockTgGetWebHookError: InjectedTestFn["mockTgGetWebHookError"];
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let localhostUrl: string;
-
-const path = "/health";
-
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
 
 describe("[health]", () => {
   beforeAll(async () => {
