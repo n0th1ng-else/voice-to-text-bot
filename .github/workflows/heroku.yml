@@ -9,7 +9,7 @@ on:
         required: true
       version:
         type: string
-        description: "Version tag"
+        description: "Version tag (v1.0.0 or commit sha)"
         required: true
 
 jobs:
