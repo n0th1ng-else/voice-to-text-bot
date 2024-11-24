@@ -12,7 +12,7 @@ on:
         required: true
       version:
         type: string
-        description: "Version tag X.X.X"
+        description: "Version tag in format: v1.0.0 or commit sha"
         required: true
 
 jobs:
@@ -33,3 +33,12 @@ jobs:
     with:
       version: ${{ inputs.version }}
       servers: '["${{ inputs.server }}"]'
+
+  post-trigger:
+    name: Print the summary
+    needs: [trigger]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "Deployed a new service version: ✨ ${{ inputs.version }} ✨to ${{ inputs.server }} 🚀" > $GITHUB_STEP_SUMMARY
