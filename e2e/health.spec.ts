@@ -41,10 +41,10 @@ let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let hostUrl: string;
-let server: InstanceType<InjectedFn["BotServer"]>;
+let server: InstanceType<InjectedFn["BotServerNew"]>;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let BotServer: InjectedFn["BotServer"];
+let BotServer: InjectedFn["BotServerNew"];
 let appVersion: InjectedFn["appVersion"];
 let testPool: MockPool;
 let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
@@ -59,7 +59,7 @@ describe("[health]", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    BotServer = init.BotServer;
+    BotServer = init.BotServerNew;
     appVersion = init.appVersion;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
     mockTgSetWebHook = initTest.mockTgSetWebHook;
@@ -101,51 +101,56 @@ describe("[health]", () => {
     host = request(`${localhostUrl}:${appPort}`);
   });
 
-  beforeEach(async () => {
-    server = new BotServer(appPort, appVersion, webhookDoNotWait);
-    stopHandler = await server.start();
-  });
-
   afterEach(async () => {
     await stopHandler();
     expect(telegramServer.isDone()).toBe(true);
     expect(testPool.isDone()).toBe(true);
   });
 
-  it("initial api access", () => {
-    return host.get(path).then((res) => {
-      expect(res.status).toBe(400);
-      expect(res.body.ssl).toBe(HealthSsl.Off);
-      expect(res.body.status).toBe(HealthStatus.InProgress);
-      expect(res.body.urls).toEqual([]);
-      expect(res.body.version).toBe(appVersion);
-      expect(res.body.message).toBe(
-        "App is not connected to the Telegram server",
-      );
+  describe("start with no bots", () => {
+    beforeEach(async () => {
+      server = new BotServer(appPort, appVersion, webhookDoNotWait);
+      stopHandler = await server.start();
+    });
+
+    it("initial api access", () => {
+      return host.get(path).then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.ssl).toBe(HealthSsl.Off);
+        expect(res.body.status).toBe(HealthStatus.InProgress);
+        expect(res.body.urls).toEqual([]);
+        expect(res.body.version).toBe(appVersion);
+        expect(res.body.message).toBe(
+          "App is not connected to the Telegram server",
+        );
+      });
+    });
+
+    it("starts with no bots enabled", () => {
+      return server
+        .setBots()
+        .applyHostLocation()
+        .then(() => host.get(path))
+        .then((res) => {
+          expect(res.status).toBe(200);
+          expect(res.body.ssl).toBe(HealthSsl.Off);
+          expect(res.body.status).toBe(HealthStatus.Online);
+          expect(res.body.urls).toEqual([]);
+          expect(res.body.version).toBe(appVersion);
+        });
     });
   });
 
-  it("starts with no bots enabled", () => {
-    return server
-      .setBots()
-      .applyHostLocation()
-      .then(() => host.get(path))
-      .then((res) => {
-        expect(res.status).toBe(200);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Online);
-        expect(res.body.urls).toEqual([]);
-        expect(res.body.version).toBe(appVersion);
-      });
-  });
-
   describe("starts with bots", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockTgGetWebHook(telegramServer, "https://another.one");
       mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
       mockTgSetCommands(telegramServer);
 
-      return server.setBots([bot]).applyHostLocation();
+      server = new BotServer(appPort, appVersion, webhookDoNotWait);
+      server.setBots([bot]);
+      await server.applyHostLocation();
+      stopHandler = await server.start();
     });
 
     it("shows okay health check", () => {
