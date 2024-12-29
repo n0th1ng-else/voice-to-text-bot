@@ -139,26 +139,27 @@ describe("[uptime daemon]", () => {
       it("Triggers daemon with minimal 1 day interval if the interval is zero", async () => {
         waiter.reset(1);
         const wrongInterval = 0;
-        return Promise.all([
+
+        await Promise.all([
           waiter.waitForCondition(),
           server.triggerDaemon(nextUrl, wrongInterval),
         ])
-          .then(() => {
+          .then(async () => {
             expect(jest.getTimerCount()).toBe(1);
             expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
             expect(requestHealthData).toHaveBeenCalledTimes(1);
             requestHealthData.mockClear();
             waiter.reset(1);
             jest.advanceTimersByTime(oneMinute);
-            return waiter.waitForCondition();
+            await waiter.waitForCondition();
           })
-          .then(() => {
+          .then(async () => {
             expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
             expect(requestHealthData).toHaveBeenCalledTimes(1);
             requestHealthData.mockClear();
             waiter.reset(3);
             jest.advanceTimersByTime(oneMinute);
-            return waiter.waitForCondition();
+            await waiter.waitForCondition();
           })
           .then(() => {
             expect(requestHealthData).toHaveBeenCalledWith(nextUrl);
