@@ -62,9 +62,9 @@ let clearIntervalSpy = jest
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
-let server: InstanceType<InjectedFn["BotServer"]>;
+let server: InstanceType<InjectedFn["BotServerNew"]>;
 let requestHealthData: SpiedFunction<InjectedFn["requestHealthData"]>;
-let BotServer: InjectedFn["BotServer"];
+let BotServer: InjectedFn["BotServerNew"];
 let appVersion: InjectedFn["appVersion"];
 let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
 let hostUrl: string;
@@ -77,7 +77,7 @@ describe("[uptime daemon]", () => {
   beforeAll(async () => {
     const init = await injectDependencies();
     requestHealthData = jest.spyOn(init, "requestHealthData");
-    BotServer = init.BotServer;
+    BotServer = init.BotServerNew;
     appVersion = init.appVersion;
 
     const localhostUrl = init.localhostUrl;
