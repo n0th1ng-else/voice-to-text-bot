@@ -51,11 +51,11 @@ jest.unstable_mockModule("../src/server/api.js", () => {
 const appPort = 3700;
 const nextUrl = `http://nexthost:${appPort + 1}`;
 
-let realClearInterval = global.clearInterval;
+const globalClearIntervalHandler = global.clearInterval;
 let clearIntervalSpy = jest
   .spyOn(global, "clearInterval")
   .mockImplementation((interval) => {
-    realClearInterval(interval);
+    globalClearIntervalHandler(interval);
     waiter.tick();
   });
 
@@ -87,26 +87,14 @@ describe("[uptime daemon]", () => {
     waiter = new WaiterForCalls();
   });
 
-  beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date().setHours(23, 58, 0, 0));
-    realClearInterval = global.clearInterval;
-    clearIntervalSpy = jest
-      .spyOn(global, "clearInterval")
-      .mockImplementation((interval) => {
-        realClearInterval(interval);
-        waiter.tick();
-      });
-
+  beforeEach(async () => {
     server = new BotServer(appPort, appVersion, webhookDoNotWait);
-    return server.start().then((stopFn) => (stopHandler = stopFn));
+    stopHandler = await server.start();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await stopHandler();
     clearIntervalSpy.mockClear();
-    return stopHandler().finally(() => {
-      jest.useRealTimers();
-    });
   });
 
   it("Failed to trigger the daemon if selfUrl is not set", async () => {
@@ -128,47 +116,68 @@ describe("[uptime daemon]", () => {
       );
     });
 
-    it("Triggers daemon with minimal 1 day interval if the interval is zero", () => {
-      waiter.reset(1);
-      const wrongInterval = 0;
-      return Promise.all([
-        waiter.waitForCondition(),
-        server.triggerDaemon(nextUrl, wrongInterval),
-      ])
-        .then(() => {
-          expect(jest.getTimerCount()).toBe(1);
-          expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-          expect(requestHealthData).toHaveBeenCalledTimes(1);
-          requestHealthData.mockClear();
-          waiter.reset(1);
-          jest.advanceTimersByTime(oneMinute);
-          return waiter.waitForCondition();
-        })
-        .then(() => {
-          expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-          expect(requestHealthData).toHaveBeenCalledTimes(1);
-          requestHealthData.mockClear();
-          waiter.reset(3);
-          jest.advanceTimersByTime(oneMinute);
-          return waiter.waitForCondition();
-        })
-        .then(() => {
-          expect(requestHealthData).toHaveBeenCalledWith(nextUrl);
-          expect(requestHealthData).toHaveBeenCalledTimes(2);
-          requestHealthData.mockClear();
-          expect(clearIntervalSpy).toHaveBeenCalledWith(expect.any(Object));
-          expect(jest.getTimerCount()).toBe(0);
-          jest.advanceTimersByTime(oneDayMinutes);
-          expect(requestHealthData).not.toBeCalled();
+    describe("has nextUrl", () => {
+      beforeEach(() => {
+        jest.useFakeTimers({
+          now: new Date().setHours(23, 58, 0, 0),
         });
-    });
 
-    it("Triggers daemon with minimal 1 day interval if the interval is negative", async () => {
-      const wrongInterval = -2;
-      await server.triggerDaemon(nextUrl, wrongInterval);
-      expect(jest.getTimerCount()).toBe(1);
-      expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-      expect(requestHealthData).toHaveBeenCalledTimes(1);
+        const fakeClearInterval = global.clearInterval;
+        clearIntervalSpy = jest
+          .spyOn(global, "clearInterval")
+          .mockImplementation((interval) => {
+            fakeClearInterval(interval);
+            waiter.tick();
+          });
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+        global.clearInterval = globalClearIntervalHandler;
+      });
+
+      it("Triggers daemon with minimal 1 day interval if the interval is zero", async () => {
+        waiter.reset(1);
+        const wrongInterval = 0;
+        return Promise.all([
+          waiter.waitForCondition(),
+          server.triggerDaemon(nextUrl, wrongInterval),
+        ])
+          .then(() => {
+            expect(jest.getTimerCount()).toBe(1);
+            expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
+            expect(requestHealthData).toHaveBeenCalledTimes(1);
+            requestHealthData.mockClear();
+            waiter.reset(1);
+            jest.advanceTimersByTime(oneMinute);
+            return waiter.waitForCondition();
+          })
+          .then(() => {
+            expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
+            expect(requestHealthData).toHaveBeenCalledTimes(1);
+            requestHealthData.mockClear();
+            waiter.reset(3);
+            jest.advanceTimersByTime(oneMinute);
+            return waiter.waitForCondition();
+          })
+          .then(() => {
+            expect(requestHealthData).toHaveBeenCalledWith(nextUrl);
+            expect(requestHealthData).toHaveBeenCalledTimes(2);
+            requestHealthData.mockClear();
+            expect(clearIntervalSpy).toHaveBeenCalledWith(expect.any(Object));
+            expect(jest.getTimerCount()).toBe(0);
+            jest.advanceTimersByTime(oneDayMinutes);
+            expect(requestHealthData).not.toBeCalled();
+          });
+      });
+
+      it("Triggers daemon with minimal 1 day interval if the interval is negative", async () => {
+        const wrongInterval = -2;
+        await server.triggerDaemon(nextUrl, wrongInterval);
+        expect(jest.getTimerCount()).toBe(1);
+        expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
+        expect(requestHealthData).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });
