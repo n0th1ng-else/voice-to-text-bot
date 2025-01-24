@@ -5,11 +5,12 @@ const logger = new Logger("cache");
 
 export class CacheProvider<Data, UniqId extends keyof Data> {
   private cache: Data[] = [];
+  private readonly cacheSize: number;
+  private readonly idKey: UniqId;
 
-  constructor(
-    private readonly cacheSize: number,
-    private readonly idKey: UniqId,
-  ) {
+  constructor(cacheSize: number, idKey: UniqId) {
+    this.cacheSize = cacheSize;
+    this.idKey = idKey;
     if (!this.hasCacheEnabled()) {
       logger.warn(
         `Cache size is ${Logger.y(

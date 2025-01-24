@@ -25,15 +25,17 @@ const logger = new Logger("telegram-bot");
 export class TelegramBotModel {
   private readonly bot: TelegramApi;
   private readonly actions: BotActions;
+  private readonly token: string;
   private id = "";
   private host = "";
   private path = "";
 
   constructor(
-    private readonly token: string,
+    token: string,
     converter: VoiceConverter,
     stat: ReturnType<typeof getDb>,
   ) {
+    this.token = token;
     const reflector = initTgReflector(this.token);
     this.bot = new TelegramApi(this.token, reflector);
     this.actions = new BotActions(stat, this.bot);

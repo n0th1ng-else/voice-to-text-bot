@@ -30,10 +30,13 @@ export const VoiceContentReason = {
 export type VoiceContentReasonType = ValueOf<typeof VoiceContentReason>;
 
 export class VoiceContentReasonModel {
-  constructor(
-    public readonly type: VoiceContentReasonType,
-    public readonly info?: string | number,
-  ) {}
+  public readonly type: VoiceContentReasonType;
+  public readonly info?: string | number;
+
+  constructor(type: VoiceContentReasonType, info?: string | number) {
+    this.type = type;
+    this.info = info;
+  }
 }
 
 export const BotCommand = {
@@ -93,10 +96,13 @@ export type MessageOptions = {
 };
 
 export class TelegramMessagePrefix {
-  constructor(
-    public readonly chatId: number,
-    public readonly id = nanoid(10),
-  ) {}
+  public readonly chatId: number;
+  public readonly id: string;
+
+  constructor(chatId: number, id = nanoid(10)) {
+    this.chatId = chatId;
+    this.id = id;
+  }
 
   public getPrefix(): string {
     return `[Id=${Logger.y(this.id)}] [ChatId=${Logger.y(this.chatId)}]`;
@@ -104,16 +110,21 @@ export class TelegramMessagePrefix {
 }
 
 export class BotLangData {
-  constructor(
-    public readonly langId: LanguageCode,
-    public readonly prefix: TelegramMessagePrefix,
-  ) {}
+  public readonly langId: LanguageCode;
+  public readonly prefix: TelegramMessagePrefix;
+
+  constructor(langId: LanguageCode, prefix: TelegramMessagePrefix) {
+    this.langId = langId;
+    this.prefix = prefix;
+  }
 }
 
 export class BotCommandOption {
   public readonly description: string;
+  public readonly command: BotCommandType;
 
-  constructor(public readonly command: BotCommandType) {
+  constructor(command: BotCommandType) {
+    this.command = command;
     const translator = getTranslator();
     this.description = translator.menu(command);
   }
@@ -147,11 +158,15 @@ export class TelegramButtonModel<V extends string = string> {
     }
   }
 
-  constructor(
-    public readonly id: TelegramButtonType,
-    public readonly value: V,
-    public readonly logPrefix: string,
-  ) {}
+  public readonly id: TelegramButtonType;
+  public readonly value: V;
+  public readonly logPrefix: string;
+
+  constructor(id: TelegramButtonType, value: V, logPrefix: string) {
+    this.id = id;
+    this.value = value;
+    this.logPrefix = logPrefix;
+  }
 
   public getDtoString(): string {
     const dto: BotButtonDto = {

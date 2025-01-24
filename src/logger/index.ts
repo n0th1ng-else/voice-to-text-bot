@@ -72,11 +72,10 @@ export class Logger {
 
   private readonly additionalPrefix: string;
   private readonly level: number;
+  private readonly id: string;
 
-  constructor(
-    private readonly id = "",
-    level = logLevel,
-  ) {
+  constructor(id = "", level = logLevel) {
+    this.id = id;
     const threadId = cluster.isMaster ? 0 : cluster?.worker?.id || 0;
     this.additionalPrefix = `thread-${threadId}`;
     const logType = LogLevelSchema.parse(level);

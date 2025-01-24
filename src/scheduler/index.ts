@@ -6,6 +6,8 @@ const logger = new Logger("daemon");
 export class ScheduleDaemon<TickData> {
   private readonly interval = 60_000;
   private readonly printId: string;
+  private readonly id: string;
+  private readonly onTick: () => Promise<TickData>;
   private handler: NodeJS.Timeout | null = null;
   private shouldStop?: (data: TickData) => boolean;
   private onFinish?: VoidPromise;
@@ -14,10 +16,9 @@ export class ScheduleDaemon<TickData> {
     return !!this.handler;
   }
 
-  constructor(
-    private readonly id: string,
-    private readonly onTick: () => Promise<TickData>,
-  ) {
+  constructor(id: string, onTick: () => Promise<TickData>) {
+    this.id = id;
+    this.onTick = onTick;
     this.printId = `[${this.id}]`;
   }
 
