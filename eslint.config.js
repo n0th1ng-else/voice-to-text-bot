@@ -18,6 +18,7 @@ export default [
       "**/node_modules",
       "**/dist",
       "**/assets",
+      "**/coverage",
       "**/coverage-e2e",
       "**/coverage-unit",
       "**/package.json",
