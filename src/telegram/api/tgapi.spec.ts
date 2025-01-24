@@ -1,10 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import axios, {
   AxiosHeaders,
   type AxiosError,
   type AxiosRequestConfig,
   type CreateAxiosDefaults,
 } from "axios";
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { nanoid } from "nanoid";
 import {
   type BotCommandDto,
@@ -61,7 +61,7 @@ let checkApiData = (config: AxiosRequestConfig): void => {
 
 let testApiResponse: TgCore<unknown>;
 
-const clientSpy = jest
+const clientSpy = vi
   .spyOn(axios, "create")
   .mockImplementation((config?: CreateAxiosDefaults) => {
     if (!config) {
@@ -86,7 +86,7 @@ describe("[telegram api client]", () => {
 
   describe("telegram response", () => {
     beforeEach(() => {
-      jest.spyOn(testClient, "request").mockImplementationOnce((config) => {
+      vi.spyOn(testClient, "request").mockImplementationOnce((config) => {
         checkApiData(config);
         return Promise.resolve().then(() => ({ data: testApiResponse }));
       });
@@ -701,7 +701,7 @@ describe("[telegram api client]", () => {
     it("simple error, not network", () => {
       const testErrMsg = "oops, we are in trouble";
       const testErr = new Error(testErrMsg);
-      jest.spyOn(testClient, "request").mockImplementationOnce(() => {
+      vi.spyOn(testClient, "request").mockImplementationOnce(() => {
         return Promise.reject(testErr);
       });
 
@@ -745,7 +745,7 @@ describe("[telegram api client]", () => {
       const errCode = 404;
       const errData = "err data";
       const testErr = new Error(testErrMsg);
-      jest.spyOn(testClient, "request").mockImplementationOnce(() => {
+      vi.spyOn(testClient, "request").mockImplementationOnce(() => {
         const networkErr: AxiosError = {
           stack: testErr.stack,
           message: testErr.message,

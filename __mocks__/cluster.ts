@@ -1,8 +1,8 @@
-import { jest } from "@jest/globals";
+import { vi } from "vitest";
 
 export const mocks = {
-  getIsMaster: jest.fn(() => true),
-  getWorkerId: jest.fn(() => 0),
+  getIsMaster: vi.fn(() => true),
+  getWorkerId: vi.fn(() => 0),
 };
 
 export default new Proxy(

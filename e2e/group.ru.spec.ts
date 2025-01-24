@@ -8,8 +8,8 @@ import {
   describe,
   expect,
   it,
-  jest,
-} from "@jest/globals";
+  vi,
+} from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
@@ -23,19 +23,10 @@ import type { TgChatType } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
-jest.unstable_mockModule(
-  "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js"),
-);
-jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
-jest.unstable_mockModule(
-  "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js"),
-);
-jest.unstable_mockModule(
-  "../src/analytics/ga/index",
-  () => import("../src/analytics/ga/__mocks__/index.js"),
-);
+vi.mock("../src/logger/index");
+vi.mock("../src/env");
+vi.mock("../src/analytics/amplitude/index");
+vi.mock("../src/analytics/ga/index");
 
 const appPort = 3500;
 const dbPort = appPort + 1;
@@ -779,97 +770,109 @@ describe("[russian language]", () => {
       });
     });
 
-    it("keeps calm on a big voice files more than 90 sec", (done) => {
-      const voiceFileId = "some-file-id";
-      const voiceFileDuration = 90;
-      tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
+    it("keeps calm on a big voice files more than 90 sec", () => {
+      return new Promise<void>((resolve, reject) => {
+        const voiceFileId = "some-file-id";
+        const voiceFileDuration = 90;
+        tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
+        mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
-      // eslint-disable-next-line
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done?.();
+        // eslint-disable-next-line
+        sendTelegramMessage(host, bot, tgMessage).then(() => {
+          expect(nock.pendingMocks()).toHaveLength(1);
+          nock.cleanAll();
+          return resolve();
+        });
       });
     });
 
-    it("keeps calm if the message is from another bot", (done) => {
-      tgMessage.setName(testMessageId, {}, true);
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
+    it("keeps calm if the message is from another bot", () => {
+      return new Promise<void>((resolve, reject) => {
+        tgMessage.setName(testMessageId, {}, true);
+        mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
-      // eslint-disable-next-line
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done?.();
+        // eslint-disable-next-line
+        sendTelegramMessage(host, bot, tgMessage).then(() => {
+          expect(nock.pendingMocks()).toHaveLength(1);
+          nock.cleanAll();
+          return resolve();
+        });
       });
     });
 
-    it("keeps calm on a voice file with wrong mime type", (done) => {
-      const voiceFileId = "some-file-id";
-      const voiceFileDuration = 59;
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        voiceFileDuration,
-        "audio/mp3",
-      );
+    it("keeps calm on a voice file with wrong mime type", () => {
+      return new Promise<void>((resolve, reject) => {
+        const voiceFileId = "some-file-id";
+        const voiceFileDuration = 59;
+        tgMessage.setVoice(
+          testMessageId,
+          voiceFileId,
+          voiceFileDuration,
+          "audio/mp3",
+        );
 
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
+        mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
-      // eslint-disable-next-line
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done?.();
+        // eslint-disable-next-line
+        sendTelegramMessage(host, bot, tgMessage).then(() => {
+          expect(nock.pendingMocks()).toHaveLength(1);
+          nock.cleanAll();
+          return resolve();
+        });
       });
     });
 
-    it("keeps calm on a voice file with broken duration", (done) => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setVoice(testMessageId, voiceFileId, -53);
+    it("keeps calm on a voice file with broken duration", () => {
+      return new Promise<void>((resolve, reject) => {
+        const voiceFileId = "some-file-id";
+        tgMessage.setVoice(testMessageId, voiceFileId, -53);
 
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
+        mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
-      // eslint-disable-next-line
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done?.();
+        // eslint-disable-next-line
+        sendTelegramMessage(host, bot, tgMessage).then(() => {
+          expect(nock.pendingMocks()).toHaveLength(1);
+          nock.cleanAll();
+          return resolve();
+        });
       });
     });
 
-    it("keeps calm on an audio file with wrong mime type", (done) => {
-      const voiceFileId = "some-file-id";
-      const voiceFileDuration = 59;
-      tgMessage.setAudio(
-        testMessageId,
-        voiceFileId,
-        voiceFileDuration,
-        "audio/wav",
-      );
+    it("keeps calm on an audio file with wrong mime type", () => {
+      return new Promise<void>((resolve, reject) => {
+        const voiceFileId = "some-file-id";
+        const voiceFileDuration = 59;
+        tgMessage.setAudio(
+          testMessageId,
+          voiceFileId,
+          voiceFileDuration,
+          "audio/wav",
+        );
 
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
+        mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
-      // eslint-disable-next-line
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done?.();
+        // eslint-disable-next-line
+        sendTelegramMessage(host, bot, tgMessage).then(() => {
+          expect(nock.pendingMocks()).toHaveLength(1);
+          nock.cleanAll();
+          return resolve();
+        });
       });
     });
 
-    it("keeps calm on an audio file with broken duration", (done) => {
-      const voiceFileId = "some-file-id";
-      tgMessage.setAudio(testMessageId, voiceFileId, -123);
+    it("keeps calm on an audio file with broken duration", () => {
+      return new Promise<void>((resolve, reject) => {
+        const voiceFileId = "some-file-id";
+        tgMessage.setAudio(testMessageId, voiceFileId, -123);
 
-      mockTgReceiveUnexpectedMessage(telegramServer, done);
+        mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
-      // eslint-disable-next-line
-      sendTelegramMessage(host, bot, tgMessage).then(() => {
-        expect(nock.pendingMocks()).toHaveLength(1);
-        nock.cleanAll();
-        return done?.();
+        // eslint-disable-next-line
+        sendTelegramMessage(host, bot, tgMessage).then(() => {
+          expect(nock.pendingMocks()).toHaveLength(1);
+          nock.cleanAll();
+          return resolve();
+        });
       });
     });
 

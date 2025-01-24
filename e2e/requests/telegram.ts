@@ -1,6 +1,6 @@
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
-import { expect } from "@jest/globals";
+import { expect } from "vitest";
 import type request from "supertest";
 import type nock from "nock";
 import querystring from "query-string";
@@ -102,11 +102,11 @@ export const mockTgGetWebHookError = (host: nock.Scope): void => {
 
 export const mockTgReceiveUnexpectedMessage = (
   host: nock.Scope,
-  done,
+  reject: (reason: unknown) => void,
 ): void => {
   host
     .post("/bottelegram-api-token/sendMessage")
-    .reply(500, () => done.fail(new Error("The message is not expected")));
+    .reply(500, () => reject(new Error("The message is not expected")));
 };
 
 export const mockTgReceiveRawMessage = (

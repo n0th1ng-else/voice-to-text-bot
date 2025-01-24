@@ -1,14 +1,11 @@
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { TranslationKeys } from "./types.js";
 import {
   injectDependencies,
   type InjectedFn,
 } from "../testUtils/dependencies.js";
 
-jest.unstable_mockModule(
-  "./translations/loader",
-  () => import("./translations/__mocks__/loader.js"),
-);
+vi.mock("./translations/loader");
 
 let isTranslationKey: InjectedFn["isTranslationKey"];
 let getTranslator: InjectedFn["getTranslator"];

@@ -5,8 +5,8 @@ import {
   describe,
   expect,
   it,
-  jest,
-} from "@jest/globals";
+  vi,
+} from "vitest";
 import { Pool as MockPool } from "./__mocks__/pg.js";
 import {
   injectDependencies,
@@ -14,10 +14,7 @@ import {
 } from "../testUtils/dependencies.js";
 import type { LanguageCode } from "../recognition/types.js";
 
-jest.unstable_mockModule(
-  "../logger/index",
-  () => import("../logger/__mocks__/index.js"),
-);
+vi.mock("../logger/index");
 
 const dbConfig = {
   user: "spy-user",

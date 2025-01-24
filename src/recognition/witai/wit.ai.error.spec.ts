@@ -1,4 +1,4 @@
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect } from "vitest";
 import { WitAiError, WitAiChunkError } from "./wit.ai.error.js";
 
 describe("WitAi errors", () => {
