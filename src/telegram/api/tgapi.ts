@@ -30,11 +30,13 @@ export class TelegramApi {
   private static readonly path = "bot";
 
   private readonly client: AxiosInstance;
+  private readonly apiToken: string;
+  private readonly errorReflector?: ApiErrorReflector;
 
-  constructor(
-    private readonly apiToken: string,
-    private readonly errorReflector?: ApiErrorReflector,
-  ) {
+  constructor(apiToken: string, errorReflector?: ApiErrorReflector) {
+    this.apiToken = apiToken;
+    this.errorReflector = errorReflector;
+
     this.client = axios.create({
       method: "POST",
       baseURL: TelegramApi.url,

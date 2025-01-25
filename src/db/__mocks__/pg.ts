@@ -84,12 +84,18 @@ export const defaults = {
 
 class MockSql {
   public readonly id = nanoid();
+  public readonly sql: string;
+  public readonly handler: (
+    values: AnyTypeForMock[],
+  ) => Promise<AnyTypeForMock>;
+
   constructor(
-    public readonly sql: string,
-    public readonly handler: (
-      values: AnyTypeForMock[],
-    ) => Promise<AnyTypeForMock>,
-  ) {}
+    sql: string,
+    handler: (values: AnyTypeForMock[]) => Promise<AnyTypeForMock>,
+  ) {
+    this.sql = sql;
+    this.handler = handler;
+  }
 }
 
 export const mockTableCreation = (testPool: Pool) => {

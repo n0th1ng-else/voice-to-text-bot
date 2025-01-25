@@ -27,6 +27,9 @@ type UserNameOptions = {
 export class TelegramMessageModel {
   public messageId = 0;
   public voiceId = "";
+  public readonly chatId: number;
+  public readonly chatType: TgChatType;
+
   private text = "";
   private voiceDuration = 0;
   private callbackData = "";
@@ -39,10 +42,10 @@ export class TelegramMessageModel {
   private contentType: "voice" | "audio" | "video_note" = "voice";
   private mimeType = "";
 
-  constructor(
-    public readonly chatId: number,
-    public readonly chatType: TgChatType,
-  ) {}
+  constructor(chatId: number, chatType: TgChatType) {
+    this.chatId = chatId;
+    this.chatType = chatType;
+  }
 
   public setName(
     messageId: number,
@@ -209,23 +212,35 @@ export const TelegramMessageMetaType = {
 type TelegramMessageMeta = ValueOf<typeof TelegramMessageMetaType>;
 
 export class TelegramMessageMetaItem {
+  public readonly type: TelegramMessageMeta;
+  public readonly title: string;
+  public readonly data: string;
+  public readonly btnType: TelegramButtonType;
+
   constructor(
-    public readonly type: TelegramMessageMeta,
-    public readonly title: string,
-    public readonly data: string,
-    public readonly btnType: TelegramButtonType = "d",
-  ) {}
+    type: TelegramMessageMeta,
+    title: string,
+    data: string,
+    btnType: TelegramButtonType = "d",
+  ) {
+    this.type = type;
+    this.title = title;
+    this.data = data;
+    this.btnType = btnType;
+  }
 }
 
 export class BotStatRecordModel {
   public objectId?: string;
   public user = "";
   public usageCount = 0;
+  public chatId: number;
+  public langId: LanguageCode;
 
-  constructor(
-    public chatId: number,
-    public langId: LanguageCode = "en-US",
-  ) {}
+  constructor(chatId: number, langId: LanguageCode = "en-US") {
+    this.chatId = chatId;
+    this.langId = langId;
+  }
 
   public setObjectId(objectId: number): this {
     this.objectId = String(objectId);

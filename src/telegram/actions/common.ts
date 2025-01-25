@@ -20,10 +20,13 @@ const logger = new Logger("telegram-bot");
 export abstract class GenericAction {
   protected readonly text = getTranslator();
 
-  constructor(
-    protected readonly stat: ReturnType<typeof getDb>,
-    protected readonly bot: TelegramApi,
-  ) {}
+  protected readonly stat: ReturnType<typeof getDb>;
+  protected readonly bot: TelegramApi;
+
+  constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
+    this.stat = stat;
+    this.bot = bot;
+  }
 
   public abstract runAction(
     mdl: BotMessageModel,

@@ -11,6 +11,7 @@ const logger = new Logger("uptime");
 export class UptimeDaemon {
   private static readonly minLifecycleInterval = 1;
   private readonly daemon: ScheduleDaemon<void>;
+  private readonly version: string;
 
   private currentUrl = "";
   private nextUrl = "";
@@ -22,7 +23,8 @@ export class UptimeDaemon {
     return this.daemon.isRunning;
   }
 
-  constructor(private readonly version = "") {
+  constructor(version = "") {
+    this.version = version;
     this.daemon = new ScheduleDaemon("uptime", () =>
       this.onTick(),
     ).setStopHandler(

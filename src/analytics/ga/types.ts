@@ -67,6 +67,9 @@ type AnalyticsAction = BotCommandType | "/voice" | "/app" | "/ignore";
 
 export class AnalyticsData {
   private readonly timer: TimeMeasure;
+  private readonly appVersion: string;
+  private readonly url: string;
+  private readonly threadId: number;
   private events: AnalyticsEvent[] = [];
   private id = 0;
   private lang = defaultLang;
@@ -75,11 +78,10 @@ export class AnalyticsData {
   private commandMeta = "";
   private title = "Audio Message Bot";
 
-  constructor(
-    private readonly appVersion: string,
-    private readonly url: string,
-    private readonly threadId: number,
-  ) {
+  constructor(appVersion: string, url: string, threadId: number) {
+    this.appVersion = appVersion;
+    this.url = url;
+    this.threadId = threadId;
     this.timer = new TimeMeasure();
   }
 

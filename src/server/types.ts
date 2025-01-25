@@ -58,17 +58,25 @@ export type HealthSslType = ValueOf<typeof HealthSsl>;
 
 export class HealthModel {
   private readonly ssl: HealthSslType;
+  private readonly version: string;
+  private readonly threadId: number;
+  private readonly serverName: string;
+  private readonly coreVersion: string;
   private status: HealthStatusType = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
 
   constructor(
-    private readonly version: string,
+    version: string,
     isHttps: boolean,
-    private readonly threadId: number,
-    private readonly serverName: string,
-    private readonly coreVersion: string,
+    threadId: number,
+    serverName: string,
+    coreVersion: string,
   ) {
+    this.version = version;
+    this.threadId = threadId;
+    this.serverName = serverName;
+    this.coreVersion = coreVersion;
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
 

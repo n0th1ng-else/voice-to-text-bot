@@ -22,8 +22,11 @@ export type DonationRowScheme = {
 
 export class DonationsDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = DonationsSql.createTable;

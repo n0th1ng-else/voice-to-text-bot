@@ -14,8 +14,11 @@ export type UsageRowScheme = {
 
 export class UsagesDb {
   private initialized = false;
+  private readonly pool: Pool;
 
-  constructor(private readonly pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   public async init(): Promise<void> {
     const query = UsagesSql.createTable;
