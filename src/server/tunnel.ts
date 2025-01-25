@@ -1,4 +1,4 @@
-import { connect } from "ngrok";
+import { forward } from "@ngrok/ngrok";
 import { Logger } from "../logger/index.js";
 import { sSuffix } from "../text/utils.js";
 
@@ -11,13 +11,18 @@ const createTunnel = async (
 ): Promise<string> => {
   logger.info("Creating tunnel");
   const localHost = `${sSuffix("http", enableSSL)}://localhost:${port}`;
-  return connect({ authtoken: token, addr: localHost }).then((host) => {
-    logger.info(
-      `Started tunnel from ${Logger.y(host)} to ${Logger.y(localHost)}`,
-    );
-    logger.info(`Using the host ${Logger.y(host)}`);
-    return host;
+  const host = await forward({
+    addr: localHost,
+    authtoken: token,
   });
+  const url = host.url();
+  if (!url) {
+    throw new Error("Unable to create the tunnel! url is not set.");
+  }
+  logger.info(`Started tunnel from ${Logger.y(url)} to ${Logger.y(localHost)}`);
+  logger.info(`Using the host ${Logger.y(url)}`);
+
+  return url;
 };
 
 export const getHostName = (
