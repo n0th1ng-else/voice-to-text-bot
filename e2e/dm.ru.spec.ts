@@ -113,7 +113,7 @@ describe("[russian language]", () => {
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const mockTgSetWebHook = initTest.mockTgSetWebHook;
     const mockTgSetCommands = initTest.mockTgSetCommands;
-    const BotServer = init.BotServer;
+    const BotServer = init.BotServerNew;
     const appVersion = init.appVersion;
     const launchTime = init.launchTime;
 

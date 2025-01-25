@@ -32,4 +32,8 @@ export class WaiterForCalls {
       this.resolve = resolve;
     });
   }
+
+  public toString(): string {
+    return `Recorded ticks: ${this.calledTimes} of ${this.times}`;
+  }
 }

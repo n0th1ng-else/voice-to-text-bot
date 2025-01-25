@@ -50,7 +50,7 @@ describe("error cases", () => {
       const mockTgGetWebHook = initTest.mockTgGetWebHook;
       const mockTgSetWebHook = initTest.mockTgSetWebHook;
       const mockTgSetCommands = initTest.mockTgSetCommands;
-      const BotServer = init.BotServer;
+      const BotServer = init.BotServerNew;
       const appVersion = init.appVersion;
       const launchTime = init.launchTime;
 
@@ -85,15 +85,12 @@ describe("error cases", () => {
       mockTgSetCommands(telegramServer);
 
       const server = new BotServer(appPort, appVersion, webhookDoNotWait);
-      return server
+      stopHandler = await server
         .setSelfUrl(hostUrl)
         .setBots([bot])
         .setStat(db)
-        .start()
-        .then((stopFn) => {
-          stopHandler = stopFn;
-          return server.applyHostLocation();
-        });
+        .start();
+      await server.applyHostLocation();
     });
 
     afterAll(() => stopHandler());
@@ -103,45 +100,38 @@ describe("error cases", () => {
       expect(testPool.isDone()).toBe(true);
     });
 
-    it("picks get request for bot url, shows not found, ", () => {
-      return host
-        .get(bot.getPath())
-        .send()
-        .then((res) => {
-          expect(res.status).toBe(404);
-          expect(res.body.error).toBe("Not found");
-          expect(res.body.message).toBe("Route not found");
-          expect(res.body.status).toBe(404);
-          // TODO check in the logs
-        });
+    it("picks get request for bot url, shows the text that route is enabled", async () => {
+      const res = await host.get(bot.getPath()).send();
+      expect(res.status).toEqual(200);
+      expect(res.text).toEqual("Route is enabled");
     });
 
-    it("picks any get request, shows not found", () => {
+    it("picks get request for bot url with old routeId, shows the text that route is enabled but stale", async () => {
+      const res = await host.get(bot.getPath("cachedId")).send();
+      expect(res.status).toEqual(200);
+      expect(res.text).toEqual("Route is enabled under new routeId");
+    });
+
+    it("picks any other get request, shows the route not found", async () => {
       const anyGetRoute = "/some/route";
       expect(anyGetRoute).not.toBe(bot.getPath());
-      return host
-        .get(anyGetRoute)
-        .send()
-        .then((res) => {
-          expect(res.status).toBe(404);
-          expect(res.body.error).toBe("Not found");
-          expect(res.body.message).toBe("Route not found");
-          expect(res.body.status).toBe(404);
-        });
+      const res = await host.get(anyGetRoute).send();
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe("Not found");
+      expect(res.body.message).toBe("Route not found");
+      expect(res.body.status).toBe(404);
     });
 
-    it("picks any get request, shows not found", () => {
+    it("picks any other post request, shows the route not found", async () => {
       const anyPostRoute = "/another/route";
       expect(anyPostRoute).not.toBe(bot.getPath());
-      return host
-        .post(anyPostRoute)
-        .send()
-        .then((res) => {
-          expect(res.status).toBe(404);
-          expect(res.body.error).toBe("Not found");
-          expect(res.body.message).toBe("Route not found");
-          expect(res.body.status).toBe(404);
-        });
+      const res = await host.post(anyPostRoute).send();
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe("Not found");
+      expect(res.body.message).toBe("Route not found");
+      expect(res.body.status).toBe(404);
     });
   });
 });

@@ -33,7 +33,7 @@ export default defineConfig({
         test: {
           name: "unit",
           include: ["./src/**/?(*.)+(spec|test).[jt]s?(x)"],
-          testTimeout: 3_000,
+          testTimeout: 2000,
         },
       },
       {
@@ -41,7 +41,7 @@ export default defineConfig({
         test: {
           name: "e2e",
           include: ["./e2e/**/?(*.)+(spec|test).[jt]s?(x)"],
-          testTimeout: 10_000,
+          testTimeout: 5000,
         },
       },
     ],

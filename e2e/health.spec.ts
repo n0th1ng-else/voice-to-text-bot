@@ -30,10 +30,10 @@ const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
 let hostUrl: string;
-let server: InstanceType<InjectedFn["BotServer"]>;
+let server: InstanceType<InjectedFn["BotServerNew"]>;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let BotServer: InjectedFn["BotServer"];
+let BotServer: InjectedFn["BotServerNew"];
 let appVersion: InjectedFn["appVersion"];
 let testPool: MockPool;
 let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
@@ -53,7 +53,7 @@ describe("[health]", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    BotServer = init.BotServer;
+    BotServer = init.BotServerNew;
     appVersion = init.appVersion;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
     mockTgSetWebHook = initTest.mockTgSetWebHook;
@@ -95,20 +95,23 @@ describe("[health]", () => {
     host = request(`${localhostUrl}:${appPort}`);
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     server = new BotServer(appPort, appVersion, webhookDoNotWait);
-    stopHandler = await server.start();
   });
 
-  afterEach(() => {
-    return stopHandler().then(() => {
-      expect(telegramServer.isDone()).toBe(true);
-      expect(testPool.isDone()).toBe(true);
+  afterEach(async () => {
+    await stopHandler();
+    expect(telegramServer.isDone()).toBe(true);
+    expect(testPool.isDone()).toBe(true);
+  });
+
+  describe("with no bots", () => {
+    beforeEach(async () => {
+      stopHandler = await server.start();
     });
-  });
 
-  it("initial api access", () => {
-    return host.get(path).then((res) => {
+    it("initial api access", async () => {
+      const res = await host.get(path);
       expect(res.status).toBe(400);
       expect(res.body.ssl).toBe(HealthSsl.Off);
       expect(res.body.status).toBe(HealthStatus.InProgress);
@@ -118,63 +121,57 @@ describe("[health]", () => {
         "App is not connected to the Telegram server",
       );
     });
-  });
 
-  it("starts with no bots enabled", () => {
-    return server
-      .setBots()
-      .applyHostLocation()
-      .then(() => host.get(path))
-      .then((res) => {
-        expect(res.status).toBe(200);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Online);
-        expect(res.body.urls).toEqual([]);
-        expect(res.body.version).toBe(appVersion);
-      });
+    it("starts with no bots enabled", async () => {
+      await server.setBots().applyHostLocation();
+      const res = await host.get(path);
+      expect(res.status).toBe(200);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Online);
+      expect(res.body.urls).toEqual([]);
+      expect(res.body.version).toBe(appVersion);
+    });
   });
 
   describe("starts with bots", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       mockTgGetWebHook(telegramServer, "https://another.one");
       mockTgSetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
       mockTgSetCommands(telegramServer);
 
-      return server.setBots([bot]).applyHostLocation();
+      await server.setBots([bot]).applyHostLocation();
+      stopHandler = await server.start();
     });
 
-    it("shows okay health check", () => {
+    it("shows okay health check", async () => {
       mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
-      return host.get(path).then((res) => {
-        expect(res.status).toBe(200);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Online);
-        expect(res.body.urls).toEqual([`${hostUrl}${bot.getPath()}`]);
-        expect(res.body.version).toBe(appVersion);
-      });
+      const res = await host.get(path);
+      expect(res.status).toBe(200);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Online);
+      expect(res.body.urls).toEqual([`${hostUrl}${bot.getPath()}`]);
+      expect(res.body.version).toBe(appVersion);
     });
 
-    it("shows okay health check with bot web hooks not owned by this node", () => {
+    it("shows okay health check with bot web hooks not owned by this node", async () => {
       const nextUrl = `${localhostUrl}-next`;
       mockTgGetWebHook(telegramServer, `${nextUrl}${bot.getPath()}`);
-      return host.get(path).then((res) => {
-        expect(res.status).toBe(200);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Online);
-        expect(res.body.urls).toEqual([`${nextUrl}${bot.getPath()}`]);
-        expect(res.body.version).toBe(appVersion);
-      });
+      const res = await host.get(path);
+      expect(res.status).toBe(200);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Online);
+      expect(res.body.urls).toEqual([`${nextUrl}${bot.getPath()}`]);
+      expect(res.body.version).toBe(appVersion);
     });
 
-    it("shows error health check", () => {
+    it("shows error health check", async () => {
       mockTgGetWebHookError(telegramServer);
-      return host.get(path).then((res) => {
-        expect(res.status).toBe(400);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Error);
-        expect(res.body.urls).toEqual([]);
-        expect(res.body.version).toBe(appVersion);
-      });
+      const res = await host.get(path);
+      expect(res.status).toBe(400);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Error);
+      expect(res.body.urls).toEqual([]);
+      expect(res.body.version).toBe(appVersion);
     });
   });
 });

@@ -42,14 +42,17 @@ export class Logger {
     this.output(...messages);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public output(...message: unknown[]): void {
-    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     const prefix = `[${this.id}]`;
-    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+
     const additionalPrefix = this.additionalPrefix
       ? `[${this.additionalPrefix}]`
       : "";
-    // console.log(prefix, additionalPrefix, ...message);
+
+    const showLogs = process.env.ENABLE_LOGGER === "true";
+    if (showLogs) {
+      // eslint-disable-next-line no-console
+      console.log(prefix, additionalPrefix, ...message);
+    }
   }
 }

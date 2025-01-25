@@ -181,7 +181,8 @@ export class BotServerNew
         async (req, reply) => {
           const routeId = req.params.id;
           const botId = bot.getId();
-          if (routeId !== botId) {
+          const isLatestRouteId = routeId === botId;
+          if (!isLatestRouteId) {
             logger.warn(
               "Wrong route id! Perhaps because of the cache on Telegram side.",
               {
@@ -193,7 +194,14 @@ export class BotServerNew
             );
           }
 
-          return reply.status(200).type("text/plain").send("Route is enabled");
+          return reply
+            .status(200)
+            .type("text/plain")
+            .send(
+              isLatestRouteId
+                ? "Route is enabled"
+                : "Route is enabled under new routeId",
+            );
         },
       );
     });

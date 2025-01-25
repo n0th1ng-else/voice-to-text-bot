@@ -18,7 +18,7 @@ export const injectDependencies = async () => {
   const dbDurations = await import("../db/sql/durations.sql.js");
   const dbIgnoredChats = await import("../db/sql/ignoredchats.sql.js");
   const env = await import("../env.js");
-  const server = await import("../server/bot-server.js");
+  const server = await import("../server/bot-server-new.js");
   const serverHelpers = await import("../server/api.js");
   const stripe = await import("../donate/stripe.js");
   const utils = await import("./waitFor.js");
