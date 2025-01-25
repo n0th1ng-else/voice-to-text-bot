@@ -1,12 +1,14 @@
 import {
-  jest,
+  vi,
   expect,
   beforeEach,
   afterEach,
   it,
   describe,
   beforeAll,
-} from "@jest/globals";
+  afterAll,
+  type MockInstance,
+} from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
@@ -16,22 +18,15 @@ import {
   HealthSsl,
   HealthStatus,
 } from "../src/server/types.js";
-import type { SpiedFunction } from "jest-mock";
 import type { VoidPromise } from "../src/common/types.js";
 
-jest.unstable_mockModule(
-  "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js"),
-);
-jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
-jest.unstable_mockModule(
-  "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js"),
-);
+vi.mock("../src/logger/index");
+vi.mock("../src/env");
+vi.mock("../src/analytics/amplitude/index");
 
-jest.unstable_mockModule("../src/server/api.js", () => {
+vi.mock("../src/server/api.js", () => {
   return {
-    requestHealthData: jest.fn(() => {
+    requestHealthData: vi.fn(() => {
       const dto: HealthDto = {
         version: "new2",
         urls: [],
@@ -52,7 +47,7 @@ const appPort = 3700;
 const nextUrl = `http://nexthost:${appPort + 1}`;
 
 let realClearInterval = global.clearInterval;
-let clearIntervalSpy = jest
+let clearIntervalSpy = vi
   .spyOn(global, "clearInterval")
   .mockImplementation((interval) => {
     realClearInterval(interval);
@@ -63,7 +58,7 @@ const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
 let server: InstanceType<InjectedFn["BotServer"]>;
-let requestHealthData: SpiedFunction<InjectedFn["requestHealthData"]>;
+let requestHealthData: MockInstance<InjectedFn["requestHealthData"]>;
 let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
 let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
@@ -75,8 +70,9 @@ let stopHandler: VoidPromise = () =>
 
 describe("[uptime daemon]", () => {
   beforeAll(async () => {
+    vi.useFakeTimers();
     const init = await injectDependencies();
-    requestHealthData = jest.spyOn(init, "requestHealthData");
+    requestHealthData = vi.spyOn(init, "requestHealthData");
     BotServer = init.BotServer;
     appVersion = init.appVersion;
 
@@ -87,11 +83,11 @@ describe("[uptime daemon]", () => {
     waiter = new WaiterForCalls();
   });
 
-  beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date().setHours(23, 58, 0, 0));
+  beforeEach(async () => {
+    vi.clearAllTimers();
+    vi.setSystemTime(new Date().setHours(23, 58, 0, 0));
     realClearInterval = global.clearInterval;
-    clearIntervalSpy = jest
+    clearIntervalSpy = vi
       .spyOn(global, "clearInterval")
       .mockImplementation((interval) => {
         realClearInterval(interval);
@@ -99,14 +95,16 @@ describe("[uptime daemon]", () => {
       });
 
     server = new BotServer(appPort, appVersion, webhookDoNotWait);
-    return server.start().then((stopFn) => (stopHandler = stopFn));
+    stopHandler = await server.start();
   });
 
-  afterEach(() => {
-    clearIntervalSpy.mockClear();
-    return stopHandler().finally(() => {
-      jest.useRealTimers();
-    });
+  afterEach(async () => {
+    clearIntervalSpy.mockRestore();
+    await stopHandler();
+  });
+
+  afterAll(() => {
+    vi.useRealTimers();
   });
 
   it("Failed to trigger the daemon if selfUrl is not set", async () => {
@@ -136,12 +134,12 @@ describe("[uptime daemon]", () => {
         server.triggerDaemon(nextUrl, wrongInterval),
       ])
         .then(() => {
-          expect(jest.getTimerCount()).toBe(1);
+          expect(vi.getTimerCount()).toBe(1);
           expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
           expect(requestHealthData).toHaveBeenCalledTimes(1);
           requestHealthData.mockClear();
           waiter.reset(1);
-          jest.advanceTimersByTime(oneMinute);
+          vi.advanceTimersByTime(oneMinute);
           return waiter.waitForCondition();
         })
         .then(() => {
@@ -149,7 +147,7 @@ describe("[uptime daemon]", () => {
           expect(requestHealthData).toHaveBeenCalledTimes(1);
           requestHealthData.mockClear();
           waiter.reset(3);
-          jest.advanceTimersByTime(oneMinute);
+          vi.advanceTimersByTime(oneMinute);
           return waiter.waitForCondition();
         })
         .then(() => {
@@ -157,8 +155,8 @@ describe("[uptime daemon]", () => {
           expect(requestHealthData).toHaveBeenCalledTimes(2);
           requestHealthData.mockClear();
           expect(clearIntervalSpy).toHaveBeenCalledWith(expect.any(Object));
-          expect(jest.getTimerCount()).toBe(0);
-          jest.advanceTimersByTime(oneDayMinutes);
+          expect(vi.getTimerCount()).toBe(0);
+          vi.advanceTimersByTime(oneDayMinutes);
           expect(requestHealthData).not.toBeCalled();
         });
     });
@@ -166,7 +164,7 @@ describe("[uptime daemon]", () => {
     it("Triggers daemon with minimal 1 day interval if the interval is negative", async () => {
       const wrongInterval = -2;
       await server.triggerDaemon(nextUrl, wrongInterval);
-      expect(jest.getTimerCount()).toBe(1);
+      expect(vi.getTimerCount()).toBe(1);
       expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
       expect(requestHealthData).toHaveBeenCalledTimes(1);
     });

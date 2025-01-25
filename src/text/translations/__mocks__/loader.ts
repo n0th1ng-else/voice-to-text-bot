@@ -1,12 +1,12 @@
-import { jest } from "@jest/globals";
+import { vi } from "vitest";
 
-export const initializeMenuLabels = jest.fn(() => {
+export const initializeMenuLabels = vi.fn(() => {
   return {
     "/start": "Command text",
   };
 });
 
-export const initializeTranslationsForLocale = jest.fn(() => {
+export const initializeTranslationsForLocale = vi.fn(() => {
   return {
     "start.welcomeMessage": "translation text",
     "recognition.voice.tooLong": "{{duration}}",

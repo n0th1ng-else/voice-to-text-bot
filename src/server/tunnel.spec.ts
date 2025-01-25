@@ -1,13 +1,10 @@
-import { it, describe, expect, jest, beforeAll } from "@jest/globals";
+import { it, describe, expect, vi, beforeAll } from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
 } from "../testUtils/dependencies.js";
 
-jest.unstable_mockModule(
-  "../logger/index",
-  () => import("../logger/__mocks__/index.js"),
-);
+vi.mock("../logger/index");
 
 let getHostName: InjectedFn["getHostName"];
 

@@ -107,8 +107,7 @@ dist
 .DS_Store
 .idea
 env-local.json
-coverage-e2e
-coverage-unit
+coverage-*
 
 # any wav dumps
 *.wav

@@ -1,12 +1,12 @@
 import {
   expect,
-  jest,
+  vi,
   beforeEach,
   afterEach,
   it,
   describe,
   beforeAll,
-} from "@jest/globals";
+} from "vitest";
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
@@ -21,15 +21,9 @@ import {
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
-jest.unstable_mockModule(
-  "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js"),
-);
-jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
-jest.unstable_mockModule(
-  "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js"),
-);
+vi.mock("../src/logger/index");
+vi.mock("../src/env");
+vi.mock("../src/analytics/amplitude/index");
 
 const appPort = 3800;
 const dbPort = appPort + 1;

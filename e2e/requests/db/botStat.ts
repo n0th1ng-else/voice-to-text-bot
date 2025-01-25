@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals";
+import { expect } from "vitest";
 import type { LanguageCode } from "../../../src/recognition/types.js";
 import { BotStatRecordModel } from "../../helpers.js";
 import { randomIntFromInterval } from "../../../src/common/timer.js";

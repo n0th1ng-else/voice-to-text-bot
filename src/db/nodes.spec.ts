@@ -4,19 +4,16 @@ import {
   afterEach,
   expect,
   it,
-  jest,
+  vi,
   beforeAll,
-} from "@jest/globals";
+} from "vitest";
 import { Pool as MockPool } from "./__mocks__/pg.js";
 import {
   injectDependencies,
   type InjectedFn,
 } from "../testUtils/dependencies.js";
 
-jest.unstable_mockModule(
-  "../logger/index",
-  () => import("../logger/__mocks__/index.js"),
-);
+vi.mock("../logger/index");
 
 const dbConfig = {
   user: "spy-user",

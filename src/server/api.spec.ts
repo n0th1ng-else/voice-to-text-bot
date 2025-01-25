@@ -1,4 +1,4 @@
-import { describe, it, expect, jest } from "@jest/globals";
+import { describe, it, expect, vi } from "vitest";
 import axios, { type AxiosRequestConfig } from "axios";
 import { requestHealthData } from "./api.js";
 import { type HealthDto, HealthSsl, HealthStatus } from "./types.js";
@@ -6,13 +6,13 @@ import { type HealthDto, HealthSsl, HealthStatus } from "./types.js";
 const mockRequest = (
   fn: (config?: AxiosRequestConfig) => Promise<HealthDto>,
 ) => {
-  jest
-    .spyOn(axios, "request")
-    .mockImplementationOnce((config?: AxiosRequestConfig) => {
+  vi.spyOn(axios, "request").mockImplementationOnce(
+    (config?: AxiosRequestConfig) => {
       expect(config?.method).toBe("GET");
       expect(config?.responseType).toBe("json");
       return Promise.resolve().then(() => fn(config));
-    });
+    },
+  );
 };
 
 const TEST_URL = "https://google.com";
@@ -37,7 +37,7 @@ describe("requestHealthData", () => {
     await requestHealthData(TEST_URL);
   });
 
-  it("should construct health error with standart message", async () => {
+  it("should construct health error with standard message", async () => {
     const errCause = {
       message: undefined,
       response: {
@@ -51,7 +51,7 @@ describe("requestHealthData", () => {
 
     try {
       await requestHealthData(TEST_URL);
-      return Promise.reject("Should not resolve");
+      return Promise.reject(new Error("Should not resolve"));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       expect(err.cause).toBe(errCause);
@@ -76,7 +76,7 @@ describe("requestHealthData", () => {
 
     try {
       await requestHealthData(TEST_URL);
-      return Promise.reject("Should not resolve");
+      return Promise.reject(new Error("Should not resolve"));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       expect(err.cause).toBe(errCause);

@@ -6,8 +6,8 @@ import {
   describe,
   expect,
   it,
-  jest,
-} from "@jest/globals";
+  vi,
+} from "vitest";
 import request from "supertest";
 import nock from "nock";
 import {
@@ -23,19 +23,10 @@ import type { TgChatType } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
-jest.unstable_mockModule(
-  "../src/logger/index",
-  () => import("../src/logger/__mocks__/index.js"),
-);
-jest.unstable_mockModule("../src/env", () => import("../src/__mocks__/env.js"));
-jest.unstable_mockModule(
-  "../src/analytics/amplitude/index",
-  () => import("../src/analytics/amplitude/__mocks__/index.js"),
-);
-jest.unstable_mockModule(
-  "../src/analytics/ga/index",
-  () => import("../src/analytics/ga/__mocks__/index.js"),
-);
+vi.mock("../src/logger/index");
+vi.mock("../src/env");
+vi.mock("../src/analytics/amplitude/index");
+vi.mock("../src/analytics/ga/index");
 
 const appPort = 3100;
 const dbPort = appPort + 1;

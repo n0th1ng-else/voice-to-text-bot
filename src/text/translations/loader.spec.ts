@@ -1,27 +1,27 @@
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
 } from "../../testUtils/dependencies.js";
 
-const origFs = await import("node:fs");
-const origTypes = await import("../types.js");
-const existsSyncMock = jest.fn();
-const readFileSyncMock = jest.fn();
-const writeFileSyncMock = jest.fn();
+const existsSyncMock = vi.fn();
+const readFileSyncMock = vi.fn();
+const writeFileSyncMock = vi.fn();
 
-jest.unstable_mockModule("node:fs", () => {
+vi.mock("node:fs", async () => {
+  const originalModule = await vi.importActual("node:fs");
   return {
-    ...origFs,
+    ...originalModule,
     existsSync: existsSyncMock,
     readFileSync: readFileSyncMock,
     writeFileSync: writeFileSyncMock,
   };
 });
 
-jest.unstable_mockModule("../types", () => {
+vi.mock("../types", async () => {
+  const originalModule = await vi.importActual("../types.js");
   return {
-    ...origTypes,
+    ...originalModule,
     TranslationKeys: {
       WelcomeMessage: "start.welcomeMessage",
       WelcomeMessageGroup: "start.groupSupport",

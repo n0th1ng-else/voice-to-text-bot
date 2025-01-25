@@ -1,13 +1,10 @@
-import { expect, describe, it, jest, beforeAll } from "@jest/globals";
+import { expect, describe, it, vi, beforeAll } from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
 } from "../testUtils/dependencies.js";
 
-jest.unstable_mockModule(
-  "../logger/index",
-  () => import("../logger/__mocks__/index.js"),
-);
+vi.mock("../logger/index");
 
 type TestCacheData = {
   testId: string;

@@ -1,24 +1,14 @@
-import {
-  describe,
-  it,
-  expect,
-  jest,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 let initTgReflector;
 let TgError;
 
-jest.unstable_mockModule(
-  "../logger/index",
-  () => import("../logger/__mocks__/index.js"),
-);
+vi.mock("../logger/index");
 
 let res: Promise<boolean> = Promise.resolve(true);
-const leaveChatMock = jest.fn().mockImplementation(() => res);
+const leaveChatMock = vi.fn().mockImplementation(() => res);
 
-jest.unstable_mockModule("./api/tgapi", () => {
+vi.mock("./api/tgapi", () => {
   return {
     TelegramApi: function () {
       return {
@@ -30,7 +20,7 @@ jest.unstable_mockModule("./api/tgapi", () => {
 
 describe("initTgReflector", () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   beforeEach(async () => {

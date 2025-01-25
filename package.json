@@ -26,13 +26,13 @@
     "build": "tsc && pnpm run copy-assets",
     "copy-assets": "node ./dist/copy-files.js",
     "locale:sync": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/scripts/locale.ts",
-    "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-vm-modules\" jest",
+    "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096\" vitest",
     "test:load": "artillery run load.yml --insecure",
-    "test:unit": "pnpm run test:runner --coverage --selectProjects=unit",
-    "test:e2e": "pnpm run test:runner --coverage --runInBand --selectProjects=e2e",
-    "test:unit:watch": "pnpm run test:runner --watch --selectProjects=unit",
-    "test:e2e:watch": "pnpm run test:runner --watch --selectProjects=e2e",
-    "test": "pnpm run test:runner --coverage --runInBand",
+    "test:unit": "pnpm run test:runner run --coverage --project=unit",
+    "test:e2e": "pnpm run test:runner run --coverage --project=e2e",
+    "test:unit:watch": "pnpm run test:runner watch --project=unit",
+    "test:e2e:watch": "pnpm run test:runner watch --project=e2e",
+    "test": "pnpm run test:runner run --coverage",
     "prepare": "husky"
   },
   "dependencies": {
@@ -62,7 +62,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "3.2.0",
     "@eslint/js": "9.19.0",
-    "@jest/globals": "29.7.0",
     "@types/eslint__eslintrc": "2.1.2",
     "@types/express": "4.17.21",
     "@types/fluent-ffmpeg": "2.1.27",
@@ -76,15 +75,16 @@
     "eslint": "9.19.0",
     "eslint-config-prettier": "10.0.1",
     "husky": "9.1.7",
-    "jest": "29.7.0",
-    "jest-mock": "29.7.0",
-    "jest-sonar": "0.2.16",
     "lint-staged": "15.4.2",
     "nock": "13.5.6",
     "prettier": "3.4.2",
     "query-string": "9.1.1",
     "supertest": "7.0.0",
-    "ts-jest": "29.2.5"
+    "vitest": "3.0.4",
+    "vitest-sonar-reporter": "2.0.0",
+    "@vitest/coverage-istanbul": "3.0.4",
+    "@vitest/coverage-v8": "3.0.4",
+    "@vitest/ui": "3.0.4"
   },
   "lint-staged": {
     "*.{md,html,yml}": [
