@@ -10,6 +10,11 @@
             <img alt="Number of installs" src="https://img.shields.io/badge/installs-170k%2B-blueviolet"> 
         </a>
     </span>
+   <span>
+        <a href="https://t.me/AudioMessBot" target="_blank">
+            <img alt="Monthly active users" src="https://img.shields.io/badge/MAU-13k-blue"> 
+        </a>
+    </span>
     <span>
         <a href="https://github.com/n0th1ng-else/voice-to-text-bot/releases">
             <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/n0th1ng-else/voice-to-text-bot"> 
