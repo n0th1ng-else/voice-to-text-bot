@@ -1,14 +1,14 @@
-import { GenericAction } from "./common.js";
-import { isVoiceMessage, isVoiceMessageLong } from "../helpers.js";
-import { Logger } from "../../logger/index.js";
-import { TranslationKeys } from "../../text/types.js";
-import { collectAnalytics } from "../../analytics/index.js";
+import { GenericAction } from "./common.ts";
+import { isVoiceMessage, isVoiceMessageLong } from "../helpers.ts";
+import { Logger } from "../../logger/index.ts";
+import { TranslationKeys } from "../../text/types.ts";
+import { collectAnalytics } from "../../analytics/index.ts";
 import {
   type BotMessageModel,
   type TelegramMessagePrefix,
   VoiceContentReason,
-} from "../types.js";
-import type { TgMessage } from "../api/types.js";
+} from "../types.ts";
+import type { TgMessage } from "../api/types.ts";
 
 const logger = new Logger("telegram-bot");
 

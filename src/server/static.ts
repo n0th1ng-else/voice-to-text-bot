@@ -2,9 +2,9 @@ import { fileURLToPath } from "node:url";
 import { resolve as resolvePath } from "node:path";
 import { readFileSync } from "node:fs";
 import Fastify, { type FastifyInstance } from "fastify";
-import { httpsOptions } from "../../certs/index.js";
-import { enableSSL } from "../env.js";
-import { getMB } from "../memory/index.js";
+import { httpsOptions } from "../../certs/index.ts";
+import { enableSSL } from "../env.ts";
+import { getMB } from "../memory/index.ts";
 
 export type FastifyStaticRoute<Body = void, Query = void, Reply = void> = {
   Body: Body;

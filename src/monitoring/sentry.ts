@@ -7,8 +7,8 @@ import {
 } from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
-import { appVersion, nodeEnvironment, sentryDsn } from "../env.js";
-import { isDevelopment } from "../common/environment.js";
+import { appVersion, nodeEnvironment, sentryDsn } from "../env.ts";
+import { isDevelopment } from "../common/environment.ts";
 
 const isEnabled = (): boolean => {
   return Boolean(sentryDsn);

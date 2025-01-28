@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { type TgMessage } from "./api/types.js";
-import { getUserLanguage, getLanguageByText } from "./helpers.js";
-import { DEFAULT_LANGUAGE, type LanguageCode } from "../recognition/types.js";
+import { type TgMessage } from "./api/types.ts";
+import { getUserLanguage, getLanguageByText } from "./helpers.ts";
+import { DEFAULT_LANGUAGE, type LanguageCode } from "../recognition/types.ts";
 
 const getMessage = (name?: string, lang?: string): TgMessage => {
   return {

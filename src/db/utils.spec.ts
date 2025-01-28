@@ -3,7 +3,7 @@ import {
   validateConfigState,
   isDBConfigValid,
   type DbConnectionConfig,
-} from "./utils.js";
+} from "./utils.ts";
 
 const cfg: DbConnectionConfig = {
   certificate: "some-cert",

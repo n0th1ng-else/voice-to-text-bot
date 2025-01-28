@@ -1,23 +1,23 @@
 import { fastify, type FastifyInstance } from "fastify";
-import { Logger } from "../logger/index.js";
-import { AnalyticsData } from "../analytics/ga/types.js";
-import { BotServerBase } from "./bot-server-base.js";
-import { initSentryNew, trackAPIHandlersNew } from "../monitoring/sentry.js";
-import { collectAnalytics } from "../analytics/index.js";
-import { sSuffix } from "../text/utils.js";
-import { isFileExist, readFile } from "../files/index.js";
-import { flattenPromise } from "../common/helpers.js";
-import { TgUpdateSchema } from "../telegram/api/types.js";
-import { getMB } from "../memory/index.js";
+import { Logger } from "../logger/index.ts";
+import { AnalyticsData } from "../analytics/ga/types.ts";
+import { BotServerBase } from "./bot-server-base.ts";
+import { initSentryNew, trackAPIHandlersNew } from "../monitoring/sentry.ts";
+import { collectAnalytics } from "../analytics/index.ts";
+import { sSuffix } from "../text/utils.ts";
+import { isFileExist, readFile } from "../files/index.ts";
+import { flattenPromise } from "../common/helpers.ts";
+import { TgUpdateSchema } from "../telegram/api/types.ts";
+import { getMB } from "../memory/index.ts";
 import {
   type BotServerModel,
   type HealthDto,
   type NotFoundDto,
   HealthModel,
-} from "./types.js";
-import type { VoidPromise } from "../common/types.js";
-import type { HttpsOptions } from "../../certs/index.js";
-import type { TelegramBotModel } from "../telegram/bot.js";
+} from "./types.ts";
+import type { VoidPromise } from "../common/types.ts";
+import type { HttpsOptions } from "../../certs/index.ts";
+import type { TelegramBotModel } from "../telegram/bot.ts";
 
 const logger = new Logger("server");
 

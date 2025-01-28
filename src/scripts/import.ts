@@ -1,8 +1,8 @@
-import { Logger } from "../logger/index.js";
-import * as envy from "../env.js";
-import { sSuffix } from "../text/utils.js";
-import { getDb } from "../db/index.js";
-import { initStaticServer, type FastifyStaticRoute } from "../server/static.js";
+import { Logger } from "../logger/index.ts";
+import * as envy from "../env.ts";
+import { sSuffix } from "../text/utils.ts";
+import { getDb } from "../db/index.ts";
+import { initStaticServer, type FastifyStaticRoute } from "../server/static.ts";
 
 const logger = new Logger("import-script");
 

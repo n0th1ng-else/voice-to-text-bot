@@ -1,10 +1,10 @@
-import { GenericAction } from "./common.js";
-import { DonationStatus } from "../../db/sql/donations.js";
-import { Logger } from "../../logger/index.js";
-import { parseDonationPayload } from "../helpers.js";
-import { type BotMessageModel, TelegramMessagePrefix } from "../types.js";
-import type { TgCheckoutQuery, TgMessage } from "../api/types.js";
-import type { AnalyticsData } from "../../analytics/ga/types.js";
+import { GenericAction } from "./common.ts";
+import { DonationStatus } from "../../db/sql/donations.ts";
+import { Logger } from "../../logger/index.ts";
+import { parseDonationPayload } from "../helpers.ts";
+import { type BotMessageModel, TelegramMessagePrefix } from "../types.ts";
+import type { TgCheckoutQuery, TgMessage } from "../api/types.ts";
+import type { AnalyticsData } from "../../analytics/ga/types.ts";
 
 const logger = new Logger("telegram-bot");
 

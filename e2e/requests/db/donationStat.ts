@@ -1,11 +1,11 @@
-import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
-import { type BotStatRecordModel } from "../../helpers.js";
-import { DonationsSql } from "../../../src/db/sql/donations.sql.js";
+import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.ts";
+import { type BotStatRecordModel } from "../../helpers.ts";
+import { DonationsSql } from "../../../src/db/sql/donations.sql.ts";
 import { expect } from "vitest";
 import {
   type DonationRowScheme,
   DonationStatus,
-} from "../../../src/db/sql/donations.js";
+} from "../../../src/db/sql/donations.ts";
 
 export const mockCreateDonationRow = (
   pool: MockPool,

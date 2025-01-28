@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { IgnoredChatsSql } from "./ignoredchats.sql.js";
+import { IgnoredChatsSql } from "./ignoredchats.sql.ts";
 
 export type IgnoredChatsRowScheme = {
   row_id: string;

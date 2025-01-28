@@ -1,8 +1,8 @@
-import { GenericAction } from "./common.js";
-import { Logger } from "../../logger/index.js";
-import { collectAnalytics } from "../../analytics/index.js";
-import { type TelegramMessagePrefix, type BotMessageModel } from "../types.js";
-import type { TgMessage } from "../api/types.js";
+import { GenericAction } from "./common.ts";
+import { Logger } from "../../logger/index.ts";
+import { collectAnalytics } from "../../analytics/index.ts";
+import { type TelegramMessagePrefix, type BotMessageModel } from "../types.ts";
+import type { TgMessage } from "../api/types.ts";
 
 const logger = new Logger("telegram-bot");
 

@@ -1,9 +1,9 @@
 import { resolve as resolvePath } from "node:path";
 import { readdirSync, statSync } from "node:fs";
-import { Logger } from "../logger/index.js";
-import { getMB } from "../memory/index.js";
-import type { AnalyticsEventExt } from "../analytics/ga/types.js";
-import { collectEvents } from "../analytics/amplitude/index.js";
+import { Logger } from "../logger/index.ts";
+import { getMB } from "../memory/index.ts";
+import type { AnalyticsEventExt } from "../analytics/ga/types.ts";
+import { collectEvents } from "../analytics/amplitude/index.ts";
 
 const logger = new Logger("storage");
 

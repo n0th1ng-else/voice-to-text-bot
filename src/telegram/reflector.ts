@@ -1,7 +1,7 @@
-import { Logger } from "../logger/index.js";
-import { TelegramApi } from "./api/tgapi.js";
-import { hasNoRightsToSendMessage, TgError } from "./api/tgerror.js";
-import { type ApiErrorReflector } from "./api/types.js";
+import { Logger } from "../logger/index.ts";
+import { TelegramApi } from "./api/tgapi.ts";
+import { hasNoRightsToSendMessage, TgError } from "./api/tgerror.ts";
+import { type ApiErrorReflector } from "./api/types.ts";
 
 const logger = new Logger("telegram:reflector");
 

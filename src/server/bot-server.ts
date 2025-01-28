@@ -1,23 +1,23 @@
 import { createServer as createHttp } from "node:http";
 import { createServer as createHttps } from "node:https";
 import express, { type Response, type Express } from "express";
-import { Logger } from "../logger/index.js";
-import { sSuffix } from "../text/utils.js";
-import { BotServerBase } from "./bot-server-base.js";
-import { AnalyticsData } from "../analytics/ga/types.js";
-import { flattenPromise } from "../common/helpers.js";
-import { collectAnalytics } from "../analytics/index.js";
-import { TgUpdateSchema } from "../telegram/api/types.js";
-import { initSentry } from "../monitoring/sentry.js";
+import { Logger } from "../logger/index.ts";
+import { sSuffix } from "../text/utils.ts";
+import { BotServerBase } from "./bot-server-base.ts";
+import { AnalyticsData } from "../analytics/ga/types.ts";
+import { flattenPromise } from "../common/helpers.ts";
+import { collectAnalytics } from "../analytics/index.ts";
+import { TgUpdateSchema } from "../telegram/api/types.ts";
+import { initSentry } from "../monitoring/sentry.ts";
 import {
   type BotServerModel,
   type HealthDto,
   type ServerStatCore,
   HealthModel,
-} from "./types.js";
-import type { TelegramBotModel } from "../telegram/bot.js";
-import type { HttpsOptions } from "../../certs/index.js";
-import type { VoidPromise } from "../common/types.js";
+} from "./types.ts";
+import type { TelegramBotModel } from "../telegram/bot.ts";
+import type { HttpsOptions } from "../../certs/index.ts";
+import type { VoidPromise } from "../common/types.ts";
 
 const logger = new Logger("server");
 

@@ -15,10 +15,10 @@ import {
   type TgLeaveChatSchema,
   type TgMessage,
   type TgWebHook,
-} from "./types.js";
-import { TelegramApi } from "./tgapi.js";
-import { type TgError } from "./tgerror.js";
-import { SANITIZE_CHARACTER } from "../../logger/const.js";
+} from "./types.ts";
+import { TelegramApi } from "./tgapi.ts";
+import { type TgError } from "./tgerror.ts";
+import { SANITIZE_CHARACTER } from "../../logger/const.ts";
 
 const getApiResponse = <Response>(
   ok: boolean,

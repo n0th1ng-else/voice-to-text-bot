@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { TranslationKeys } from "./types.js";
+import { TranslationKeys } from "./types.ts";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
+} from "../testUtils/dependencies.ts";
 
 vi.mock("./translations/loader");
 

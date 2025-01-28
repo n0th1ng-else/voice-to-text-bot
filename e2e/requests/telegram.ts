@@ -4,20 +4,20 @@ import { expect } from "vitest";
 import type request from "supertest";
 import type nock from "nock";
 import querystring from "query-string";
-import { type TelegramBotModel } from "../../src/telegram/bot.js";
+import { type TelegramBotModel } from "../../src/telegram/bot.ts";
 import {
   type TelegramMessageMetaItem,
   TelegramMessageMetaType,
   type TelegramMessageModel,
-} from "../helpers.js";
-import { getTranslator, isTranslationKey } from "../../src/text/index.js";
-import { type TranslationKey, TranslationKeys } from "../../src/text/types.js";
-import { getBotMenuCommands } from "../../src/telegram/data.js";
-import { flattenPromise } from "../../src/common/helpers.js";
-import { TelegramButtonModel } from "../../src/telegram/types.js";
-import { parseDonationPayload } from "../../src/telegram/helpers.js";
-import type { TgUpdate } from "../../src/telegram/api/types.js";
-import type { LanguageCode } from "../../src/recognition/types.js";
+} from "../helpers.ts";
+import { getTranslator, isTranslationKey } from "../../src/text/index.ts";
+import { type TranslationKey, TranslationKeys } from "../../src/text/types.ts";
+import { getBotMenuCommands } from "../../src/telegram/data.ts";
+import { flattenPromise } from "../../src/common/helpers.ts";
+import { TelegramButtonModel } from "../../src/telegram/types.ts";
+import { parseDonationPayload } from "../../src/telegram/helpers.ts";
+import type { TgUpdate } from "../../src/telegram/api/types.ts";
+import type { LanguageCode } from "../../src/recognition/types.ts";
 
 const text = getTranslator();
 const telegramApiResponseOk = JSON.stringify({ ok: true });

@@ -1,4 +1,4 @@
-import { BotCommand, BotCommandOption } from "./types.js";
+import { BotCommand, BotCommandOption } from "./types.ts";
 
 export const getBotMenuCommands = (): BotCommandOption[] => [
   new BotCommandOption(BotCommand.Support),

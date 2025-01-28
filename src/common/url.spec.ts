@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getHostDomain } from "./url.js";
+import { getHostDomain } from "./url.ts";
 
 describe("url", () => {
   it("should return the full url if it is a top level domain", () => {

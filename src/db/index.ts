@@ -1,10 +1,10 @@
-import { DbClient } from "./client.js";
-import type { LanguageCode } from "../recognition/types.js";
-import type { UsageRowScheme } from "./sql/usages.js";
-import type { NodeRowScheme } from "./sql/nodes.js";
-import type { DonationRowScheme, DonationStatusType } from "./sql/donations.js";
-import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
-import type { DbConnectionConfig } from "./utils.js";
+import { DbClient } from "./client.ts";
+import type { LanguageCode } from "../recognition/types.ts";
+import type { UsageRowScheme } from "./sql/usages.ts";
+import type { NodeRowScheme } from "./sql/nodes.ts";
+import type { DonationRowScheme, DonationStatusType } from "./sql/donations.ts";
+import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.ts";
+import type { DbConnectionConfig } from "./utils.ts";
 
 class DbCore {
   private readonly clients: DbClient[];

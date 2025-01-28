@@ -7,19 +7,19 @@ import {
   DonationSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
-} from "./types.js";
-import { telegramBotName } from "../env.js";
+} from "./types.ts";
+import { telegramBotName } from "../env.ts";
 import {
   type TgCallbackQuery,
   type TgMedia,
   type TgMessage,
-} from "./api/types.js";
+} from "./api/types.ts";
 import {
   DEFAULT_LANGUAGE,
   type LanguageCode,
   LanguageSchema,
-} from "../recognition/types.js";
-import { durationLimitSec, supportedAudioFormats } from "../const.js";
+} from "../recognition/types.ts";
+import { durationLimitSec, supportedAudioFormats } from "../const.ts";
 
 export const isLangMessage = (
   model: BotMessageModel,

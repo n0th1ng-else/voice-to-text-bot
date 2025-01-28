@@ -1,5 +1,5 @@
 import axios, { type AxiosError } from "axios";
-import type { HealthDto } from "./types.js";
+import type { HealthDto } from "./types.ts";
 
 class HealthError extends Error {
   public code = 0;

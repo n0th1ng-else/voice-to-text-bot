@@ -3,7 +3,7 @@ import type { IncomingMessage } from "node:http";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { nanoid } from "nanoid";
-import { Logger } from "../logger/index.js";
+import { Logger } from "../logger/index.ts";
 
 const logger = new Logger("media-to-wav");
 

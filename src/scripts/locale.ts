@@ -1,6 +1,6 @@
 import { createInterface } from "node:readline";
-import { createTranslationsFileForLocale } from "../text/translations/loader.js";
-import { Logger } from "../logger/index.js";
+import { createTranslationsFileForLocale } from "../text/translations/loader.ts";
+import { Logger } from "../logger/index.ts";
 
 const logger = new Logger("locale-script");
 

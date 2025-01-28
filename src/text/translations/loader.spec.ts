@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../../testUtils/dependencies.js";
+} from "../../testUtils/dependencies.ts";
 
 const existsSyncMock = vi.fn();
 const readFileSyncMock = vi.fn();
@@ -19,7 +19,7 @@ vi.mock("node:fs", async () => {
 });
 
 vi.mock("../types", async () => {
-  const originalModule = await vi.importActual("../types.js");
+  const originalModule = await vi.importActual("../types.ts");
   return {
     ...originalModule,
     TranslationKeys: {

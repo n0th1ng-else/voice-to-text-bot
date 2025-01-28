@@ -1,9 +1,9 @@
 import type { Pool } from "pg";
-import { Logger } from "../logger/index.js";
+import { Logger } from "../logger/index.ts";
 import {
   IgnoredChatsDb,
   type IgnoredChatsRowScheme,
-} from "./sql/ignoredchats.js";
+} from "./sql/ignoredchats.ts";
 
 const logger = new Logger("postgres-ignored-chats");
 

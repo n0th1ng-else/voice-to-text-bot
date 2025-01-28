@@ -1,30 +1,30 @@
-import { GenericAction } from "./common.js";
+import { GenericAction } from "./common.ts";
 import {
   BotCommand,
   BotLangData,
   type BotMessageModel,
   TelegramButtonModel,
   TelegramMessagePrefix,
-} from "../types.js";
+} from "../types.ts";
 import {
   getLanguageByText,
   getRawUserLanguage,
   isLangMessage,
-} from "../helpers.js";
-import { type TranslationKey, TranslationKeys } from "../../text/types.js";
-import { Logger } from "../../logger/index.js";
-import { collectAnalytics } from "../../analytics/index.js";
-import { isMessageNotModified } from "../api/tgerror.js";
+} from "../helpers.ts";
+import { type TranslationKey, TranslationKeys } from "../../text/types.ts";
+import { Logger } from "../../logger/index.ts";
+import { collectAnalytics } from "../../analytics/index.ts";
+import { isMessageNotModified } from "../api/tgerror.ts";
 import type {
   TgCallbackQuery,
   TgInlineKeyboardButton,
   TgMessage,
-} from "../api/types.js";
+} from "../api/types.ts";
 import {
   type LanguageCode,
   SUPPORTED_LANGUAGES,
-} from "../../recognition/types.js";
-import type { AnalyticsData } from "../../analytics/ga/types.js";
+} from "../../recognition/types.ts";
+import type { AnalyticsData } from "../../analytics/ga/types.ts";
 
 const logger = new Logger("telegram-bot");
 

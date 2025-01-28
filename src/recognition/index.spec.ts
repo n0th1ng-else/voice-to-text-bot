@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getVoiceConverterProvider } from "./index.js";
+import { getVoiceConverterProvider } from "./index.ts";
 
 describe("getVoiceConverterProvider", () => {
   it.each([

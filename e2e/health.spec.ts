@@ -9,17 +9,17 @@ import {
 } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { HealthSsl, HealthStatus } from "../src/server/types.js";
+import { Pool as MockPool } from "../src/db/__mocks__/pg.ts";
+import { HealthSsl, HealthStatus } from "../src/server/types.ts";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../src/testUtils/dependencies.js";
+} from "../src/testUtils/dependencies.ts";
 import {
   type InjectedTestFn,
   injectTestDependencies,
-} from "./helpers/dependencies.js";
-import type { VoidPromise } from "../src/common/types.js";
+} from "./helpers/dependencies.ts";
+import type { VoidPromise } from "../src/common/types.ts";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");

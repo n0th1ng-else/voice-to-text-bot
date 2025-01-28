@@ -3,11 +3,11 @@ import {
   type VoiceConverter,
   type VoiceConverterProvider,
   VoiceConverterProviderSchema,
-} from "./types.js";
-import { GoogleProvider } from "./google.js";
-import { WithAiProvider } from "./witai/wit.ai.js";
-import { AWSProvider } from "./aws.js";
-import { WhisperProvider } from "./whisper.js";
+} from "./types.ts";
+import { GoogleProvider } from "./google.ts";
+import { WithAiProvider } from "./witai/wit.ai.ts";
+import { AWSProvider } from "./aws.ts";
+import { WhisperProvider } from "./whisper.ts";
 
 // Subset of the env.js file
 export type SupportedEnvironment = {

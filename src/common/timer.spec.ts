@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getLaunchDelay } from "./timer.js";
+import { getLaunchDelay } from "./timer.ts";
 
 describe("getLaunchDelay", () => {
   it("returns 0 if the argument is 0", () => {

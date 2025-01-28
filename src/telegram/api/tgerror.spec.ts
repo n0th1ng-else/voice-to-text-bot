@@ -5,9 +5,9 @@ import {
   isBlockedByUser,
   isMessageNotModified,
   isKickedFromSupergroup,
-} from "./tgerror.js";
-import { type TgCore } from "./types.js";
-import { SANITIZE_CHARACTER } from "../../logger/const.js";
+} from "./tgerror.ts";
+import { type TgCore } from "./types.ts";
+import { SANITIZE_CHARACTER } from "../../logger/const.ts";
 
 describe("tgerror", () => {
   describe("TgError", () => {

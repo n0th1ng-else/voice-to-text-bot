@@ -3,13 +3,13 @@ import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import axios from "axios";
 import { nanoid } from "nanoid";
-import { Logger } from "../logger/index.js";
+import { Logger } from "../logger/index.ts";
 import {
   deleteFileIfExists,
   readFileIntoBuffer,
   saveStreamToFile,
-} from "../files/index.js";
-import { wavSampleRate } from "../const.js";
+} from "../files/index.ts";
+import { wavSampleRate } from "../const.ts";
 
 const logger = new Logger("media-to-wav");
 

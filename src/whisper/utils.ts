@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { LanguageCode } from "../recognition/types.js";
-import { isFileExist, readDirectoryFiles } from "../files/index.js";
+import type { LanguageCode } from "../recognition/types.ts";
+import { isFileExist, readDirectoryFiles } from "../files/index.ts";
 
 /**
  * Whisper-compatible languages. We only added the languages we support atm.

@@ -5,9 +5,9 @@ import {
   type ConverterMeta,
   type LanguageCode,
   VoiceConverter,
-} from "./types.js";
-import { getWavBuffer } from "../ffmpeg/index.js";
-import { Logger } from "../logger/index.js";
+} from "./types.ts";
+import { getWavBuffer } from "../ffmpeg/index.ts";
+import { Logger } from "../logger/index.ts";
 
 const logger = new Logger("aws-recognition");
 

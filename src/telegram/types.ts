@@ -12,13 +12,13 @@ import {
   getVoiceFile,
   isChatGroup,
   isVideoMessage,
-} from "./helpers.js";
-import { Logger } from "../logger/index.js";
-import { getTranslator } from "../text/index.js";
-import { type TgMessage, type TgMessageOptions } from "./api/types.js";
-import { type AnalyticsData } from "../analytics/ga/types.js";
-import type { LanguageCode } from "../recognition/types.js";
-import type { ValueOf } from "../common/types.js";
+} from "./helpers.ts";
+import { Logger } from "../logger/index.ts";
+import { getTranslator } from "../text/index.ts";
+import { type TgMessage, type TgMessageOptions } from "./api/types.ts";
+import { type AnalyticsData } from "../analytics/ga/types.ts";
+import type { LanguageCode } from "../recognition/types.ts";
+import type { ValueOf } from "../common/types.ts";
 
 export const VoiceContentReason = {
   Ok: "Ok",

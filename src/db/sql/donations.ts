@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
-import { DonationsSql } from "./donations.sql.js";
-import type { ValueOf } from "../../common/types.js";
+import { DonationsSql } from "./donations.sql.ts";
+import type { ValueOf } from "../../common/types.ts";
 
 export const DonationStatus = {
   Initialized: "INITIALIZED",

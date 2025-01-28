@@ -1,19 +1,19 @@
-import { Logger } from "../../logger/index.js";
-import { getTranslator } from "../../text/index.js";
-import { splitTextIntoParts } from "../../common/helpers.js";
+import { Logger } from "../../logger/index.ts";
+import { getTranslator } from "../../text/index.ts";
+import { splitTextIntoParts } from "../../common/helpers.ts";
 import {
   TELEGRAM_API_MAX_MESSAGE_SIZE,
   type TelegramApi,
-} from "../api/tgapi.js";
-import type { TgMessage, TgMessageOptions } from "../api/types.js";
+} from "../api/tgapi.ts";
+import type { TgMessage, TgMessageOptions } from "../api/types.ts";
 import type {
   BotMessageModel,
   MessageOptions,
   TelegramMessagePrefix,
-} from "../types.js";
-import type { getDb } from "../../db/index.js";
-import type { LanguageCode } from "../../recognition/types.js";
-import type { TranslationKey } from "../../text/types.js";
+} from "../types.ts";
+import type { getDb } from "../../db/index.ts";
+import type { LanguageCode } from "../../recognition/types.ts";
+import type { TranslationKey } from "../../text/types.ts";
 
 const logger = new Logger("telegram-bot");
 

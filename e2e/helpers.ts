@@ -1,22 +1,22 @@
 import { readFileSync } from "node:fs";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
-import { TranslationKeys } from "../src/text/types.js";
-import { randomIntFromInterval } from "../src/common/timer.js";
+import { TranslationKeys } from "../src/text/types.ts";
+import { randomIntFromInterval } from "../src/common/timer.ts";
 import {
   TelegramButtonModel,
   type TelegramButtonType,
-} from "../src/telegram/types.js";
-import { donationLevels } from "../src/const.js";
-import { toCurrency } from "../src/text/utils.js";
+} from "../src/telegram/types.ts";
+import { donationLevels } from "../src/const.ts";
+import { toCurrency } from "../src/text/utils.ts";
 import type {
   TgCallbackQuery,
   TgChatType,
   TgMessage,
-} from "../src/telegram/api/types.js";
-import type { LanguageCode } from "../src/recognition/types.js";
-import type { SupportedEnvironment } from "../src/recognition/index.js";
-import type { ValueOf } from "../src/common/types.js";
+} from "../src/telegram/api/types.ts";
+import type { LanguageCode } from "../src/recognition/types.ts";
+import type { SupportedEnvironment } from "../src/recognition/index.ts";
+import type { ValueOf } from "../src/common/types.ts";
 
 type UserNameOptions = {
   userName?: string;

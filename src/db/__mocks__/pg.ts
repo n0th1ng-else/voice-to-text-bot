@@ -1,11 +1,11 @@
 import pg from "pg";
 import { nanoid } from "nanoid";
-import { NodesSql } from "../sql/nodes.sql.js";
-import { UsagesSql } from "../sql/usages.sql.js";
-import { DonationsSql } from "../sql/donations.sql.js";
-import { UsedEmailsSql } from "../sql/emails.sql.js";
-import { IgnoredChatsSql } from "../sql/ignoredchats.sql.js";
-import { DurationsSql } from "../sql/durations.sql.js";
+import { NodesSql } from "../sql/nodes.sql.ts";
+import { UsagesSql } from "../sql/usages.sql.ts";
+import { DonationsSql } from "../sql/donations.sql.ts";
+import { UsedEmailsSql } from "../sql/emails.sql.ts";
+import { IgnoredChatsSql } from "../sql/ignoredchats.sql.ts";
+import { DurationsSql } from "../sql/durations.sql.ts";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyTypeForMock = any;

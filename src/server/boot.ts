@@ -1,29 +1,29 @@
-import * as envy from "../env.js";
-import { BotServer } from "./bot-server.js";
-import { BotServerNew } from "./bot-server-new.js";
-import { httpsOptions } from "../../certs/index.js";
+import * as envy from "../env.ts";
+import { BotServer } from "./bot-server.ts";
+import { BotServerNew } from "./bot-server-new.ts";
+import { httpsOptions } from "../../certs/index.ts";
 import {
   getVoiceConverterInstance,
   getVoiceConverterProvider,
-} from "../recognition/index.js";
-import { getDb } from "../db/index.js";
-import { StripePayment } from "../donate/stripe.js";
-import { TelegramBotModel } from "../telegram/bot.js";
-import { ScheduleDaemon } from "../scheduler/index.js";
+} from "../recognition/index.ts";
+import { getDb } from "../db/index.ts";
+import { StripePayment } from "../donate/stripe.ts";
+import { TelegramBotModel } from "../telegram/bot.ts";
+import { ScheduleDaemon } from "../scheduler/index.ts";
 import {
   printCurrentMemoryStat,
   sendMemoryStatAnalytics,
-} from "../memory/index.js";
+} from "../memory/index.ts";
 import {
   printCurrentStorageUsage,
   sendStorageStatAnalytics,
-} from "../storage/index.js";
-import { StopListener } from "../process/index.js";
-import { getHostName } from "./tunnel.js";
-import { Logger } from "../logger/index.js";
-import { isDBConfigValid } from "../db/utils.js";
-import { parseMultilineEnvVariable } from "../common/environment.js";
-import type { BotServerModel } from "./types.js";
+} from "../storage/index.ts";
+import { StopListener } from "../process/index.ts";
+import { getHostName } from "./tunnel.ts";
+import { Logger } from "../logger/index.ts";
+import { isDBConfigValid } from "../db/utils.ts";
+import { parseMultilineEnvVariable } from "../common/environment.ts";
+import type { BotServerModel } from "./types.ts";
 
 const logger = new Logger("boot-server");
 

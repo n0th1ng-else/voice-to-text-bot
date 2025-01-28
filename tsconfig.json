@@ -8,6 +8,9 @@
     "strict": true,
     "noImplicitAny": false,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true
   }
 }

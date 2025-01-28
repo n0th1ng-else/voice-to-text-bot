@@ -2,7 +2,7 @@ import {
   durationLimitSec,
   secondsInOneMinute,
   supportedAudioFormats,
-} from "../const.js";
+} from "../const.ts";
 
 export const getMaxDuration = (
   duration = durationLimitSec,

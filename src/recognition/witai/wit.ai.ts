@@ -1,16 +1,16 @@
 import axios from "axios";
-import { Logger } from "../../logger/index.js";
+import { Logger } from "../../logger/index.ts";
 import {
   VoiceConverter,
   type ConverterMeta,
   type LanguageCode,
-} from "../types.js";
-import { getWavBuffer } from "../../ffmpeg/index.js";
-import { parseChunkedResponse } from "../../common/request.js";
-import { TimeMeasure } from "../../common/timer.js";
-import { wavSampleRate } from "../../const.js";
-import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
-import { addAttachment } from "../../monitoring/sentry.js";
+} from "../types.ts";
+import { getWavBuffer } from "../../ffmpeg/index.ts";
+import { parseChunkedResponse } from "../../common/request.ts";
+import { TimeMeasure } from "../../common/timer.ts";
+import { wavSampleRate } from "../../const.ts";
+import { WitAiChunkError, WitAiError } from "./wit.ai.error.ts";
+import { addAttachment } from "../../monitoring/sentry.ts";
 
 const logger = new Logger("wit-ai-recognition");
 

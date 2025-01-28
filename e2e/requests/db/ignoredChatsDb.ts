@@ -1,7 +1,7 @@
 // import { expect } from "vitest";
-import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
-// import { IgnoredChatsSql } from "../../../src/db/sql/ignoredchats.sql.js";
-// import type { IgnoredChatRowScheme } from "../../../src/db/sql/ignoredchats.js";
+import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.ts";
+// import { IgnoredChatsSql } from "../../../src/db/sql/ignoredchats.sql.ts";
+// import type { IgnoredChatRowScheme } from "../../../src/db/sql/ignoredchats.ts";
 
 export const mockGetIgnoredChatsRow = (
   pool: MockPool,

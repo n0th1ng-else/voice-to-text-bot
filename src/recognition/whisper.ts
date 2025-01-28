@@ -3,17 +3,17 @@ import {
   type ConverterMeta,
   type LanguageCode,
   VoiceConverter,
-} from "./types.js";
-import { Logger } from "../logger/index.js";
-import { addAttachment } from "../monitoring/sentry.js";
-import { getWavFilePath } from "../ffmpeg/index.js";
-import { deleteFileIfExists } from "../files/index.js";
-import { runWhisper } from "../whisper/whisper-engine.js";
+} from "./types.ts";
+import { Logger } from "../logger/index.ts";
+import { addAttachment } from "../monitoring/sentry.ts";
+import { getWavFilePath } from "../ffmpeg/index.ts";
+import { deleteFileIfExists } from "../files/index.ts";
+import { runWhisper } from "../whisper/whisper-engine.ts";
 import {
   lookupModel,
   type WhisperAddonArchitecture,
-} from "../whisper/utils.js";
-import { whisperEnableGpu, whisperModelFile } from "../env.js";
+} from "../whisper/utils.ts";
+import { whisperEnableGpu, whisperModelFile } from "../env.ts";
 
 const logger = new Logger("whisper-recognition");
 
