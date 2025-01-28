@@ -303,6 +303,9 @@ export class BotServerNew
       // return;
     }
 
+    const days = this.uptimeDaemon.getCurrent();
+    status.setDaysOnline(days.current, days.limit);
+
     try {
       const urls = await Promise.all(
         this.bots.map((bot) => bot.getHostLocation()),

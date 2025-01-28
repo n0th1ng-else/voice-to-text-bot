@@ -74,6 +74,20 @@ export class UptimeDaemon {
     return this;
   }
 
+  public getCurrent(): { current: number; limit: number } {
+    if (this.isRunning) {
+      return {
+        current: this.daysRunning.size,
+        limit: this.lifecycleInterval,
+      };
+    }
+
+    return {
+      current: 0,
+      limit: 0,
+    };
+  }
+
   private async onTick(): Promise<void> {
     const currentDay = new Date().getDate();
     this.daysRunning.add(currentDay);
