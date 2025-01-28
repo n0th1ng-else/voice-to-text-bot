@@ -70,7 +70,7 @@ describe("ignore chats", () => {
     const TelegramBotModel = init.TelegramBotModel;
     const TelegramApi = init.TelegramApi;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
-    const BotServer = init.BotServer;
+    const BotServer = init.BotServerNew;
     const appVersion = init.appVersion;
     const launchTime = init.launchTime;
 

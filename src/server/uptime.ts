@@ -2,7 +2,6 @@ import { ScheduleDaemon } from "../scheduler/index.js";
 import { Logger } from "../logger/index.js";
 import { HealthStatus } from "./types.js";
 import { sSuffix } from "../text/utils.js";
-import { flattenPromise } from "../common/helpers.js";
 import { requestHealthData } from "./api.js";
 import type { getDb } from "../db/index.js";
 
@@ -16,7 +15,7 @@ export class UptimeDaemon {
   private currentUrl = "";
   private nextUrl = "";
   private lifecycleInterval = UptimeDaemon.minLifecycleInterval;
-  private daysRunning: number[] = [];
+  private daysRunning = new Set<number>();
   private stat: ReturnType<typeof getDb> | null = null;
 
   public get isRunning(): boolean {
@@ -34,13 +33,13 @@ export class UptimeDaemon {
   }
 
   public stop(): void {
-    this.daysRunning = [];
+    this.daysRunning = new Set();
     this.daemon.stop();
     logger.warn(`Daemon stopped and ${Logger.y("I am going to hibernate")}`);
   }
 
   public start(): void {
-    this.daysRunning = [];
+    this.daysRunning = new Set();
     this.daemon.start();
   }
 
@@ -75,74 +74,65 @@ export class UptimeDaemon {
     return this;
   }
 
-  private onTick(): Promise<void> {
+  private async onTick(): Promise<void> {
     const currentDay = new Date().getDate();
-    if (!this.daysRunning.includes(currentDay)) {
-      this.daysRunning.push(currentDay);
-    }
+    this.daysRunning.add(currentDay);
 
-    const daysRunning = this.daysRunning.join(", ");
+    const daysRunning = [...this.daysRunning].join(", ");
     logger.info(
       `Daemon tick. Today is ${Logger.y(
         currentDay,
       )} and I have been running for (${Logger.y(daysRunning)}) already`,
     );
 
-    return requestHealthData(this.currentUrl).then((health) => {
-      if (health.status !== HealthStatus.Online) {
-        logger.error("Node status is not ok", health);
-        throw new Error("Node status is not ok");
-      }
+    const health = await requestHealthData(this.currentUrl);
+    if (health.status !== HealthStatus.Online) {
+      logger.error("Node status is not ok", health);
+      throw new Error("Node status is not ok");
+    }
+    logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
 
-      logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
+    const isCallbackOwner = health.urls.every((url) =>
+      url.includes(this.currentUrl),
+    );
 
-      const isCallbackOwner = health.urls.every((url) =>
-        url.includes(this.currentUrl),
-      );
+    if (!isCallbackOwner && this.isRunning) {
+      this.stop();
 
-      if (!isCallbackOwner && this.isRunning) {
-        this.stop();
-
-        logger.warn(`Callback is not owned by ${Logger.y("this")} node`);
-
-        if (!this.stat) {
-          return;
-        }
-
-        const isActive = false;
-        return this.stat
-          .updateNodeState(this.currentUrl, isActive, this.version)
-          .then(flattenPromise);
-      }
-    });
-  }
-
-  private onFinish(): Promise<void> {
-    return requestHealthData(this.nextUrl).then((health) => {
-      if (health.status !== HealthStatus.Online) {
-        logger.error("Buddy node status is not ok", health);
-        throw new Error("Buddy node status is not ok");
-      }
-
-      logger.warn(
-        `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
-          this.nextUrl,
-        )}`,
-      );
+      logger.warn(`Callback is not owned by ${Logger.y("this")} node`);
 
       if (!this.stat) {
         return;
       }
 
       const isActive = false;
-      return this.stat
-        .updateNodeState(this.currentUrl, isActive, this.version)
-        .then(flattenPromise);
-    });
+      await this.stat.updateNodeState(this.currentUrl, isActive, this.version);
+    }
+  }
+
+  private async onFinish(): Promise<void> {
+    const health = await requestHealthData(this.nextUrl);
+    if (health.status !== HealthStatus.Online) {
+      logger.error("Buddy node status is not ok", health);
+      throw new Error("Buddy node status is not ok");
+    }
+
+    logger.warn(
+      `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
+        this.nextUrl,
+      )}`,
+    );
+
+    if (!this.stat) {
+      return;
+    }
+
+    const isActive = false;
+    await this.stat.updateNodeState(this.currentUrl, isActive, this.version);
   }
 
   private shouldStop(): boolean {
-    const currentInterval = this.daysRunning.length;
+    const currentInterval = this.daysRunning.size;
     const shouldStop = currentInterval > this.lifecycleInterval;
 
     if (shouldStop) {
