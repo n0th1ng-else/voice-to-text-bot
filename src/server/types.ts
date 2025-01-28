@@ -38,7 +38,9 @@ export type HealthDto = {
   version: string;
   threadId: number;
   serverName: string;
-  nodeVersion: string;
+  runtimeVersion: string;
+  daysOnlineCurrent: number;
+  daysOnlineLimit: number;
 };
 
 export const HealthStatus = {
@@ -65,6 +67,8 @@ export class HealthModel {
   private status: HealthStatusType = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
+  private daysOnlineCurrent = 0;
+  private daysOnlineLimit = 0;
 
   constructor(
     version: string,
@@ -93,6 +97,11 @@ export class HealthModel {
     }
   }
 
+  public setDaysOnline(current: number, limit: number): void {
+    this.daysOnlineCurrent = current;
+    this.daysOnlineLimit = limit;
+  }
+
   public getDto(): HealthDto {
     return {
       ssl: this.ssl,
@@ -102,7 +111,9 @@ export class HealthModel {
       message: this.message,
       threadId: this.threadId,
       serverName: this.serverName,
-      nodeVersion: this.coreVersion,
+      runtimeVersion: this.coreVersion,
+      daysOnlineCurrent: this.daysOnlineCurrent,
+      daysOnlineLimit: this.daysOnlineLimit,
     };
   }
 }

@@ -34,7 +34,9 @@ vi.mock("../src/server/api.js", () => {
         ssl: HealthSsl.Off,
         threadId: 0,
         serverName: "MockedServer",
-        nodeVersion: "1.0.0",
+        runtimeVersion: "1.0.0",
+        daysOnlineCurrent: 1,
+        daysOnlineLimit: 1,
       };
       waiter.tick();
       return Promise.resolve(dto);
