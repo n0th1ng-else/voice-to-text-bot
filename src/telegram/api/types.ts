@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type Prettify } from "../../common/types.js";
+import { type Prettify } from "../../common/types.ts";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 

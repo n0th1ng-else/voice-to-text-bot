@@ -4,7 +4,7 @@ import {
   getSupportedAudioFormats,
   getMaxDuration,
   toCurrency,
-} from "./utils.js";
+} from "./utils.ts";
 
 describe("text/utils", () => {
   describe("sSuffix", () => {

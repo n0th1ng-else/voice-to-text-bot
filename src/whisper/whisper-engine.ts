@@ -1,8 +1,8 @@
-import type { LanguageCode } from "../recognition/types.js";
+import type { LanguageCode } from "../recognition/types.ts";
 import {
   mapAppLanguageToWhisperLanguage,
   type WhisperAddonArchitecture,
-} from "./utils.js";
+} from "./utils.ts";
 import getWhisper from "./whisper-addon.cjs";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -19,7 +19,7 @@ type WhisperOptions = import("./whisper-addon.cjs").WhisperOptions;
  * @param modelPath {string} - Whisper model file
  * @param wavPath {string} - file path
  * @param languageCode {import("../recognition/types").LanguageCode} - language code for recognition
- * @param architecture {import("./utils.js").WhisperAddonArchitecture}
+ * @param architecture {import("./utils.ts").WhisperAddonArchitecture}
  * @param useGpu {boolean}
  *
  * @return {Promise<string>}

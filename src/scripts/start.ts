@@ -1,8 +1,8 @@
-import * as envy from "../env.js";
-import { Logger } from "../logger/index.js";
-import { getLaunchDelay } from "../common/timer.js";
-import { prepareInstance, prepareStopListener } from "../server/boot.js";
-import type { BotServerModel } from "../server/types.js";
+import * as envy from "../env.ts";
+import { Logger } from "../logger/index.ts";
+import { getLaunchDelay } from "../common/timer.ts";
+import { prepareInstance, prepareStopListener } from "../server/boot.ts";
+import type { BotServerModel } from "../server/types.ts";
 
 const logger = new Logger("start-script");
 

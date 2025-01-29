@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Logger } from "./index.js";
+import type { Logger } from "./index.ts";
 
-vi.mock("node:cluster", () => import("../../__mocks__/cluster.js"));
+vi.mock("node:cluster", () => import("../../__mocks__/cluster.ts"));
 vi.mock("picocolors", () => {
   return {
     default: {
@@ -27,7 +27,7 @@ let LOG_LEVEL: string | undefined = undefined;
 const testMessage = "some message";
 
 const getLogger = async (): Promise<typeof Logger> => {
-  const init = await import("./index.js");
+  const init = await import("./index.ts");
   return init.Logger;
 };
 describe("Logger", () => {

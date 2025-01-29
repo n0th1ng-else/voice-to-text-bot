@@ -1,4 +1,4 @@
-import type { LanguageCode } from "./recognition/types.js";
+import type { LanguageCode } from "./recognition/types.ts";
 
 export const appPort: number = Number(process.env.PORT) || 3000;
 

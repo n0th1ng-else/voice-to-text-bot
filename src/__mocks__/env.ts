@@ -1,4 +1,4 @@
-import { randomIntFromInterval } from "../common/timer.js";
+import { randomIntFromInterval } from "../common/timer.ts";
 
 export const appPort = 3000;
 

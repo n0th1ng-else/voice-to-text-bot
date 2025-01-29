@@ -1,5 +1,5 @@
-import { Logger } from "../logger/index.js";
-import { sSuffix } from "../text/utils.js";
+import { Logger } from "../logger/index.ts";
+import { sSuffix } from "../text/utils.ts";
 
 const logger = new Logger("cache");
 

@@ -1,6 +1,6 @@
-import type { ValueOf, VoidPromise } from "../common/types.js";
-import type { TelegramBotModel } from "../telegram/bot.js";
-import type { getDb } from "../db/index.js";
+import type { ValueOf, VoidPromise } from "../common/types.ts";
+import type { TelegramBotModel } from "../telegram/bot.ts";
+import type { getDb } from "../db/index.ts";
 
 export type ServerStatCore = ReturnType<typeof getDb>;
 

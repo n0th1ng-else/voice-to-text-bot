@@ -1,10 +1,10 @@
 import { expect } from "vitest";
-import type { LanguageCode } from "../../../src/recognition/types.js";
-import { BotStatRecordModel } from "../../helpers.js";
-import { randomIntFromInterval } from "../../../src/common/timer.js";
-import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
-import { UsagesSql } from "../../../src/db/sql/usages.sql.js";
-import { type UsageRowScheme } from "../../../src/db/sql/usages.js";
+import type { LanguageCode } from "../../../src/recognition/types.ts";
+import { BotStatRecordModel } from "../../helpers.ts";
+import { randomIntFromInterval } from "../../../src/common/timer.ts";
+import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.ts";
+import { UsagesSql } from "../../../src/db/sql/usages.sql.ts";
+import { type UsageRowScheme } from "../../../src/db/sql/usages.ts";
 
 export const mockGetBotStatItem = (
   pool: MockPool,

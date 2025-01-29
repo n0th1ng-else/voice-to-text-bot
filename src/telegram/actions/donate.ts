@@ -1,21 +1,21 @@
-import { GenericAction } from "./common.js";
+import { GenericAction } from "./common.ts";
 import {
   BotCommand,
   BotMessageModel,
   TelegramButtonModel,
   TelegramMessagePrefix,
-} from "../types.js";
-import { getDonationDtoString, isDonateMessage } from "../helpers.js";
-import { TranslationKeys } from "../../text/types.js";
-import { Logger } from "../../logger/index.js";
-import { collectAnalytics } from "../../analytics/index.js";
-import { BOT_LOGO, donationLevels } from "../../const.js";
-import { SIZE_UNIT } from "../../memory/index.js";
-import { toCurrency } from "../../text/utils.js";
-import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
-import type { PaymentService } from "../../donate/types.js";
-import type { AnalyticsData } from "../../analytics/ga/types.js";
-import type { LanguageCode } from "../../recognition/types.js";
+} from "../types.ts";
+import { getDonationDtoString, isDonateMessage } from "../helpers.ts";
+import { TranslationKeys } from "../../text/types.ts";
+import { Logger } from "../../logger/index.ts";
+import { collectAnalytics } from "../../analytics/index.ts";
+import { BOT_LOGO, donationLevels } from "../../const.ts";
+import { SIZE_UNIT } from "../../memory/index.ts";
+import { toCurrency } from "../../text/utils.ts";
+import type { TgInlineKeyboardButton, TgMessage } from "../api/types.ts";
+import type { PaymentService } from "../../donate/types.ts";
+import type { AnalyticsData } from "../../analytics/ga/types.ts";
+import type { LanguageCode } from "../../recognition/types.ts";
 
 const logger = new Logger("telegram-bot");
 

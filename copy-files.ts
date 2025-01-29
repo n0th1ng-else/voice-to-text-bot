@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { cpSync } from "node:fs";
-import { Logger } from "./src/logger/index.js";
+import { Logger } from "./src/logger/index.ts";
 
 const logger = new Logger("file-copy");
 

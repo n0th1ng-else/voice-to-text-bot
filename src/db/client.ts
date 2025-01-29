@@ -1,13 +1,13 @@
 import pg, { type PoolConfig } from "pg";
-import { Logger } from "../logger/index.js";
-import { getHostDomain } from "../common/url.js";
-import { type DbConnectionConfig, validateConfigState } from "./utils.js";
-import { NodesClient } from "./nodes.js";
-import { UsagesClient } from "./usages.js";
-import { DonationsClient } from "./donations.js";
-import { UsedEmailClient } from "./emails.js";
-import { DurationsClient } from "./durations.js";
-import { IgnoredChatsClient } from "./ignoredchats.js";
+import { Logger } from "../logger/index.ts";
+import { getHostDomain } from "../common/url.ts";
+import { type DbConnectionConfig, validateConfigState } from "./utils.ts";
+import { NodesClient } from "./nodes.ts";
+import { UsagesClient } from "./usages.ts";
+import { DonationsClient } from "./donations.ts";
+import { UsedEmailClient } from "./emails.ts";
+import { DurationsClient } from "./durations.ts";
+import { IgnoredChatsClient } from "./ignoredchats.ts";
 
 const { Pool } = pg;
 const logger = new Logger("postgres-client");

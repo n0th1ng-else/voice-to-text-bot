@@ -1,4 +1,4 @@
-import { nodeEnvironment } from "../env.js";
+import { nodeEnvironment } from "../env.ts";
 
 export const isDevelopment = (): boolean => {
   return nodeEnvironment === "development";

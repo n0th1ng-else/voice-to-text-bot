@@ -8,31 +8,31 @@
   },
   "type": "module",
   "scripts": {
-    "ts": "NODE_OPTIONS=\"--loader ts-node/esm\" node --env-file=.env src/scripts/run.js",
-    "import": "pnpm run ts import ts",
-    "chart": "pnpm run ts chart ts",
-    "start": "pnpm run ts start ts",
-    "dev": "pnpm run ts dev ts",
-    "cluster": "pnpm run ts cluster ts",
+    "ts": "NODE_OPTIONS=\"--experimental-strip-types\" node --env-file=.env src/scripts/run.ts",
+    "import": "npm run ts import ts",
+    "chart": "npm run ts chart ts",
+    "start": "npm run ts start ts",
+    "dev": "npm run ts dev ts",
+    "cluster": "npm run ts cluster ts",
     "js": "node --env-file=.env --experimental-loader newrelic/esm-loader.mjs -r newrelic dist/src/scripts/run.js",
-    "start:js": "pnpm run js start js",
-    "dev:js": "pnpm run js dev js",
-    "cluster:js": "pnpm run js cluster js",
+    "start:js": "npm run js start js",
+    "dev:js": "npm run js dev js",
+    "cluster:js": "npm run js cluster js",
     "format": "prettier --write",
     "format:check": "prettier --check .",
     "lint": "eslint",
     "lint:all": "eslint .",
     "typecheck": "tsc --noEmit",
-    "build": "tsc && pnpm run copy-assets",
+    "build": "tsc && npm run copy-assets",
     "copy-assets": "node ./dist/copy-files.js",
-    "locale:sync": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/scripts/locale.ts",
+    "locale:sync": "NODE_OPTIONS=\"--experimental-strip-types\" node src/scripts/locale.ts",
     "test:runner": "NODE_OPTIONS=\"--max_old_space_size=4096\" vitest",
     "test:load": "artillery run load.yml --insecure",
-    "test:unit": "pnpm run test:runner run --coverage --project=unit",
-    "test:e2e": "pnpm run test:runner run --coverage --project=e2e",
-    "test:unit:watch": "pnpm run test:runner watch --project=unit",
-    "test:e2e:watch": "pnpm run test:runner watch --project=e2e",
-    "test": "pnpm run test:runner run --coverage",
+    "test:unit": "npm run test:runner run --coverage --project=unit",
+    "test:e2e": "npm run test:runner run --coverage --project=e2e",
+    "test:unit:watch": "npm run test:runner watch --project=unit",
+    "test:e2e:watch": "npm run test:runner watch --project=e2e",
+    "test": "npm run test:runner run --coverage",
     "prepare": "husky"
   },
   "dependencies": {
@@ -53,7 +53,6 @@
     "picocolors": "1.1.1",
     "signal-exit": "4.1.0",
     "strip-ansi": "7.1.0",
-    "ts-node": "10.9.2",
     "typescript": "5.7.3",
     "winston": "3.17.0",
     "winston-logsene": "2.1.2",
@@ -88,11 +87,11 @@
   },
   "lint-staged": {
     "*.{md,html,yml}": [
-      "pnpm run format"
+      "npm run format"
     ],
     "*.{js,ts,json}": [
-      "pnpm run format",
-      "pnpm run lint"
+      "npm run format",
+      "npm run lint"
     ]
   },
   "author": "n0th1ng-else",

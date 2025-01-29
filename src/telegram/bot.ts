@@ -3,22 +3,22 @@ import {
   type TgCheckoutQuery,
   type TgMessage,
   type TgUpdate,
-} from "./api/types.js";
-import { Logger } from "../logger/index.js";
-import { type VoiceConverter } from "../recognition/types.js";
-import { TranslationKeys } from "../text/types.js";
-import { BotMessageModel, TelegramMessagePrefix } from "./types.js";
-import { isMessageSupported } from "./helpers.js";
-import { runPromiseWithRetry } from "../common/helpers.js";
-import { getMd5Hash } from "../common/hash.js";
-import { BotActions } from "./actions/index.js";
-import { getBotMenuCommands } from "./data.js";
-import { TelegramApi } from "./api/tgapi.js";
-import { collectAnalytics } from "../analytics/index.js";
-import { type AnalyticsData } from "../analytics/ga/types.js";
-import { type PaymentService } from "../donate/types.js";
-import { initTgReflector } from "./reflector.js";
-import type { getDb } from "../db/index.js";
+} from "./api/types.ts";
+import { Logger } from "../logger/index.ts";
+import { type VoiceConverter } from "../recognition/types.ts";
+import { TranslationKeys } from "../text/types.ts";
+import { BotMessageModel, TelegramMessagePrefix } from "./types.ts";
+import { isMessageSupported } from "./helpers.ts";
+import { runPromiseWithRetry } from "../common/helpers.ts";
+import { getMd5Hash } from "../common/hash.ts";
+import { BotActions } from "./actions/index.ts";
+import { getBotMenuCommands } from "./data.ts";
+import { TelegramApi } from "./api/tgapi.ts";
+import { collectAnalytics } from "../analytics/index.ts";
+import { type AnalyticsData } from "../analytics/ga/types.ts";
+import { type PaymentService } from "../donate/types.ts";
+import { initTgReflector } from "./reflector.ts";
+import type { getDb } from "../db/index.ts";
 
 const logger = new Logger("telegram-bot");
 

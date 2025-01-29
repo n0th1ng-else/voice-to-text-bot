@@ -1,9 +1,9 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
 import { z } from "zod";
-import { sendLogs } from "./integration.js";
-import { captureError } from "../monitoring/sentry.js";
-import { logLevel } from "../env.js";
+import { sendLogs } from "./integration.ts";
+import { captureError } from "../monitoring/sentry.ts";
+import { logLevel } from "../env.ts";
 
 const LogLevelSchema = z
   .union([

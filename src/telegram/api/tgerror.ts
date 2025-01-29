@@ -1,6 +1,6 @@
-import { type TgCore } from "./types.js";
-import { SANITIZE_CHARACTER } from "../../logger/const.js";
-import { getRegExpFromString } from "../../common/helpers.js";
+import { type TgCore } from "./types.ts";
+import { SANITIZE_CHARACTER } from "../../logger/const.ts";
+import { getRegExpFromString } from "../../common/helpers.ts";
 
 export class TgError extends Error {
   public code = 0;

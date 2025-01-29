@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import { nanoid } from "nanoid";
-import { DurationsSql } from "./durations.sql.js";
+import { DurationsSql } from "./durations.sql.ts";
 
 export type DurationRowScheme = {
   duration_id: string;

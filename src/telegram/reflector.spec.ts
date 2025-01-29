@@ -24,8 +24,8 @@ describe("initTgReflector", () => {
   });
 
   beforeEach(async () => {
-    const r = await import("./reflector.js");
-    const e = await import("./api/tgerror.js");
+    const r = await import("./reflector.ts");
+    const e = await import("./api/tgerror.ts");
     initTgReflector = r.initTgReflector;
     TgError = e.TgError;
   });

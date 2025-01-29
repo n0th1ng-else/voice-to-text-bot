@@ -7,11 +7,11 @@ import {
   it,
   vi,
 } from "vitest";
-import { Pool as MockPool } from "./__mocks__/pg.js";
+import { Pool as MockPool } from "./__mocks__/pg.ts";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
+} from "../testUtils/dependencies.ts";
 
 vi.mock("../logger/index");
 

@@ -13,14 +13,14 @@ import nock from "nock";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../src/testUtils/dependencies.js";
+} from "../src/testUtils/dependencies.ts";
 import {
   type InjectedTestFn,
   injectTestDependencies,
-} from "./helpers/dependencies.js";
-import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import type { TgChatType } from "../src/telegram/api/types.js";
-import type { VoidPromise } from "../src/common/types.js";
+} from "./helpers/dependencies.ts";
+import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.ts";
+import type { TgChatType } from "../src/telegram/api/types.ts";
+import type { VoidPromise } from "../src/common/types.ts";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
