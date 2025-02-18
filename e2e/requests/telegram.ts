@@ -1,8 +1,8 @@
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "vitest";
-import type request from "supertest";
-import type nock from "nock";
+import { type Agent as RequestAgent } from "supertest";
+import { type Scope as NockScope } from "nock";
 import querystring from "query-string";
 import { type TelegramBotModel } from "../../src/telegram/bot.js";
 import {
@@ -27,7 +27,7 @@ const makeTelegramResponse = <D>(result: D) => {
 };
 
 export const sendTelegramMessage = (
-  host: request.Agent,
+  host: RequestAgent,
   bot: TelegramBotModel,
   msg: TelegramMessageModel,
 ): Promise<void> => {
@@ -45,7 +45,7 @@ export const sendTelegramMessage = (
 };
 
 export const sendTelegramCallbackMessage = (
-  host: request.Agent,
+  host: RequestAgent,
   bot: TelegramBotModel,
   msg: TelegramMessageModel,
 ): Promise<void> => {
@@ -62,7 +62,7 @@ export const sendTelegramCallbackMessage = (
     });
 };
 
-export const mockTgSetCommands = (host: nock.Scope): void => {
+export const mockTgSetCommands = (host: NockScope): void => {
   host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.commands).toBeDefined();
@@ -79,7 +79,7 @@ export const mockTgSetCommands = (host: nock.Scope): void => {
   });
 };
 
-export const mockTgSetWebHook = (host: nock.Scope, hookUrl: string): void => {
+export const mockTgSetWebHook = (host: NockScope, hookUrl: string): void => {
   host.post("/bottelegram-api-token/setWebHook").reply((uri, body) => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.url).toBe(hookUrl);
@@ -87,21 +87,21 @@ export const mockTgSetWebHook = (host: nock.Scope, hookUrl: string): void => {
   });
 };
 
-export const mockTgGetWebHook = (host: nock.Scope, hookUrl: string): void => {
+export const mockTgGetWebHook = (host: NockScope, hookUrl: string): void => {
   host.post("/bottelegram-api-token/getWebhookInfo").reply(() => {
     return makeTelegramResponse({ url: hookUrl });
   });
 };
 
-export const mockTgGetWebHookError = (host: nock.Scope): void => {
-  host.post("/bottelegram-api-token/getWebhookInfo").replyWithError({
+export const mockTgGetWebHookError = (host: NockScope): void => {
+  host.post("/bottelegram-api-token/getWebhookInfo").reply(503, {
     status: 503,
     message: "Telegram webhook is off",
   });
 };
 
 export const mockTgReceiveUnexpectedMessage = (
-  host: nock.Scope,
+  host: NockScope,
   reject: (reason: unknown) => void,
 ): void => {
   host
@@ -110,7 +110,7 @@ export const mockTgReceiveUnexpectedMessage = (
 };
 
 export const mockTgReceiveRawMessage = (
-  host: nock.Scope,
+  host: NockScope,
   chatId: number,
   lang: LanguageCode,
   message: string,
@@ -127,7 +127,7 @@ export const mockTgReceiveRawMessage = (
 };
 
 export const mockTgReceiveMessage = (
-  host: nock.Scope,
+  host: NockScope,
   chatId: number,
   lang: LanguageCode,
   textId: TranslationKey,
@@ -188,7 +188,7 @@ export const mockTgReceiveMessage = (
 };
 
 export const mockTgReceiveMessages = (
-  host: nock.Scope,
+  host: NockScope,
   chatId: number,
   lang: LanguageCode,
   textIds: TranslationKey[],
@@ -198,7 +198,7 @@ export const mockTgReceiveMessages = (
   ).then(flattenPromise);
 };
 
-export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
+export const mockTgGetFileUrl = (host: NockScope, fileId: string): void => {
   const pathToFile = `super/path/to/file/${fileId}`;
   const fullPathToFile = `/file/bottelegram-api-token/${pathToFile}`;
 
@@ -221,7 +221,7 @@ export const mockTgGetFileUrl = (host: nock.Scope, fileId: string): void => {
 };
 
 export const mockTgReceiveCallbackMessage = (
-  host: nock.Scope,
+  host: NockScope,
   chatId: number,
   messageId: number,
   langId: LanguageCode,
@@ -285,7 +285,7 @@ export const mockTgReceiveCallbackMessage = (
 };
 
 export const mockTgReceiveInvoiceMessage = (
-  host: nock.Scope,
+  host: NockScope,
   chatId: number,
   messageId: number,
   langId: LanguageCode,
