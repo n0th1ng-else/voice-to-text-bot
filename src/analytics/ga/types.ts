@@ -1,6 +1,6 @@
-import type { BotCommandType } from "../../telegram/types.js";
-import { TimeMeasure } from "../../common/timer.js";
-import { TelegramApi } from "../../telegram/api/tgapi.js";
+import type { BotCommandType } from "../../telegram/types.ts";
+import { TimeMeasure } from "../../common/timer.ts";
+import { TelegramApi } from "../../telegram/api/tgapi.ts";
 
 type AnalyticsEventBaseParams = {
   app_version: string;

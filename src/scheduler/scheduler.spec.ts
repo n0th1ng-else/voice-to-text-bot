@@ -13,8 +13,8 @@ import { nanoid } from "nanoid";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
-import type { VoidPromise } from "../common/types.js";
+} from "../testUtils/dependencies.ts";
+import type { VoidPromise } from "../common/types.ts";
 
 vi.mock("../logger/index");
 

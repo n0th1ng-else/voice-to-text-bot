@@ -2,7 +2,7 @@ import { expect, describe, it, vi, beforeAll } from "vitest";
 import {
   injectDependencies,
   type InjectedFn,
-} from "../testUtils/dependencies.js";
+} from "../testUtils/dependencies.ts";
 
 vi.mock("../logger/index");
 

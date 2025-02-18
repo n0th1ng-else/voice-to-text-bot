@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 import { nanoid } from "nanoid";
-import { NodesSql } from "./nodes.sql.js";
+import { NodesSql } from "./nodes.sql.ts";
 
 export type NodeRowScheme = {
   node_id: string;

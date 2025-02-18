@@ -1,9 +1,9 @@
-import { ScheduleDaemon } from "../scheduler/index.js";
-import { Logger } from "../logger/index.js";
-import { HealthStatus } from "./types.js";
-import { sSuffix } from "../text/utils.js";
-import { requestHealthData } from "./api.js";
-import type { getDb } from "../db/index.js";
+import { ScheduleDaemon } from "../scheduler/index.ts";
+import { Logger } from "../logger/index.ts";
+import { HealthStatus } from "./types.ts";
+import { sSuffix } from "../text/utils.ts";
+import { requestHealthData } from "./api.ts";
+import type { getDb } from "../db/index.ts";
 
 const logger = new Logger("uptime");
 

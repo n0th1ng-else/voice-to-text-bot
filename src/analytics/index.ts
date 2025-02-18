@@ -1,7 +1,7 @@
-import { Logger } from "../logger/index.js";
-import { collectEvents as collectGA } from "./ga/index.js";
-import { collectEvents as collectAmplitude } from "./amplitude/index.js";
-import { type AnalyticsData } from "./ga/types.js";
+import { Logger } from "../logger/index.ts";
+import { collectEvents as collectGA } from "./ga/index.ts";
+import { collectEvents as collectAmplitude } from "./amplitude/index.ts";
+import { type AnalyticsData } from "./ga/types.ts";
 
 const logger = new Logger("analytics");
 

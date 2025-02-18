@@ -18,8 +18,8 @@ import {
   TgSetWebHookSchema,
   type TgWebHook,
   TgWebHookSchema,
-} from "./types.js";
-import { TgError } from "./tgerror.js";
+} from "./types.ts";
+import { TgError } from "./tgerror.ts";
 
 export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
 

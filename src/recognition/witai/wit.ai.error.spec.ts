@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { WitAiError, WitAiChunkError } from "./wit.ai.error.js";
+import { WitAiError, WitAiChunkError } from "./wit.ai.error.ts";
 
 describe("WitAi errors", () => {
   describe("WitAiError", () => {

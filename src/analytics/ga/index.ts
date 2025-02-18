@@ -1,8 +1,8 @@
 import axios from "axios";
-import { Logger } from "../../logger/index.js";
-import { type AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
-import { analytics } from "../../env.js";
-import { isDevelopment } from "../../common/environment.js";
+import { Logger } from "../../logger/index.ts";
+import { type AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.ts";
+import { analytics } from "../../env.ts";
+import { isDevelopment } from "../../common/environment.ts";
 
 const logger = new Logger("analytics:ga");
 

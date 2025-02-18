@@ -2,8 +2,8 @@ import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import Logsene from "winston-logsene";
 import { isAxiosError, type AxiosError } from "axios";
-import { selfUrl, logApiTokenV2, appVersion, isDebug } from "../env.js";
-import { type LogType, SANITIZE_CHARACTER } from "./const.js";
+import { selfUrl, logApiTokenV2, appVersion, isDebug } from "../env.ts";
+import { type LogType, SANITIZE_CHARACTER } from "./const.ts";
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const convertDataItem = (data: any, ind: number): Record<string, string> => {

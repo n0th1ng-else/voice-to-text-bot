@@ -30,7 +30,7 @@ const { promisify } = require("node:util");
 /**
  * Initialize the Whisper as an addon. The easiest way is to just require it in the CommonJS module.
  * Then we can use it everywhere.
- * @param addonArchitecture {import("./utils.js").WhisperAddonArchitecture} - language code for recognition
+ * @param addonArchitecture {import("./utils.ts").WhisperAddonArchitecture} - language code for recognition
  *
  * @return {(opts: WhisperOptions) => Promise<WhisperResultItem[]>}
  */

@@ -1,16 +1,16 @@
-import { type TranslationKey, TranslationKeys } from "./types.js";
+import { type TranslationKey, TranslationKeys } from "./types.ts";
 import {
   DEFAULT_LANGUAGE,
   SUPPORTED_LANGUAGES,
   type LanguageCode,
-} from "../recognition/types.js";
+} from "../recognition/types.ts";
 import {
   initializeMenuLabels,
   initializeTranslationsForLocale,
   type TranslationsFileType,
-} from "./translations/loader.js";
-import type { BotCommandType } from "../telegram/types.js";
-import { getMaxDuration, getSupportedAudioFormats } from "./utils.js";
+} from "./translations/loader.ts";
+import type { BotCommandType } from "../telegram/types.ts";
+import { getMaxDuration, getSupportedAudioFormats } from "./utils.ts";
 
 type Translator = {
   getFallbackLanguage: () => LanguageCode;

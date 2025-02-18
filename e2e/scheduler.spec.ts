@@ -11,19 +11,19 @@ import {
 import {
   injectDependencies,
   type InjectedFn,
-} from "../src/testUtils/dependencies.js";
+} from "../src/testUtils/dependencies.ts";
 import {
   type HealthDto,
   HealthSsl,
   HealthStatus,
-} from "../src/server/types.js";
-import type { VoidPromise } from "../src/common/types.js";
+} from "../src/server/types.ts";
+import type { VoidPromise } from "../src/common/types.ts";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 
-vi.mock("../src/server/api.js", () => {
+vi.mock("../src/server/api.ts", () => {
   return {
     requestHealthData: vi.fn(() => {
       const dto: HealthDto = {
