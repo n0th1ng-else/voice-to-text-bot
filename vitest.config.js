@@ -8,6 +8,7 @@ const isCI = process.env.GITHUB_ACTIONS === "true";
 
 export default defineConfig({
   test: {
+    fileParallelism: false,
     reporters: isCI
       ? [
           "default",
