@@ -7,7 +7,7 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@10
 COPY package.json pnpm-lock.yaml tsconfig.json $APP_DIR
 RUN npm pkg delete scripts.prepare
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
@@ -39,7 +39,7 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
-RUN npm install -g pnpm@9 && touch "$APP_DIR/.env"
+RUN npm install -g pnpm@10 && touch "$APP_DIR/.env"
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/file-temp $APP_DIR/file-temp
 COPY --from=builder $APP_DIR/model-cache $APP_DIR/model-cache
