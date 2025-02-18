@@ -72,3 +72,5 @@ export const WhisperAddonArchitectureSchema = z
 export type WhisperAddonArchitecture = z.infer<
   typeof WhisperAddonArchitectureSchema
 >;
+
+// TODO test static server scripts. Also tests are failing on CI
