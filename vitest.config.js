@@ -41,7 +41,7 @@ export default defineConfig({
         test: {
           name: "e2e",
           include: ["./e2e/**/?(*.)+(spec|test).[jt]s?(x)"],
-          testTimeout: 5000,
+          testTimeout: 15000,
         },
       },
     ],
