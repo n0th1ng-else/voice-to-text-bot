@@ -80,11 +80,11 @@
     "prettier": "3.5.1",
     "query-string": "9.1.1",
     "supertest": "7.0.0",
-    "vitest": "3.0.6",
+    "vitest": "3.0.4",
     "vitest-sonar-reporter": "2.0.0",
-    "@vitest/coverage-istanbul": "3.0.6",
-    "@vitest/coverage-v8": "3.0.6",
-    "@vitest/ui": "3.0.6"
+    "@vitest/coverage-istanbul": "3.0.4",
+    "@vitest/coverage-v8": "3.0.4",
+    "@vitest/ui": "3.0.4"
   },
   "lint-staged": {
     "*.{md,html,yml}": [
