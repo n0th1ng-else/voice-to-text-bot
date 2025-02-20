@@ -11,6 +11,7 @@ import { TimeMeasure } from "../../common/timer.js";
 import { wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 import { addAttachment } from "../../monitoring/sentry.js";
+import { WitAiTokenItems } from "./parser.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -26,11 +27,38 @@ export class WithAiProvider extends VoiceConverter {
   private static readonly apiVersion = "20230215";
   private readonly tokens: LanguageTokens;
 
-  constructor(options: WitAiVoiceProviderOptions) {
+  public static getOptions(
+    optionsObj: WitAiVoiceProviderOptions,
+    optionsStr?: string,
+  ): LanguageTokens {
+    if (!optionsStr) {
+      logger.warn("Wit.ai tokens not found. Falling back to the old format");
+      return optionsObj.tokens;
+    }
+    try {
+      const options = WitAiTokenItems.parse(JSON.parse(optionsStr));
+      const obj = options.reduce<LanguageTokens>((acc, item) => {
+        return {
+          ...acc,
+          [item.locale]: item.token,
+        };
+      }, {} as LanguageTokens);
+
+      return obj;
+    } catch (err) {
+      logger.error(
+        "Failed to parse the wit.ai tokens. Falling back to the old format",
+        err,
+      );
+      return optionsObj.tokens;
+    }
+  }
+
+  constructor(tokens: LanguageTokens) {
     super();
 
     logger.info("Using Wit.ai");
-    this.tokens = options.tokens;
+    this.tokens = tokens;
   }
 
   public async transformToText(
@@ -46,6 +74,11 @@ export class WithAiProvider extends VoiceConverter {
       .then((bufferData) => {
         logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
         const token = this.getApiToken(lang);
+        if (!token) {
+          throw new Error("The token is not provided for the language", {
+            cause: { lang },
+          });
+        }
         return WithAiProvider.recognise(bufferData, token, logData.prefix);
       })
       .then((chunks) => chunks.map(({ text }) => text).join(" ") || "");
@@ -175,7 +208,7 @@ export class WithAiProvider extends VoiceConverter {
       });
   }
 
-  private getApiToken(lang: LanguageCode): string {
+  private getApiToken(lang: LanguageCode): string | undefined {
     return this.tokens[lang];
   }
 }

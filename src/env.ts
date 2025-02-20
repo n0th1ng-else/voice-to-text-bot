@@ -71,6 +71,8 @@ export const witAiApi: { tokens: Record<LanguageCode, string> } = {
   },
 };
 
+export const wtiAiTokens = process.env.WIT_AI_TOKENS || "";
+
 export const isDebug = process.env.DEBUG === "true";
 
 export const stripeToken = process.env.STRIPE_TOKEN || "";

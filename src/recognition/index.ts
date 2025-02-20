@@ -11,6 +11,7 @@ import { WhisperProvider } from "./whisper.js";
 
 // Subset of the env.js file
 export type SupportedEnvironment = {
+  wtiAiTokens: string;
   witAiApi: {
     tokens: Record<LanguageCode, string>;
   };
@@ -48,9 +49,14 @@ export const getVoiceConverterInstance = async (
         poolId: "",
       });
     case "WITAI":
-      return new WithAiProvider({
-        tokens: environment.witAiApi.tokens,
-      });
+      return new WithAiProvider(
+        WithAiProvider.getOptions(
+          {
+            tokens: environment.witAiApi.tokens,
+          },
+          environment.wtiAiTokens,
+        ),
+      );
     case "WHISPER":
       return await WhisperProvider.factory();
     default:

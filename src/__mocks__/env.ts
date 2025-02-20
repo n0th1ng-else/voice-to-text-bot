@@ -68,6 +68,8 @@ export const witAiApi = {
   },
 };
 
+export const wtiAiTokens = "";
+
 export const isDebug = false;
 
 export const stripeToken = "";

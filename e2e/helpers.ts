@@ -303,6 +303,16 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
 
 export const getConverterOptions = (): SupportedEnvironment => {
   return {
+    wtiAiTokens: JSON.stringify([
+      {
+        locale: "en-US",
+        token: "en-token",
+      },
+      {
+        locale: "ru-RU",
+        token: "ru-token",
+      },
+    ]),
     witAiApi: {
       tokens: {
         "en-US": "en-token",
