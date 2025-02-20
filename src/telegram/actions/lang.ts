@@ -32,7 +32,7 @@ const logger = new Logger("telegram-bot");
 const languageButtonLabel: Record<LanguageCode, TranslationKey> = {
   "en-US": TranslationKeys.BtnEnglish,
   "ru-RU": TranslationKeys.BtnRussian,
-  "nl-NL": TranslationKeys.BtnDutch,
+  // "nl-NL": TranslationKeys.BtnDutch, // TODO implement!!!
 };
 
 export class LangAction extends GenericAction {

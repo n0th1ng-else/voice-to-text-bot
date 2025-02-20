@@ -18,8 +18,9 @@ export const mapAppLanguageToWhisperLanguage = (
       return "ru";
     case "en-US":
       return "en";
-    case "nl-NL":
-      return "nl";
+    // TODO implement!!!
+    // case "nl-NL":
+    //   return "nl";
     default:
       throw new Error(`The language code "${languageCode}" is not supported?`);
   }
