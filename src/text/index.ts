@@ -19,6 +19,7 @@ type Translator = {
     locale: LanguageCode,
     params?: Record<string, string | number>,
   ) => string;
+  paidT: (key: TranslationKey, locale: LanguageCode) => string;
 };
 
 const TRANSLATION_VARIABLES_PATTERN = /\{\{(.+?)}}/gi;
@@ -43,35 +44,41 @@ const initTranslations = (): Translator => {
     return str;
   };
 
+  const translate = (
+    key: TranslationKey,
+    locale: LanguageCode,
+    params?: Record<string, string | number>,
+  ): string => {
+    let str = getRawTranslation(key, locale);
+
+    if (params) {
+      str = Object.keys(params).reduce((acc, varKey) => {
+        const varValue = params[varKey];
+        return acc.replaceAll(`{{${varKey}}}`, String(varValue));
+      }, str);
+    }
+
+    const missing = str.match(TRANSLATION_VARIABLES_PATTERN);
+
+    if (missing?.length) {
+      throw new Error("Missing text interpolation", {
+        cause: {
+          key,
+          missing,
+        },
+      });
+    }
+
+    return str;
+  };
+
   return {
     getFallbackLanguage,
     menu: (command: BotCommandType): string => menuLabels[command],
-    t: (
-      key: TranslationKey,
-      locale: LanguageCode,
-      params?: Record<string, string | number>,
-    ): string => {
-      let str = getRawTranslation(key, locale);
-
-      if (params) {
-        str = Object.keys(params).reduce((acc, varKey) => {
-          const varValue = params[varKey];
-          return acc.replaceAll(`{{${varKey}}}`, String(varValue));
-        }, str);
-      }
-
-      const missing = str.match(TRANSLATION_VARIABLES_PATTERN);
-
-      if (missing?.length) {
-        throw new Error("Missing text interpolation", {
-          cause: {
-            key,
-            missing,
-          },
-        });
-      }
-
-      return str;
+    t: translate,
+    paidT: (key: TranslationKey, locale: LanguageCode): string => {
+      const tr = translate(key, locale);
+      return `${tr} 🔑`;
     },
   };
 };

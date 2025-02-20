@@ -312,6 +312,7 @@ export const getConverterOptions = (): SupportedEnvironment => {
       },
     ]),
     witAiApi: {
+      // @ ts-expect-error we can provide a subset of locales
       tokens: {
         "en-US": "en-token",
         "ru-RU": "ru-token",

@@ -65,6 +65,7 @@ export const analytics = {
 };
 
 export const witAiApi: { tokens: LanguageTokens } = {
+  // @ ts-expect-error we can provide a subset of locales
   tokens: {
     "en-US": process.env.WIT_AI_TOKEN_EN || "",
     "ru-RU": process.env.WIT_AI_TOKEN_RU || "",

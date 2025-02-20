@@ -25,12 +25,14 @@ import {
   SUPPORTED_LANGUAGES,
 } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
+import { isPremiumLocale } from "../../subscription/locale.js";
 
 const logger = new Logger("telegram-bot");
 
 const languageButtonLabel: Record<LanguageCode, TranslationKey> = {
   "en-US": TranslationKeys.BtnEnglish,
   "ru-RU": TranslationKeys.BtnRussian,
+  // "nl-NL": TranslationKeys.BtnDutch, // TODO implement!!!
 };
 
 export class LangAction extends GenericAction {
@@ -200,8 +202,14 @@ export class LangAction extends GenericAction {
           );
 
           const label = languageButtonLabel[supportedLanguage];
+          const isPremiumLang = isPremiumLocale(supportedLanguage);
+
+          const text = isPremiumLang
+            ? this.text.paidT(label, lang)
+            : this.text.t(label, lang);
+
           const btn: TgInlineKeyboardButton = {
-            text: this.text.t(label, lang),
+            text,
             callback_data: data.getDtoString(),
           };
 

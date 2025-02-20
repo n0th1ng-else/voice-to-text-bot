@@ -11,6 +11,7 @@
   "donate.payment.form.title": "Support AudioMessBot",
   "language.button.english": "🇺🇸 English",
   "language.button.russian": "🇷🇺 Russian",
+  "language.button.dutch": "🇳🇱 Dutch",
   "language.changeLanguage.error": "Failed to update the language. Please try again later 😔",
   "language.changeSaved": "Language has been changed 🆗",
   "language.selectLanguage": "Select the language 🔮",
