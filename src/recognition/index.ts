@@ -1,5 +1,5 @@
 import {
-  type LanguageCode,
+  type LanguageTokens,
   type VoiceConverter,
   type VoiceConverterProvider,
   VoiceConverterProviderSchema,
@@ -9,12 +9,14 @@ import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
 import { WhisperProvider } from "./whisper.js";
 import { ElevenLabsProvider } from "./elevenLabs.js";
+import { getWitAILanguageTokens } from "./witai/parser.js";
 
 // Subset of the env.js file
 export type SupportedEnvironment = {
   elevenLabsKey: string;
+  wtiAiTokens: string;
   witAiApi: {
-    tokens: Record<LanguageCode, string>;
+    tokens: LanguageTokens;
   };
   googleApi: {
     privateKey: string;
@@ -50,9 +52,12 @@ export const getVoiceConverterInstance = async (
         poolId: "",
       });
     case "WITAI":
-      return new WithAiProvider({
-        tokens: environment.witAiApi.tokens,
-      });
+      return new WithAiProvider(
+        getWitAILanguageTokens(
+          environment.witAiApi.tokens,
+          environment.wtiAiTokens,
+        ),
+      );
     case "WHISPER":
       return await WhisperProvider.factory();
     case "11LABS":

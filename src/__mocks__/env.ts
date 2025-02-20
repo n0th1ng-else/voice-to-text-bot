@@ -68,6 +68,8 @@ export const witAiApi = {
   },
 };
 
+export const wtiAiTokens = "";
+
 export const isDebug = false;
 
 export const stripeToken = "";
@@ -89,3 +91,5 @@ export const whisperModelFile = "";
 export const whisperEnableGpu = false;
 
 export const nodeVersion = "0.0.0";
+
+export const elevenLabsKey = "";
