@@ -8,7 +8,7 @@ import { isFileExist, readDirectoryFiles } from "../files/index.js";
  * - https://github.com/n0th1ng-else/whisper.cpp/blob/master/src/whisper.cpp#L278
  *
  */
-export type WhisperSupportedLanguage = "en" | "ru";
+export type WhisperSupportedLanguage = "en" | "ru" | "nl";
 
 export const mapAppLanguageToWhisperLanguage = (
   languageCode: LanguageCode,
@@ -18,6 +18,8 @@ export const mapAppLanguageToWhisperLanguage = (
       return "ru";
     case "en-US":
       return "en";
+    case "nl-NL":
+      return "nl";
     default:
       throw new Error(`The language code "${languageCode}" is not supported?`);
   }

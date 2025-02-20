@@ -49,6 +49,7 @@ describe("text.loader", () => {
       expect(labels).toStrictEqual({
         [BotCommand.Language]: "Switch the recognition language",
         [BotCommand.Support]: "Show support links",
+        [BotCommand.Subscription]: "Show subscription info",
         [BotCommand.Start]: "Say hello and see bot info",
         [BotCommand.Donate]: "Help us with funding the project",
       });

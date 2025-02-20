@@ -28,6 +28,7 @@ export const TranslationKeys = {
   FormattedTimeSeconds: "recognition.voice.time.seconds",
   BtnEnglish: "language.button.english",
   BtnRussian: "language.button.russian",
+  BtnDutch: "language.button.dutch",
 } as const;
 
 export type TranslationKey =

@@ -24,7 +24,7 @@ export abstract class VoiceConverter {
 }
 
 export const LanguageSchema = z
-  .enum(["en-US", "ru-RU"])
+  .enum(["en-US", "ru-RU", "nl-NL"])
   .describe("Supported language codes");
 
 export type LanguageCode = z.infer<typeof LanguageSchema>;

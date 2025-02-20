@@ -16,6 +16,7 @@ type Translator = {
   getFallbackLanguage: () => LanguageCode;
   menu: (command: BotCommandType) => string;
   t: (key: TranslationKey, locale: LanguageCode) => string;
+  paidT: (key: TranslationKey, locale: LanguageCode) => string;
 };
 
 const initTranslations = (): Translator => {
@@ -40,36 +41,42 @@ const initTranslations = (): Translator => {
     return str;
   };
 
+  const translate = (key: TranslationKey, locale: LanguageCode): string => {
+    const str = getRawTranslation(key, locale);
+
+    if (str.includes("{{formats}}")) {
+      return str.replace("{{formats}}", supportedAudioFormats);
+    }
+
+    if (str.includes("{{duration}}")) {
+      const minutesRaw = getRawTranslation(
+        TranslationKeys.FormattedTimeMinutes,
+        locale,
+      );
+      const secondsRaw = getRawTranslation(
+        TranslationKeys.FormattedTimeSeconds,
+        locale,
+      );
+
+      const [min, sec] = maxVoiceDuration;
+      const minutes =
+        min > 0 ? minutesRaw.replace("{{minutes}}", String(min)) : "";
+      const seconds =
+        sec > 0 ? secondsRaw.replace("{{seconds}}", String(sec)) : "";
+      const duration = [minutes, seconds].filter(Boolean).join(" ");
+      return str.replace("{{duration}}", duration);
+    }
+
+    return str;
+  };
+
   return {
     getFallbackLanguage,
     menu: (command: BotCommandType): string => menuLabels[command],
-    t: (key: TranslationKey, locale: LanguageCode): string => {
-      const str = getRawTranslation(key, locale);
-
-      if (str.includes("{{formats}}")) {
-        return str.replace("{{formats}}", supportedAudioFormats);
-      }
-
-      if (str.includes("{{duration}}")) {
-        const minutesRaw = getRawTranslation(
-          TranslationKeys.FormattedTimeMinutes,
-          locale,
-        );
-        const secondsRaw = getRawTranslation(
-          TranslationKeys.FormattedTimeSeconds,
-          locale,
-        );
-
-        const [min, sec] = maxVoiceDuration;
-        const minutes =
-          min > 0 ? minutesRaw.replace("{{minutes}}", String(min)) : "";
-        const seconds =
-          sec > 0 ? secondsRaw.replace("{{seconds}}", String(sec)) : "";
-        const duration = [minutes, seconds].filter(Boolean).join(" ");
-        return str.replace("{{duration}}", duration);
-      }
-
-      return str;
+    t: translate,
+    paidT: (key: TranslationKey, locale: LanguageCode): string => {
+      const tr = translate(key, locale);
+      return `${tr} 🔑`;
     },
   };
 };

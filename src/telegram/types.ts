@@ -44,6 +44,7 @@ export const BotCommand = {
   Language: "/lang",
   Support: "/support",
   Donate: "/donate",
+  Subscription: "/subscription",
 } as const;
 
 export type BotCommandType = ValueOf<typeof BotCommand>;
