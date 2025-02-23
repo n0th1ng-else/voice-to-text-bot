@@ -8,6 +8,7 @@ import { DonationsClient } from "./donations.js";
 import { UsedEmailClient } from "./emails.js";
 import { DurationsClient } from "./durations.js";
 import { IgnoredChatsClient } from "./ignoredchats.js";
+import { SubscriptionsClient } from "./subscriptions.js";
 
 const { Pool } = pg;
 const logger = new Logger("postgres-client");
@@ -44,6 +45,7 @@ export class DbClient {
   public readonly emails: UsedEmailClient;
   public readonly durations: DurationsClient;
   public readonly ignoredChats: IgnoredChatsClient;
+  public readonly subscriptions: SubscriptionsClient;
 
   private readonly initialized: boolean;
   private ready = false;
@@ -83,6 +85,7 @@ export class DbClient {
     this.emails = new UsedEmailClient(pool);
     this.durations = new DurationsClient(pool);
     this.ignoredChats = new IgnoredChatsClient(pool);
+    this.subscriptions = new SubscriptionsClient(pool);
   }
 
   public init(): Promise<void> {
@@ -97,6 +100,7 @@ export class DbClient {
       this.emails.init(),
       this.durations.init(),
       this.ignoredChats.init(),
+      this.subscriptions.init(),
     ]).then(() => {
       this.ready = true;
     });
@@ -113,6 +117,7 @@ export class DbClient {
     this.emails.setSecondary();
     this.durations.setSecondary();
     this.ignoredChats.setSecondary();
+    this.subscriptions.setSecondary();
     return this;
   }
 

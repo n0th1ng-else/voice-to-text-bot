@@ -5,6 +5,7 @@ import type { NodeRowScheme } from "./sql/nodes.js";
 import type { DonationRowScheme, DonationStatusType } from "./sql/donations.js";
 import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { DbConnectionConfig } from "./utils.js";
+import type { SubscriptionRowScheme } from "./sql/subscriptions.js";
 
 class DbCore {
   private readonly clients: DbClient[];
@@ -122,6 +123,11 @@ class DbCore {
     chatId: number,
   ): Promise<IgnoredChatsRowScheme | null> {
     return this.main.ignoredChats.getRow(chatId);
+  }
+
+  public async getActiveSubscriptions(): Promise<SubscriptionRowScheme[]> {
+    const rows = await this.main.subscriptions.getActiveRows();
+    return rows;
   }
 }
 
