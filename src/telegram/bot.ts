@@ -222,6 +222,14 @@ export class TelegramBotModel {
       return this.actions.checkout.runAction(model, prefix);
     }
 
+    if (await this.actions.subscription.runCondition(msg, model)) {
+      return this.actions.subscription.runAction(model, prefix);
+    }
+
+    if (await this.actions.subscriptionChange.runCondition(msg, model)) {
+      return this.actions.subscriptionChange.runAction(model, prefix);
+    }
+
     return this.sendNoVoiceMessage(model, prefix);
   }
 
