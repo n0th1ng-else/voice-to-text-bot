@@ -41,7 +41,7 @@ export const isDonateMessage = (
   msg: TgMessage,
 ): boolean => isCommandMessage(model, msg, BotCommand.Donate);
 
-const isCommandMessage = (
+export const isCommandMessage = (
   model: BotMessageModel,
   msg: TgMessage,
   command: BotCommandType,
