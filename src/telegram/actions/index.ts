@@ -11,6 +11,8 @@ import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { CheckoutAction } from "./checkout.js";
 import { IgnoreAction } from "./ignore.js";
+import { SubscriptionAction } from "./subscription.js";
+import { SubscriptionChangeAction } from "./subscription-change.js";
 import type { TelegramApi } from "../api/tgapi.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
@@ -30,6 +32,8 @@ export class BotActions {
   public readonly voiceLength: VoiceLengthAction;
   public readonly checkout: CheckoutAction;
   public readonly ignore: IgnoreAction;
+  public readonly subscription: SubscriptionAction;
+  public readonly subscriptionChange: SubscriptionChangeAction;
 
   constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -42,6 +46,8 @@ export class BotActions {
     this.voiceLength = new VoiceLengthAction(stat, bot);
     this.checkout = new CheckoutAction(stat, bot);
     this.ignore = new IgnoreAction(stat, bot);
+    this.subscription = new SubscriptionAction(stat, bot);
+    this.subscriptionChange = new SubscriptionChangeAction(stat, bot);
   }
 
   public setPayment(payment: PaymentService): void {
@@ -84,6 +90,8 @@ export class BotActions {
             return this.donate.runCallback(message, button, analytics);
           case "l":
             return this.lang.runCallback(message, button, analytics, msg);
+          case "s":
+            return this.subscription.runCallback(message, button, analytics);
           default:
             throw new Error(`Unknown type passed in callback query ${data}`, {
               cause: data,

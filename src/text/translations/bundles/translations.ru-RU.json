@@ -27,5 +27,19 @@
   "start.changeLanguage": "Не забудь выбрать язык для распознавания голосовых сообщений с помощью команды /lang",
   "start.groupSupport": "Ты можешь добавить меня в группу, и я буду распознавать голосовые сообщения от всех участников! \n\nИ еще кое-что... Я умею распознавать и видеосообщения (кружочки Telegram) 🎉",
   "start.welcomeMessage": "👋🏽 Привет! Отправь мне голосовое сообщение, и я распознаю его в текст",
-  "telegram.messages.voiceNotFound": "Голосовое сообщение не найдено 😬"
+  "telegram.messages.voiceNotFound": "Голосовое сообщение не найдено 😬",
+  "subscription.button.subscribe": "Подписаться",
+  "subscription.button.resubscribe": "Подписаться снова",
+  "subscription.button.unsubscribe": "Отписаться",
+  "subscription.noActive": "Нет активной подписки",
+  "subscription.manageInDirectMessages": "Управляйте подпиской на бота с помощью этой команды. \n\nНажмите на {{name}}, чтобы открыть чат с ботом.",
+  "subscription.activeSubscription": "✨Ваша подписка активна ✨\n\nСледующее продление: {{date}}. Стоимость: {{amount}} ⭐",
+  "subscription.activeSubscriptionEnds": "✨Ваша подписка активна ✨\n\nОна **не будет продлена** после {{date}}",
+  "subscription.activeSubscription.renewed": "Ваша подписка продлена. Следующая дата списания: {{date}}. \n\nДля управления подпиской используйте команду /subscription",
+  "subscription.activeSubscription.activated": "Ваша подписка активирована! Следующая дата списания: {{date}}. \n\nДля управления подпиской используйте команду /subscription",
+  "subscription.activeSubscription.deactivated": "Подписка остановлена. \n\nВы сможете пользоваться всеми премиум функциями до {{date}}. \n\n Используйте команду /subscription, чтобы подписаться на бот снова.",
+  "subscription.button.confirmUnsubscribe": "Отменить подписку",
+  "subscription.button.back": "Назад",
+  "subscription.confirmUnsubscribe": "Вы уверены, что хотите остановить подписку? \n\nПодписка на бот даёт лучшее качество распознавания голоса и поддержку дополнительных языков. \n\nВы сможете пользоваться всеми премиум функциями до {{date}}. \n\nВы действительно хотите отменить подписку?",
+  "subscription.confirmUnsubscribeLang": "Вы уверены, что хотите остановить подписку? \n\nПодписка на бот даёт лучшее качество распознавания голоса и поддержку дополнительных языков. \n\nВы сможете пользоваться всеми премиум функциями до {{date}}. После этой даты язык будет сброшен на английский. \n\nВы действительно хотите отменить подписку?"
 }

@@ -5,8 +5,9 @@ import type { NodeRowScheme } from "./sql/nodes.js";
 import type { DonationRowScheme, DonationStatusType } from "./sql/donations.js";
 import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { DbConnectionConfig } from "./utils.js";
-import type { ChatId, PaymentChargeId } from "../telegram/api/core.js";
+import type { ChatId, PaymentChargeId, UserId } from "../telegram/api/core.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
+import type { SubscriptionRowScheme } from "./sql/subscriptions.js";
 
 class DbCore {
   private readonly clients: DbClient[];
@@ -130,6 +131,43 @@ class DbCore {
     chatId: ChatId,
   ): Promise<IgnoredChatsRowScheme | null> {
     return this.main.ignoredChats.getRow(chatId);
+  }
+
+  public async getActiveSubscriptions(): Promise<SubscriptionRowScheme[]> {
+    const rows = await this.main.subscriptions.getRowsByDate(new Date());
+    return rows;
+  }
+
+  public async getSubscriptionDataByUserId(
+    userId: UserId,
+    limit: number,
+  ): Promise<SubscriptionRowScheme[]> {
+    const row = await this.main.subscriptions.getRowsByUserId(userId, limit);
+    return row;
+  }
+
+  public async createSubscription(
+    userId: UserId,
+    chargeId: PaymentChargeId,
+    renewalDate: Date,
+    amount: number,
+    currency: Currency,
+  ): Promise<SubscriptionRowScheme> {
+    const row = await this.main.subscriptions.createRow(
+      userId,
+      chargeId,
+      renewalDate,
+      amount,
+      currency,
+    );
+    return row;
+  }
+
+  public async markSubscriptionAsCanceled(
+    subscriptionId: string,
+  ): Promise<SubscriptionRowScheme> {
+    const row = await this.main.subscriptions.markAsCanceled(subscriptionId);
+    return row;
   }
 }
 

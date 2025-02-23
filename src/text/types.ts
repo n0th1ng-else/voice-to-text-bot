@@ -29,6 +29,20 @@ export const TranslationKeys = {
   FormattedTimeSeconds: "recognition.voice.time.seconds",
   BtnEnglish: "language.button.english",
   BtnRussian: "language.button.russian",
+  BtnSubscribe: "subscription.button.subscribe",
+  BtnResubscribe: "subscription.button.resubscribe",
+  BtnUnsubscribe: "subscription.button.unsubscribe",
+  BtnConfirmUnsubscribe: "subscription.button.confirmUnsubscribe",
+  NoActiveSubscription: "subscription.noActive",
+  HasActiveSubscription: "subscription.activeSubscription",
+  HasActiveSubscriptionEnds: "subscription.activeSubscriptionEnds",
+  BtnBack: "subscription.button.back",
+  ConfirmUnsubscribe: "subscription.confirmUnsubscribe",
+  ConfirmUnsubscribeLang: "subscription.confirmUnsubscribeLang",
+  SubscriptionRenewed: "subscription.activeSubscription.renewed",
+  SubscriptionActivated: "subscription.activeSubscription.activated",
+  SubscriptionDeactivated: "subscription.activeSubscription.deactivated",
+  ManageSubscriptionInDMs: "subscription.manageInDirectMessages",
 } as const;
 
 export type TranslationKey =

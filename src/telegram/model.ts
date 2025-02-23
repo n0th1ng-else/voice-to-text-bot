@@ -43,6 +43,7 @@ export class BotMessageModel {
   public readonly paymentChargeId?: PaymentChargeId;
   public readonly paymentAmount?: number;
   public readonly paymentCurrency?: Currency;
+  public readonly paymentNextDate?: number;
   public readonly isSubscriptionPayment: boolean;
   public readonly forumThreadId?: MessageThreadId;
   public readonly chatType: ChatType;
@@ -67,6 +68,9 @@ export class BotMessageModel {
     this.isSubscriptionPayment = payment?.is_recurring ?? false;
     this.paymentAmount = payment?.total_amount;
     this.paymentCurrency = payment?.currency;
+    const expirationDate = payment?.subscription_expiration_date;
+    // Telegram returns date in seconds, we need milliseconds
+    this.paymentNextDate = expirationDate ? expirationDate * 1000 : undefined;
 
     if (msg.is_topic_message && msg.message_thread_id) {
       this.forumThreadId = msg.message_thread_id;
