@@ -89,3 +89,5 @@ export const whisperModelFile = "";
 export const whisperEnableGpu = false;
 
 export const nodeVersion = "0.0.0";
+
+export const elevenLabsKey = "";

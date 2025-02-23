@@ -16,6 +16,7 @@ import type { PaymentService } from "../../donate/types.js";
 import type { TgCallbackQuery, TgCheckoutQuery } from "../api/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { getDb } from "../../db/index.js";
+import { SubscriptionAction } from "./subscription.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -30,6 +31,7 @@ export class BotActions {
   public readonly voiceLength: VoiceLengthAction;
   public readonly checkout: CheckoutAction;
   public readonly ignore: IgnoreAction;
+  public readonly subscription: SubscriptionAction;
 
   constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -42,6 +44,7 @@ export class BotActions {
     this.voiceLength = new VoiceLengthAction(stat, bot);
     this.checkout = new CheckoutAction(stat, bot);
     this.ignore = new IgnoreAction(stat, bot);
+    this.subscription = new SubscriptionAction(stat, bot);
   }
 
   public setPayment(payment: PaymentService): void {
@@ -84,6 +87,8 @@ export class BotActions {
             return this.donate.runCallback(message, button, analytics);
           case "l":
             return this.lang.runCallback(message, button, analytics, msg);
+          case "s":
+            return this.subscription.runCallback(message, button, analytics);
           default:
             throw new Error(`Unknown type passed in callback query ${data}`, {
               cause: data,
