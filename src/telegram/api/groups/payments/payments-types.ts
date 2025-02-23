@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Prettify } from "../../../../common/types.js";
-import { TgChatId, TgMessageThreadId } from "../../core.js";
+import { TgChatId, TgMessageThreadId, TgPaymentChargeId } from "../../core.js";
 
 export const TgSubscriptionChangeSchema = z
   .boolean()
@@ -29,7 +29,7 @@ export const TgSuccessfulPaymentSchema = z
   .intersection(
     TgPaymentSchema,
     z.object({
-      telegram_payment_charge_id: z.string(),
+      telegram_payment_charge_id: TgPaymentChargeId,
       provider_payment_charge_id: z.string(),
     }),
   )

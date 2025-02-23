@@ -14,6 +14,8 @@ export const secondsInOneMinute = 60;
 
 export const durationLimitSec = 90;
 
+export const subscriptionDurationDays = 2_592_000; // 30d * 24h * 60m * 60s
+
 export const supportedAudioFormats = [
   {
     mimeType: "audio/ogg",
