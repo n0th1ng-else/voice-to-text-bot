@@ -7,6 +7,7 @@ import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { DbConnectionConfig } from "./utils.js";
 import type { ChatId, PaymentChargeId } from "../telegram/api/core.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
+import type { SubscriptionRowScheme } from "./sql/subscriptions.js";
 
 class DbCore {
   private readonly clients: DbClient[];
@@ -130,6 +131,11 @@ class DbCore {
     chatId: ChatId,
   ): Promise<IgnoredChatsRowScheme | null> {
     return this.main.ignoredChats.getRow(chatId);
+  }
+
+  public async getActiveSubscriptions(): Promise<SubscriptionRowScheme[]> {
+    const rows = await this.main.subscriptions.getActiveRows();
+    return rows;
   }
 }
 
