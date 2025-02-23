@@ -26,5 +26,9 @@
   "start.changeLanguage": "Do not forget to select the language you want to recognise by typing the /lang command",
   "start.groupSupport": "You can add me to a group so I will convert voice messages from all the participants! \n\nEven better, I can recognise video notes (Telegram video circles) as well 🎉",
   "start.welcomeMessage": "👋🏽 Hey there! Send me a voice message and I will show what they are talking about in plain text",
-  "telegram.messages.voiceNotFound": "No voice track found in the message 🌚"
+  "telegram.messages.voiceNotFound": "No voice track found in the message 🌚",
+  "subscription.button.subscribe": "Activate subscription",
+  "subscription.button.unsubscribe": "Cancel subscription",
+  "subscription.noActive": "No active",
+  "subscription.activeSubscription": "Active"
 }

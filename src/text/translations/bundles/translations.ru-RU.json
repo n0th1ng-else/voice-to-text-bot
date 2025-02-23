@@ -26,5 +26,9 @@
   "start.changeLanguage": "Не забудь выбрать язык голосовых сообщений с помощью команды /lang",
   "start.groupSupport": "Ты можешь добавить меня в группу, и я буду распознавать сообщения от каждого участника! \n\nИ еще кое-что... Я умею распознавать видео сообщения (круглые видео) 🎉",
   "start.welcomeMessage": "👋🏽 Привет! отправь мне голосовое сообщение и я распознаю его в текст",
-  "telegram.messages.voiceNotFound": "Голосовое сообщение не найдено 🌚"
+  "telegram.messages.voiceNotFound": "Голосовое сообщение не найдено 🌚",
+  "subscription.button.subscribe": "Активировать подписку",
+  "subscription.button.unsubscribe": "Отменить подписку",
+  "subscription.noActive": "Нет активной",
+  "subscription.activeSubscription": "Активная"
 }

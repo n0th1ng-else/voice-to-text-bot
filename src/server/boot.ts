@@ -24,6 +24,7 @@ import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import type { BotServerModel } from "./types.js";
+import { warmupCaches } from "./cache.js";
 
 const logger = new Logger("boot-server");
 
@@ -81,6 +82,7 @@ export const prepareInstance = async (
 
   return db
     .init()
+    .then(() => warmupCaches(db))
     .then(() =>
       getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken),
     )
