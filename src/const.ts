@@ -26,7 +26,7 @@ export const subscriptionTrialDurationSeconds = 604_800; // 7d * 24h * 60m * 60s
 
 export const subscriptionTrialPaymentId = "trial-no-payment" as PaymentChargeId;
 
-export const subscriptionPrice = 150; // 150 Stars
+export const subscriptionPrice = 1; // 150 Stars
 
 export const API_TIMEOUT_MS = 10_000;
 

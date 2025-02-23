@@ -26,6 +26,8 @@ import {
   trackApplicationHealth,
 } from "../monitoring/newrelic.js";
 import { requestHealthData } from "./api.js";
+import { warmupCaches } from "./cache.js";
+import { removeStaleItemsFromCache } from "../subscription/subscriptions.js";
 
 const logger = new Logger("boot-server");
 
@@ -86,6 +88,7 @@ export const prepareInstance = async (
 
   return db
     .init()
+    .then(() => warmupCaches(db))
     .then(() =>
       getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken),
     )
@@ -130,14 +133,28 @@ export const prepareStopListener = async (): Promise<StopListener> => {
       trackApplicationHealth(status);
     },
     {
+      // Dont forget to update Newrelic if want to change
+      interval: 60_000,
       skipInitialTick: true,
     },
   ).start();
+  const cacheDaemon = new ScheduleDaemon(
+    "subscription",
+    async () => {
+      // TODO notify users
+      removeStaleItemsFromCache();
+      return Promise.resolve();
+    },
+    {
+      interval: 60_000,
+    },
+  );
 
   const stopListener = new StopListener().addTrigger(() => {
     memoryDaemon.stop();
     storageDaemon.stop();
     healthDaemon.stop();
+    cacheDaemon.stop();
   });
 
   return stopListener;

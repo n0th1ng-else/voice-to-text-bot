@@ -1,3 +1,4 @@
+import { getSubscriptionFromCache } from "./subscriptions.js";
 import type { ConverterType, LanguageCode } from "../recognition/types.js";
 import type { BotMessageModel } from "../telegram/model.js";
 import type { UserId } from "../telegram/api/core.js";
@@ -9,11 +10,19 @@ export const isPremiumLanguage = (lang: LanguageCode): boolean => {
 };
 
 export const getConverterType = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _model: Pick<BotMessageModel, "isGroup" | "userId">,
+  model: Pick<BotMessageModel, "isGroup" | "userId">,
 ): ConverterType => {
-  // TODO implement
-  return "main";
+  if (model.isGroup) {
+    // TODO we only support direct messages for now
+    return "main";
+  }
+
+  if (!model.userId) {
+    return "main";
+  }
+  const userSubscription = getSubscriptionFromCache(model.userId);
+  const converterType: ConverterType = userSubscription ? "advanced" : "main";
+  return converterType;
 };
 
 /**
