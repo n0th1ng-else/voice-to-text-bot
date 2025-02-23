@@ -54,6 +54,7 @@ export const BotCommand = {
   Language: "/lang",
   Support: "/support",
   Donate: "/donate",
+  Subscription: "/subscription",
 } as const;
 
 export type BotCommandType = ValueOf<typeof BotCommand>;
@@ -147,8 +148,13 @@ export class BotCommandOption {
 }
 
 const TelegramButtonTypeSchema = z
-  .union([z.literal("d"), z.literal("l"), z.literal("u")])
-  .describe("Button type schema. d is Donation, l is Language, u is Unknown");
+  .union([
+    z.literal("d").describe("Donation"),
+    z.literal("l").describe("Language"),
+    z.literal("u").describe("Unknown"),
+    z.literal("s").describe("Subscription"),
+  ])
+  .describe("Supported Button type schemas (in messages)");
 
 export type TelegramButtonType = z.infer<typeof TelegramButtonTypeSchema>;
 
@@ -203,12 +209,10 @@ export type DonationPayload = {
 
 export const DonationSchema = z
   .object({
-    d: z.number(),
+    d: z.number().describe("DonationId"),
     c: TgChatId,
-    l: z.string(),
+    l: z.string().describe("Log prefix"),
   })
-  .describe(
-    "Donation schema used in Telegram callback. d is DonationId, c is ChatId, l is Log prefix",
-  );
+  .describe("Donation schema used in Telegram callback");
 
 export type DonationDto = z.infer<typeof DonationSchema>;

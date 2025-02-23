@@ -28,6 +28,14 @@ export const TranslationKeys = {
   FormattedTimeSeconds: "recognition.voice.time.seconds",
   BtnEnglish: "language.button.english",
   BtnRussian: "language.button.russian",
+  BtnSubscribe: "subscription.button.subscribe",
+  BtnUnsubscribe: "subscription.button.unsubscribe",
+  BtnConfirmUnsubscribe: "subscription.button.confirmUnsubscribe",
+  NoActiveSubscription: "subscription.noActive",
+  HasActiveSubscription: "subscription.activeSubscription",
+  HasActiveSubscriptionEnds: "subscription.activeSubscriptionEnds",
+  BtnBack: "subscription.button.back",
+  ConfirmUnsubscribe: "subscription.confirmUnsubscribe",
 } as const;
 
 export type TranslationKey =

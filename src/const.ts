@@ -16,6 +16,10 @@ export const secondsInOneMinute = 60;
 
 export const durationLimitSec = 90;
 
+export const subscriptionDurationDays = 2_592_000; // 30d * 24h * 60m * 60s
+
+export const subscriptionPrice = 1;
+
 export const API_TIMEOUT_MS = 10_000;
 
 export const supportedAudioFormats = [
