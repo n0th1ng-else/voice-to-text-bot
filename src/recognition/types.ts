@@ -6,6 +6,7 @@ export const VoiceConverterProviderSchema = z
     z.literal("AWS"),
     z.literal("GOOGLE"),
     z.literal("WHISPER"),
+    z.literal("11LABS"),
   ])
   .catch("WITAI")
   .describe("Validation schema for the Voice converter providers we support");
@@ -17,7 +18,6 @@ export type VoiceConverterProvider = z.infer<
 export abstract class VoiceConverter {
   public abstract transformToText(
     fileLink: string,
-    isVideo: boolean,
     lang: LanguageCode,
     logData: ConverterMeta,
   ): Promise<string>;

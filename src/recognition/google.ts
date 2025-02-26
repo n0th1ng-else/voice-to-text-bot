@@ -37,7 +37,6 @@ export class GoogleProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
-    _isVideo: boolean,
     lang: LanguageCode,
     opts: ConverterMeta,
   ): Promise<string> {

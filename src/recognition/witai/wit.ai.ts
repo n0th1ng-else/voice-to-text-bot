@@ -35,7 +35,6 @@ export class WithAiProvider extends VoiceConverter {
 
   public async transformToText(
     fileLink: string,
-    _isVideo: boolean,
     lang: LanguageCode,
     logData: ConverterMeta,
   ): Promise<string> {
