@@ -92,3 +92,5 @@ export const whisperModelFile = process.env.WHISPER_MODEL_FILE || "";
 export const whisperEnableGpu = process.env.WHISPER_GPU === "true";
 
 export const nodeVersion = process.versions.node;
+
+export const elevenLabsKey = process.env.ELEVENLABS_API_KEY || "";

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { LanguageCode } from "../recognition/types.js";
 import { isFileExist, readDirectoryFiles } from "../files/index.js";
 
 /**
@@ -8,20 +7,6 @@ import { isFileExist, readDirectoryFiles } from "../files/index.js";
  * - https://github.com/n0th1ng-else/whisper.cpp/blob/master/src/whisper.cpp#L278
  *
  */
-export type WhisperSupportedLanguage = "en" | "ru";
-
-export const mapAppLanguageToWhisperLanguage = (
-  languageCode: LanguageCode,
-): WhisperSupportedLanguage => {
-  switch (languageCode) {
-    case "ru-RU":
-      return "ru";
-    case "en-US":
-      return "en";
-    default:
-      throw new Error(`The language code "${languageCode}" is not supported?`);
-  }
-};
 
 // Downloading the model from GDrive loses the file name and extension
 const WHISPER_MODEL_EXTENSIONS = [".part", ".bin"] as const;

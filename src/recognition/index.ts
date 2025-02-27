@@ -8,9 +8,11 @@ import { GoogleProvider } from "./google.js";
 import { WithAiProvider } from "./witai/wit.ai.js";
 import { AWSProvider } from "./aws.js";
 import { WhisperProvider } from "./whisper.js";
+import { ElevenLabsProvider } from "./elevenLabs.js";
 
 // Subset of the env.js file
 export type SupportedEnvironment = {
+  elevenLabsKey: string;
   witAiApi: {
     tokens: Record<LanguageCode, string>;
   };
@@ -53,6 +55,8 @@ export const getVoiceConverterInstance = async (
       });
     case "WHISPER":
       return await WhisperProvider.factory();
+    case "11LABS":
+      return new ElevenLabsProvider({ apiToken: environment.elevenLabsKey });
     default:
       throw new Error("Voice recognition provider is not specified");
   }

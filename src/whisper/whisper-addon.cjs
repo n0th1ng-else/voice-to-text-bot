@@ -14,7 +14,7 @@ const { promisify } = require("node:util");
  * Whisper input Parameters.
  *
  * @typedef {Object} WhisperOptions
- * @property {import("./utils.ts").WhisperSupportedLanguage} language - The recognition language
+ * @property {import("../recognition/common.ts").ISOLanguage} language - The recognition language
  * @property {string} model - The absolute file path for the trained model
  * @property {string} [fname_inp] - The absolute file path for the WAV file
  * @property {Buffer} [pcmf32] - Raw pcm32 Buffer instead of fname_inp

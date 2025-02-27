@@ -41,7 +41,6 @@ export class AWSProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
-    _isVideo: boolean,
     _lang: LanguageCode,
     logData: ConverterMeta,
   ): Promise<string> {

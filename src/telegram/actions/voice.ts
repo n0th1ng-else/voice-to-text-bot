@@ -69,7 +69,7 @@ export class VoiceAction extends GenericAction {
         }
 
         return Promise.all([
-          this.converter.transformToText(fileLink, model.isVideo, lang, {
+          this.converter.transformToText(fileLink, lang, {
             fileId: model.voiceFileId,
             prefix: prefix.getPrefix(),
           }),

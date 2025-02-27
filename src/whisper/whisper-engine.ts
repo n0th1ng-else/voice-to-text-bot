@@ -1,9 +1,7 @@
 import type { LanguageCode } from "../recognition/types.js";
-import {
-  mapAppLanguageToWhisperLanguage,
-  type WhisperAddonArchitecture,
-} from "./utils.js";
+import { type WhisperAddonArchitecture } from "./utils.js";
 import getWhisper from "./whisper-addon.cjs";
+import { convertLanguageCodeToISO } from "../recognition/common.js";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type WhisperOptions = import("./whisper-addon.cjs").WhisperOptions;
@@ -32,7 +30,7 @@ export const runWhisper = async (
   useGpu: boolean,
 ): Promise<string> => {
   const runWhisperAsync = getWhisper(architecture);
-  const language = mapAppLanguageToWhisperLanguage(languageCode);
+  const language = convertLanguageCodeToISO(languageCode);
 
   const whisperParams: WhisperOptions = {
     language,

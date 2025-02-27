@@ -303,6 +303,7 @@ export const getLangButtons = (): TelegramMessageMetaItem[][] => {
 
 export const getConverterOptions = (): SupportedEnvironment => {
   return {
+    elevenLabsKey: "11labs-token",
     witAiApi: {
       tokens: {
         "en-US": "en-token",
