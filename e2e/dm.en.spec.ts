@@ -19,6 +19,7 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { getSupportedAudioFormats } from "../src/text/utils.js";
 import type { TgChatType } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
@@ -432,7 +433,14 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [TranslationKeys.LongVoiceMessage],
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: "1 min 30 sec",
+              },
+            ],
+          ],
         ),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
@@ -457,7 +465,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           [
             TranslationKeys.AudioNotSupportedMessage,
-            TranslationKeys.SupportedFormatsMessage,
+            [
+              TranslationKeys.SupportedFormatsMessage,
+              { formats: getSupportedAudioFormats() },
+            ],
             TranslationKeys.SupportedFormatsMessageExplanation,
           ],
         ),
@@ -526,7 +537,14 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [TranslationKeys.LongVoiceMessage],
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: "1 min 30 sec",
+              },
+            ],
+          ],
         ),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
@@ -551,7 +569,10 @@ describe("[default language - english]", () => {
           statModel.langId,
           [
             TranslationKeys.AudioNotSupportedMessage,
-            TranslationKeys.SupportedFormatsMessage,
+            [
+              TranslationKeys.SupportedFormatsMessage,
+              { formats: getSupportedAudioFormats() },
+            ],
             TranslationKeys.SupportedFormatsMessageExplanation,
           ],
         ),
@@ -620,7 +641,14 @@ describe("[default language - english]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [TranslationKeys.LongVoiceMessage],
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: "1 min 30 sec",
+              },
+            ],
+          ],
         ),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),

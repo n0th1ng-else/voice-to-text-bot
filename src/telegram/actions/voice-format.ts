@@ -9,6 +9,7 @@ import {
   VoiceContentReason,
 } from "../types.js";
 import type { TgMessage } from "../api/types.js";
+import { getSupportedAudioFormats } from "../../text/utils.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -57,7 +58,12 @@ export class VoiceFormatAction extends GenericAction {
           model.id,
           [
             TranslationKeys.AudioNotSupportedMessage,
-            TranslationKeys.SupportedFormatsMessage,
+            [
+              TranslationKeys.SupportedFormatsMessage,
+              {
+                formats: getSupportedAudioFormats(),
+              },
+            ],
             TranslationKeys.SupportedFormatsMessageExplanation,
           ],
           {

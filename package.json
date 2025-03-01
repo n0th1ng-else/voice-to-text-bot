@@ -55,7 +55,7 @@
     "signal-exit": "4.1.0",
     "strip-ansi": "7.1.0",
     "ts-node": "10.9.2",
-    "typescript": "5.7.3",
+    "typescript": "5.8.2",
     "winston": "3.17.0",
     "winston-logsene": "2.1.2",
     "zod": "3.24.2"

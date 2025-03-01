@@ -13,7 +13,10 @@ import type {
 } from "../types.js";
 import type { getDb } from "../../db/index.js";
 import type { LanguageCode } from "../../recognition/types.js";
-import type { TranslationKey } from "../../text/types.js";
+import {
+  type TranslationKey,
+  type TranslationKeyFull,
+} from "../../text/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -61,31 +64,31 @@ export abstract class GenericAction {
   public async sendMessage(
     chatId: number,
     messageId: number,
-    ids: TranslationKey | TranslationKey[],
+    ids: TranslationKeyFull[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
     forumThreadId?: number,
   ): Promise<void> {
-    const msgs = Array.isArray(ids) ? ids : [ids];
-    if (!msgs.length) {
+    if (!ids.length) {
       return Promise.resolve();
     }
 
-    const part = msgs.shift();
+    const part = ids.shift();
     if (!part) {
       return Promise.resolve();
     }
 
+    const [partKey, partParams] = Array.isArray(part) ? part : [part];
     logger.info(`${prefix.getPrefix()} Sending the message`);
     return this.sendRawMessage(
       chatId,
-      this.text.t(part, meta.lang),
+      this.text.t(partKey, meta.lang, partParams),
       meta.lang,
       meta.options,
       forumThreadId,
     )
       .then(() =>
-        this.sendMessage(chatId, messageId, msgs, meta, prefix, forumThreadId),
+        this.sendMessage(chatId, messageId, ids, meta, prefix, forumThreadId),
       )
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to send the message`, err);

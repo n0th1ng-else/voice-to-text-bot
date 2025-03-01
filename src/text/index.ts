@@ -10,13 +10,18 @@ import {
   type TranslationsFileType,
 } from "./translations/loader.js";
 import type { BotCommandType } from "../telegram/types.js";
-import { getMaxDuration, getSupportedAudioFormats } from "./utils.js";
 
 type Translator = {
   getFallbackLanguage: () => LanguageCode;
   menu: (command: BotCommandType) => string;
-  t: (key: TranslationKey, locale: LanguageCode) => string;
+  t: (
+    key: TranslationKey,
+    locale: LanguageCode,
+    params?: Record<string, string | number>,
+  ) => string;
 };
+
+const TRANSLATION_VARIABLES_PATTERN = /\{\{(.+?)}}/gi;
 
 const initTranslations = (): Translator => {
   const menuLabels = initializeMenuLabels();
@@ -26,8 +31,6 @@ const initTranslations = (): Translator => {
     textRegistry.set(locale, dictionary);
   });
 
-  const supportedAudioFormats = getSupportedAudioFormats();
-  const maxVoiceDuration = getMaxDuration();
   const getFallbackLanguage = (): LanguageCode => DEFAULT_LANGUAGE;
 
   const getRawTranslation = (
@@ -43,30 +46,29 @@ const initTranslations = (): Translator => {
   return {
     getFallbackLanguage,
     menu: (command: BotCommandType): string => menuLabels[command],
-    t: (key: TranslationKey, locale: LanguageCode): string => {
-      const str = getRawTranslation(key, locale);
+    t: (
+      key: TranslationKey,
+      locale: LanguageCode,
+      params?: Record<string, string | number>,
+    ): string => {
+      let str = getRawTranslation(key, locale);
 
-      if (str.includes("{{formats}}")) {
-        return str.replace("{{formats}}", supportedAudioFormats);
+      if (params) {
+        str = Object.keys(params).reduce((acc, varKey) => {
+          const varValue = params[varKey];
+          return acc.replaceAll(`{{${varKey}}}`, String(varValue));
+        }, str);
       }
 
-      if (str.includes("{{duration}}")) {
-        const minutesRaw = getRawTranslation(
-          TranslationKeys.FormattedTimeMinutes,
-          locale,
-        );
-        const secondsRaw = getRawTranslation(
-          TranslationKeys.FormattedTimeSeconds,
-          locale,
-        );
+      const missing = str.match(TRANSLATION_VARIABLES_PATTERN);
 
-        const [min, sec] = maxVoiceDuration;
-        const minutes =
-          min > 0 ? minutesRaw.replace("{{minutes}}", String(min)) : "";
-        const seconds =
-          sec > 0 ? secondsRaw.replace("{{seconds}}", String(sec)) : "";
-        const duration = [minutes, seconds].filter(Boolean).join(" ");
-        return str.replace("{{duration}}", duration);
+      if (missing?.length) {
+        throw new Error("Missing text interpolation", {
+          cause: {
+            key,
+            missing,
+          },
+        });
       }
 
       return str;

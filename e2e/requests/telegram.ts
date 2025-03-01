@@ -11,7 +11,11 @@ import {
   type TelegramMessageModel,
 } from "../helpers.js";
 import { getTranslator, isTranslationKey } from "../../src/text/index.js";
-import { type TranslationKey, TranslationKeys } from "../../src/text/types.js";
+import {
+  type TranslationKey,
+  type TranslationKeyFull,
+  TranslationKeys,
+} from "../../src/text/types.js";
 import { getBotMenuCommands } from "../../src/telegram/data.js";
 import { flattenPromise } from "../../src/common/helpers.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
@@ -130,14 +134,15 @@ export const mockTgReceiveMessage = (
   host: NockScope,
   chatId: number,
   lang: LanguageCode,
-  textId: TranslationKey,
+  textId: TranslationKeyFull,
   expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
-    host.post("/bottelegram-api-token/sendMessage").reply(200, (uri, body) => {
+    host.post("/bottelegram-api-token/sendMessage").reply(200, (_uri, body) => {
       const answer = typeof body === "string" ? querystring.parse(body) : body;
       expect(answer.chat_id).toBe(chatId);
-      expect(answer.text).toBe(text.t(textId, lang));
+      const [textKey, textParams] = Array.isArray(textId) ? textId : [textId];
+      expect(answer.text).toBe(text.t(textKey, lang, textParams));
       let prefixId = "";
 
       if (expectedMarkup.length) {
@@ -191,7 +196,7 @@ export const mockTgReceiveMessages = (
   host: NockScope,
   chatId: number,
   lang: LanguageCode,
-  textIds: TranslationKey[],
+  textIds: TranslationKeyFull[],
 ): Promise<void> => {
   return Promise.all(
     textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)),

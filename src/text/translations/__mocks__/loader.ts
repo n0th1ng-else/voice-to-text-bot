@@ -11,7 +11,6 @@ export const initializeTranslationsForLocale = vi.fn(() => {
     "start.welcomeMessage": "translation text",
     "recognition.voice.tooLong": "{{duration}}",
     "recognition.voice.supportedFormats": "{{formats}}",
-    "recognition.voice.time.minutes": "{{minutes}} min",
-    "recognition.voice.time.seconds": "{{seconds}} sec",
+    "recognition.voice.time.minutes": "{{minutes}} min {{seconds}} sec",
   };
 });
