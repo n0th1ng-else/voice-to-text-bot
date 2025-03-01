@@ -66,17 +66,37 @@ describe("text.index", () => {
     });
 
     describe("interpolation", () => {
-      it("should interpolate the {{formats}}", () => {
+      it("should interpolate the {{var}} with the params array", () => {
+        const formatsInterpolation = "any kind of file";
         const text = TEST_TRANSLATOR.t(
           "recognition.voice.supportedFormats",
           "en-US",
+          {
+            formats: formatsInterpolation,
+          },
         );
-        expect(text).toEqual("*.ogg, *.opus, *.m4a");
+        expect(text).toEqual(formatsInterpolation);
       });
 
-      it("should interpolate the {{duration}}", () => {
-        const text = TEST_TRANSLATOR.t("recognition.voice.tooLong", "en-US");
-        expect(text).toEqual("1 min 30 sec");
+      it("should interpolate all variables", () => {
+        const text = TEST_TRANSLATOR.t(
+          "recognition.voice.time.minutes",
+          "en-US",
+          {
+            minutes: 7,
+            seconds: 21,
+          },
+        );
+        expect(text).toEqual("7 min 21 sec");
+      });
+
+      it("should throw an Error is the is a variable missing", () => {
+        expect(() =>
+          TEST_TRANSLATOR.t("recognition.voice.time.minutes", "en-US", {
+            minutes: 7,
+            // missing `seconds`
+          }),
+        ).toThrowError(/Missing text interpolation/);
       });
     });
   });

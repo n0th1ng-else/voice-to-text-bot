@@ -32,3 +32,7 @@ export const TranslationKeys = {
 
 export type TranslationKey =
   (typeof TranslationKeys)[keyof typeof TranslationKeys];
+
+export type TranslationKeyFull =
+  | TranslationKey
+  | [TranslationKey, Record<string, string>];

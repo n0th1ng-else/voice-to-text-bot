@@ -208,7 +208,7 @@ export class TelegramBotModel {
         this.actions.core.sendMessage(
           model.chatId,
           model.id,
-          TranslationKeys.NoContent,
+          [TranslationKeys.NoContent],
           { lang },
           prefix,
           model.forumThreadId,

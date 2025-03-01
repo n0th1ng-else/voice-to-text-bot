@@ -121,7 +121,7 @@ export class LangAction extends GenericAction {
         return this.sendMessage(
           chatId,
           messageId,
-          TranslationKeys.UpdateLanguageError,
+          [TranslationKeys.UpdateLanguageError],
           { lang },
           prefix,
           forumThreadId,
@@ -211,7 +211,7 @@ export class LangAction extends GenericAction {
         return this.sendMessage(
           model.chatId,
           model.id,
-          TranslationKeys.ChangeLangTitle,
+          [TranslationKeys.ChangeLangTitle],
           {
             lang,
             options: {

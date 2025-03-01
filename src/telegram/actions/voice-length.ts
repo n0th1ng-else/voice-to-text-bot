@@ -9,10 +9,14 @@ import {
   VoiceContentReason,
 } from "../types.js";
 import type { TgMessage } from "../api/types.js";
+import { getMaxDuration } from "../../text/utils.js";
+import type { LanguageCode } from "../../recognition/types.js";
 
 const logger = new Logger("telegram-bot");
 
 export class VoiceLengthAction extends GenericAction {
+  private static maxVoiceDuration = getMaxDuration();
+
   public runAction(
     mdl: BotMessageModel,
     prefix: TelegramMessagePrefix,
@@ -30,7 +34,7 @@ export class VoiceLengthAction extends GenericAction {
     return Promise.resolve(isVoice && isVoiceMessageLong(mdl));
   }
 
-  private sendVoiceIsTooLongMessage(
+  private async sendVoiceIsTooLongMessage(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
@@ -58,7 +62,14 @@ export class VoiceLengthAction extends GenericAction {
         this.sendMessage(
           model.chatId,
           model.id,
-          TranslationKeys.LongVoiceMessage,
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: this.getDurationString(lang),
+              },
+            ],
+          ],
           {
             lang,
           },
@@ -83,5 +94,28 @@ export class VoiceLengthAction extends GenericAction {
           ),
         ),
       );
+  }
+
+  private getDurationString(lang: LanguageCode): string {
+    const [min, sec] = VoiceLengthAction.maxVoiceDuration;
+    const parts: string[] = [];
+    if (min > 0) {
+      parts.push(
+        this.text.t(TranslationKeys.FormattedTimeMinutes, lang, {
+          minutes: min,
+        }),
+      );
+    }
+
+    if (sec > 0) {
+      parts.push(
+        this.text.t(TranslationKeys.FormattedTimeSeconds, lang, {
+          seconds: sec,
+        }),
+      );
+    }
+
+    const duration = parts.filter(Boolean).join(" ");
+    return duration;
   }
 }

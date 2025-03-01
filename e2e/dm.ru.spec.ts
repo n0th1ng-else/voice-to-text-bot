@@ -19,6 +19,7 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { getSupportedAudioFormats } from "../src/text/utils.js";
 import type { TgChatType } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
@@ -474,7 +475,14 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [TranslationKeys.LongVoiceMessage],
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: "1 мин 30 сек",
+              },
+            ],
+          ],
         ),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -500,7 +508,10 @@ describe("[russian language]", () => {
           statModel.langId,
           [
             TranslationKeys.AudioNotSupportedMessage,
-            TranslationKeys.SupportedFormatsMessage,
+            [
+              TranslationKeys.SupportedFormatsMessage,
+              { formats: getSupportedAudioFormats() },
+            ],
             TranslationKeys.SupportedFormatsMessageExplanation,
           ],
         ),
@@ -562,7 +573,14 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [TranslationKeys.LongVoiceMessage],
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: "1 мин 30 сек",
+              },
+            ],
+          ],
         ),
       ]);
     });
@@ -592,7 +610,10 @@ describe("[russian language]", () => {
           statModel.langId,
           [
             TranslationKeys.AudioNotSupportedMessage,
-            TranslationKeys.SupportedFormatsMessage,
+            [
+              TranslationKeys.SupportedFormatsMessage,
+              { formats: getSupportedAudioFormats() },
+            ],
             TranslationKeys.SupportedFormatsMessageExplanation,
           ],
         ),
@@ -676,7 +697,14 @@ describe("[russian language]", () => {
           telegramServer,
           tgMessage.chatId,
           statModel.langId,
-          [TranslationKeys.LongVoiceMessage],
+          [
+            [
+              TranslationKeys.LongVoiceMessage,
+              {
+                duration: "1 мин 30 сек",
+              },
+            ],
+          ],
         ),
       ]);
     });
