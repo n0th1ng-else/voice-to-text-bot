@@ -6,8 +6,8 @@ on:
       server:
         type: choice
         options:
-          - "Production Ω"
           - "Production β"
+          - "Production Ω"
         description: "What server to deploy the application on"
         required: true
       version:
