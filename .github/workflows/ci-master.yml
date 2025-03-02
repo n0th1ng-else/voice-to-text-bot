@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      version: ${{ needs.prerelease.outputs.version }}
+      version: v${{ needs.prerelease.outputs.version }}
       sha: ${{ github.sha }}
       # Enable if you want to test on one environment
       servers: '["Production β"]'
