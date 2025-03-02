@@ -27,7 +27,7 @@ export const initTgReflector = (token: string): ApiErrorReflector => {
         return;
       }
 
-      return api
+      return api.chats
         .leaveChat(err.chatId)
         .then((isChatLeft) => {
           if (isChatLeft) {

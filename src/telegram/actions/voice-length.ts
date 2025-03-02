@@ -15,7 +15,7 @@ import type { LanguageCode } from "../../recognition/types.js";
 const logger = new Logger("telegram-bot");
 
 export class VoiceLengthAction extends GenericAction {
-  private static maxVoiceDuration = getMaxDuration();
+  private static readonly maxVoiceDuration = getMaxDuration();
 
   public runAction(
     mdl: BotMessageModel,

@@ -67,7 +67,7 @@ export class TelegramBotModel {
     logger.warn(`WebHook url is ${Logger.y(hookUrl)}`);
 
     return runPromiseWithRetry("bot.getWebHookInfo", () =>
-      this.bot.getWebHookInfo(),
+      this.bot.updates.getWebHookInfo(),
     ).then((info) => {
       if (info.url === hookUrl) {
         return true;
@@ -82,17 +82,17 @@ export class TelegramBotModel {
     logger.warn(`Applying WebHook url is ${Logger.y(hookUrl)}`);
     return runPromiseWithRetry(
       "bot.applyHostLocation",
-      () => this.bot.setWebHook(hookUrl),
+      () => this.bot.updates.setWebHook(hookUrl),
       timeoutMs,
     ).then(() =>
       runPromiseWithRetry("bot.setMyCommands", () =>
-        this.bot.setMyCommands(getBotMenuCommands()),
+        this.bot.updates.setMyCommands(getBotMenuCommands()),
       ),
     );
   }
 
   public getHostLocation(): Promise<string> {
-    return this.bot.getWebHookInfo().then((info) => info.url);
+    return this.bot.updates.getWebHookInfo().then((info) => info.url);
   }
 
   public setPayment(payment: PaymentService): this {

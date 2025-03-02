@@ -19,7 +19,7 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import type { TgChatType } from "../src/telegram/api/types.js";
+import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
 vi.mock("../src/logger/index");
@@ -68,7 +68,7 @@ describe("ignore chats", () => {
     const getDb = init.getDb;
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
-    const TelegramApi = init.TelegramApi;
+    const TelegramBaseApi = init.TelegramBaseApi;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const BotServer = init.BotServerNew;
     const appVersion = init.appVersion;
@@ -98,7 +98,7 @@ describe("ignore chats", () => {
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
 
-    telegramServer = nock(TelegramApi.url);
+    telegramServer = nock(TelegramBaseApi.url);
     host = request(hostUrl);
 
     mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);

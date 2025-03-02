@@ -46,7 +46,7 @@ describe("error cases", () => {
       const getDb = init.getDb;
       const localhostUrl = init.localhostUrl;
       const TelegramBotModel = init.TelegramBotModel;
-      const TelegramApi = init.TelegramApi;
+      const TelegramBaseApi = init.TelegramBaseApi;
       const mockTgGetWebHook = initTest.mockTgGetWebHook;
       const mockTgSetWebHook = initTest.mockTgSetWebHook;
       const mockTgSetCommands = initTest.mockTgSetCommands;
@@ -77,7 +77,7 @@ describe("error cases", () => {
       bot = new TelegramBotModel("telegram-api-token", converter, db);
       bot.setHostLocation(hostUrl, launchTime);
 
-      telegramServer = nock(TelegramApi.url);
+      telegramServer = nock(TelegramBaseApi.url);
       host = request(hostUrl);
 
       mockTgGetWebHook(telegramServer, "https://just.test");

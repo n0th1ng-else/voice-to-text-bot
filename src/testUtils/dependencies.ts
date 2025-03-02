@@ -4,6 +4,7 @@ export const injectDependencies = async () => {
   const botCommands = await import("../telegram/types.js");
   const tgApiTypes = await import("../telegram/api/types.js");
   const tgApi = await import("../telegram/api/tgapi.js");
+  const tgApiBase = await import("../telegram/api/groups/core.js");
   const recognitionApi = await import("../recognition/index.js");
   const recognitionTypes = await import("../recognition/types.js");
   const constants = await import("../const.js");
@@ -46,6 +47,7 @@ export const injectDependencies = async () => {
     ...timer,
     ...tgApiTypes,
     ...tgApi,
+    ...tgApiBase,
     ...getDb,
     ...dbClient,
     ...dbNode,

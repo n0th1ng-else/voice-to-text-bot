@@ -224,7 +224,7 @@ export class DonateAction extends GenericAction {
       },
       forumThreadId,
     };
-    return this.bot
+    return this.bot.payments
       .sendInvoice(invoice)
       .then(() => logger.info(`${prefix.getPrefix()} Invoice sent`))
       .catch((err) => {

@@ -14,3 +14,17 @@ export const convertLanguageCodeToISO = (lang: LanguageCode): ISOLanguage => {
       throw new Error("Language not supported");
   }
 };
+
+/**
+ * Converts ISO-639-1 code into Internal language code into
+ */
+export const convertLanguageCodeFromISO = (lang: string): LanguageCode => {
+  switch (lang) {
+    case "en":
+      return "en-US";
+    case "ru":
+      return "ru-RU";
+    default:
+      throw new Error("Language not supported");
+  }
+};
