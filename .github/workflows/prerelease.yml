@@ -4,7 +4,7 @@ on:
   workflow_call:
     outputs:
       version:
-        description: "Export version tag"
+        description: "Export version tag (no v prefix, only 1.0.0)"
         value: ${{ jobs.tag-release.outputs.version }}
 
 jobs:
@@ -53,4 +53,4 @@ jobs:
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           environment: production
-          version: ${{ needs.tag-release.outputs.version }}
+          version: v${{ needs.tag-release.outputs.version }}

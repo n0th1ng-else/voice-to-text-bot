@@ -11,7 +11,7 @@ on:
         required: false
       version:
         type: string
-        description: "Version tag"
+        description: "Version tag (ie v1.0.0)"
         required: true
       sha:
         type: string
@@ -31,5 +31,5 @@ jobs:
     uses: ./.github/workflows/heroku.yml
     secrets: inherit
     with:
-      version: v${{ inputs.version }}
+      version: ${{ inputs.version }}
       servers: ${{ inputs.servers }}
