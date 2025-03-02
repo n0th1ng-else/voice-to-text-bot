@@ -9,17 +9,15 @@ import {
   VoiceContentReasonModel,
 } from "./types.js";
 import { telegramBotName } from "../env.js";
-import {
-  type TgCallbackQuery,
-  type TgMedia,
-  type TgMessage,
-} from "./api/types.js";
+import { type TgCallbackQuery, type TgMessage } from "./api/types.js";
 import {
   DEFAULT_LANGUAGE,
   type LanguageCode,
   LanguageSchema,
 } from "../recognition/types.js";
 import { durationLimitSec, supportedAudioFormats } from "../const.js";
+import { convertLanguageCodeFromISO } from "../recognition/common.js";
+import { type TgMedia } from "./api/groups/chats/chats-types.js";
 
 export const isLangMessage = (
   model: BotMessageModel,
@@ -172,11 +170,12 @@ export const getUserLanguage = (msg: TgMessage): LanguageCode => {
   const msgLang = getRawUserLanguage(msg);
   const globalPart = msgLang.slice(0, 2).toLowerCase();
 
-  if (globalPart === "ru") {
-    return "ru-RU";
+  try {
+    const lang = convertLanguageCodeFromISO(globalPart);
+    return lang;
+  } catch {
+    return DEFAULT_LANGUAGE;
   }
-
-  return "en-US";
 };
 
 export const getRawUserLanguage = (

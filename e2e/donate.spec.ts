@@ -19,7 +19,7 @@ import {
   type InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
-import type { TgChatType } from "../src/telegram/api/types.js";
+import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
@@ -98,7 +98,7 @@ describe("[default language - english] donate", () => {
     const getDb = init.getDb;
     const localhostUrl = init.localhostUrl;
     const TelegramBotModel = init.TelegramBotModel;
-    const TelegramApi = init.TelegramApi;
+    const TelegramBaseApi = init.TelegramBaseApi;
     const StripePayment = init.StripePayment;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const BotServer = init.BotServerNew;
@@ -116,7 +116,7 @@ describe("[default language - english] donate", () => {
     const hostUrl = `${localhostUrl}:${appPort}`;
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl);
-    telegramServer = nock(TelegramApi.url);
+    telegramServer = nock(TelegramBaseApi.url);
     host = request(hostUrl);
 
     chatType = "private";

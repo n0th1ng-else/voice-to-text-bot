@@ -9,14 +9,11 @@ import {
 } from "../src/telegram/types.js";
 import { donationLevels } from "../src/const.js";
 import { toCurrency } from "../src/text/utils.js";
-import type {
-  TgCallbackQuery,
-  TgChatType,
-  TgMessage,
-} from "../src/telegram/api/types.js";
+import type { TgCallbackQuery, TgMessage } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
+import { type TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 
 type UserNameOptions = {
   userName?: string;

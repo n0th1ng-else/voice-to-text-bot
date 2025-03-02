@@ -7,18 +7,23 @@ import axios, {
 } from "axios";
 import { nanoid } from "nanoid";
 import {
-  type BotCommandDto,
   type TgCore,
-  type TgFile,
   type TgInlineKeyboardButton,
-  type TgInvoice,
-  type TgLeaveChatSchema,
   type TgMessage,
-  type TgWebHook,
 } from "./types.js";
 import { TelegramApi } from "./tgapi.js";
 import { type TgError } from "./tgerror.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
+import { TelegramBaseApi } from "./groups/core.js";
+import {
+  type BotCommandDto,
+  type TgWebHook,
+} from "./groups/updates/updates-types.js";
+import {
+  type TgFile,
+  type TgLeaveChatSchema,
+} from "./groups/chats/chats-types.js";
+import { type TgInvoice } from "./groups/payments/payments-types.js";
 
 const getApiResponse = <Response>(
   ok: boolean,
@@ -67,8 +72,8 @@ const clientSpy = vi
     if (!config) {
       throw new Error("config can not be empty");
     }
-    expect(config.baseURL).toBe(TelegramApi.url);
-    expect(config.timeout).toBe(TelegramApi.timeout);
+    expect(config.baseURL).toBe(TelegramBaseApi.url);
+    expect(config.timeout).toBe(TelegramBaseApi.timeout);
     expect(config.method).toBe("POST");
     expect(config.responseType).toBe("json");
     // @ts-expect-error Some mess with header types
@@ -102,7 +107,7 @@ describe("[telegram api client]", () => {
           expect(config.data.url).toBe(testHook);
         };
 
-        return api.setWebHook(testHook).then((isOk) => {
+        return api.updates.setWebHook(testHook).then((isOk) => {
           expect(isOk).toBe(true);
         });
       });
@@ -130,7 +135,7 @@ describe("[telegram api client]", () => {
           });
         };
 
-        return api.setMyCommands(testCommands).then((isOk) => {
+        return api.updates.setMyCommands(testCommands).then((isOk) => {
           expect(isOk).toBe(true);
         });
       });
@@ -145,7 +150,7 @@ describe("[telegram api client]", () => {
           expect(config.data).not.toBeDefined();
         };
 
-        return api.getWebHookInfo().then((data) => {
+        return api.updates.getWebHookInfo().then((data) => {
           expect(Object.keys(data)).toHaveLength(1);
           expect(data.url).toBe(testHook);
         });
@@ -168,9 +173,9 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return api.getFileLink(testFileId).then((fileUrl) => {
+        return api.chats.getFileLink(testFileId).then((fileUrl) => {
           expect(fileUrl).toBe(
-            `${TelegramApi.url}/file/bot${testApiToken}/${testFilePath}`,
+            `${TelegramBaseApi.url}/file/bot${testApiToken}/${testFilePath}`,
           );
         });
       });
@@ -198,7 +203,7 @@ describe("[telegram api client]", () => {
           expect(config.data.parse_mode).toBe("HTML");
         };
 
-        return api
+        return api.chats
           .editMessageText(testChatId, testMessageId, testText)
           .then((data) => {
             expect(data).toBeDefined();
@@ -224,7 +229,7 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.answerPreCheckoutQuery(queryId);
+          return api.payments.answerPreCheckoutQuery(queryId);
         });
 
         it("should send proper error payload", () => {
@@ -243,7 +248,7 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.answerPreCheckoutQuery(queryId, errMessage);
+          return api.payments.answerPreCheckoutQuery(queryId, errMessage);
         });
       });
 
@@ -295,7 +300,7 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.sendInvoice(data);
+          return api.payments.sendInvoice(data);
         });
       });
 
@@ -309,7 +314,7 @@ describe("[telegram api client]", () => {
             expect(config.data.chat_id).toBe(testChatId);
           };
 
-          return api.leaveChat(testChatId).then((data) => {
+          return api.chats.leaveChat(testChatId).then((data) => {
             expect(data).toBe(true);
           });
         });
@@ -323,7 +328,7 @@ describe("[telegram api client]", () => {
             expect(config.data.chat_id).toBe(testChatId);
           };
 
-          return api.leaveChat(testChatId).then(
+          return api.chats.leaveChat(testChatId).then(
             () => {
               throw new Error(
                 "should not resolve, should receive validation error",
@@ -360,7 +365,7 @@ describe("[telegram api client]", () => {
           expect(config.data.parse_mode).toBe("HTML");
         };
 
-        return api.sendMessage(testChatId, testText).then((data) => {
+        return api.chats.sendMessage(testChatId, testText).then((data) => {
           expect(data).toBeDefined();
           expect(data.chat.id).toBe(testChatId);
           expect(data.chat.type).toBe(testChatType);
@@ -399,7 +404,7 @@ describe("[telegram api client]", () => {
           ).toBe(testButton.callback_data);
         };
 
-        return api
+        return api.chats
           .sendMessage(testChatId, testText, { buttons: [[testButton]] })
           .then((data) => {
             expect(data).toBeDefined();
@@ -431,7 +436,7 @@ describe("[telegram api client]", () => {
           expect(config.data.reply_markup).toBe(undefined);
         };
 
-        return api
+        return api.chats
           .sendMessage(testChatId, testText, { disableMarkup: true })
           .then((data) => {
             expect(data).toBeDefined();
@@ -472,7 +477,7 @@ describe("[telegram api client]", () => {
           ).toBe(testButton.callback_data);
         };
 
-        return api
+        return api.chats
           .sendMessage(testChatId, testText, {
             buttons: [[testButton]],
             disableMarkup: true,
@@ -516,7 +521,7 @@ describe("[telegram api client]", () => {
           );
         };
 
-        return api
+        return api.chats
           .sendMessage(testChatId, testText, { buttons: [[testButton]] })
           .then((data) => {
             expect(data).toBeDefined();
@@ -544,15 +549,17 @@ describe("[telegram api client]", () => {
           expect(config.data.url).toBe(testHook);
         };
 
-        return getPromiseError(() => api.setWebHook(testHook)).then((err) => {
-          expect(err.stack).toBeDefined();
-          expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
-          expect(err.code).toBe(testErrorCode);
-          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setWebHook`);
-          expect(err.response).toBe(undefined);
-          expect(err.migrateToChatId).toBe(0);
-          expect(err.retryAfter).toBe(0);
-        });
+        return getPromiseError(() => api.updates.setWebHook(testHook)).then(
+          (err) => {
+            expect(err.stack).toBeDefined();
+            expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
+            expect(err.code).toBe(testErrorCode);
+            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setWebHook`);
+            expect(err.response).toBe(undefined);
+            expect(err.migrateToChatId).toBe(0);
+            expect(err.retryAfter).toBe(0);
+          },
+        );
       });
 
       it("telegram returned error code, description, retryAfter", () => {
@@ -588,17 +595,17 @@ describe("[telegram api client]", () => {
           });
         };
 
-        return getPromiseError(() => api.setMyCommands(testCommands)).then(
-          (err) => {
-            expect(err.stack).toBeDefined();
-            expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
-            expect(err.code).toBe(testErrorCode);
-            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setMyCommands`);
-            expect(err.response).toBe(undefined);
-            expect(err.migrateToChatId).toBe(0);
-            expect(err.retryAfter).toBe(testRetryAfter);
-          },
-        );
+        return getPromiseError(() =>
+          api.updates.setMyCommands(testCommands),
+        ).then((err) => {
+          expect(err.stack).toBeDefined();
+          expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
+          expect(err.code).toBe(testErrorCode);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setMyCommands`);
+          expect(err.response).toBe(undefined);
+          expect(err.migrateToChatId).toBe(0);
+          expect(err.retryAfter).toBe(testRetryAfter);
+        });
       });
 
       it("telegram returned error code", () => {
@@ -617,17 +624,19 @@ describe("[telegram api client]", () => {
           expect(config.data).not.toBeDefined();
         };
 
-        return getPromiseError(() => api.getWebHookInfo()).then((err) => {
-          expect(err.stack).toBeDefined();
-          expect(err.message).toBe(
-            "ETELEGRAM Telegram request was unsuccessful",
-          );
-          expect(err.code).toBe(testErrorCode);
-          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getWebhookInfo`);
-          expect(err.response).toBe(undefined);
-          expect(err.migrateToChatId).toBe(0);
-          expect(err.retryAfter).toBe(0);
-        });
+        return getPromiseError(() => api.updates.getWebHookInfo()).then(
+          (err) => {
+            expect(err.stack).toBeDefined();
+            expect(err.message).toBe(
+              "ETELEGRAM Telegram request was unsuccessful",
+            );
+            expect(err.code).toBe(testErrorCode);
+            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getWebhookInfo`);
+            expect(err.response).toBe(undefined);
+            expect(err.migrateToChatId).toBe(0);
+            expect(err.retryAfter).toBe(0);
+          },
+        );
       });
 
       it("telegram returned error code, description, retryAfter, migrateChatId", () => {
@@ -659,7 +668,7 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return getPromiseError(() => api.getFileLink(testFileId)).then(
+        return getPromiseError(() => api.chats.getFileLink(testFileId)).then(
           (err) => {
             expect(err.stack).toBeDefined();
             expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
@@ -687,7 +696,7 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return getPromiseError(() => api.getFileLink(testFileId)).then(
+        return getPromiseError(() => api.chats.getFileLink(testFileId)).then(
           (err) => {
             expect(err.stack).toBeDefined();
             expect(err.message).toBe("ETELEGRAM Unable to get the file link");
@@ -728,7 +737,7 @@ describe("[telegram api client]", () => {
       };
 
       return getPromiseError(() =>
-        api.editMessageText(testChatId, testMessageId, testText),
+        api.chats.editMessageText(testChatId, testMessageId, testText),
       ).then((err) => {
         expect(err.stack).toBeDefined();
         expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
@@ -790,17 +799,17 @@ describe("[telegram api client]", () => {
         expect(config.data.parse_mode).toBe("HTML");
       };
 
-      return getPromiseError(() => api.sendMessage(testChatId, testText)).then(
-        (err) => {
-          expect(err.stack).toBeDefined();
-          expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
-          expect(err.code).toBe(errCode);
-          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/sendMessage`);
-          expect(err.response).toBe(errData);
-          expect(err.migrateToChatId).toBe(0);
-          expect(err.retryAfter).toBe(0);
-        },
-      );
+      return getPromiseError(() =>
+        api.chats.sendMessage(testChatId, testText),
+      ).then((err) => {
+        expect(err.stack).toBeDefined();
+        expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
+        expect(err.code).toBe(errCode);
+        expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/sendMessage`);
+        expect(err.response).toBe(errData);
+        expect(err.migrateToChatId).toBe(0);
+        expect(err.retryAfter).toBe(0);
+      });
     });
   });
 });

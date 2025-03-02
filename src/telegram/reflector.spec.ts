@@ -8,9 +8,9 @@ vi.mock("../logger/index");
 let res: Promise<boolean> = Promise.resolve(true);
 const leaveChatMock = vi.fn().mockImplementation(() => res);
 
-vi.mock("./api/tgapi", () => {
+vi.mock("./api/groups/chats/chats-api.js", () => {
   return {
-    TelegramApi: function () {
+    TelegramChatsApi: function () {
       return {
         leaveChat: leaveChatMock,
       };

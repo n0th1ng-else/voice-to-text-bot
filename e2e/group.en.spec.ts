@@ -19,7 +19,7 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import type { TgChatType } from "../src/telegram/api/types.js";
+import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 
@@ -123,7 +123,7 @@ describe("[default language - english]", () => {
     const getVoiceConverterProvider = init.getVoiceConverterProvider;
     const BotServer = init.BotServerNew;
     const appVersion = init.appVersion;
-    const TelegramApi = init.TelegramApi;
+    const TelegramBaseApi = init.TelegramBaseApi;
     const localhostUrl = init.localhostUrl;
     const launchTime = init.launchTime;
     const DbClient = init.DbClient;
@@ -141,7 +141,7 @@ describe("[default language - english]", () => {
 
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
-    telegramServer = nock(TelegramApi.url);
+    telegramServer = nock(TelegramBaseApi.url);
     host = request(hostUrl);
     chatType = "group";
     tgMessage = new TelegramMessageModel(testChatId, chatType);

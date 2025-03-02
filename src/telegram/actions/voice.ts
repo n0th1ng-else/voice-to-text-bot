@@ -162,7 +162,7 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    return this.bot.getFileLink(model.voiceFileId);
+    return this.bot.chats.getFileLink(model.voiceFileId);
   }
 
   private sendInProgressMessage(

@@ -1,6 +1,6 @@
 import type { BotCommandType } from "../../telegram/types.js";
 import { TimeMeasure } from "../../common/timer.js";
-import { TelegramApi } from "../../telegram/api/tgapi.js";
+import { TelegramBaseApi } from "../../telegram/api/groups/core.js";
 
 type AnalyticsEventBaseParams = {
   app_version: string;
@@ -9,7 +9,7 @@ type AnalyticsEventBaseParams = {
   language: string;
   page_location: string;
   page_title: string;
-  page_referrer: typeof TelegramApi.url;
+  page_referrer: typeof TelegramBaseApi.url;
   screen_resolution: "1920x1080";
   page_meta: string;
 };
@@ -105,7 +105,7 @@ export class AnalyticsData {
       engagement_time_msec: time,
       language: this.lang,
       screen_resolution: "1920x1080",
-      page_referrer: TelegramApi.url,
+      page_referrer: TelegramBaseApi.url,
       page_meta: this.commandMeta,
     };
 

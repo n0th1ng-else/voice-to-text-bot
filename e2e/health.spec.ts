@@ -68,7 +68,7 @@ describe("[health]", () => {
     const getDb = init.getDb;
     const TelegramBotModel = init.TelegramBotModel;
     const launchTime = init.launchTime;
-    const TelegramApi = init.TelegramApi;
+    const TelegramBaseApi = init.TelegramBaseApi;
 
     mockGoogleAuth();
 
@@ -91,7 +91,7 @@ describe("[health]", () => {
 
     bot = new TelegramBotModel("telegram-api-token", converter, db);
     bot.setHostLocation(hostUrl, launchTime);
-    telegramServer = nock(TelegramApi.url);
+    telegramServer = nock(TelegramBaseApi.url);
     host = request(`${localhostUrl}:${appPort}`);
   });
 

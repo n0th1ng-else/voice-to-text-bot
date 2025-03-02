@@ -103,7 +103,7 @@ export abstract class GenericAction {
     id: TranslationKey,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    return this.bot
+    return this.bot.chats
       .editMessageText(
         chatId,
         messageId,
@@ -144,7 +144,7 @@ export abstract class GenericAction {
       return Promise.resolve();
     }
 
-    return this.bot
+    return this.bot.chats
       .sendMessage(chatId, message, options, forumThreadId)
       .then(() =>
         this.sendRawMessageParts(chatId, messageParts, options, forumThreadId),
