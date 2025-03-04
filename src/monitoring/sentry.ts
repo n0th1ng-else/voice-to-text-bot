@@ -10,6 +10,9 @@ import type { FastifyInstance } from "fastify";
 import { appVersion, nodeEnvironment, sentryDsn } from "../env.js";
 import { isDevelopment } from "../common/environment.js";
 
+const ERROR_RATE_LIMIT = 10; // report only 10% of "EWITAI canceled" errors
+let ERROR_RATE_COUNT = 0;
+
 const isEnabled = (): boolean => {
   return Boolean(sentryDsn);
 };
@@ -110,6 +113,28 @@ export const initSentryNew = (): void => {
     tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
     profilesSampleRate: isDevelopment() ? 1.0 : 0.2,
     sampleRate: isDevelopment() ? 1.0 : 0.5,
+    beforeSend: (event, hint) => {
+      const error = hint.originalException;
+
+      if (!error || typeof error !== "object") {
+        return event;
+      }
+
+      const message = "message" in error && error.message;
+
+      if (message === "EWITAI canceled") {
+        ERROR_RATE_COUNT = ERROR_RATE_COUNT + 1;
+
+        if (ERROR_RATE_COUNT > ERROR_RATE_LIMIT) {
+          ERROR_RATE_COUNT = 0;
+          return event;
+        }
+
+        return null;
+      }
+
+      return event;
+    },
   });
 };
 
