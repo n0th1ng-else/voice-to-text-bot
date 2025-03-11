@@ -29,6 +29,8 @@ export const LanguageSchema = z
 
 export type LanguageCode = z.infer<typeof LanguageSchema>;
 
+export type LanguageTokens = Record<LanguageCode, string>;
+
 export const SUPPORTED_LANGUAGES = LanguageSchema.options;
 
 export const DEFAULT_LANGUAGE: LanguageCode = "en-US";

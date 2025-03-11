@@ -4,6 +4,7 @@ import {
   VoiceConverter,
   type ConverterMeta,
   type LanguageCode,
+  type LanguageTokens,
 } from "../types.js";
 import { getWavBuffer } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
@@ -14,23 +15,17 @@ import { addAttachment } from "../../monitoring/sentry.js";
 
 const logger = new Logger("wit-ai-recognition");
 
-type LanguageTokens = Record<LanguageCode, string>;
-
-type WitAiVoiceProviderOptions = {
-  tokens: LanguageTokens;
-};
-
 export class WithAiProvider extends VoiceConverter {
   public static readonly url = "https://api.wit.ai";
   public static readonly timeout = 10_000;
   private static readonly apiVersion = "20230215";
   private readonly tokens: LanguageTokens;
 
-  constructor(options: WitAiVoiceProviderOptions) {
+  constructor(tokens: LanguageTokens) {
     super();
 
     logger.info("Using Wit.ai");
-    this.tokens = options.tokens;
+    this.tokens = tokens;
   }
 
   public async transformToText(
@@ -45,6 +40,11 @@ export class WithAiProvider extends VoiceConverter {
       .then((bufferData) => {
         logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
         const token = this.getApiToken(lang);
+        if (!token) {
+          throw new Error("The token is not provided for the language", {
+            cause: { lang },
+          });
+        }
         return WithAiProvider.recognise(bufferData, token, logData.prefix);
       })
       .then((chunks) => chunks.map(({ text }) => text).join(" ") || "");
@@ -174,7 +174,7 @@ export class WithAiProvider extends VoiceConverter {
       });
   }
 
-  private getApiToken(lang: LanguageCode): string {
+  private getApiToken(lang: LanguageCode): string | undefined {
     return this.tokens[lang];
   }
 }
