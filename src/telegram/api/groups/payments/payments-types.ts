@@ -92,6 +92,8 @@ const TgPhotoSchema = z
   })
   .describe("Telegram photo object schema");
 
+export type TgPhotoDto = Prettify<z.infer<typeof TgPhotoSchema>>;
+
 const TgPaymentBaseSchema = z
   .intersection(
     LabeledPriceSchema,

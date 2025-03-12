@@ -5,17 +5,27 @@ import {
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
-import { getDonationDtoString, isDonateMessage } from "../helpers.js";
+import {
+  getBotLogo,
+  getDonationDtoString,
+  isCommandMessage,
+} from "../helpers.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
-import { BOT_LOGO, donationLevels } from "../../const.js";
-import { SIZE_UNIT } from "../../memory/index.js";
+import { donationLevels } from "../../const.js";
 import { toCurrency } from "../../text/utils.js";
 import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
+
+const getDonateButton = (
+  price: number,
+  logPrefix: string,
+): TelegramButtonModel => {
+  return new TelegramButtonModel<string>("d", `${price}`, logPrefix);
+};
 
 const logger = new Logger("telegram-bot");
 
@@ -34,7 +44,8 @@ export class DonateAction extends GenericAction {
     msg: TgMessage,
     mdl: BotMessageModel,
   ): Promise<boolean> {
-    return Promise.resolve(isDonateMessage(mdl, msg));
+    const isDonateMessage = isCommandMessage(mdl, msg, BotCommand.Donate);
+    return Promise.resolve(isDonateMessage);
   }
 
   public async runCallback(
@@ -169,13 +180,10 @@ export class DonateAction extends GenericAction {
     logId: string,
     emoji: string,
   ): TgInlineKeyboardButton {
+    const btn = getDonateButton(price, logId);
     return {
       text: toCurrency(price, emoji),
-      callback_data: new TelegramButtonModel(
-        "d",
-        `${price}`,
-        logId,
-      ).getDtoString(),
+      callback_data: btn.getDtoString(),
     };
   }
 
@@ -217,11 +225,7 @@ export class DonateAction extends GenericAction {
       description,
       label,
       payload: getDonationDtoString(donationId, chatId, prefix.id),
-      photo: {
-        url: BOT_LOGO,
-        height: SIZE_UNIT,
-        width: SIZE_UNIT,
-      },
+      photo: getBotLogo(),
       forumThreadId,
     };
     return this.bot.payments

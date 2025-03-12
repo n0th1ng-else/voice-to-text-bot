@@ -1,5 +1,4 @@
 import {
-  BotCommand,
   type BotCommandType,
   type BotMessageModel,
   type DonationDto,
@@ -15,31 +14,12 @@ import {
   type LanguageCode,
   LanguageSchema,
 } from "../recognition/types.js";
-import { durationLimitSec, supportedAudioFormats } from "../const.js";
+import { BOT_LOGO, durationLimitSec, supportedAudioFormats } from "../const.js";
 import { convertLanguageCodeFromISO } from "../recognition/common.js";
 import { type TgMedia } from "./api/groups/chats/chats-types.js";
+import type { TgPhotoDto } from "./api/groups/payments/payments-types.js";
 
-export const isLangMessage = (
-  model: BotMessageModel,
-  msg: TgMessage,
-): boolean => isCommandMessage(model, msg, BotCommand.Language);
-
-export const isHelloMessage = (
-  model: BotMessageModel,
-  msg: TgMessage,
-): boolean => isCommandMessage(model, msg, BotCommand.Start);
-
-export const isSupportMessage = (
-  model: BotMessageModel,
-  msg: TgMessage,
-): boolean => isCommandMessage(model, msg, BotCommand.Support);
-
-export const isDonateMessage = (
-  model: BotMessageModel,
-  msg: TgMessage,
-): boolean => isCommandMessage(model, msg, BotCommand.Donate);
-
-const isCommandMessage = (
+export const isCommandMessage = (
   model: BotMessageModel,
   msg: TgMessage,
   command: BotCommandType,
@@ -229,4 +209,12 @@ export const parseDonationPayload = (dtoString = ""): DonationPayload => {
       prefix: "",
     };
   }
+};
+
+export const getBotLogo = (): TgPhotoDto => {
+  return {
+    url: BOT_LOGO,
+    width: 1024,
+    height: 1024,
+  };
 };
