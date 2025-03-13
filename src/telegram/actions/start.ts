@@ -39,7 +39,6 @@ export class StartAction extends GenericAction {
       .then((lang) =>
         this.sendMessage(
           model.chatId,
-          model.id,
           [
             TranslationKeys.WelcomeMessage,
             TranslationKeys.WelcomeMessageGroup,

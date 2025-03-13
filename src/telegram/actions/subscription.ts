@@ -5,7 +5,7 @@ import {
   BotCommand,
   BotMessageModel,
   TelegramButtonModel,
-  type TelegramMessagePrefix,
+  TelegramMessagePrefix,
 } from "../types.js";
 import { getBotLogo, isCommandMessage } from "../helpers.js";
 import {
@@ -58,14 +58,8 @@ export class SubscriptionAction extends GenericAction {
     logger.info(`${prefix.getPrefix()} Sending subscription message`);
 
     try {
-      const subscription = getSubscriptionFromCache(model.chatId);
       const lang = await this.getChatLanguage(model, prefix);
-      if (!subscription) {
-        await this.sendNotSubscribedMessage(prefix, model, lang);
-      } else {
-        await this.sendSubscribedMessage(subscription, prefix, model, lang);
-      }
-
+      await this.showSubscriptionOverview(model, prefix, lang);
       logger.info(`${prefix.getPrefix()} Subscription message sent`);
     } catch (err) {
       const errorMessage = "Unable to send subscription message";
@@ -91,31 +85,49 @@ export class SubscriptionAction extends GenericAction {
     const model = new BotMessageModel(msg, analytics);
 
     const action = await this.getButtonTypeClicked(button);
+    const prefix = new TelegramMessagePrefix(model.chatId, button.logPrefix);
+    const lang = await this.getChatLanguage(model, prefix);
 
     switch (action) {
       case "u":
-        return await this.showConfirmUnsubscribe(model);
+        return await this.showConfirmUnsubscribe(model, prefix, lang);
       case "+":
-        return await this.showSubscriptionOverview(model);
+        return await this.showSubscriptionOverview(model, prefix, lang);
       case "-":
-        return await this.cancelSubscription(model);
+        return await this.cancelSubscription(model, prefix, lang);
       default:
         throw new Error("Unknown button value");
     }
   }
 
-  private async showConfirmUnsubscribe(mdl: BotMessageModel): Promise<void> {
-    logger.warn("TODO implement showConfirmUnsubscribe", mdl);
+  private async showConfirmUnsubscribe(
+    mdl: BotMessageModel,
+    prefix: TelegramMessagePrefix,
+    lang: LanguageCode,
+  ): Promise<void> {
+    logger.warn("TODO implement showConfirmUnsubscribe", { mdl, prefix, lang });
     return Promise.resolve();
   }
 
-  private async showSubscriptionOverview(mdl: BotMessageModel): Promise<void> {
-    logger.warn("TODO implement showSubscriptionOverview", mdl);
-    return Promise.resolve();
+  private async showSubscriptionOverview(
+    model: BotMessageModel,
+    prefix: TelegramMessagePrefix,
+    lang: LanguageCode,
+  ): Promise<void> {
+    const subscription = getSubscriptionFromCache(model.chatId);
+    if (!subscription) {
+      await this.sendNotSubscribedMessage(prefix, model, lang);
+    } else {
+      await this.sendSubscribedMessage(subscription, prefix, model, lang);
+    }
   }
 
-  private async cancelSubscription(mdl: BotMessageModel): Promise<void> {
-    logger.warn("TODO implement cancelSubscription", mdl);
+  private async cancelSubscription(
+    mdl: BotMessageModel,
+    prefix: TelegramMessagePrefix,
+    lang: LanguageCode,
+  ): Promise<void> {
+    logger.warn("TODO implement cancelSubscription", { mdl, prefix, lang });
     return Promise.resolve();
   }
 
@@ -139,7 +151,9 @@ export class SubscriptionAction extends GenericAction {
     model: BotMessageModel,
     lang: LanguageCode,
   ): Promise<void> {
-    logger.info(`${prefix.getPrefix()} Sending ask to subscribe`);
+    logger.info(
+      `${prefix.getPrefix()} Sending ask to subscribe ${model.id} ${model.chatId}`,
+    );
 
     // TODO fill in
     const url = await this.bot.payments.createInvoiceLink(model.chatId, {
@@ -160,7 +174,6 @@ export class SubscriptionAction extends GenericAction {
 
     await this.sendMessage(
       model.chatId,
-      model.id,
       [TranslationKeys.NoActiveSubscription],
       {
         lang,
@@ -181,7 +194,7 @@ export class SubscriptionAction extends GenericAction {
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending subscription info`);
 
-    const button = getSubscriptionButton("-", prefix.id);
+    const button = getSubscriptionButton("u", prefix.id);
 
     const btn: TgInlineKeyboardButton = {
       text: this.text.t(TranslationKeys.BtnUnsubscribe, lang),
@@ -190,7 +203,6 @@ export class SubscriptionAction extends GenericAction {
 
     await this.sendMessage(
       model.chatId,
-      model.id,
       [TranslationKeys.HasActiveSubscription],
       {
         lang,

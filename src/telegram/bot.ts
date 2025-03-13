@@ -211,7 +211,6 @@ export class TelegramBotModel {
       .then((lang) =>
         this.actions.core.sendMessage(
           model.chatId,
-          model.id,
           [TranslationKeys.NoContent],
           { lang },
           prefix,

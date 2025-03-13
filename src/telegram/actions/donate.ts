@@ -82,7 +82,6 @@ export class DonateAction extends GenericAction {
 
         return this.sendMessage(
           model.chatId,
-          model.id,
           [TranslationKeys.DonateCommandMessage],
           {
             lang,

@@ -31,6 +31,13 @@ const saveSubscriptionsCache = (rows: SubscriptionRowScheme[]): void => {
     acc.set(row.chat_id, cachedItem);
     return acc;
   }, new Map<number, ActiveSubscriptionItem>());
+
+  // TODO remove test subscription
+  cache.set(744639, {
+    chatId: 744639,
+    startedAt: new Date("10.03.2025"),
+    subscriptionId: 1231323,
+  });
 };
 
 export const warmupSubscriptionsCache = async (

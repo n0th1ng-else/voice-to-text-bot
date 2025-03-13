@@ -65,7 +65,6 @@ export class SupportAction extends GenericAction {
 
         return this.sendMessage(
           model.chatId,
-          model.id,
           [TranslationKeys.SupportCommand],
           {
             lang,
