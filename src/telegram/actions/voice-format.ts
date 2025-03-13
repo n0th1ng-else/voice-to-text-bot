@@ -55,7 +55,6 @@ export class VoiceFormatAction extends GenericAction {
       .then((lang) =>
         this.sendMessage(
           model.chatId,
-          model.id,
           [
             TranslationKeys.AudioNotSupportedMessage,
             [
