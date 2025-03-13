@@ -43,7 +43,7 @@
     "@sentry/node": "9.1.0",
     "@sentry/profiling-node": "9.1.0",
     "aws-sdk": "2.1310.0",
-    "axios": "1.7.9",
+    "axios": "1.8.2",
     "elevenlabs": "1.52.0",
     "express": "4.21.2",
     "fastify": "5.2.1",
