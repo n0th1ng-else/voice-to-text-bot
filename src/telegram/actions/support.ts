@@ -1,5 +1,5 @@
 import { GenericAction } from "./common.js";
-import { isSupportMessage } from "../helpers.js";
+import { isCommandMessage } from "../helpers.js";
 import { TranslationKeys } from "../../text/types.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
@@ -28,7 +28,8 @@ export class SupportAction extends GenericAction {
     msg: TgMessage,
     mdl: BotMessageModel,
   ): Promise<boolean> {
-    return Promise.resolve(isSupportMessage(mdl, msg));
+    const isSupportMessage = isCommandMessage(mdl, msg, BotCommand.Support);
+    return Promise.resolve(isSupportMessage);
   }
 
   public setAuthorUrl(url: string): void {

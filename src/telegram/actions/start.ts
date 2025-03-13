@@ -1,5 +1,5 @@
 import { GenericAction } from "./common.js";
-import { isHelloMessage } from "../helpers.js";
+import { isCommandMessage } from "../helpers.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -26,7 +26,8 @@ export class StartAction extends GenericAction {
     msg: TgMessage,
     mdl: BotMessageModel,
   ): Promise<boolean> {
-    return Promise.resolve(isHelloMessage(mdl, msg));
+    const isStartMessage = isCommandMessage(mdl, msg, BotCommand.Start);
+    return Promise.resolve(isStartMessage);
   }
 
   private sendHelloMessage(
