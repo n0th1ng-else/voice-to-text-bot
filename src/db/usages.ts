@@ -3,6 +3,7 @@ import type { LanguageCode } from "../recognition/types.js";
 import { Logger } from "../logger/index.js";
 import { type UsageRowScheme, UsagesDb } from "./sql/usages.js";
 import { getLanguageByText } from "../telegram/helpers.js";
+import type { ChatId } from "../telegram/api/core.js";
 
 const logger = new Logger("postgres-usages");
 
@@ -32,7 +33,7 @@ export class UsagesClient {
   }
 
   public getLangId(
-    chatId: number,
+    chatId: ChatId,
     username: string,
     langId: LanguageCode,
   ): Promise<LanguageCode> {
@@ -49,7 +50,7 @@ export class UsagesClient {
   }
 
   public updateLangId(
-    chatId: number,
+    chatId: ChatId,
     langId: LanguageCode,
   ): Promise<UsageRowScheme> {
     return this.getRows(chatId).then((rows) => {
@@ -68,7 +69,7 @@ export class UsagesClient {
   }
 
   public updateUsageCount(
-    chatId: number,
+    chatId: ChatId,
     username: string,
     langId: LanguageCode,
   ): Promise<UsageRowScheme> {
@@ -91,7 +92,7 @@ export class UsagesClient {
    * @deprecated Use it only for migration
    */
   public importRow(
-    chatId: number,
+    chatId: ChatId,
     usageCount: number,
     langId: string,
     username: string,
@@ -161,7 +162,7 @@ export class UsagesClient {
   }
 
   private createRow(
-    chatId: number,
+    chatId: ChatId,
     langId: LanguageCode,
     username = "",
     usageCount = 0,
@@ -180,7 +181,7 @@ export class UsagesClient {
       });
   }
 
-  private getRows(chatId: number): Promise<UsageRowScheme[]> {
+  private getRows(chatId: ChatId): Promise<UsageRowScheme[]> {
     this.logInfo(`Looking for rows for chatId=${chatId}`);
     return this.db
       .getRows(chatId)

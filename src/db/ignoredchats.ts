@@ -4,6 +4,7 @@ import {
   IgnoredChatsDb,
   type IgnoredChatsRowScheme,
 } from "./sql/ignoredchats.js";
+import type { ChatId } from "../telegram/api/core.js";
 
 const logger = new Logger("postgres-ignored-chats");
 
@@ -35,7 +36,7 @@ export class IgnoredChatsClient {
     this.secondary = true;
   }
 
-  public getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
+  public getRow(chatId: ChatId): Promise<IgnoredChatsRowScheme | null> {
     this.logInfo(`Looking for row for chatId=${chatId}`);
     return this.db
       .getRow(chatId)

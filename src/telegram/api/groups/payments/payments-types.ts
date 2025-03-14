@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Prettify } from "../../../../common/types.js";
+import { TgChatId } from "../../core.js";
 
 export const TgSubscriptionChangeSchema = z
   .boolean()
@@ -76,7 +77,7 @@ const InvoiceSchema = z
   .intersection(
     PaymentObjectSchema,
     z.object({
-      chat_id: z.number(),
+      chat_id: TgChatId,
       message_thread_id: z.optional(z.number()), // Forum thread id
     }),
   )
@@ -112,7 +113,7 @@ const TgInvoiceSchema = z
   .intersection(
     TgPaymentBaseSchema,
     z.object({
-      chatId: z.number(),
+      chatId: TgChatId,
       token: z.string(),
       forumThreadId: z.optional(z.number()),
     }),

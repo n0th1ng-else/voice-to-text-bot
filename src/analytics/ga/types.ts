@@ -1,6 +1,7 @@
 import type { BotCommandType } from "../../telegram/types.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { TelegramBaseApi } from "../../telegram/api/groups/core.js";
+import type { ChatId } from "../../telegram/api/core.js";
 
 type AnalyticsEventBaseParams = {
   app_version: string;
@@ -71,7 +72,7 @@ export class AnalyticsData {
   private readonly url: string;
   private readonly threadId: number;
   private events: AnalyticsEvent[] = [];
-  private id = 0;
+  private id: ChatId = 0 as ChatId;
   private lang = defaultLang;
   private command: AnalyticsAction = "/app";
   private commandTitle = "";
@@ -85,12 +86,12 @@ export class AnalyticsData {
     this.timer = new TimeMeasure();
   }
 
-  public setId(id: number): this {
+  public setId(id: ChatId): this {
     this.id = id;
     return this;
   }
 
-  public getId(): number {
+  public getId(): ChatId {
     return this.id;
   }
 

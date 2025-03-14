@@ -1,13 +1,14 @@
 // import { expect } from "vitest";
 import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
+import type { ChatId } from "../../../src/telegram/api/core.js";
 // import { IgnoredChatsSql } from "../../../src/db/sql/ignoredchats.sql.js";
 // import type { IgnoredChatRowScheme } from "../../../src/db/sql/ignoredchats.js";
 
 export const mockGetIgnoredChatsRow = (
   pool: MockPool,
-  chatId: number,
+  chatId: ChatId,
   ignore: boolean,
-): Promise<{ pool: MockPool; chatId: number; ignore: boolean }> => {
+): Promise<{ pool: MockPool; chatId: ChatId; ignore: boolean }> => {
   // TODO enable with caching
   return Promise.resolve({ pool, chatId, ignore });
   // return new Promise((resolve) => {
@@ -25,7 +26,7 @@ export const mockGetIgnoredChatsRow = (
   // });
 };
 
-// const getDbDto = (chatId: number, ignore: boolean): IgnoredChatRowScheme => {
+// const getDbDto = (chatId: ChatId, ignore: boolean): IgnoredChatRowScheme => {
 //   return {
 //     ignored_chat_id: "",
 //     chat_id: chatId,

@@ -24,6 +24,8 @@ import {
   type TgLeaveChatSchema,
 } from "./groups/chats/chats-types.js";
 import { type TgInvoice } from "./groups/payments/payments-types.js";
+import { asChatId__test } from "../../testUtils/types.js";
+import type { ChatId } from "./core.js";
 
 const getApiResponse = <Response>(
   ok: boolean,
@@ -31,7 +33,7 @@ const getApiResponse = <Response>(
   errorCode?: number,
   errorDescription?: string,
   retryAfter?: number,
-  migrateChatId?: number,
+  migrateChatId?: ChatId,
 ): TgCore<Response> => {
   const hasMeta = migrateChatId || retryAfter;
   return {
@@ -181,7 +183,7 @@ describe("[telegram api client]", () => {
       });
 
       it("editMessageText", () => {
-        const testChatId = 323426;
+        const testChatId = asChatId__test(323426);
         const testMessageId = 657887689;
         const testText = "text-for-edit lalala";
         const testChatType = "private";
@@ -256,7 +258,7 @@ describe("[telegram api client]", () => {
         it("should send proper payload", () => {
           const data: TgInvoice = {
             amount: 1900,
-            chatId: 234211,
+            chatId: asChatId__test(234211),
             description: "Invoice reason description",
             label: "Invoice for stuff",
             meta: "Helpful meta",
@@ -306,7 +308,7 @@ describe("[telegram api client]", () => {
 
       describe("leaveChat", () => {
         it("should return proper result", () => {
-          const testChatId = 323426;
+          const testChatId = asChatId__test(323426);
           testApiResponse = getApiResponse<TgLeaveChatSchema>(true, true);
 
           checkApiData = (config) => {
@@ -320,7 +322,7 @@ describe("[telegram api client]", () => {
         });
 
         it("should return proper result?", () => {
-          const testChatId = 323426;
+          const testChatId = asChatId__test(323426);
           testApiResponse = getApiResponse(true, "broken response");
 
           checkApiData = (config) => {
@@ -345,7 +347,7 @@ describe("[telegram api client]", () => {
       });
 
       it("sendMessage no params", () => {
-        const testChatId = 323426;
+        const testChatId = asChatId__test(323426);
         const testText = "text-for-edit lalala";
         const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
@@ -373,7 +375,7 @@ describe("[telegram api client]", () => {
       });
 
       it("sendMessage with button", () => {
-        const testChatId = 323426;
+        const testChatId = asChatId__test(323426);
         const testText = "text-for-edit lalala";
         const testChatType = "private";
 
@@ -414,7 +416,7 @@ describe("[telegram api client]", () => {
       });
 
       it("sendMessage without markup", () => {
-        const testChatId = 323426;
+        const testChatId = asChatId__test(323426);
         const testText = "<|~foo_bar~|>";
         const testChatType = "private";
 
@@ -446,7 +448,7 @@ describe("[telegram api client]", () => {
       });
 
       it("sendMessage with button and without markup", () => {
-        const testChatId = 323426;
+        const testChatId = asChatId__test(323426);
         const testText = "<|~foo_bar~|>";
         const testChatType = "private";
 
@@ -490,7 +492,7 @@ describe("[telegram api client]", () => {
       });
 
       it("sendMessage with link", () => {
-        const testChatId = 323426;
+        const testChatId = asChatId__test(323426);
         const testText = "text-for-edit lalala";
         const testChatType = "private";
 
@@ -643,7 +645,7 @@ describe("[telegram api client]", () => {
         const testErrorCode = 918;
         const testErrorDescription = "Really a trouble";
         const testRetryAfter = 1355;
-        const testMigrateToChat = 88723;
+        const testMigrateToChat = asChatId__test(88723);
 
         const testFileId = "debug-file-id";
         const testFilePath = "path/to/tg/data";
@@ -714,7 +716,7 @@ describe("[telegram api client]", () => {
         return Promise.reject(testErr);
       });
 
-      const testChatId = 3453453;
+      const testChatId = asChatId__test(3453453);
       const testMessageId = 2345566;
       const testText = "text text text";
       const testChatType = "channel";
@@ -779,7 +781,7 @@ describe("[telegram api client]", () => {
         return Promise.reject(networkErr);
       });
 
-      const testChatId = 32422;
+      const testChatId = asChatId__test(32422);
       const testText = "op op op";
       const testChatType = "supergroup";
       testApiResponse = getApiResponse<TgMessage>(true, {

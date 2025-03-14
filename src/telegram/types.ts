@@ -19,6 +19,7 @@ import { type TgMessage, type TgMessageOptions } from "./api/types.js";
 import { type AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
+import { type ChatId, TgChatId } from "./api/core.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -50,7 +51,7 @@ export type BotCommandType = ValueOf<typeof BotCommand>;
 
 export class BotMessageModel {
   public readonly id: number;
-  public readonly chatId: number;
+  public readonly chatId: ChatId;
   public readonly isGroup: boolean;
   public readonly userName: string;
   public readonly fullUserName: string;
@@ -96,10 +97,10 @@ export type MessageOptions = {
 };
 
 export class TelegramMessagePrefix {
-  public readonly chatId: number;
+  public readonly chatId: ChatId;
   public readonly id: string;
 
-  constructor(chatId: number, id = nanoid(10)) {
+  constructor(chatId: ChatId, id = nanoid(10)) {
     this.chatId = chatId;
     this.id = id;
   }
@@ -181,14 +182,14 @@ export class TelegramButtonModel<V extends string = string> {
 
 export type DonationPayload = {
   donationId: number;
-  chatId: number;
+  chatId: ChatId;
   prefix: string;
 };
 
 export const DonationSchema = z
   .object({
     d: z.number(),
-    c: z.number(),
+    c: TgChatId,
     l: z.string(),
   })
   .describe(

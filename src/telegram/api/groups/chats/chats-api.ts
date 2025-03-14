@@ -10,6 +10,7 @@ import {
   type TgFile,
   TgLeaveChatSchema,
 } from "./chats-types.js";
+import type { ChatId } from "../../core.js";
 
 export class TelegramChatsApi {
   private readonly client: TelegramBaseApi;
@@ -21,7 +22,7 @@ export class TelegramChatsApi {
   }
 
   public sendMessage(
-    chatId: number,
+    chatId: ChatId,
     text: string,
     options: TgMessageOptions = {},
     forumThreadId?: number,
@@ -53,7 +54,7 @@ export class TelegramChatsApi {
   }
 
   public editMessageText(
-    chatId: number,
+    chatId: ChatId,
     messageId: number,
     text: string,
     options: TgMessageOptions = {},
@@ -81,7 +82,7 @@ export class TelegramChatsApi {
     );
   }
 
-  public leaveChat(chatId: number): Promise<boolean> {
+  public leaveChat(chatId: ChatId): Promise<boolean> {
     return this.client.requestValidate(
       "leaveChat",
       TgLeaveChatSchema,

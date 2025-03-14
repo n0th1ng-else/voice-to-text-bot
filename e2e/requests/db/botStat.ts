@@ -5,10 +5,11 @@ import { randomIntFromInterval } from "../../../src/common/timer.js";
 import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
 import { UsagesSql } from "../../../src/db/sql/usages.sql.js";
 import { type UsageRowScheme } from "../../../src/db/sql/usages.js";
+import type { ChatId } from "../../../src/telegram/api/core.js";
 
 export const mockGetBotStatItem = (
   pool: MockPool,
-  chatId: number,
+  chatId: ChatId,
   lang: LanguageCode,
   item?: BotStatRecordModel,
 ): BotStatRecordModel => {
@@ -41,7 +42,7 @@ export const mockUpdateBotStatLang = (
 
 const mockBotStatFind = (
   pool: MockPool,
-  chatId: number,
+  chatId: ChatId,
   items: BotStatRecordModel[] = [],
 ): void => {
   pool.mockQuery(UsagesSql.getRows, (values) => {
@@ -54,7 +55,7 @@ const mockBotStatFind = (
 
 const mockBotStatCreate = (
   pool: MockPool,
-  chatId: number,
+  chatId: ChatId,
   userName: string,
   lang: LanguageCode,
 ): BotStatRecordModel => {

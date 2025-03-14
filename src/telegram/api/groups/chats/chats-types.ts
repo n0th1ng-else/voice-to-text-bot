@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TgChatId } from "../../core.js";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgFileSchema = z
@@ -24,7 +25,7 @@ export type FileDto = z.infer<typeof FileSchema>;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EditMessageSchema = z
   .object({
-    chat_id: z.optional(z.union([z.number(), z.string()])),
+    chat_id: z.optional(TgChatId),
     message_id: z.optional(z.number()),
     text: z.string(),
   })
@@ -55,7 +56,7 @@ export type TgChatType = z.infer<typeof TgChatTypeSchema>;
 
 export const TgChatSchema = z
   .object({
-    id: z.number(),
+    id: TgChatId,
     type: TgChatTypeSchema,
     title: z.optional(z.string()),
     username: z.optional(z.string()),

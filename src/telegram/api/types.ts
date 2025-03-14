@@ -5,6 +5,7 @@ import {
   TgPaymentSchema,
   TgSuccessfulPaymentSchema,
 } from "./groups/payments/payments-types.js";
+import { TgChatId } from "./core.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 
@@ -21,7 +22,7 @@ export type TgCore<Response> = {
 
 const TgErrorParametersSchema = z
   .object({
-    migrate_to_chat_id: z.optional(z.number()),
+    migrate_to_chat_id: z.optional(TgChatId),
     /**
      * If present, tell us when we can retry the request, in seconds
      */
@@ -132,7 +133,7 @@ export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MessageSchema = z
   .object({
-    chat_id: z.number(),
+    chat_id: TgChatId,
     text: z.string(),
     message_id: z.optional(z.number()),
     parse_mode: z.optional(

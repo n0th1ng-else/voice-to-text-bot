@@ -6,6 +6,7 @@ import {
   DonationStatus,
   type DonationStatusType,
 } from "./sql/donations.js";
+import type { ChatId } from "../telegram/api/core.js";
 
 const logger = new Logger("postgres-donations");
 
@@ -57,7 +58,7 @@ export class DonationsClient {
       });
   }
 
-  public createRow(chatId: number, price: number): Promise<DonationRowScheme> {
+  public createRow(chatId: ChatId, price: number): Promise<DonationRowScheme> {
     this.logInfo("Creating a new row");
     return this.db
       .createRow(chatId, price)

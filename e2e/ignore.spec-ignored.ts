@@ -21,6 +21,7 @@ import {
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { VoidPromise } from "../src/common/types.js";
+import { asChatId__test } from "../src/testUtils/types.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -35,7 +36,7 @@ let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let testMessageId = 0;
-let testChatId = 0;
+let testChatId = asChatId__test(0);
 
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
@@ -119,7 +120,7 @@ describe("ignore chats", () => {
   beforeEach(() => {
     bot.setAuthor("");
     testMessageId = randomIntFromInterval(1, 100000);
-    testChatId = randomIntFromInterval(1, 100000);
+    testChatId = asChatId__test(randomIntFromInterval(1, 100000));
   });
 
   afterEach(() => {

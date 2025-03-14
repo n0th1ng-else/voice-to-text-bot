@@ -17,6 +17,7 @@ import {
   type TranslationKey,
   type TranslationKeyFull,
 } from "../../text/types.js";
+import type { ChatId } from "../api/core.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -62,7 +63,7 @@ export abstract class GenericAction {
   }
 
   public async sendMessage(
-    chatId: number,
+    chatId: ChatId,
     ids: TranslationKeyFull[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
@@ -94,7 +95,7 @@ export abstract class GenericAction {
   }
 
   public async editMessage(
-    chatId: number,
+    chatId: ChatId,
     messageId: number,
     meta: MessageOptions,
     id: TranslationKey,
@@ -111,7 +112,7 @@ export abstract class GenericAction {
   }
 
   protected async sendRawMessage(
-    chatId: number,
+    chatId: ChatId,
     message: string,
     lang: LanguageCode,
     options: TgMessageOptions = {},
@@ -131,7 +132,7 @@ export abstract class GenericAction {
   }
 
   private async sendRawMessageParts(
-    chatId: number,
+    chatId: ChatId,
     messageParts: string[],
     options: TgMessageOptions = {},
     forumThreadId?: number,

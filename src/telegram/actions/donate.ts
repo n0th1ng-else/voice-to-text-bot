@@ -19,6 +19,7 @@ import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
+import type { ChatId } from "../api/core.js";
 
 const getDonateButton = (
   price: number,
@@ -203,7 +204,7 @@ export class DonateAction extends GenericAction {
   }
 
   private sendInvoice(
-    chatId: number,
+    chatId: ChatId,
     amount: number,
     donationId: number,
     token: string,

@@ -14,6 +14,7 @@ import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
 import { type TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
+import type { ChatId } from "../src/telegram/api/core.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -24,7 +25,7 @@ type UserNameOptions = {
 export class TelegramMessageModel {
   public messageId = 0;
   public voiceId = "";
-  public readonly chatId: number;
+  public readonly chatId: ChatId;
   public readonly chatType: TgChatType;
 
   private text = "";
@@ -39,7 +40,7 @@ export class TelegramMessageModel {
   private contentType: "voice" | "audio" | "video_note" = "voice";
   private mimeType = "";
 
-  constructor(chatId: number, chatType: TgChatType) {
+  constructor(chatId: ChatId, chatType: TgChatType) {
     this.chatId = chatId;
     this.chatType = chatType;
   }
@@ -231,10 +232,10 @@ export class BotStatRecordModel {
   public objectId?: string;
   public user = "";
   public usageCount = 0;
-  public chatId: number;
+  public chatId: ChatId;
   public langId: LanguageCode;
 
-  constructor(chatId: number, langId: LanguageCode = "en-US") {
+  constructor(chatId: ChatId, langId: LanguageCode = "en-US") {
     this.chatId = chatId;
     this.langId = langId;
   }
