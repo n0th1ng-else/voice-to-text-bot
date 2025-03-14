@@ -92,7 +92,12 @@ export class SubscriptionAction extends GenericAction {
       case "u":
         return await this.showConfirmUnsubscribe(model, prefix, lang);
       case "+":
-        return await this.showSubscriptionOverview(model, prefix, lang);
+        return await this.showSubscriptionOverview(
+          model,
+          prefix,
+          lang,
+          model.id,
+        );
       case "-":
         return await this.cancelSubscription(model, prefix, lang);
       default:
@@ -113,12 +118,19 @@ export class SubscriptionAction extends GenericAction {
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
     lang: LanguageCode,
+    messageId?: number,
   ): Promise<void> {
     const subscription = getSubscriptionFromCache(model.chatId);
     if (!subscription) {
-      await this.sendNotSubscribedMessage(prefix, model, lang);
+      await this.sendNotSubscribedMessage(prefix, model, lang, messageId);
     } else {
-      await this.sendSubscribedMessage(subscription, prefix, model, lang);
+      await this.sendSubscribedMessage(
+        subscription,
+        prefix,
+        model,
+        lang,
+        messageId,
+      );
     }
   }
 
@@ -150,6 +162,7 @@ export class SubscriptionAction extends GenericAction {
     prefix: TelegramMessagePrefix,
     model: BotMessageModel,
     lang: LanguageCode,
+    messageId?: number,
   ): Promise<void> {
     logger.info(
       `${prefix.getPrefix()} Sending ask to subscribe ${model.id} ${model.chatId}`,
@@ -172,18 +185,33 @@ export class SubscriptionAction extends GenericAction {
       url,
     };
 
-    await this.sendMessage(
-      model.chatId,
-      [TranslationKeys.NoActiveSubscription],
-      {
-        lang,
-        options: {
-          buttons: [[btn]],
+    if (messageId) {
+      await this.editMessage(
+        model.chatId,
+        messageId,
+        {
+          lang,
+          options: {
+            buttons: [[btn]],
+          },
         },
-      },
-      prefix,
-      model.forumThreadId,
-    );
+        TranslationKeys.NoActiveSubscription,
+        prefix,
+      );
+    } else {
+      await this.sendMessage(
+        model.chatId,
+        [TranslationKeys.NoActiveSubscription],
+        {
+          lang,
+          options: {
+            buttons: [[btn]],
+          },
+        },
+        prefix,
+        model.forumThreadId,
+      );
+    }
   }
 
   private async sendSubscribedMessage(
@@ -191,6 +219,7 @@ export class SubscriptionAction extends GenericAction {
     prefix: TelegramMessagePrefix,
     model: BotMessageModel,
     lang: LanguageCode,
+    messageId?: number,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending subscription info`);
 
@@ -201,17 +230,32 @@ export class SubscriptionAction extends GenericAction {
       callback_data: button.getDtoString(),
     };
 
-    await this.sendMessage(
-      model.chatId,
-      [TranslationKeys.HasActiveSubscription],
-      {
-        lang,
-        options: {
-          buttons: [[btn]],
+    if (messageId) {
+      await this.editMessage(
+        model.chatId,
+        messageId,
+        {
+          lang,
+          options: {
+            buttons: [[btn]],
+          },
         },
-      },
-      prefix,
-      model.forumThreadId,
-    );
+        TranslationKeys.HasActiveSubscription,
+        prefix,
+      );
+    } else {
+      await this.sendMessage(
+        model.chatId,
+        [TranslationKeys.HasActiveSubscription],
+        {
+          lang,
+          options: {
+            buttons: [[btn]],
+          },
+        },
+        prefix,
+        model.forumThreadId,
+      );
+    }
   }
 }
