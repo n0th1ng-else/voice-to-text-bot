@@ -15,16 +15,14 @@ import { type TranslationKey, TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
-import type {
-  TgCallbackQuery,
-  TgInlineKeyboardButton,
-  TgMessage,
-} from "../api/types.js";
+import type { TgCallbackQuery, TgMessage } from "../api/types.js";
 import {
   type LanguageCode,
   SUPPORTED_LANGUAGES,
 } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
+import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
+import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -92,10 +90,10 @@ export class LangAction extends GenericAction {
 
   private updateLanguage(
     opts: BotLangData,
-    chatId: number,
-    messageId: number,
+    chatId: ChatId,
+    messageId: MessageId,
     analytics: AnalyticsData,
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const lang = opts.langId;
     const prefix = opts.prefix;
@@ -139,9 +137,9 @@ export class LangAction extends GenericAction {
   }
 
   private updateLangMessage(
-    chatId: number,
+    chatId: ChatId,
     lang: LanguageCode,
-    messageId: number,
+    messageId: MessageId,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.editMessage(
@@ -166,7 +164,7 @@ export class LangAction extends GenericAction {
   }
 
   private getLangData(
-    chatId: number,
+    chatId: ChatId,
     button: TelegramButtonModel,
   ): Promise<BotLangData> {
     if (!button.value) {

@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
 import { type DurationRowScheme, DurationsDb } from "./sql/durations.js";
+import type { ChatId } from "../telegram/api/core.js";
 
 const logger = new Logger("postgres-durations");
 
@@ -33,7 +34,7 @@ export class DurationsClient {
   }
 
   public createRow(
-    chatId: number,
+    chatId: ChatId,
     duration: number,
   ): Promise<DurationRowScheme> {
     this.logInfo("Creating a new row");

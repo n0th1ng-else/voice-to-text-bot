@@ -2,6 +2,7 @@ import axios, { type AxiosError, type AxiosInstance } from "axios";
 import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
+import type { ChatId } from "../core.js";
 
 export class TelegramBaseApi {
   public static readonly url = "https://api.telegram.org";
@@ -38,7 +39,7 @@ export class TelegramBaseApi {
     methodName: string,
     schema: z.ZodType<Output, Def, Input>,
     data?: Data,
-    chatId?: number,
+    chatId?: ChatId,
   ): Promise<z.infer<z.ZodType<Output, Def, Input>>> {
     const result = await this.request(methodName, data, chatId);
     return schema.parse(result);
@@ -50,7 +51,7 @@ export class TelegramBaseApi {
   public request<Response, Data>(
     methodName: string,
     data?: Data,
-    chatId?: number,
+    chatId?: ChatId,
   ): Promise<Response> {
     const url = this.getApiUrl(methodName);
     return this.client.request<TgCore<Response>>({ url, data }).then(

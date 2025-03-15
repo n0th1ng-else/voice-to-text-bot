@@ -2,11 +2,12 @@ import { Logger } from "../logger/index.js";
 import { TelegramApi } from "./api/tgapi.js";
 import { hasNoRightsToSendMessage, TgError } from "./api/tgerror.js";
 import { type ApiErrorReflector } from "./api/types.js";
+import type { ChatId } from "./api/core.js";
 
 const logger = new Logger("telegram:reflector");
 
 class ReflectorError extends Error {
-  public chatId: number | undefined;
+  public chatId: ChatId | undefined;
   public isChatLeft: boolean | undefined;
 
   constructor(message: string, cause?: unknown) {

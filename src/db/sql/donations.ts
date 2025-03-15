@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { DonationsSql } from "./donations.sql.js";
 import type { ValueOf } from "../../common/types.js";
+import type { ChatId } from "../../telegram/api/core.js";
 
 export const DonationStatus = {
   Initialized: "INITIALIZED",
@@ -34,7 +35,7 @@ export class DonationsDb {
     this.initialized = true;
   }
 
-  public createRow(chatId: number, price: number): Promise<DonationRowScheme> {
+  public createRow(chatId: ChatId, price: number): Promise<DonationRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table donations is not initialized yet"),

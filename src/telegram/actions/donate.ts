@@ -15,10 +15,12 @@ import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { donationLevels } from "../../const.js";
 import { toCurrency } from "../../text/utils.js";
-import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
+import type { TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
+import type { ChatId, MessageThreadId } from "../api/core.js";
+import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
 
 const getDonateButton = (
   price: number,
@@ -203,13 +205,13 @@ export class DonateAction extends GenericAction {
   }
 
   private sendInvoice(
-    chatId: number,
+    chatId: ChatId,
     amount: number,
     donationId: number,
     token: string,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const title = this.text.t(TranslationKeys.DonationTitle, lang);
     const description = this.text.t(TranslationKeys.DonationDescription, lang);

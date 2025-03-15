@@ -18,6 +18,7 @@ import { BOT_LOGO, durationLimitSec, supportedAudioFormats } from "../const.js";
 import { convertLanguageCodeFromISO } from "../recognition/common.js";
 import { type TgMedia } from "./api/groups/chats/chats-types.js";
 import type { TgPhotoDto } from "./api/groups/payments/payments-types.js";
+import type { ChatId } from "./api/core.js";
 
 export const isCommandMessage = (
   model: BotMessageModel,
@@ -92,7 +93,7 @@ export const isMessageSupported = (msg: TgMessage): boolean => {
   return !isBot;
 };
 
-export const getChatId = (msg: TgMessage): number => msg.chat.id;
+export const getChatId = (msg: TgMessage): ChatId => msg.chat.id;
 
 export const isChatGroup = (msg: TgMessage): boolean =>
   msg.chat.type !== "private";
@@ -182,7 +183,7 @@ export const getLanguageByText = (
 
 export const getDonationDtoString = (
   donationId: number,
-  chatId: number,
+  chatId: ChatId,
   logPrefix: string,
 ): string => {
   const dto: DonationDto = {
@@ -198,14 +199,15 @@ export const parseDonationPayload = (dtoString = ""): DonationPayload => {
   try {
     const obj = DonationSchema.parse(JSON.parse(dtoString));
     return {
-      donationId: obj.d || 0,
-      chatId: obj.c || 0,
-      prefix: obj.l || "",
+      donationId: obj.d,
+      chatId: obj.c,
+      prefix: obj.l,
     };
   } catch {
     return {
       donationId: 0,
-      chatId: 0,
+      // TODO dangerous, why do I need to fallback on something?
+      chatId: 0 as ChatId,
       prefix: "",
     };
   }

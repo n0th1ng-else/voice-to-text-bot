@@ -1,5 +1,6 @@
 import type { Pool } from "pg";
 import { IgnoredChatsSql } from "./ignoredchats.sql.js";
+import type { ChatId } from "../../telegram/api/core.js";
 
 export type IgnoredChatsRowScheme = {
   row_id: string;
@@ -24,7 +25,7 @@ export class IgnoredChatsDb {
     });
   }
 
-  public async getRow(chatId: number): Promise<IgnoredChatsRowScheme | null> {
+  public async getRow(chatId: ChatId): Promise<IgnoredChatsRowScheme | null> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table ignoredchats is not initialized yet"),

@@ -3,6 +3,7 @@ import * as envy from "../env.js";
 import { sSuffix } from "../text/utils.js";
 import { getDb } from "../db/index.js";
 import { initStaticServer, type FastifyStaticRoute } from "../server/static.js";
+import type { ChatId } from "../telegram/api/core.js";
 
 const logger = new Logger("import-script");
 
@@ -11,7 +12,7 @@ type ImportPayload = {
 };
 
 type ImportRow = {
-  chatId: number;
+  chatId: ChatId;
   usageCount: number;
   langId: string;
   user: string;

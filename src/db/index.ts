@@ -5,6 +5,7 @@ import type { NodeRowScheme } from "./sql/nodes.js";
 import type { DonationRowScheme, DonationStatusType } from "./sql/donations.js";
 import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { DbConnectionConfig } from "./utils.js";
+import type { ChatId } from "../telegram/api/core.js";
 
 class DbCore {
   private readonly clients: DbClient[];
@@ -41,7 +42,7 @@ class DbCore {
   }
 
   public async getLanguage(
-    chatId: number,
+    chatId: ChatId,
     username: string,
     langId: LanguageCode,
   ): Promise<LanguageCode> {
@@ -50,7 +51,7 @@ class DbCore {
   }
 
   public async updateLanguage(
-    chatId: number,
+    chatId: ChatId,
     langId: LanguageCode,
   ): Promise<UsageRowScheme> {
     const row = await this.main.usages.updateLangId(chatId, langId);
@@ -58,7 +59,7 @@ class DbCore {
   }
 
   public async updateUsageCount(
-    chatId: number,
+    chatId: ChatId,
     username: string,
     langId: LanguageCode,
   ): Promise<UsageRowScheme> {
@@ -71,7 +72,7 @@ class DbCore {
   }
 
   public async importUsageRow(
-    chatId: number,
+    chatId: ChatId,
     usageCount: number,
     langId: string,
     username: string,
@@ -107,7 +108,7 @@ class DbCore {
   }
 
   public async createDonationRow(
-    chatId: number,
+    chatId: ChatId,
     price: number,
   ): Promise<DonationRowScheme> {
     const row = await this.main.donations.createRow(chatId, price);
@@ -119,7 +120,7 @@ class DbCore {
   }
 
   public async getIgnoredChatRow(
-    chatId: number,
+    chatId: ChatId,
   ): Promise<IgnoredChatsRowScheme | null> {
     return this.main.ignoredChats.getRow(chatId);
   }

@@ -1,10 +1,23 @@
 import { z } from "zod";
 import { type Prettify } from "../../common/types.js";
-import { TgChatSchema, TgMediaSchema } from "./groups/chats/chats-types.js";
+import {
+  TgChatSchema,
+  TgMediaSchema,
+  TgReplyMarkup,
+} from "./groups/chats/chats-types.js";
 import {
   TgPaymentSchema,
   TgSuccessfulPaymentSchema,
 } from "./groups/payments/payments-types.js";
+import {
+  TgCallbackQueryId,
+  TgChatId,
+  TgMessageId,
+  TgMessageThreadId,
+  TgParseMode,
+  TgUpdateId,
+  TgUserId,
+} from "./core.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 
@@ -21,7 +34,7 @@ export type TgCore<Response> = {
 
 const TgErrorParametersSchema = z
   .object({
-    migrate_to_chat_id: z.optional(z.number()),
+    migrate_to_chat_id: z.optional(TgChatId),
     /**
      * If present, tell us when we can retry the request, in seconds
      */
@@ -46,7 +59,7 @@ export const TgCoreSchema = <Schema extends z.ZodTypeAny>(schema: Schema) => {
 
 const TgUserSchema = z
   .object({
-    id: z.number(),
+    id: TgUserId,
     is_bot: z.boolean(),
     first_name: z.string(),
     last_name: z.optional(z.string()),
@@ -69,7 +82,7 @@ export type TgCheckoutQuery = Prettify<z.infer<typeof TgCheckoutQuerySchema>>;
 
 const TgMessageSchema = z
   .object({
-    message_id: z.number(),
+    message_id: TgMessageId,
     date: z.number(),
     chat: TgChatSchema,
     text: z.optional(z.string()),
@@ -79,7 +92,7 @@ const TgMessageSchema = z
     video_note: z.optional(TgMediaSchema),
     successful_payment: z.optional(TgSuccessfulPaymentSchema),
     is_topic_message: z.optional(z.boolean()),
-    message_thread_id: z.optional(z.number()),
+    message_thread_id: z.optional(TgMessageThreadId),
   })
   .describe("[Message] Telegram chat message schema validator");
 
@@ -87,7 +100,7 @@ export type TgMessage = z.infer<typeof TgMessageSchema>;
 
 const TgCallbackQuerySchema = z
   .object({
-    id: z.string(),
+    id: TgCallbackQueryId,
     from: TgUserSchema,
     message: z.optional(TgMessageSchema),
     data: z.optional(z.string()),
@@ -98,7 +111,7 @@ export type TgCallbackQuery = z.infer<typeof TgCallbackQuerySchema>;
 
 export const TgUpdateSchema = z
   .object({
-    update_id: z.number(),
+    update_id: TgUpdateId,
     message: z.optional(TgMessageSchema),
     callback_query: z.optional(TgCallbackQuerySchema),
     pre_checkout_query: z.optional(TgCheckoutQuerySchema),
@@ -107,47 +120,15 @@ export const TgUpdateSchema = z
 
 export type TgUpdate = z.infer<typeof TgUpdateSchema>;
 
-const TgInlineKeyboardButtonSchema = z
-  .object({
-    text: z.string(),
-    callback_data: z.optional(z.string()),
-    url: z.optional(z.string()),
-  })
-  .describe("Telegram inline keyboard button schema");
-
-export type TgInlineKeyboardButton = z.infer<
-  typeof TgInlineKeyboardButtonSchema
->;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TgMessageOptionsSchema = z
-  .object({
-    buttons: z.optional(z.array(z.array(TgInlineKeyboardButtonSchema))),
-    disableMarkup: z.optional(z.boolean()),
-  })
-  .describe("Telegram message options schema");
-
-export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MessageSchema = z
   .object({
-    chat_id: z.number(),
+    chat_id: TgChatId,
     text: z.string(),
-    message_id: z.optional(z.number()),
-    parse_mode: z.optional(
-      z.union([
-        z.literal("HTML"),
-        z.literal("Markdown"),
-        z.literal("MarkdownV2"),
-      ]),
-    ),
-    reply_markup: z.optional(
-      z.object({
-        inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
-      }),
-    ),
-    message_thread_id: z.optional(z.number()),
+    message_id: z.optional(TgMessageId),
+    parse_mode: z.optional(TgParseMode),
+    reply_markup: z.optional(TgReplyMarkup),
+    message_thread_id: z.optional(TgMessageThreadId),
   })
   .describe("Telegram message schema");
 

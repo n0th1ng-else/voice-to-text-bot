@@ -13,6 +13,7 @@ import {
   type InjectedFn,
 } from "../testUtils/dependencies.js";
 import type { LanguageCode } from "../recognition/types.js";
+import { asChatId__test } from "../testUtils/types.js";
 
 vi.mock("../logger/index");
 
@@ -48,32 +49,39 @@ describe("Usages DB", () => {
   describe("not initialized", () => {
     it("can not import row", async () => {
       await expect(
-        client.importRow(1234, 3, "en-US", "t-user", new Date(), new Date()),
+        client.importRow(
+          asChatId__test(1234),
+          3,
+          "en-US",
+          "t-user",
+          new Date(),
+          new Date(),
+        ),
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("can not update language", async () => {
-      await expect(client.updateLangId(45611, "ru-RU")).rejects.toThrowError(
-        "The table usages is not initialized yet",
-      );
+      await expect(
+        client.updateLangId(asChatId__test(45611), "ru-RU"),
+      ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("can not get the language", async () => {
       await expect(
-        client.getLangId(-123123, "test-user", "en-US"),
+        client.getLangId(asChatId__test(-123123), "test-user", "en-US"),
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("can not update usage count", async () => {
       await expect(
-        client.updateUsageCount(-72722, "new-name", "ru-RU"),
+        client.updateUsageCount(asChatId__test(-72722), "new-name", "ru-RU"),
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrow();
       await expect(
-        client.getLangId(-123123, "test-user", "en-US"),
+        client.getLangId(asChatId__test(-123123), "test-user", "en-US"),
       ).rejects.toThrowError("The table usages is not initialized yet");
     });
   });
@@ -86,7 +94,7 @@ describe("Usages DB", () => {
 
     describe("creates a new row", () => {
       it("during the update language", () => {
-        const chatId = 124522;
+        const chatId = asChatId__test(124522);
         const langId: LanguageCode = "ru-RU";
 
         testPool.mockQuery(UsagesSql.getRows, () =>
@@ -135,7 +143,7 @@ describe("Usages DB", () => {
       });
 
       it("during the get language", () => {
-        const chatId = 124522;
+        const chatId = asChatId__test(124522);
         const langId: LanguageCode = "en-US";
         const userName = "some-super-user";
 
@@ -182,7 +190,7 @@ describe("Usages DB", () => {
       });
 
       it("during the update usage count", () => {
-        const chatId = 124522;
+        const chatId = asChatId__test(124522);
         const langId: LanguageCode = "en-US";
         const userName = "some-super-user";
 
@@ -232,7 +240,7 @@ describe("Usages DB", () => {
       });
 
       it("during the row import", () => {
-        const chatId = 25552342;
+        const chatId = asChatId__test(25552342);
         const usageCount = 2114;
         const langId: LanguageCode = "ru-RU";
         const userName = "alfa dude";
@@ -317,7 +325,7 @@ describe("Usages DB", () => {
     describe("updates existing row", () => {
       it("during the update language", () => {
         const usageId = "new-id";
-        const chatId = 124522;
+        const chatId = asChatId__test(124522);
         const userName = "John Wo";
         const usageCount = 231;
         const langId: LanguageCode = "en-US";
@@ -371,7 +379,7 @@ describe("Usages DB", () => {
 
       it("during the get language (weird one)", () => {
         const usageId = "new-id-2";
-        const chatId = -213555;
+        const chatId = asChatId__test(-213555);
         const userName = "Spring Field";
         const usageCount = 111;
         const langId: LanguageCode = "en-US";
@@ -399,7 +407,7 @@ describe("Usages DB", () => {
 
       it("during the get language", () => {
         const usageId = "new-id-2";
-        const chatId = -213555;
+        const chatId = asChatId__test(-213555);
         const userName = "Spring Field";
         const usageCount = 111;
         const langId: LanguageCode = "en-US";
@@ -427,7 +435,7 @@ describe("Usages DB", () => {
 
       it("during the update usage count", () => {
         const usageId = "asdgfddf";
-        const chatId = 12552233;
+        const chatId = asChatId__test(12552233);
         const userName = "superdave";
         const usageCount = 56112;
         const langId: LanguageCode = "ru-RU";
@@ -483,7 +491,7 @@ describe("Usages DB", () => {
 
       it("during the row import", () => {
         const usageId = "asdgfdf=asdsada";
-        const chatId = 25552342;
+        const chatId = asChatId__test(25552342);
         const usageCount = 2114;
         const langId: LanguageCode = "ru-RU";
         const userName = "alfa dude";
@@ -546,7 +554,7 @@ describe("Usages DB", () => {
 
     describe("unable to receive the result row", () => {
       it("on create row", async () => {
-        const chatId = 124522;
+        const chatId = asChatId__test(124522);
         const langId: LanguageCode = "en-US";
         const userName = "some-super-user";
 
@@ -584,7 +592,7 @@ describe("Usages DB", () => {
 
       it("on update row", async () => {
         const usageId = "asdgfddf";
-        const chatId = 12552233;
+        const chatId = asChatId__test(12552233);
         const userName = "superdave";
         const usageCount = 56112;
         const langId: LanguageCode = "ru-RU";

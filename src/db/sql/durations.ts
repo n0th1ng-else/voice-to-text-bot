@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { nanoid } from "nanoid";
 import { DurationsSql } from "./durations.sql.js";
+import type { ChatId } from "../../telegram/api/core.js";
 
 export type DurationRowScheme = {
   duration_id: string;
@@ -25,7 +26,7 @@ export class DurationsDb {
   }
 
   public async createRow(
-    chatId: number,
+    chatId: ChatId,
     duration: number,
   ): Promise<DurationRowScheme> {
     if (!this.initialized) {

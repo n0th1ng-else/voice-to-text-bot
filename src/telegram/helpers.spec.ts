@@ -2,19 +2,24 @@ import { describe, it, expect } from "vitest";
 import { type TgMessage } from "./api/types.js";
 import { getUserLanguage, getLanguageByText } from "./helpers.js";
 import { DEFAULT_LANGUAGE, type LanguageCode } from "../recognition/types.js";
+import {
+  asChatId__test,
+  asMessageId__test,
+  asUserId__test,
+} from "../testUtils/types.js";
 
 const getMessage = (name?: string, lang?: string): TgMessage => {
   return {
-    message_id: 4324,
+    message_id: asMessageId__test(4324),
     date: new Date().getTime(),
     chat: {
       type: "private",
-      id: 23324,
+      id: asChatId__test(23324),
     },
     from: name
       ? {
           first_name: "name",
-          id: 4324,
+          id: asUserId__test(4324),
           is_bot: false,
           language_code: lang,
         }

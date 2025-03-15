@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { TgChatId, TgFileId, TgMessageId, TgParseMode } from "../../core.js";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgFileSchema = z
   .object({
     file_id: z.string(),
-    file_unique_id: z.string(),
+    file_unique_id: TgFileId,
     file_size: z.optional(z.number()),
     file_path: z.optional(z.string()),
   })
@@ -21,12 +22,42 @@ const FileSchema = z
 
 export type FileDto = z.infer<typeof FileSchema>;
 
+const TgInlineKeyboardButtonSchema = z
+  .object({
+    text: z.string(),
+    callback_data: z.optional(z.string()),
+    url: z.optional(z.string()),
+  })
+  .describe("Telegram inline keyboard button schema");
+
+export type TgInlineKeyboardButton = z.infer<
+  typeof TgInlineKeyboardButtonSchema
+>;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const TgMessageOptionsSchema = z
+  .object({
+    buttons: z.optional(z.array(z.array(TgInlineKeyboardButtonSchema))),
+    disableMarkup: z.optional(z.boolean()),
+  })
+  .describe("Telegram message options schema");
+
+export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
+
+export const TgReplyMarkup = z
+  .object({
+    inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
+  })
+  .describe("Button layout attached to the message");
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EditMessageSchema = z
   .object({
-    chat_id: z.optional(z.union([z.number(), z.string()])),
-    message_id: z.optional(z.number()),
+    chat_id: TgChatId,
+    message_id: TgMessageId,
     text: z.string(),
+    parse_mode: z.optional(TgParseMode),
+    reply_markup: z.optional(TgReplyMarkup),
   })
   .describe("Telegram edit message schema");
 
@@ -55,7 +86,7 @@ export type TgChatType = z.infer<typeof TgChatTypeSchema>;
 
 export const TgChatSchema = z
   .object({
-    id: z.number(),
+    id: TgChatId,
     type: TgChatTypeSchema,
     title: z.optional(z.string()),
     username: z.optional(z.string()),
