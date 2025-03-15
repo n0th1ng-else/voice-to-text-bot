@@ -7,3 +7,7 @@ export type ChatId = z.infer<typeof TgChatId>;
 export const TgMessageId = z.number().brand<"MessageId">();
 
 export type MessageId = z.infer<typeof TgMessageId>;
+
+export const TgUpdateId = z.number().brand<"UpdateId">();
+
+export type UpdateId = z.infer<typeof TgUpdateId>;

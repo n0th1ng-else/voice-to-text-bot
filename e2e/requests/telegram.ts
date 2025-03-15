@@ -23,6 +23,7 @@ import { parseDonationPayload } from "../../src/telegram/helpers.js";
 import type { TgUpdate } from "../../src/telegram/api/types.js";
 import type { LanguageCode } from "../../src/recognition/types.js";
 import type { ChatId } from "../../src/telegram/api/core.js";
+import { asUpdateId__test } from "../../src/testUtils/types.js";
 
 const text = getTranslator();
 const telegramApiResponseOk = JSON.stringify({ ok: true });
@@ -37,7 +38,7 @@ export const sendTelegramMessage = (
   msg: TelegramMessageModel,
 ): Promise<void> => {
   const payload: TgUpdate = {
-    update_id: 12434,
+    update_id: asUpdateId__test(12434),
     message: msg.toApi(),
   };
   return host
@@ -55,7 +56,7 @@ export const sendTelegramCallbackMessage = (
   msg: TelegramMessageModel,
 ): Promise<void> => {
   const payload: TgUpdate = {
-    update_id: 12434,
+    update_id: asUpdateId__test(12434),
     callback_query: msg.toCallbackApi(),
   };
   return host

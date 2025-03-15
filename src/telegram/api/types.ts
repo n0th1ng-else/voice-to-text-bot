@@ -5,7 +5,7 @@ import {
   TgPaymentSchema,
   TgSuccessfulPaymentSchema,
 } from "./groups/payments/payments-types.js";
-import { TgChatId, TgMessageId } from "./core.js";
+import { TgChatId, TgMessageId, TgUpdateId } from "./core.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 
@@ -99,7 +99,7 @@ export type TgCallbackQuery = z.infer<typeof TgCallbackQuerySchema>;
 
 export const TgUpdateSchema = z
   .object({
-    update_id: z.number(),
+    update_id: TgUpdateId,
     message: z.optional(TgMessageSchema),
     callback_query: z.optional(TgCallbackQuerySchema),
     pre_checkout_query: z.optional(TgCheckoutQuerySchema),
