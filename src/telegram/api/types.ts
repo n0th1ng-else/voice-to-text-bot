@@ -5,7 +5,12 @@ import {
   TgPaymentSchema,
   TgSuccessfulPaymentSchema,
 } from "./groups/payments/payments-types.js";
-import { TgChatId, TgMessageId, TgUpdateId } from "./core.js";
+import {
+  TgCallbackQueryId,
+  TgChatId,
+  TgMessageId,
+  TgUpdateId,
+} from "./core.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 
@@ -88,7 +93,7 @@ export type TgMessage = z.infer<typeof TgMessageSchema>;
 
 const TgCallbackQuerySchema = z
   .object({
-    id: z.string(),
+    id: TgCallbackQueryId,
     from: TgUserSchema,
     message: z.optional(TgMessageSchema),
     data: z.optional(z.string()),

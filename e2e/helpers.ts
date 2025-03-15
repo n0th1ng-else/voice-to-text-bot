@@ -15,7 +15,10 @@ import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
 import { type TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { ChatId, MessageId } from "../src/telegram/api/core.js";
-import { asMessageId__test } from "../src/testUtils/types.js";
+import {
+  asCallbackQueryId__test,
+  asMessageId__test,
+} from "../src/testUtils/types.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -182,7 +185,7 @@ export class TelegramMessageModel {
   public toCallbackApi(): TgCallbackQuery {
     return {
       data: this.callbackData,
-      id: "",
+      id: asCallbackQueryId__test(""),
       from: {
         is_bot: false,
         first_name: this.firstName,
