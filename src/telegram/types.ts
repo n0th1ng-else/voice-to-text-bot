@@ -19,7 +19,7 @@ import { type TgMessage, type TgMessageOptions } from "./api/types.js";
 import { type AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
-import { type ChatId, TgChatId } from "./api/core.js";
+import { type ChatId, type MessageId, TgChatId } from "./api/core.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -50,7 +50,7 @@ export const BotCommand = {
 export type BotCommandType = ValueOf<typeof BotCommand>;
 
 export class BotMessageModel {
-  public readonly id: number;
+  public readonly id: MessageId;
   public readonly chatId: ChatId;
   public readonly isGroup: boolean;
   public readonly userName: string;

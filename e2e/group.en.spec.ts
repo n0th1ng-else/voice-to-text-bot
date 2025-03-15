@@ -22,7 +22,7 @@ import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import { asChatId__test } from "../src/testUtils/types.js";
+import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -51,7 +51,7 @@ let converter: InstanceType<InjectedFn["VoiceConverter"]>;
 let hostUrl: string;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let chatType: TgChatType;
-let testMessageId = 0;
+let testMessageId = asMessageId__test(0);
 let testChatId = asChatId__test(0);
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
 let telegramServer: nock.Scope;
@@ -168,7 +168,7 @@ describe("[default language - english]", () => {
   beforeEach(() => {
     bot.setAuthor("");
     chatType = "group";
-    testMessageId = randomIntFromInterval(1, 100000);
+    testMessageId = asMessageId__test(randomIntFromInterval(1, 100000));
     testChatId = asChatId__test(0 - randomIntFromInterval(1, 100000));
   });
 
@@ -184,7 +184,7 @@ describe("[default language - english]", () => {
     });
 
     it("keeps calm on a message without voice content", () => {
-      tgMessage.setText(testMessageId, "some text");
+      tgMessage.setText(asMessageId__test(testMessageId), "some text");
 
       return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
     });
@@ -441,7 +441,11 @@ describe("[default language - english]", () => {
       ]).then(([prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId: LanguageCode = "ru-RU";
-        cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
+        cbMessage.setLangCallback(
+          asMessageId__test(tgMessage.messageId + 1),
+          newLangId,
+          prefixId,
+        );
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -476,7 +480,11 @@ describe("[default language - english]", () => {
       ]).then(([prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId: LanguageCode = "ru-RU";
-        cbMessage.setLangCallback(tgMessage.messageId + 1, newLangId, prefixId);
+        cbMessage.setLangCallback(
+          asMessageId__test(tgMessage.messageId + 1),
+          newLangId,
+          prefixId,
+        );
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(

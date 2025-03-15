@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { TgChatId } from "../../core.js";
+import { TgChatId, TgMessageId } from "../../core.js";
+import { TgParseMode, TgReplyMarkup } from "../../types.js";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgFileSchema = z
@@ -25,9 +26,11 @@ export type FileDto = z.infer<typeof FileSchema>;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EditMessageSchema = z
   .object({
-    chat_id: z.optional(TgChatId),
-    message_id: z.optional(z.number()),
+    chat_id: TgChatId,
+    message_id: TgMessageId,
     text: z.string(),
+    parse_mode: z.optional(TgParseMode),
+    reply_markup: z.optional(TgReplyMarkup),
   })
   .describe("Telegram edit message schema");
 

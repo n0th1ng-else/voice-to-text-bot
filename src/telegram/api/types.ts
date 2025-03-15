@@ -5,7 +5,7 @@ import {
   TgPaymentSchema,
   TgSuccessfulPaymentSchema,
 } from "./groups/payments/payments-types.js";
-import { TgChatId } from "./core.js";
+import { TgChatId, TgMessageId } from "./core.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
 
@@ -70,7 +70,7 @@ export type TgCheckoutQuery = Prettify<z.infer<typeof TgCheckoutQuerySchema>>;
 
 const TgMessageSchema = z
   .object({
-    message_id: z.number(),
+    message_id: TgMessageId,
     date: z.number(),
     chat: TgChatSchema,
     text: z.optional(z.string()),
@@ -130,24 +130,24 @@ const TgMessageOptionsSchema = z
 
 export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
 
+export const TgParseMode = z
+  .union([z.literal("HTML"), z.literal("Markdown"), z.literal("MarkdownV2")])
+  .describe("Message parse more");
+
+export const TgReplyMarkup = z
+  .object({
+    inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
+  })
+  .describe("Button layout attached to the message");
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MessageSchema = z
   .object({
     chat_id: TgChatId,
     text: z.string(),
-    message_id: z.optional(z.number()),
-    parse_mode: z.optional(
-      z.union([
-        z.literal("HTML"),
-        z.literal("Markdown"),
-        z.literal("MarkdownV2"),
-      ]),
-    ),
-    reply_markup: z.optional(
-      z.object({
-        inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
-      }),
-    ),
+    message_id: z.optional(TgMessageId),
+    parse_mode: z.optional(TgParseMode),
+    reply_markup: z.optional(TgReplyMarkup),
     message_thread_id: z.optional(z.number()),
   })
   .describe("Telegram message schema");

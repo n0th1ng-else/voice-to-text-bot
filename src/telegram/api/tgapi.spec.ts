@@ -24,7 +24,7 @@ import {
   type TgLeaveChatSchema,
 } from "./groups/chats/chats-types.js";
 import { type TgInvoice } from "./groups/payments/payments-types.js";
-import { asChatId__test } from "../../testUtils/types.js";
+import { asChatId__test, asMessageId__test } from "../../testUtils/types.js";
 import type { ChatId } from "./core.js";
 
 const getApiResponse = <Response>(
@@ -184,7 +184,7 @@ describe("[telegram api client]", () => {
 
       it("editMessageText", () => {
         const testChatId = asChatId__test(323426);
-        const testMessageId = 657887689;
+        const testMessageId = asMessageId__test(657887689);
         const testText = "text-for-edit lalala";
         const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
@@ -273,7 +273,7 @@ describe("[telegram api client]", () => {
           };
           testApiResponse = getApiResponse<TgMessage>(true, {
             date: new Date().getTime(),
-            message_id: 32411244,
+            message_id: asMessageId__test(32411244),
             chat: {
               id: data.chatId,
               type: "private",
@@ -352,7 +352,7 @@ describe("[telegram api client]", () => {
         const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
-          message_id: 32411244,
+          message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
             type: testChatType,
@@ -385,7 +385,7 @@ describe("[telegram api client]", () => {
         };
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
-          message_id: 32411244,
+          message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
             type: testChatType,
@@ -422,7 +422,7 @@ describe("[telegram api client]", () => {
 
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
-          message_id: 32411244,
+          message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
             type: testChatType,
@@ -458,7 +458,7 @@ describe("[telegram api client]", () => {
         };
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
-          message_id: 32411244,
+          message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
             type: testChatType,
@@ -502,7 +502,7 @@ describe("[telegram api client]", () => {
         };
         testApiResponse = getApiResponse<TgMessage>(true, {
           date: new Date().getTime(),
-          message_id: 32411244,
+          message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
             type: testChatType,
@@ -717,7 +717,7 @@ describe("[telegram api client]", () => {
       });
 
       const testChatId = asChatId__test(3453453);
-      const testMessageId = 2345566;
+      const testMessageId = asMessageId__test(2345566);
       const testText = "text text text";
       const testChatType = "channel";
       testApiResponse = getApiResponse<TgMessage>(true, {
@@ -786,7 +786,7 @@ describe("[telegram api client]", () => {
       const testChatType = "supergroup";
       testApiResponse = getApiResponse<TgMessage>(true, {
         date: new Date().getTime(),
-        message_id: 4353411,
+        message_id: asMessageId__test(4353411),
         chat: {
           id: testChatId,
           type: testChatType,

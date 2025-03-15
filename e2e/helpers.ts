@@ -14,7 +14,8 @@ import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
 import { type TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
-import type { ChatId } from "../src/telegram/api/core.js";
+import type { ChatId, MessageId } from "../src/telegram/api/core.js";
+import { asMessageId__test } from "../src/testUtils/types.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -23,7 +24,7 @@ type UserNameOptions = {
 };
 
 export class TelegramMessageModel {
-  public messageId = 0;
+  public messageId: MessageId = asMessageId__test(0);
   public voiceId = "";
   public readonly chatId: ChatId;
   public readonly chatType: TgChatType;
@@ -46,7 +47,7 @@ export class TelegramMessageModel {
   }
 
   public setName(
-    messageId: number,
+    messageId: MessageId,
     options: UserNameOptions,
     isBot = false,
     lang = "",
@@ -61,14 +62,14 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setText(messageId: number, text: string): this {
+  public setText(messageId: MessageId, text: string): this {
     this.messageId = messageId;
     this.text = text;
     return this;
   }
 
   public setVoice(
-    messageId: number,
+    messageId: MessageId,
     id: string,
     duration: number,
     type = "audio/ogg",
@@ -81,7 +82,7 @@ export class TelegramMessageModel {
   }
 
   public setAudio(
-    messageId: number,
+    messageId: MessageId,
     id: string,
     duration: number,
     type = "audio/opus",
@@ -95,7 +96,7 @@ export class TelegramMessageModel {
   }
 
   public setVideoNote(
-    messageId: number,
+    messageId: MessageId,
     id: string,
     duration: number,
     type = "audio/mpeg",
@@ -109,7 +110,7 @@ export class TelegramMessageModel {
   }
 
   public setLangCallback(
-    messageId: number,
+    messageId: MessageId,
     langId: LanguageCode,
     prefixId: string,
   ): this {
@@ -121,7 +122,7 @@ export class TelegramMessageModel {
   }
 
   public setDonateCallback(
-    messageId: number,
+    messageId: MessageId,
     price: number,
     prefixId: string,
   ): this {

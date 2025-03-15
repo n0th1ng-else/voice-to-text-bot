@@ -25,7 +25,7 @@ import {
   SUPPORTED_LANGUAGES,
 } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
-import type { ChatId } from "../api/core.js";
+import type { ChatId, MessageId } from "../api/core.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -94,7 +94,7 @@ export class LangAction extends GenericAction {
   private updateLanguage(
     opts: BotLangData,
     chatId: ChatId,
-    messageId: number,
+    messageId: MessageId,
     analytics: AnalyticsData,
     forumThreadId?: number,
   ): Promise<void> {
@@ -142,7 +142,7 @@ export class LangAction extends GenericAction {
   private updateLangMessage(
     chatId: ChatId,
     lang: LanguageCode,
-    messageId: number,
+    messageId: MessageId,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.editMessage(

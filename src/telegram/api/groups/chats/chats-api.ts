@@ -10,7 +10,7 @@ import {
   type TgFile,
   TgLeaveChatSchema,
 } from "./chats-types.js";
-import type { ChatId } from "../../core.js";
+import type { ChatId, MessageId } from "../../core.js";
 
 export class TelegramChatsApi {
   private readonly client: TelegramBaseApi;
@@ -55,11 +55,11 @@ export class TelegramChatsApi {
 
   public editMessageText(
     chatId: ChatId,
-    messageId: number,
+    messageId: MessageId,
     text: string,
     options: TgMessageOptions = {},
   ): Promise<TgMessage> {
-    const data: MessageDto = {
+    const data: EditMessageDto = {
       text,
       chat_id: chatId,
       message_id: messageId,

@@ -17,7 +17,7 @@ import {
   type TranslationKey,
   type TranslationKeyFull,
 } from "../../text/types.js";
-import type { ChatId } from "../api/core.js";
+import type { ChatId, MessageId } from "../api/core.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -96,7 +96,7 @@ export abstract class GenericAction {
 
   public async editMessage(
     chatId: ChatId,
-    messageId: number,
+    messageId: MessageId,
     meta: MessageOptions,
     id: TranslationKey,
     prefix: TelegramMessagePrefix,
