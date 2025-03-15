@@ -5,7 +5,7 @@ import {
   TELEGRAM_API_MAX_MESSAGE_SIZE,
   type TelegramApi,
 } from "../api/tgapi.js";
-import type { TgMessage, TgMessageOptions } from "../api/types.js";
+import type { TgMessage } from "../api/types.js";
 import type {
   BotMessageModel,
   MessageOptions,
@@ -18,6 +18,7 @@ import {
   type TranslationKeyFull,
 } from "../../text/types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
+import type { TgMessageOptions } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 

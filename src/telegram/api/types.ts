@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { type Prettify } from "../../common/types.js";
-import { TgChatSchema, TgMediaSchema } from "./groups/chats/chats-types.js";
+import {
+  TgChatSchema,
+  TgMediaSchema,
+  TgReplyMarkup,
+} from "./groups/chats/chats-types.js";
 import {
   TgPaymentSchema,
   TgSuccessfulPaymentSchema,
@@ -10,6 +14,7 @@ import {
   TgChatId,
   TgMessageId,
   TgMessageThreadId,
+  TgParseMode,
   TgUpdateId,
   TgUserId,
 } from "./core.js";
@@ -114,38 +119,6 @@ export const TgUpdateSchema = z
   .describe("[Update] Telegram incoming message schema validator");
 
 export type TgUpdate = z.infer<typeof TgUpdateSchema>;
-
-const TgInlineKeyboardButtonSchema = z
-  .object({
-    text: z.string(),
-    callback_data: z.optional(z.string()),
-    url: z.optional(z.string()),
-  })
-  .describe("Telegram inline keyboard button schema");
-
-export type TgInlineKeyboardButton = z.infer<
-  typeof TgInlineKeyboardButtonSchema
->;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TgMessageOptionsSchema = z
-  .object({
-    buttons: z.optional(z.array(z.array(TgInlineKeyboardButtonSchema))),
-    disableMarkup: z.optional(z.boolean()),
-  })
-  .describe("Telegram message options schema");
-
-export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
-
-export const TgParseMode = z
-  .union([z.literal("HTML"), z.literal("Markdown"), z.literal("MarkdownV2")])
-  .describe("Message parse more");
-
-export const TgReplyMarkup = z
-  .object({
-    inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
-  })
-  .describe("Button layout attached to the message");
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MessageSchema = z

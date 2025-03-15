@@ -6,11 +6,7 @@ import axios, {
   type CreateAxiosDefaults,
 } from "axios";
 import { nanoid } from "nanoid";
-import {
-  type TgCore,
-  type TgInlineKeyboardButton,
-  type TgMessage,
-} from "./types.js";
+import { type TgCore, type TgMessage } from "./types.js";
 import { TelegramApi } from "./tgapi.js";
 import { type TgError } from "./tgerror.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
@@ -21,6 +17,7 @@ import {
 } from "./groups/updates/updates-types.js";
 import {
   type TgFile,
+  type TgInlineKeyboardButton,
   type TgLeaveChatSchema,
 } from "./groups/chats/chats-types.js";
 import { type TgInvoice } from "./groups/payments/payments-types.js";

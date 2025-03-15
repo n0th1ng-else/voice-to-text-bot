@@ -1,13 +1,10 @@
 import { TelegramBaseApi } from "../core.js";
-import {
-  type MessageDto,
-  type TgMessage,
-  type TgMessageOptions,
-} from "../../types.js";
+import { type MessageDto, type TgMessage } from "../../types.js";
 import {
   type EditMessageDto,
   type FileDto,
   type TgFile,
+  type TgMessageOptions,
   TgLeaveChatSchema,
 } from "./chats-types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../../core.js";

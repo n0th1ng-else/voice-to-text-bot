@@ -9,7 +9,8 @@ import {
   type BotMessageModel,
   type TelegramMessagePrefix,
 } from "../types.js";
-import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
+import type { TgMessage } from "../api/types.js";
+import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 

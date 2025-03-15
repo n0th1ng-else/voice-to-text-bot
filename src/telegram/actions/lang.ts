@@ -15,17 +15,14 @@ import { type TranslationKey, TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
-import type {
-  TgCallbackQuery,
-  TgInlineKeyboardButton,
-  TgMessage,
-} from "../api/types.js";
+import type { TgCallbackQuery, TgMessage } from "../api/types.js";
 import {
   type LanguageCode,
   SUPPORTED_LANGUAGES,
 } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
+import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 

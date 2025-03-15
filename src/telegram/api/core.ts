@@ -27,3 +27,7 @@ export type MessageThreadId = z.infer<typeof TgMessageThreadId>;
 export const TgFileId = z.string().brand<"FileId">();
 
 export type FileId = z.infer<typeof TgFileId>;
+
+export const TgParseMode = z
+  .union([z.literal("HTML"), z.literal("Markdown"), z.literal("MarkdownV2")])
+  .describe("Message parse more");
