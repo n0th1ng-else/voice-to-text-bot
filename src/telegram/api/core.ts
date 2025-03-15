@@ -19,3 +19,7 @@ export type CallbackQueryId = z.infer<typeof TgCallbackQueryId>;
 export const TgUserId = z.number().brand<"UserId">();
 
 export type UserId = z.infer<typeof TgUserId>;
+
+export const TgMessageThreadId = z.number().brand<"MessageThreadId">();
+
+export type MessageThreadId = z.infer<typeof TgMessageThreadId>;

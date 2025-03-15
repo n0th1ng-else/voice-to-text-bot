@@ -19,7 +19,7 @@ import type { TgInlineKeyboardButton, TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
-import type { ChatId } from "../api/core.js";
+import type { ChatId, MessageThreadId } from "../api/core.js";
 
 const getDonateButton = (
   price: number,
@@ -210,7 +210,7 @@ export class DonateAction extends GenericAction {
     token: string,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const title = this.text.t(TranslationKeys.DonationTitle, lang);
     const description = this.text.t(TranslationKeys.DonationDescription, lang);

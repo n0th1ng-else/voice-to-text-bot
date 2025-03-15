@@ -19,7 +19,12 @@ import { type TgMessage, type TgMessageOptions } from "./api/types.js";
 import { type AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
-import { type ChatId, type MessageId, TgChatId } from "./api/core.js";
+import {
+  type ChatId,
+  type MessageId,
+  type MessageThreadId,
+  TgChatId,
+} from "./api/core.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -62,7 +67,7 @@ export class BotMessageModel {
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
   public readonly donationId: number;
-  public readonly forumThreadId?: number;
+  public readonly forumThreadId?: MessageThreadId;
 
   constructor(msg: TgMessage, analytics: AnalyticsData) {
     this.id = msg.message_id;

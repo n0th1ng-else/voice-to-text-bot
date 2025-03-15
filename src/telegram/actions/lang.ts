@@ -25,7 +25,7 @@ import {
   SUPPORTED_LANGUAGES,
 } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
-import type { ChatId, MessageId } from "../api/core.js";
+import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -96,7 +96,7 @@ export class LangAction extends GenericAction {
     chatId: ChatId,
     messageId: MessageId,
     analytics: AnalyticsData,
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const lang = opts.langId;
     const prefix = opts.prefix;

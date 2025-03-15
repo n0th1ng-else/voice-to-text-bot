@@ -9,6 +9,7 @@ import {
   TgCallbackQueryId,
   TgChatId,
   TgMessageId,
+  TgMessageThreadId,
   TgUpdateId,
   TgUserId,
 } from "./core.js";
@@ -86,7 +87,7 @@ const TgMessageSchema = z
     video_note: z.optional(TgMediaSchema),
     successful_payment: z.optional(TgSuccessfulPaymentSchema),
     is_topic_message: z.optional(z.boolean()),
-    message_thread_id: z.optional(z.number()),
+    message_thread_id: z.optional(TgMessageThreadId),
   })
   .describe("[Message] Telegram chat message schema validator");
 
@@ -154,7 +155,7 @@ const MessageSchema = z
     message_id: z.optional(TgMessageId),
     parse_mode: z.optional(TgParseMode),
     reply_markup: z.optional(TgReplyMarkup),
-    message_thread_id: z.optional(z.number()),
+    message_thread_id: z.optional(TgMessageThreadId),
   })
   .describe("Telegram message schema");
 

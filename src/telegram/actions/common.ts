@@ -17,7 +17,7 @@ import {
   type TranslationKey,
   type TranslationKeyFull,
 } from "../../text/types.js";
-import type { ChatId, MessageId } from "../api/core.js";
+import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -67,7 +67,7 @@ export abstract class GenericAction {
     ids: TranslationKeyFull[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     if (!ids.length) {
       return Promise.resolve();
@@ -116,7 +116,7 @@ export abstract class GenericAction {
     message: string,
     lang: LanguageCode,
     options: TgMessageOptions = {},
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const messageParts = splitTextIntoParts(
       message,
@@ -135,7 +135,7 @@ export abstract class GenericAction {
     chatId: ChatId,
     messageParts: string[],
     options: TgMessageOptions = {},
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const message = messageParts.shift();
     if (!message) {

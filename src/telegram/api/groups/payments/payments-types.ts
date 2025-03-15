@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Prettify } from "../../../../common/types.js";
-import { TgChatId } from "../../core.js";
+import { TgChatId, TgMessageThreadId } from "../../core.js";
 
 export const TgSubscriptionChangeSchema = z
   .boolean()
@@ -78,7 +78,7 @@ const InvoiceSchema = z
     PaymentObjectSchema,
     z.object({
       chat_id: TgChatId,
-      message_thread_id: z.optional(z.number()), // Forum thread id
+      message_thread_id: z.optional(TgMessageThreadId), // Forum thread id
     }),
   )
   .describe("Telegram invoice schema");
@@ -115,7 +115,7 @@ const TgInvoiceSchema = z
     z.object({
       chatId: TgChatId,
       token: z.string(),
-      forumThreadId: z.optional(z.number()),
+      forumThreadId: z.optional(TgMessageThreadId),
     }),
   )
   .describe("Telegram invoice schema");
