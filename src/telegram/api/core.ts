@@ -15,3 +15,7 @@ export type UpdateId = z.infer<typeof TgUpdateId>;
 export const TgCallbackQueryId = z.string().brand<"CallbackQueryId">();
 
 export type CallbackQueryId = z.infer<typeof TgCallbackQueryId>;
+
+export const TgUserId = z.number().brand<"UserId">();
+
+export type UserId = z.infer<typeof TgUserId>;

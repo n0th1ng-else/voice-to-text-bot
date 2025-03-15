@@ -9,7 +9,7 @@ import {
   TgSubscriptionChangeSchema,
   TgSubscriptionUrlSchema,
 } from "./payments-types.js";
-import type { ChatId } from "../../core.js";
+import type { ChatId, UserId } from "../../core.js";
 
 export class TelegramPaymentsApi {
   private readonly client: TelegramBaseApi;
@@ -81,7 +81,7 @@ export class TelegramPaymentsApi {
 
   public refundStarPayment(
     chatId: ChatId,
-    userId: number,
+    userId: UserId,
     paymentChargeId: string,
   ): Promise<boolean> {
     const data = {
@@ -101,7 +101,7 @@ export class TelegramPaymentsApi {
    */
   public editUserStarSubscription(
     chatId: ChatId,
-    userId: number,
+    userId: UserId,
     paymentChargeId: string,
   ): Promise<boolean> {
     const data = {

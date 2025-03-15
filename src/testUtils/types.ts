@@ -7,6 +7,8 @@ import {
   TgUpdateId,
   type CallbackQueryId,
   TgCallbackQueryId,
+  type UserId,
+  TgUserId,
 } from "../telegram/api/core.js";
 
 export const asChatId__test = (chatId: number): ChatId =>
@@ -21,3 +23,6 @@ export const asUpdateId__test = (updateId: number): UpdateId =>
 export const asCallbackQueryId__test = (
   callbackQueryId: string,
 ): CallbackQueryId => TgCallbackQueryId.parse(callbackQueryId);
+
+export const asUserId__test = (userId: number): UserId =>
+  TgUserId.parse(userId);

@@ -18,6 +18,7 @@ import type { ChatId, MessageId } from "../src/telegram/api/core.js";
 import {
   asCallbackQueryId__test,
   asMessageId__test,
+  asUserId__test,
 } from "../src/testUtils/types.js";
 
 type UserNameOptions = {
@@ -144,7 +145,7 @@ export class TelegramMessageModel {
       from: this.hasFrom
         ? {
             is_bot: this.isBot,
-            id: randomIntFromInterval(1, 100000),
+            id: asUserId__test(randomIntFromInterval(1, 100000)),
             first_name: this.firstName,
             last_name: this.lastName,
             username: this.userName,
@@ -191,7 +192,7 @@ export class TelegramMessageModel {
         first_name: this.firstName,
         last_name: this.lastName,
         username: this.userName,
-        id: randomIntFromInterval(1, 100000),
+        id: asUserId__test(randomIntFromInterval(1, 100000)),
       },
       message: {
         text: this.text,

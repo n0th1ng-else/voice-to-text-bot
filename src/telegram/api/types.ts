@@ -10,6 +10,7 @@ import {
   TgChatId,
   TgMessageId,
   TgUpdateId,
+  TgUserId,
 } from "./core.js";
 
 export type ApiErrorReflector = (err: unknown) => Promise<void>;
@@ -52,7 +53,7 @@ export const TgCoreSchema = <Schema extends z.ZodTypeAny>(schema: Schema) => {
 
 const TgUserSchema = z
   .object({
-    id: z.number(),
+    id: TgUserId,
     is_bot: z.boolean(),
     first_name: z.string(),
     last_name: z.optional(z.string()),

@@ -2,7 +2,11 @@ import { describe, it, expect } from "vitest";
 import { type TgMessage } from "./api/types.js";
 import { getUserLanguage, getLanguageByText } from "./helpers.js";
 import { DEFAULT_LANGUAGE, type LanguageCode } from "../recognition/types.js";
-import { asChatId__test, asMessageId__test } from "../testUtils/types.js";
+import {
+  asChatId__test,
+  asMessageId__test,
+  asUserId__test,
+} from "../testUtils/types.js";
 
 const getMessage = (name?: string, lang?: string): TgMessage => {
   return {
@@ -15,7 +19,7 @@ const getMessage = (name?: string, lang?: string): TgMessage => {
     from: name
       ? {
           first_name: "name",
-          id: 4324,
+          id: asUserId__test(4324),
           is_bot: false,
           language_code: lang,
         }
