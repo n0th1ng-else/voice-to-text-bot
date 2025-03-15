@@ -24,7 +24,11 @@ import {
   type TgLeaveChatSchema,
 } from "./groups/chats/chats-types.js";
 import { type TgInvoice } from "./groups/payments/payments-types.js";
-import { asChatId__test, asMessageId__test } from "../../testUtils/types.js";
+import {
+  asChatId__test,
+  asFileId__test,
+  asMessageId__test,
+} from "../../testUtils/types.js";
 import type { ChatId } from "./core.js";
 
 const getApiResponse = <Response>(
@@ -164,7 +168,7 @@ describe("[telegram api client]", () => {
 
         testApiResponse = getApiResponse<TgFile>(true, {
           file_id: testFileId,
-          file_unique_id: "unused-identifier",
+          file_unique_id: asFileId__test("unused-identifier"),
           file_path: testFilePath,
         });
 
@@ -654,7 +658,7 @@ describe("[telegram api client]", () => {
           false,
           {
             file_id: testFileId,
-            file_unique_id: "unused-identifier",
+            file_unique_id: asFileId__test("unused-identifier"),
             file_path: testFilePath,
           },
           testErrorCode,
@@ -688,7 +692,7 @@ describe("[telegram api client]", () => {
 
         testApiResponse = getApiResponse<TgFile>(true, {
           file_id: testFileId,
-          file_unique_id: "unused-identifier",
+          file_unique_id: asFileId__test("unused-identifier"),
         });
 
         checkApiData = (config) => {

@@ -9,6 +9,8 @@ import {
   TgCallbackQueryId,
   type UserId,
   TgUserId,
+  type FileId,
+  TgFileId,
 } from "../telegram/api/core.js";
 
 export const asChatId__test = (chatId: number): ChatId =>
@@ -26,3 +28,6 @@ export const asCallbackQueryId__test = (
 
 export const asUserId__test = (userId: number): UserId =>
   TgUserId.parse(userId);
+
+export const asFileId__test = (fileId: string): FileId =>
+  TgFileId.parse(fileId);

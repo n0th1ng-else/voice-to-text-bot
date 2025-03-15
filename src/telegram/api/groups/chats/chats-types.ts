@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { TgChatId, TgMessageId } from "../../core.js";
+import { TgChatId, TgFileId, TgMessageId } from "../../core.js";
 import { TgParseMode, TgReplyMarkup } from "../../types.js";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgFileSchema = z
   .object({
     file_id: z.string(),
-    file_unique_id: z.string(),
+    file_unique_id: TgFileId,
     file_size: z.optional(z.number()),
     file_path: z.optional(z.string()),
   })

@@ -23,3 +23,7 @@ export type UserId = z.infer<typeof TgUserId>;
 export const TgMessageThreadId = z.number().brand<"MessageThreadId">();
 
 export type MessageThreadId = z.infer<typeof TgMessageThreadId>;
+
+export const TgFileId = z.string().brand<"FileId">();
+
+export type FileId = z.infer<typeof TgFileId>;
