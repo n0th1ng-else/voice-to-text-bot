@@ -1,11 +1,16 @@
 import { type SubscriptionRowScheme } from "../db/sql/subscriptions.js";
 import type { getDb } from "../db/index.js";
 import type { ChatId } from "../telegram/api/core.js";
+import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 
 export type ActiveSubscriptionItem = {
   subscriptionId: number;
   chatId: ChatId;
-  startedAt: Date;
+  startDate: Date;
+  endDate: Date | null;
+  isStopped: boolean;
+  amount: number;
+  currency: Currency;
 };
 
 type SubscriptionsCache = Map<ChatId, ActiveSubscriptionItem>;
@@ -27,7 +32,11 @@ const saveSubscriptionsCache = (rows: SubscriptionRowScheme[]): void => {
     const cachedItem: ActiveSubscriptionItem = {
       subscriptionId: row.subscription_id,
       chatId: row.chat_id,
-      startedAt: row.started_at,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      amount: row.amount,
+      currency: row.currency,
+      isStopped: row.is_stopped,
     };
     acc.set(row.chat_id, cachedItem);
     return acc;
@@ -36,9 +45,13 @@ const saveSubscriptionsCache = (rows: SubscriptionRowScheme[]): void => {
   // TODO remove test subscription
   const myChat = 744639 as ChatId;
   cache.set(myChat, {
-    chatId: myChat,
-    startedAt: new Date("10.03.2025"),
     subscriptionId: 1231323,
+    chatId: myChat,
+    startDate: new Date("10.03.2025"),
+    endDate: null,
+    amount: 100,
+    currency: "XTR",
+    isStopped: false,
   });
 };
 

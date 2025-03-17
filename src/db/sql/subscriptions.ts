@@ -1,21 +1,18 @@
-import type { ValueOf } from "../../common/types.js";
+import { nanoid } from "nanoid";
 import { ClientDb } from "./clientDb.js";
 import { SubscriptionsSql } from "./subscriptions.sql.js";
 import type { ChatId, UserId } from "../../telegram/api/core.js";
-
-export const SubscriptionStatus = {
-  Active: "ACTIVE",
-};
-
-export type SubscriptionStatusType = ValueOf<typeof SubscriptionStatus>;
+import type { Currency } from "../../telegram/api/groups/payments/payments-types.js";
 
 export type SubscriptionRowScheme = {
   subscription_id: number;
-  status: string;
   chat_id: ChatId;
-  started_by: UserId;
-  started_at: Date;
-  ended_at: Date | null;
+  user_id: UserId;
+  amount: number;
+  currency: Currency;
+  is_stopped: boolean;
+  start_date: Date;
+  end_date: Date | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -27,21 +24,63 @@ export class SubscriptionDb extends ClientDb {
     this.initialized = true;
   }
 
-  public async getRows(
-    status: SubscriptionStatusType,
-  ): Promise<SubscriptionRowScheme[]> {
+  public async getRows(endDate: Date): Promise<SubscriptionRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table subscriptions is not initialized yet"),
       );
     }
     const query = SubscriptionsSql.getRows;
-    const values = [status];
+    const values = [endDate];
     const queryData = await this.pool.query<SubscriptionRowScheme>(
       query,
       values,
     );
     return queryData.rows;
+  }
+
+  public async createRow(
+    chatId: ChatId,
+    userId: UserId,
+    amount: number,
+    durationSeconds: number,
+  ): Promise<SubscriptionRowScheme> {
+    if (!this.initialized) {
+      return Promise.reject(
+        new Error("The table subscriptions is not initialized yet"),
+      );
+    }
+    const query = SubscriptionsSql.insertRow;
+    const subscriptionId = nanoid(15);
+    const createdAt = new Date();
+    const startedAt = createdAt;
+    const updatedAt = createdAt;
+    const endedAt = new Date();
+    endedAt.setSeconds(endedAt.getSeconds() + durationSeconds);
+
+    const isStopped = false;
+
+    const values = [
+      subscriptionId,
+      chatId,
+      userId,
+      amount,
+      "XTR",
+      startedAt,
+      endedAt,
+      isStopped,
+      createdAt,
+      updatedAt,
+    ];
+    return this.pool
+      .query<SubscriptionRowScheme>(query, values)
+      .then((queryData) => {
+        const firstRow = queryData.rows.shift();
+        if (!firstRow) {
+          return Promise.reject(new Error("Unable to get created row info"));
+        }
+        return firstRow;
+      });
   }
 
   public getId(row: SubscriptionRowScheme): number {

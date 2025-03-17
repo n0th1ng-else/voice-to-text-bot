@@ -3,7 +3,6 @@ import { Logger } from "../logger/index.js";
 import {
   SubscriptionDb,
   type SubscriptionRowScheme,
-  SubscriptionStatus,
 } from "./sql/subscriptions.js";
 
 const logger = new Logger("postgres-subscriptions");
@@ -32,15 +31,16 @@ export class SubscriptionsClient {
 
   public async getActiveRows(): Promise<SubscriptionRowScheme[]> {
     try {
-      this.logInfo(`Looking for rows for status=${SubscriptionStatus.Active}`);
-      const rows = await this.db.getRows(SubscriptionStatus.Active);
+      const currentDate = new Date();
+      this.logInfo("Looking for rows with endDate in the future");
+      const rows = await this.db.getRows(currentDate);
       this.logInfo(
-        `Row search has been executed for status=${SubscriptionStatus.Active}`,
+        "Row search has been executed for rows with endDate in the future",
       );
       return rows;
     } catch (err) {
       logger.error(
-        `Unable provide a search for status=${SubscriptionStatus.Active}`,
+        "Unable provide a search for rows with endDate in the future",
         err,
       );
       throw err;

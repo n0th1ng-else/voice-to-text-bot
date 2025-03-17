@@ -17,6 +17,8 @@ export const TgCurrencySchema = z
   ])
   .describe("Telegram currency schema");
 
+export type Currency = Prettify<z.infer<typeof TgCurrencySchema>>;
+
 export const TgPaymentSchema = z
   .object({
     currency: TgCurrencySchema,
