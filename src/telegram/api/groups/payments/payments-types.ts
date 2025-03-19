@@ -31,11 +31,24 @@ export const TgSuccessfulPaymentSchema = z
   .intersection(
     TgPaymentSchema,
     z.object({
+      subscription_expiration_date: z.optional(z.number()),
+      is_recurring: z.boolean(),
+      is_first_recurring: z.boolean(),
       telegram_payment_charge_id: TgPaymentChargeId,
       provider_payment_charge_id: z.string(),
     }),
   )
   .describe("Telegram successful payment schema validator");
+
+export const TgRefundedPaymentSchema = z
+  .intersection(
+    TgPaymentSchema,
+    z.object({
+      telegram_payment_charge_id: TgPaymentChargeId,
+      provider_payment_charge_id: z.optional(z.string()),
+    }),
+  )
+  .describe("Telegram refunded payment schema validator");
 
 export const LabeledPriceSchema = z
   .object({
