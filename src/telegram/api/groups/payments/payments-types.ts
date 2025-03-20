@@ -128,6 +128,7 @@ const TgInvoiceSchema = z
   .intersection(
     TgPaymentBaseSchema,
     z.object({
+      currency: TgCurrencySchema,
       chatId: TgChatId,
       token: z.string(),
       forumThreadId: z.optional(TgMessageThreadId),

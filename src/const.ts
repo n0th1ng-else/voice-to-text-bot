@@ -49,3 +49,18 @@ export const donationLevels = [
     meta: "👑",
   },
 ];
+
+export const donationLevelsStars = [
+  {
+    amount: 100,
+    meta: "⭐",
+  },
+  {
+    amount: 150,
+    meta: "⭐⭐",
+  },
+  {
+    amount: 250,
+    meta: "⭐⭐⭐",
+  },
+];

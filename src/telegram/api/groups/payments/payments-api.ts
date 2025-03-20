@@ -21,7 +21,7 @@ export class TelegramPaymentsApi {
   public sendInvoice(opts: TgInvoice): Promise<TgMessage> {
     const data: InvoiceDto = {
       chat_id: opts.chatId,
-      currency: "EUR",
+      currency: opts.currency,
       title: opts.title,
       description: opts.description,
       payload: opts.payload,

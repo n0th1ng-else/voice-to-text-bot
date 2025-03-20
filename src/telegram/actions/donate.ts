@@ -13,7 +13,7 @@ import {
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
-import { donationLevels } from "../../const.js";
+import { donationLevels, donationLevelsStars } from "../../const.js";
 import { toCurrency } from "../../text/utils.js";
 import type { TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
@@ -21,12 +21,18 @@ import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import type { ChatId, MessageThreadId } from "../api/core.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
+import type {
+  Currency,
+  TgInvoice,
+} from "../api/groups/payments/payments-types.js";
 
 const getDonateButton = (
   price: number,
+  currency: Currency,
   logPrefix: string,
 ): TelegramButtonModel => {
-  return new TelegramButtonModel<string>("d", `${price}`, logPrefix);
+  const val = JSON.stringify([price, currency]);
+  return new TelegramButtonModel<string>("d", val, logPrefix);
 };
 
 const logger = new Logger("telegram-bot");
@@ -75,12 +81,29 @@ export class DonateAction extends GenericAction {
 
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
-        const donations = donationLevels.map((level) =>
-          DonateAction.getDonationButton(level.amount, prefix.id, level.meta),
+        const donationEuros = donationLevels.map((level) =>
+          DonateAction.getDonationButton(
+            level.amount,
+            "EUR",
+            prefix.id,
+            level.meta,
+            false,
+          ),
+        );
+
+        const donationStars = donationLevelsStars.map((level) =>
+          DonateAction.getDonationButton(
+            level.amount,
+            "XTR",
+            prefix.id,
+            level.meta,
+            true,
+          ),
         );
 
         const buttons: TgInlineKeyboardButton[][] = [];
-        buttons.push(donations);
+        buttons.push(donationStars);
+        buttons.push(donationEuros);
 
         return this.sendMessage(
           model.chatId,
@@ -117,6 +140,7 @@ export class DonateAction extends GenericAction {
   ): Promise<void> {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId, button.logPrefix);
+    // TODO
     const price = Number(button.value);
 
     if (!price) {
@@ -178,12 +202,14 @@ export class DonateAction extends GenericAction {
 
   private static getDonationButton(
     price: number,
+    currency: Currency,
     logId: string,
     emoji: string,
+    isStars: boolean,
   ): TgInlineKeyboardButton {
-    const btn = getDonateButton(price, logId);
+    const btn = getDonateButton(price, currency, logId);
     return {
-      text: toCurrency(price, emoji),
+      text: isStars ? `${price} ${emoji}` : toCurrency(price, emoji),
       callback_data: btn.getDtoString(),
     };
   }
@@ -217,10 +243,11 @@ export class DonateAction extends GenericAction {
     const description = this.text.t(TranslationKeys.DonationDescription, lang);
     const label = this.text.t(TranslationKeys.DonationLabel, lang);
 
-    const invoice = {
+    const invoice: TgInvoice = {
       chatId,
       amount: amount * 100,
       meta: String(donationId),
+      currency: "XTR",
       token,
       title,
       description,
