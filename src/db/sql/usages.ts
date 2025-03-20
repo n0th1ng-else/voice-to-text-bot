@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { nanoid } from "nanoid";
 import { UsagesSql } from "./usages.sql.js";
+import type { ChatId } from "../../telegram/api/core.js";
 
 export type UsageRowScheme = {
   usage_id: string;
@@ -28,7 +29,7 @@ export class UsagesDb {
   }
 
   public async createRow(
-    chatId: number,
+    chatId: ChatId,
     langId: string,
     username: string,
     usageCount: number,
@@ -118,7 +119,7 @@ export class UsagesDb {
     });
   }
 
-  public async getRows(chatId: number): Promise<UsageRowScheme[]> {
+  public async getRows(chatId: ChatId): Promise<UsageRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table usages is not initialized yet"),

@@ -3,11 +3,12 @@ import { Logger } from "../../logger/index.js";
 import { type AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
 import { analytics } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
+import type { ChatId } from "../../telegram/api/core.js";
 
 const logger = new Logger("analytics:ga");
 
 export const collectEvents = async (
-  chatId: number,
+  chatId: ChatId,
   events: AnalyticsEventExt[],
 ): Promise<void> => {
   if (!analytics.measurementId || !analytics.apiSecret) {

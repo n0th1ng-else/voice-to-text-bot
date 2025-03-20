@@ -5,7 +5,7 @@ import {
   TELEGRAM_API_MAX_MESSAGE_SIZE,
   type TelegramApi,
 } from "../api/tgapi.js";
-import type { TgMessage, TgMessageOptions } from "../api/types.js";
+import type { TgMessage } from "../api/types.js";
 import type {
   BotMessageModel,
   MessageOptions,
@@ -17,6 +17,8 @@ import {
   type TranslationKey,
   type TranslationKeyFull,
 } from "../../text/types.js";
+import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
+import type { TgMessageOptions } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -62,11 +64,11 @@ export abstract class GenericAction {
   }
 
   public async sendMessage(
-    chatId: number,
+    chatId: ChatId,
     ids: TranslationKeyFull[],
     meta: MessageOptions,
     prefix: TelegramMessagePrefix,
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     if (!ids.length) {
       return Promise.resolve();
@@ -94,8 +96,8 @@ export abstract class GenericAction {
   }
 
   public async editMessage(
-    chatId: number,
-    messageId: number,
+    chatId: ChatId,
+    messageId: MessageId,
     meta: MessageOptions,
     id: TranslationKey,
     prefix: TelegramMessagePrefix,
@@ -111,11 +113,11 @@ export abstract class GenericAction {
   }
 
   protected async sendRawMessage(
-    chatId: number,
+    chatId: ChatId,
     message: string,
     lang: LanguageCode,
     options: TgMessageOptions = {},
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const messageParts = splitTextIntoParts(
       message,
@@ -131,10 +133,10 @@ export abstract class GenericAction {
   }
 
   private async sendRawMessageParts(
-    chatId: number,
+    chatId: ChatId,
     messageParts: string[],
     options: TgMessageOptions = {},
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<void> {
     const message = messageParts.shift();
     if (!message) {

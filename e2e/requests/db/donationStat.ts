@@ -6,6 +6,7 @@ import {
   type DonationRowScheme,
   DonationStatus,
 } from "../../../src/db/sql/donations.js";
+import type { ChatId } from "../../../src/telegram/api/core.js";
 
 export const mockCreateDonationRow = (
   pool: MockPool,
@@ -34,7 +35,7 @@ export const mockCreateDonationRow = (
 };
 
 const getDbDto = (
-  chatId: number,
+  chatId: ChatId,
   price: number,
   status: string,
   donationId: number,

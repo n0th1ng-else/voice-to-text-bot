@@ -1,15 +1,13 @@
 import { TelegramBaseApi } from "../core.js";
-import {
-  type MessageDto,
-  type TgMessage,
-  type TgMessageOptions,
-} from "../../types.js";
+import { type MessageDto, type TgMessage } from "../../types.js";
 import {
   type EditMessageDto,
   type FileDto,
   type TgFile,
+  type TgMessageOptions,
   TgLeaveChatSchema,
 } from "./chats-types.js";
+import type { ChatId, MessageId, MessageThreadId } from "../../core.js";
 
 export class TelegramChatsApi {
   private readonly client: TelegramBaseApi;
@@ -21,10 +19,10 @@ export class TelegramChatsApi {
   }
 
   public sendMessage(
-    chatId: number,
+    chatId: ChatId,
     text: string,
     options: TgMessageOptions = {},
-    forumThreadId?: number,
+    forumThreadId?: MessageThreadId,
   ): Promise<TgMessage> {
     const data: MessageDto = {
       text,
@@ -53,12 +51,12 @@ export class TelegramChatsApi {
   }
 
   public editMessageText(
-    chatId: number,
-    messageId: number,
+    chatId: ChatId,
+    messageId: MessageId,
     text: string,
     options: TgMessageOptions = {},
   ): Promise<TgMessage> {
-    const data: MessageDto = {
+    const data: EditMessageDto = {
       text,
       chat_id: chatId,
       message_id: messageId,
@@ -81,7 +79,7 @@ export class TelegramChatsApi {
     );
   }
 
-  public leaveChat(chatId: number): Promise<boolean> {
+  public leaveChat(chatId: ChatId): Promise<boolean> {
     return this.client.requestValidate(
       "leaveChat",
       TgLeaveChatSchema,

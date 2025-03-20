@@ -9,6 +9,7 @@ import {
   TgSubscriptionChangeSchema,
   TgSubscriptionUrlSchema,
 } from "./payments-types.js";
+import type { ChatId, UserId } from "../../core.js";
 
 export class TelegramPaymentsApi {
   private readonly client: TelegramBaseApi;
@@ -49,7 +50,7 @@ export class TelegramPaymentsApi {
   }
 
   public createInvoiceLink(
-    chatId: number,
+    chatId: ChatId,
     opts: TgSubscription,
   ): Promise<string> {
     const data: SubscriptionDto = {
@@ -79,8 +80,8 @@ export class TelegramPaymentsApi {
   }
 
   public refundStarPayment(
-    chatId: number,
-    userId: number,
+    chatId: ChatId,
+    userId: UserId,
     paymentChargeId: string,
   ): Promise<boolean> {
     const data = {
@@ -99,8 +100,8 @@ export class TelegramPaymentsApi {
    * Cancel or re-enable subscription
    */
   public editUserStarSubscription(
-    chatId: number,
-    userId: number,
+    chatId: ChatId,
+    userId: UserId,
     paymentChargeId: string,
   ): Promise<boolean> {
     const data = {

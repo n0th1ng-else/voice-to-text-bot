@@ -8,6 +8,7 @@ import {
 } from "./tgerror.js";
 import { type TgCore } from "./types.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
+import { asChatId__test } from "../../testUtils/types.js";
 
 describe("tgerror", () => {
   describe("TgError", () => {
@@ -44,7 +45,7 @@ describe("tgerror", () => {
       const errCause = new Error("original error");
       const msg = "ooops";
       const err = new TgError(errCause, msg);
-      const chatId = 1234555;
+      const chatId = asChatId__test(1234555);
       err.setChatId(chatId);
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`ETELEGRAM ${msg}`);

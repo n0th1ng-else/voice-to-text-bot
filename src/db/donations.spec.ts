@@ -12,6 +12,7 @@ import {
   injectDependencies,
   type InjectedFn,
 } from "../testUtils/dependencies.js";
+import { asChatId__test } from "../testUtils/types.js";
 
 vi.mock("../logger/index");
 
@@ -48,9 +49,9 @@ describe("Donations DB", () => {
 
   describe("not initialized", () => {
     it("can not create row", async () => {
-      await expect(client.createRow(23444, 3)).rejects.toThrowError(
-        "The table donations is not initialized yet",
-      );
+      await expect(
+        client.createRow(asChatId__test(23444), 3),
+      ).rejects.toThrowError("The table donations is not initialized yet");
     });
 
     it("can not update row", async () => {
@@ -67,9 +68,9 @@ describe("Donations DB", () => {
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrowError();
-      await expect(client.createRow(5231, 5)).rejects.toThrowError(
-        "The table donations is not initialized yet",
-      );
+      await expect(
+        client.createRow(asChatId__test(5231), 5),
+      ).rejects.toThrowError("The table donations is not initialized yet");
     });
   });
 
@@ -80,7 +81,7 @@ describe("Donations DB", () => {
     });
 
     it("creates a new row", () => {
-      const chatId = 83222;
+      const chatId = asChatId__test(83222);
       const price = 10;
       const status = DonationStatus.Initialized;
 

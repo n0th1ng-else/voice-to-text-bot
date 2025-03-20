@@ -1,10 +1,11 @@
 import { type TgCore } from "./types.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
 import { getRegExpFromString } from "../../common/helpers.js";
+import type { ChatId } from "./core.js";
 
 export class TgError extends Error {
   public code = 0;
-  public chatId?: number;
+  public chatId?: ChatId;
   public response?: TgCore<void>;
   public migrateToChatId = 0;
   public retryAfter = 0;
@@ -24,7 +25,7 @@ export class TgError extends Error {
     return this;
   }
 
-  public setChatId(chatId?: number): this {
+  public setChatId(chatId?: ChatId): this {
     this.chatId = chatId;
     return this;
   }

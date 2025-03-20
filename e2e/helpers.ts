@@ -14,6 +14,12 @@ import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
 import { type TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
+import type { ChatId, MessageId } from "../src/telegram/api/core.js";
+import {
+  asCallbackQueryId__test,
+  asMessageId__test,
+  asUserId__test,
+} from "../src/testUtils/types.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -22,9 +28,9 @@ type UserNameOptions = {
 };
 
 export class TelegramMessageModel {
-  public messageId = 0;
+  public messageId: MessageId = asMessageId__test(0);
   public voiceId = "";
-  public readonly chatId: number;
+  public readonly chatId: ChatId;
   public readonly chatType: TgChatType;
 
   private text = "";
@@ -39,13 +45,13 @@ export class TelegramMessageModel {
   private contentType: "voice" | "audio" | "video_note" = "voice";
   private mimeType = "";
 
-  constructor(chatId: number, chatType: TgChatType) {
+  constructor(chatId: ChatId, chatType: TgChatType) {
     this.chatId = chatId;
     this.chatType = chatType;
   }
 
   public setName(
-    messageId: number,
+    messageId: MessageId,
     options: UserNameOptions,
     isBot = false,
     lang = "",
@@ -60,14 +66,14 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setText(messageId: number, text: string): this {
+  public setText(messageId: MessageId, text: string): this {
     this.messageId = messageId;
     this.text = text;
     return this;
   }
 
   public setVoice(
-    messageId: number,
+    messageId: MessageId,
     id: string,
     duration: number,
     type = "audio/ogg",
@@ -80,7 +86,7 @@ export class TelegramMessageModel {
   }
 
   public setAudio(
-    messageId: number,
+    messageId: MessageId,
     id: string,
     duration: number,
     type = "audio/opus",
@@ -94,7 +100,7 @@ export class TelegramMessageModel {
   }
 
   public setVideoNote(
-    messageId: number,
+    messageId: MessageId,
     id: string,
     duration: number,
     type = "audio/mpeg",
@@ -108,7 +114,7 @@ export class TelegramMessageModel {
   }
 
   public setLangCallback(
-    messageId: number,
+    messageId: MessageId,
     langId: LanguageCode,
     prefixId: string,
   ): this {
@@ -120,7 +126,7 @@ export class TelegramMessageModel {
   }
 
   public setDonateCallback(
-    messageId: number,
+    messageId: MessageId,
     price: number,
     prefixId: string,
   ): this {
@@ -139,7 +145,7 @@ export class TelegramMessageModel {
       from: this.hasFrom
         ? {
             is_bot: this.isBot,
-            id: randomIntFromInterval(1, 100000),
+            id: asUserId__test(randomIntFromInterval(1, 100000)),
             first_name: this.firstName,
             last_name: this.lastName,
             username: this.userName,
@@ -180,13 +186,13 @@ export class TelegramMessageModel {
   public toCallbackApi(): TgCallbackQuery {
     return {
       data: this.callbackData,
-      id: "",
+      id: asCallbackQueryId__test(""),
       from: {
         is_bot: false,
         first_name: this.firstName,
         last_name: this.lastName,
         username: this.userName,
-        id: randomIntFromInterval(1, 100000),
+        id: asUserId__test(randomIntFromInterval(1, 100000)),
       },
       message: {
         text: this.text,
@@ -231,10 +237,10 @@ export class BotStatRecordModel {
   public objectId?: string;
   public user = "";
   public usageCount = 0;
-  public chatId: number;
+  public chatId: ChatId;
   public langId: LanguageCode;
 
-  constructor(chatId: number, langId: LanguageCode = "en-US") {
+  constructor(chatId: ChatId, langId: LanguageCode = "en-US") {
     this.chatId = chatId;
     this.langId = langId;
   }

@@ -15,10 +15,17 @@ import {
 } from "./helpers.js";
 import { Logger } from "../logger/index.js";
 import { getTranslator } from "../text/index.js";
-import { type TgMessage, type TgMessageOptions } from "./api/types.js";
+import { type TgMessage } from "./api/types.js";
 import { type AnalyticsData } from "../analytics/ga/types.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
+import {
+  type ChatId,
+  type MessageId,
+  type MessageThreadId,
+  TgChatId,
+} from "./api/core.js";
+import type { TgMessageOptions } from "./api/groups/chats/chats-types.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -49,8 +56,8 @@ export const BotCommand = {
 export type BotCommandType = ValueOf<typeof BotCommand>;
 
 export class BotMessageModel {
-  public readonly id: number;
-  public readonly chatId: number;
+  public readonly id: MessageId;
+  public readonly chatId: ChatId;
   public readonly isGroup: boolean;
   public readonly userName: string;
   public readonly fullUserName: string;
@@ -61,7 +68,7 @@ export class BotMessageModel {
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
   public readonly donationId: number;
-  public readonly forumThreadId?: number;
+  public readonly forumThreadId?: MessageThreadId;
 
   constructor(msg: TgMessage, analytics: AnalyticsData) {
     this.id = msg.message_id;
@@ -96,10 +103,10 @@ export type MessageOptions = {
 };
 
 export class TelegramMessagePrefix {
-  public readonly chatId: number;
+  public readonly chatId: ChatId;
   public readonly id: string;
 
-  constructor(chatId: number, id = nanoid(10)) {
+  constructor(chatId: ChatId, id = nanoid(10)) {
     this.chatId = chatId;
     this.id = id;
   }
@@ -181,14 +188,14 @@ export class TelegramButtonModel<V extends string = string> {
 
 export type DonationPayload = {
   donationId: number;
-  chatId: number;
+  chatId: ChatId;
   prefix: string;
 };
 
 export const DonationSchema = z
   .object({
     d: z.number(),
-    c: z.number(),
+    c: TgChatId,
     l: z.string(),
   })
   .describe(

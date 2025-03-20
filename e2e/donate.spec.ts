@@ -22,6 +22,7 @@ import {
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
+import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -48,8 +49,8 @@ let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 let chatType: TgChatType;
-let testMessageId = 0;
-let testChatId = 0;
+let testMessageId = asMessageId__test(0);
+let testChatId = asChatId__test(0);
 
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
 let testLangId: LanguageCode;
@@ -143,7 +144,7 @@ describe("[default language - english] donate", () => {
   beforeEach(() => {
     bot.setAuthor("");
     chatType = "private";
-    testMessageId = randomIntFromInterval(1, 100000);
+    testMessageId = asMessageId__test(randomIntFromInterval(1, 100000));
   });
 
   afterEach(() => {
@@ -154,7 +155,7 @@ describe("[default language - english] donate", () => {
 
   describe("DIRECT", () => {
     beforeEach(() => {
-      testChatId = randomIntFromInterval(1, 100000);
+      testChatId = asChatId__test(randomIntFromInterval(1, 100000));
       tgMessage = new TelegramMessageModel(testChatId, chatType);
     });
 
@@ -186,7 +187,11 @@ describe("[default language - english] donate", () => {
           mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(
+            asMessageId__test(tgMessage.messageId + 1),
+            price,
+            prefixId,
+          );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -235,7 +240,11 @@ describe("[default language - english] donate", () => {
           mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(
+            asMessageId__test(tgMessage.messageId + 1),
+            price,
+            prefixId,
+          );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -257,7 +266,7 @@ describe("[default language - english] donate", () => {
 
   describe("GROUP", () => {
     beforeEach(() => {
-      testChatId = 0 - randomIntFromInterval(1, 100000);
+      testChatId = asChatId__test(0 - randomIntFromInterval(1, 100000));
       tgMessage = new TelegramMessageModel(testChatId, chatType);
     });
 
@@ -288,7 +297,11 @@ describe("[default language - english] donate", () => {
           mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(
+            asMessageId__test(tgMessage.messageId + 1),
+            price,
+            prefixId,
+          );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
@@ -337,7 +350,11 @@ describe("[default language - english] donate", () => {
           mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
         ]).then(([prefixId]) => {
           const cbMessage = new TelegramMessageModel(testChatId, chatType);
-          cbMessage.setDonateCallback(tgMessage.messageId + 1, price, prefixId);
+          cbMessage.setDonateCallback(
+            asMessageId__test(tgMessage.messageId + 1),
+            price,
+            prefixId,
+          );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
           return Promise.all([
             sendTelegramCallbackMessage(host, bot, cbMessage),
