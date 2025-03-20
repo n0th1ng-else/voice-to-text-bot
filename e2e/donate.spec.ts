@@ -22,6 +22,7 @@ import {
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
+import type { Currency } from "../src/telegram/api/groups/payments/payments-types.js";
 import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
 
 vi.mock("../src/logger/index");
@@ -168,6 +169,7 @@ describe("[default language - english] donate", () => {
         tgMessage.setText(testMessageId, BotCommand.Donate);
         const donationId = 43646456;
         const price = 7;
+        const currency: Currency = "EUR";
 
         const statModel = mockGetBotStatItem(
           testPool,
@@ -190,6 +192,7 @@ describe("[default language - english] donate", () => {
           cbMessage.setDonateCallback(
             asMessageId__test(tgMessage.messageId + 1),
             price,
+            currency,
             prefixId,
           );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
@@ -220,6 +223,7 @@ describe("[default language - english] donate", () => {
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
         const donationId = 214566;
         const price = 3;
+        const currency: Currency = "EUR";
 
         const statModel = mockGetBotStatItem(
           testPool,
@@ -243,6 +247,7 @@ describe("[default language - english] donate", () => {
           cbMessage.setDonateCallback(
             asMessageId__test(tgMessage.messageId + 1),
             price,
+            currency,
             prefixId,
           );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
@@ -278,6 +283,8 @@ describe("[default language - english] donate", () => {
       it("responds on a /donate message with extra buttons and sends payment link", () => {
         const donationId = 5780;
         const price = 5;
+        const currency: Currency = "EUR";
+
         tgMessage.setText(testMessageId, BotCommand.Donate);
         const statModel = mockGetBotStatItem(
           testPool,
@@ -300,6 +307,7 @@ describe("[default language - english] donate", () => {
           cbMessage.setDonateCallback(
             asMessageId__test(tgMessage.messageId + 1),
             price,
+            currency,
             prefixId,
           );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);
@@ -330,6 +338,7 @@ describe("[default language - english] donate", () => {
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
         const donationId = 911;
         const price = 7;
+        const currency: Currency = "EUR";
 
         const statModel = mockGetBotStatItem(
           testPool,
@@ -353,6 +362,7 @@ describe("[default language - english] donate", () => {
           cbMessage.setDonateCallback(
             asMessageId__test(tgMessage.messageId + 1),
             price,
+            currency,
             prefixId,
           );
           mockGetBotStatItem(testPool, tgMessage.chatId, testLangId, statModel);

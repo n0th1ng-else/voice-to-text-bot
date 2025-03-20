@@ -1,15 +1,19 @@
 import { type TelegramBaseApi } from "../core.js";
-import { type TgMessage } from "../../types.js";
+import { type TgMessage, TgMessageSchema } from "../../types.js";
 import {
+  type BasePaymentSchema,
+  type EditUserStarSubscriptionDto,
   type InvoiceDto,
   type PreCheckoutQueryDto,
   type SubscriptionDto,
+  TgAnswerPreCheckoutQuerySchema,
+  TgEditUserStarSubscriptionSchema,
   type TgInvoice,
+  TgRefundStarPaymentSchema,
   type TgSubscription,
-  TgSubscriptionChangeSchema,
   TgSubscriptionUrlSchema,
 } from "./payments-types.js";
-import type { ChatId, UserId } from "../../core.js";
+import type { ChatId, PaymentChargeId, UserId } from "../../core.js";
 
 export class TelegramPaymentsApi {
   private readonly client: TelegramBaseApi;
@@ -21,7 +25,7 @@ export class TelegramPaymentsApi {
   public sendInvoice(opts: TgInvoice): Promise<TgMessage> {
     const data: InvoiceDto = {
       chat_id: opts.chatId,
-      currency: "EUR",
+      currency: opts.currency,
       title: opts.title,
       description: opts.description,
       payload: opts.payload,
@@ -42,8 +46,9 @@ export class TelegramPaymentsApi {
       data.message_thread_id = opts.forumThreadId;
     }
 
-    return this.client.request<TgMessage, InvoiceDto>(
+    return this.client.requestValidate(
       "sendInvoice",
+      TgMessageSchema,
       data,
       opts.chatId,
     );
@@ -82,15 +87,15 @@ export class TelegramPaymentsApi {
   public refundStarPayment(
     chatId: ChatId,
     userId: UserId,
-    paymentChargeId: string,
+    paymentChargeId: PaymentChargeId,
   ): Promise<boolean> {
-    const data = {
+    const data: BasePaymentSchema = {
       user_id: userId,
       telegram_payment_charge_id: paymentChargeId,
     };
     return this.client.requestValidate(
       "refundStarPayment",
-      TgSubscriptionChangeSchema,
+      TgRefundStarPaymentSchema,
       data,
       chatId,
     );
@@ -102,33 +107,37 @@ export class TelegramPaymentsApi {
   public editUserStarSubscription(
     chatId: ChatId,
     userId: UserId,
-    paymentChargeId: string,
+    paymentChargeId: PaymentChargeId,
+    isCanceled = true,
   ): Promise<boolean> {
-    const data = {
+    const data: EditUserStarSubscriptionDto = {
       user_id: userId,
       telegram_payment_charge_id: paymentChargeId,
-      is_canceled: true,
+      is_canceled: isCanceled,
     };
     return this.client.requestValidate(
       "editUserStarSubscription",
-      TgSubscriptionChangeSchema,
+      TgEditUserStarSubscriptionSchema,
       data,
       chatId,
     );
   }
 
   public answerPreCheckoutQuery(
+    chatId: ChatId,
     queryId: string,
     error?: string,
-  ): Promise<TgMessage> {
+  ): Promise<boolean> {
     const data: PreCheckoutQueryDto = {
       pre_checkout_query_id: queryId,
       ok: !error,
       error_message: error,
     };
-    return this.client.request<TgMessage, PreCheckoutQueryDto>(
+    return this.client.requestValidate(
       "answerPreCheckoutQuery",
+      TgAnswerPreCheckoutQuerySchema,
       data,
+      chatId,
     );
   }
 }

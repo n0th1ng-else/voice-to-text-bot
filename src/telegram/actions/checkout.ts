@@ -42,7 +42,7 @@ export class CheckoutAction extends GenericAction {
     const prefix = new TelegramMessagePrefix(chatId, prefixId);
 
     return this.bot.payments
-      .answerPreCheckoutQuery(msg.id)
+      .answerPreCheckoutQuery(chatId, msg.id)
       .then(() => {
         if (!donationId) {
           logger.error(

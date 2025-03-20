@@ -17,7 +17,10 @@ import {
 import { BOT_LOGO, durationLimitSec, supportedAudioFormats } from "../const.js";
 import { convertLanguageCodeFromISO } from "../recognition/common.js";
 import { type TgMedia } from "./api/groups/chats/chats-types.js";
-import type { TgPhotoDto } from "./api/groups/payments/payments-types.js";
+import type {
+  Currency,
+  TgPhotoDto,
+} from "./api/groups/payments/payments-types.js";
 import type { ChatId } from "./api/core.js";
 
 export const isCommandMessage = (
@@ -219,4 +222,8 @@ export const getBotLogo = (): TgPhotoDto => {
     width: 1024,
     height: 1024,
   };
+};
+
+export const isStars = (currency: Currency): boolean => {
+  return currency === "XTR";
 };
