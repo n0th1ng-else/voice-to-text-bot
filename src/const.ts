@@ -33,17 +33,33 @@ export const supportedAudioFormats = [
   },
 ];
 
-export const donationLevels = [
-  {
-    amount: 3,
-    meta: "🚀",
-  },
-  {
-    amount: 5,
-    meta: "😎",
-  },
-  {
-    amount: 7,
-    meta: "👑",
-  },
-];
+export const donationLevels = {
+  stars: [
+    {
+      amount: 100,
+      meta: "⭐",
+    },
+    {
+      amount: 150,
+      meta: "⭐⭐",
+    },
+    {
+      amount: 250,
+      meta: "⭐⭐⭐",
+    },
+  ],
+  euros: [
+    {
+      amount: 3,
+      meta: "🚀",
+    },
+    {
+      amount: 5,
+      meta: "😎",
+    },
+    {
+      amount: 7,
+      meta: "👑",
+    },
+  ],
+};

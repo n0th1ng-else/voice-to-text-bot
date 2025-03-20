@@ -5,7 +5,8 @@ import type { NodeRowScheme } from "./sql/nodes.js";
 import type { DonationRowScheme, DonationStatusType } from "./sql/donations.js";
 import type { IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { DbConnectionConfig } from "./utils.js";
-import type { ChatId } from "../telegram/api/core.js";
+import type { ChatId, PaymentChargeId } from "../telegram/api/core.js";
+import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 
 class DbCore {
   private readonly clients: DbClient[];
@@ -102,16 +103,22 @@ class DbCore {
   public async updateDonationRow(
     donationId: number,
     status: DonationStatusType,
+    paymentChargeId?: PaymentChargeId,
   ): Promise<DonationRowScheme> {
-    const row = await this.main.donations.updateRow(donationId, status);
+    const row = await this.main.donations.updateRow(
+      donationId,
+      status,
+      paymentChargeId,
+    );
     return row;
   }
 
   public async createDonationRow(
     chatId: ChatId,
     price: number,
+    currency: Currency,
   ): Promise<DonationRowScheme> {
-    const row = await this.main.donations.createRow(chatId, price);
+    const row = await this.main.donations.createRow(chatId, price, currency);
     return row;
   }
 

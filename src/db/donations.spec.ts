@@ -1,22 +1,15 @@
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type pg from "pg";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../testUtils/dependencies.js";
-import { asChatId__test } from "../testUtils/types.js";
+import { asChatId__test, asPaymentChargeId__test } from "../testUtils/types.js";
+import { DonationsClient } from "./donations.js";
+import { type DonationRowScheme, DonationStatus } from "./sql/donations.js";
+import { DonationsSql } from "./sql/donations.sql.js";
+import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 
 vi.mock("../logger/index");
 
-const dbConfig = {
+const dbConfig: pg.PoolConfig = {
   user: "spy-user",
   password: "not-me",
   host: "localhost",
@@ -24,20 +17,10 @@ const dbConfig = {
   port: 5432,
 };
 
-let DonationsSql: InjectedFn["DonationsSql"];
-let DonationsClient: InjectedFn["DonationsClient"];
-let DonationStatus: InjectedFn["DonationStatus"];
 let testPool = new MockPool(dbConfig);
-let client: InstanceType<InjectedFn["DonationsClient"]>;
+let client: DonationsClient;
 
 describe("Donations DB", () => {
-  beforeAll(async () => {
-    const init = await injectDependencies();
-    DonationsSql = init.DonationsSql;
-    DonationsClient = init.DonationsClient;
-    DonationStatus = init.DonationStatus;
-  });
-
   beforeEach(() => {
     testPool = new MockPool(dbConfig);
     client = new DonationsClient(testPool);
@@ -50,7 +33,7 @@ describe("Donations DB", () => {
   describe("not initialized", () => {
     it("can not create row", async () => {
       await expect(
-        client.createRow(asChatId__test(23444), 3),
+        client.createRow(asChatId__test(23444), 3, "EUR"),
       ).rejects.toThrowError("The table donations is not initialized yet");
     });
 
@@ -69,7 +52,7 @@ describe("Donations DB", () => {
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrowError();
       await expect(
-        client.createRow(asChatId__test(5231), 5),
+        client.createRow(asChatId__test(5231), 5, "EUR"),
       ).rejects.toThrowError("The table donations is not initialized yet");
     });
   });
@@ -77,30 +60,40 @@ describe("Donations DB", () => {
   describe("initialized", () => {
     beforeEach(() => {
       testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
+      testPool.mockQuery(DonationsSql.migration_22032025_1, () =>
+        Promise.resolve(),
+      );
+      testPool.mockQuery(DonationsSql.migration_22032025_2, () =>
+        Promise.resolve(),
+      );
       return client.init();
     });
 
     it("creates a new row", () => {
       const chatId = asChatId__test(83222);
       const price = 10;
+      const currency: Currency = "EUR";
       const status = DonationStatus.Initialized;
 
       testPool.mockQuery(DonationsSql.insertRow, (values) => {
-        expect(values).toHaveLength(5);
-        const [rChatId, rStatus, rPrice, rCreated, rUpdated] = values;
+        expect(values).toHaveLength(6);
+        const [rChatId, rStatus, rPrice, rCurrency, rCreated, rUpdated] =
+          values;
 
         expect(rChatId).toBe(chatId);
         expect(rStatus).toBe(status);
         expect(rPrice).toBe(price);
         expect(rCreated).toBe(rUpdated);
+        expect(rCurrency).toBe(currency);
 
-        return Promise.resolve({
+        return Promise.resolve<{ rows: DonationRowScheme[] }>({
           rows: [
             {
               donation_id: 21,
               status: rStatus,
               chat_id: rChatId,
               price: rPrice,
+              currency: rCurrency,
               created_at: new Date(),
               updated_at: new Date(),
             },
@@ -108,10 +101,11 @@ describe("Donations DB", () => {
         });
       });
 
-      return client.createRow(chatId, price).then((row) => {
+      return client.createRow(chatId, price, currency).then((row) => {
         expect(typeof row.donation_id).toBe("number");
         expect(row.chat_id).toBe(chatId);
         expect(row.price).toBe(price);
+        expect(row.currency).toBe(currency);
         expect(row.status).toBe(status);
       });
     });
@@ -121,18 +115,19 @@ describe("Donations DB", () => {
       const status = DonationStatus.Canceled;
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
-        expect(values).toHaveLength(3);
-        const [rStatus, rUpdatedAt, rDonationId] = values;
+        expect(values).toHaveLength(4);
+        const [rStatus, rPaymentChargeId, rUpdatedAt, rDonationId] = values;
 
         expect(rStatus).toBe(status);
         expect(rDonationId).toBe(donationId);
         expect(rUpdatedAt).toBeDefined();
 
-        return Promise.resolve({
+        return Promise.resolve<{ rows: DonationRowScheme[] }>({
           rows: [
             {
               donation_id: rDonationId,
               status: rStatus,
+              charge_id: rPaymentChargeId,
               chat_id: 34444,
               price: 4,
               created_at: new Date(),
@@ -155,19 +150,21 @@ describe("Donations DB", () => {
       const status = DonationStatus.Received;
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
-        expect(values).toHaveLength(3);
-        const [rStatus, rUpdatedAt, rDonationId] = values;
+        expect(values).toHaveLength(4);
+        const [rStatus, rPaymentChargeId, rUpdatedAt, rDonationId] = values;
 
         expect(rStatus).toBe(status);
         expect(rDonationId).toBe(donationId);
         expect(rUpdatedAt).toBeDefined();
+        expect(rPaymentChargeId).toBe(undefined);
 
-        return Promise.resolve({
+        return Promise.resolve<{ rows: DonationRowScheme[] }>({
           rows: [
             {
               donation_id: rDonationId,
               status: rStatus,
               chat_id: 21344,
+              charge_id: rPaymentChargeId,
               price: 4,
               created_at: new Date(),
               updated_at: rUpdatedAt,
@@ -189,18 +186,20 @@ describe("Donations DB", () => {
       const status = DonationStatus.Pending;
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
-        expect(values).toHaveLength(3);
-        const [rStatus, rUpdatedAt, rDonationId] = values;
+        expect(values).toHaveLength(4);
+        const [rStatus, rPaymentChargeId, rUpdatedAt, rDonationId] = values;
 
         expect(rStatus).toBe(status);
         expect(rDonationId).toBe(donationId);
         expect(rUpdatedAt).toBeDefined();
+        expect(rPaymentChargeId).toBe(undefined);
 
-        return Promise.resolve({
+        return Promise.resolve<{ rows: DonationRowScheme[] }>({
           rows: [
             {
               donation_id: rDonationId,
               status: rStatus,
+              charge_id: rPaymentChargeId,
               chat_id: 21344,
               price: 4,
               created_at: new Date(),
@@ -213,6 +212,44 @@ describe("Donations DB", () => {
       return client.updateRow(donationId, status).then((row) => {
         expect(row.donation_id).toBe(donationId);
         expect(row.chat_id).toBe(21344);
+        expect(row.price).toBe(4);
+        expect(row.status).toBe(status);
+      });
+    });
+
+    it("updates some row with chargeId", () => {
+      const donationId = 342;
+      const status = DonationStatus.Pending;
+      const chargeId = asPaymentChargeId__test("asdadassda");
+
+      testPool.mockQuery(DonationsSql.updateRow, (values) => {
+        expect(values).toHaveLength(4);
+        const [rStatus, rPaymentChargeId, rUpdatedAt, rDonationId] = values;
+
+        expect(rStatus).toBe(status);
+        expect(rDonationId).toBe(donationId);
+        expect(rUpdatedAt).toBeDefined();
+        expect(rPaymentChargeId).toBe(chargeId);
+
+        return Promise.resolve<{ rows: DonationRowScheme[] }>({
+          rows: [
+            {
+              donation_id: rDonationId,
+              status: rStatus,
+              charge_id: rPaymentChargeId,
+              chat_id: 21344,
+              price: 4,
+              created_at: new Date(),
+              updated_at: rUpdatedAt,
+            },
+          ],
+        });
+      });
+
+      return client.updateRow(donationId, status, chargeId).then((row) => {
+        expect(row.donation_id).toBe(donationId);
+        expect(row.chat_id).toBe(21344);
+        expect(row.charge_id).toBe(chargeId);
         expect(row.price).toBe(4);
         expect(row.status).toBe(status);
       });

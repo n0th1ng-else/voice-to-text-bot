@@ -7,6 +7,7 @@ import {
 } from "./groups/chats/chats-types.js";
 import {
   TgPaymentSchema,
+  TgRefundedPaymentSchema,
   TgSuccessfulPaymentSchema,
 } from "./groups/payments/payments-types.js";
 import {
@@ -80,7 +81,7 @@ const TgCheckoutQuerySchema = z
 
 export type TgCheckoutQuery = Prettify<z.infer<typeof TgCheckoutQuerySchema>>;
 
-const TgMessageSchema = z
+export const TgMessageSchema = z
   .object({
     message_id: TgMessageId,
     date: z.number(),
@@ -91,6 +92,7 @@ const TgMessageSchema = z
     audio: z.optional(TgMediaSchema),
     video_note: z.optional(TgMediaSchema),
     successful_payment: z.optional(TgSuccessfulPaymentSchema),
+    refunded_payment: z.optional(TgRefundedPaymentSchema),
     is_topic_message: z.optional(z.boolean()),
     message_thread_id: z.optional(TgMessageThreadId),
   })

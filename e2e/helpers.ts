@@ -13,8 +13,9 @@ import type { TgCallbackQuery, TgMessage } from "../src/telegram/api/types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
-import { type TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
+import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { ChatId, MessageId } from "../src/telegram/api/core.js";
+import type { Currency } from "../src/telegram/api/groups/payments/payments-types.js";
 import {
   asCallbackQueryId__test,
   asMessageId__test,
@@ -128,10 +129,15 @@ export class TelegramMessageModel {
   public setDonateCallback(
     messageId: MessageId,
     price: number,
+    currency: Currency,
     prefixId: string,
   ): this {
     this.messageId = messageId;
-    const data = new TelegramButtonModel("d", String(price), prefixId);
+    const data = new TelegramButtonModel(
+      "d",
+      JSON.stringify([price, currency]),
+      prefixId,
+    );
 
     this.callbackData = data.getDtoString();
     return this;
@@ -269,16 +275,26 @@ export const getMockCertificate = (): string => {
 
 export const getDonateButtons = (): TelegramMessageMetaItem[][] => {
   const buttons: TelegramMessageMetaItem[][] = [];
-  const extendedButtons: TelegramMessageMetaItem[] = donationLevels.map(
+  const starsButtons: TelegramMessageMetaItem[] = donationLevels.stars.map(
+    (level) =>
+      new TelegramMessageMetaItem(
+        TelegramMessageMetaType.Button,
+        `${level.amount} ${level.meta}`,
+        JSON.stringify([level.amount, "XTR"]),
+      ),
+  );
+
+  const eurosButtons: TelegramMessageMetaItem[] = donationLevels.euros.map(
     (level) =>
       new TelegramMessageMetaItem(
         TelegramMessageMetaType.Button,
         toCurrency(level.amount, level.meta),
-        String(level.amount),
+        JSON.stringify([level.amount, "EUR"]),
       ),
   );
 
-  buttons.push(extendedButtons);
+  buttons.push(starsButtons);
+  buttons.push(eurosButtons);
 
   return buttons;
 };

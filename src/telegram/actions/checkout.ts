@@ -5,6 +5,7 @@ import { parseDonationPayload } from "../helpers.js";
 import { type BotMessageModel, TelegramMessagePrefix } from "../types.js";
 import type { TgCheckoutQuery, TgMessage } from "../api/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
+import type { PaymentChargeId } from "../api/core.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -15,6 +16,7 @@ export class CheckoutAction extends GenericAction {
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     const donationId = mdl.donationId;
+    const chargeId = mdl.paymentChargeId;
     if (!donationId) {
       logger.error(
         `${prefix.getPrefix()} Unable to parse the donationId in runAction. Will not update the DB row!`,
@@ -22,7 +24,7 @@ export class CheckoutAction extends GenericAction {
       );
       return Promise.resolve();
     }
-    return this.markAsSuccessful(donationId, prefix);
+    return this.markAsSuccessful(donationId, prefix, chargeId);
   }
 
   public async runCondition(msg: TgMessage): Promise<boolean> {
@@ -42,7 +44,7 @@ export class CheckoutAction extends GenericAction {
     const prefix = new TelegramMessagePrefix(chatId, prefixId);
 
     return this.bot.payments
-      .answerPreCheckoutQuery(msg.id)
+      .answerPreCheckoutQuery(chatId, msg.id)
       .then(() => {
         if (!donationId) {
           logger.error(
@@ -78,9 +80,10 @@ export class CheckoutAction extends GenericAction {
   private async markAsSuccessful(
     donationId: number,
     prefix: TelegramMessagePrefix,
+    paymentChargeId?: PaymentChargeId,
   ): Promise<void> {
     return this.stat
-      .updateDonationRow(donationId, DonationStatus.Received)
+      .updateDonationRow(donationId, DonationStatus.Received, paymentChargeId)
       .then(() => {
         logger.info(`${prefix.getPrefix()} Donation marked as SUCCESSFUL`);
       })
