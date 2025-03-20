@@ -21,9 +21,10 @@ import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import type { ChatId, MessageThreadId } from "../api/core.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
-import type {
-  Currency,
-  TgInvoice,
+import {
+  type Currency,
+  TgCurrencySchema,
+  type TgInvoice,
 } from "../api/groups/payments/payments-types.js";
 
 const getDonateButton = (
@@ -33,6 +34,17 @@ const getDonateButton = (
 ): TelegramButtonModel => {
   const val = JSON.stringify([price, currency]);
   return new TelegramButtonModel<string>("d", val, logPrefix);
+};
+
+const parseButtonValue = (value: string): [number, Currency] => {
+  const data = JSON.parse(value);
+  const price = data.at(0);
+  const currency = TgCurrencySchema.parse(data.at(1));
+  if (typeof price !== "number" || price <= 0) {
+    throw new Error("Failed to parse the donation button data");
+  }
+
+  return [price, currency];
 };
 
 const logger = new Logger("telegram-bot");
@@ -140,15 +152,54 @@ export class DonateAction extends GenericAction {
   ): Promise<void> {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId, button.logPrefix);
-    // TODO
-    const price = Number(button.value);
 
-    if (!price) {
-      const errorMessage = `Price is not a number, got ${button.value}`;
-      logger.error(
-        `${prefix.getPrefix()} ${errorMessage}`,
-        new Error("Price is not a number"),
-      );
+    try {
+      const [price, currency] = parseButtonValue(button.value);
+
+      return Promise.all([
+        this.getChatLanguage(model, prefix),
+        this.getDonationId(model, price, prefix),
+      ])
+        .then(([lang, donationId]) => {
+          if (!this.payment) {
+            const errorMessage =
+              "Payment service is not set for callback query";
+            logger.error(
+              `${prefix.getPrefix()} ${errorMessage}`,
+              new Error("Payment service is not set"),
+            );
+            model.analytics.addError(errorMessage);
+            return collectAnalytics(
+              model.analytics.setCommand(
+                BotCommand.Donate,
+                "Donate message error",
+                "Payment service is not set",
+              ),
+            );
+          }
+
+          const token = this.payment.getLink(price, donationId, lang);
+
+          return this.sendInvoice(
+            model.chatId,
+            price,
+            currency,
+            donationId,
+            token,
+            lang,
+            prefix,
+            model.forumThreadId,
+          );
+        })
+        .catch((err) => {
+          logger.error(
+            `${prefix.getPrefix()} Unable to send the donations link`,
+            err,
+          );
+        });
+    } catch (err) {
+      const errorMessage = `Failed to parse donation button, got ${button.value}`;
+      logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
       model.analytics.addError(errorMessage);
       return collectAnalytics(
         model.analytics.setCommand(
@@ -158,46 +209,6 @@ export class DonateAction extends GenericAction {
         ),
       );
     }
-
-    return Promise.all([
-      this.getChatLanguage(model, prefix),
-      this.getDonationId(model, price, prefix),
-    ])
-      .then(([lang, donationId]) => {
-        if (!this.payment) {
-          const errorMessage = "Payment service is not set for callback query";
-          logger.error(
-            `${prefix.getPrefix()} ${errorMessage}`,
-            new Error("Payment service is not set"),
-          );
-          model.analytics.addError(errorMessage);
-          return collectAnalytics(
-            model.analytics.setCommand(
-              BotCommand.Donate,
-              "Donate message error",
-              "Payment service is not set",
-            ),
-          );
-        }
-
-        const token = this.payment.getLink(price, donationId, lang);
-
-        return this.sendInvoice(
-          model.chatId,
-          price,
-          donationId,
-          token,
-          lang,
-          prefix,
-          model.forumThreadId,
-        );
-      })
-      .catch((err) => {
-        logger.error(
-          `${prefix.getPrefix()} Unable to send the donations link`,
-          err,
-        );
-      });
   }
 
   private static getDonationButton(
@@ -233,6 +244,7 @@ export class DonateAction extends GenericAction {
   private sendInvoice(
     chatId: ChatId,
     amount: number,
+    currency: Currency,
     donationId: number,
     token: string,
     lang: LanguageCode,
@@ -245,9 +257,9 @@ export class DonateAction extends GenericAction {
 
     const invoice: TgInvoice = {
       chatId,
-      amount: amount * 100,
+      amount: currency === "XTR" ? amount : amount * 100,
       meta: String(donationId),
-      currency: "XTR",
+      currency,
       token,
       title,
       description,
