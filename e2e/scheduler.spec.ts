@@ -5,43 +5,41 @@ import {
   afterEach,
   it,
   describe,
-  beforeAll,
   type MockInstance,
 } from "vitest";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
 import {
   type HealthDto,
   HealthSsl,
   HealthStatus,
 } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";
+import * as apiUtils from "../src/server/api.js";
+import { BotServerNew } from "../src/server/bot-server-new.js";
+import { WaiterForCalls } from "../src/testUtils/waitFor.js";
+import { localhostUrl } from "../src/const.js";
+import { appVersion } from "../src/env.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 
-vi.mock("../src/server/api.js", () => {
-  return {
-    requestHealthData: vi.fn(() => {
-      const dto: HealthDto = {
-        version: "new2",
-        urls: [],
-        status: HealthStatus.Online,
-        message: "ok",
-        ssl: HealthSsl.Off,
-        threadId: 0,
-        serverName: "MockedServer",
-        runtimeVersion: "1.0.0",
-        daysOnlineCurrent: 1,
-        daysOnlineLimit: 1,
-      };
-      waiter.tick();
-      return Promise.resolve(dto);
-    }),
+const apiSpy = vi.spyOn(apiUtils, "requestHealthData");
+
+apiSpy.mockImplementation(() => {
+  const dto: HealthDto = {
+    version: "new2",
+    urls: [],
+    status: HealthStatus.Online,
+    message: "ok",
+    ssl: HealthSsl.Off,
+    threadId: 0,
+    serverName: "MockedServer",
+    runtimeVersion: "1.0.0",
+    daysOnlineCurrent: 1,
+    daysOnlineLimit: 1,
   };
+  waiter.tick();
+  return Promise.resolve(dto);
 });
 
 const appPort = 3700;
@@ -53,31 +51,15 @@ let clearIntervalSpy: MockInstance;
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
-let server: InstanceType<InjectedFn["BotServerNew"]>;
-let requestHealthData: MockInstance<InjectedFn["requestHealthData"]>;
-let BotServer: InjectedFn["BotServerNew"];
-let appVersion: InjectedFn["appVersion"];
-let waiter: InstanceType<InjectedFn["WaiterForCalls"]>;
-let hostUrl: string;
+let server: BotServerNew;
+const waiter = new WaiterForCalls();
+const hostUrl = `${localhostUrl}:${appPort}`;
 const webhookDoNotWait = false;
 
 let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 describe("[uptime daemon]", () => {
-  beforeAll(async () => {
-    const init = await injectDependencies();
-    requestHealthData = vi.spyOn(init, "requestHealthData");
-    BotServer = init.BotServerNew;
-    appVersion = init.appVersion;
-
-    const localhostUrl = init.localhostUrl;
-    const WaiterForCalls = init.WaiterForCalls;
-
-    hostUrl = `${localhostUrl}:${appPort}`;
-    waiter = new WaiterForCalls();
-  });
-
   beforeEach(() => {
     vi.useFakeTimers({
       now: new Date().setHours(23, 58, 0, 0),
@@ -85,19 +67,19 @@ describe("[uptime daemon]", () => {
     });
     vi.clearAllTimers();
     realClearInterval = global.clearInterval;
-    clearIntervalSpy = vi
-      .spyOn(global, "clearInterval")
-      .mockImplementation((interval) => {
-        realClearInterval(interval);
-        waiter.tick();
-      });
+    clearIntervalSpy = vi.spyOn(global, "clearInterval");
 
-    server = new BotServer(appPort, appVersion, webhookDoNotWait);
+    clearIntervalSpy.mockImplementation((interval) => {
+      realClearInterval(interval);
+      waiter.tick();
+    });
+
+    server = new BotServerNew(appPort, appVersion, webhookDoNotWait);
   });
 
   afterEach(async () => {
     clearIntervalSpy.mockRestore();
-    requestHealthData.mockClear();
+    apiSpy.mockClear();
     vi.useRealTimers();
     await stopHandler();
   });
@@ -139,29 +121,29 @@ describe("[uptime daemon]", () => {
       ]);
 
       expect(vi.getTimerCount()).toBe(1);
-      expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-      expect(requestHealthData).toHaveBeenCalledTimes(1);
-      requestHealthData.mockClear();
+      expect(apiSpy).toHaveBeenCalledWith(hostUrl);
+      expect(apiSpy).toHaveBeenCalledTimes(1);
+      apiSpy.mockClear();
       waiter.reset(1);
       vi.advanceTimersByTime(oneMinute);
       await waiter.waitForCondition();
 
-      expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-      expect(requestHealthData).toHaveBeenCalledTimes(1);
-      requestHealthData.mockClear();
+      expect(apiSpy).toHaveBeenCalledWith(hostUrl);
+      expect(apiSpy).toHaveBeenCalledTimes(1);
+      apiSpy.mockClear();
       waiter.reset(3);
       vi.advanceTimersByTime(oneMinute);
       await waiter.waitForCondition();
 
-      expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-      expect(requestHealthData).toHaveBeenLastCalledWith(nextUrl);
+      expect(apiSpy).toHaveBeenCalledWith(hostUrl);
+      expect(apiSpy).toHaveBeenLastCalledWith(nextUrl);
       // TODO why does the test call the nextUrl twice? (should be 2)
-      expect(requestHealthData).toHaveBeenCalledTimes(3);
-      requestHealthData.mockClear();
+      expect(apiSpy).toHaveBeenCalledTimes(3);
+      apiSpy.mockClear();
       expect(clearIntervalSpy).toHaveBeenCalledWith(expect.any(Object));
       expect(vi.getTimerCount()).toBe(0);
       vi.advanceTimersByTime(oneDayMinutes * oneMinute);
-      expect(requestHealthData).not.toBeCalled();
+      expect(apiSpy).not.toBeCalled();
     });
 
     it.each([
@@ -171,9 +153,10 @@ describe("[uptime daemon]", () => {
       "Triggers daemon with minimal 1 day interval if the interval is %s",
       async (_, interval) => {
         await server.triggerDaemon(nextUrl, interval);
+
         expect(vi.getTimerCount()).toBe(1);
-        expect(requestHealthData).toHaveBeenCalledWith(hostUrl);
-        expect(requestHealthData).toHaveBeenCalledTimes(1);
+        expect(apiSpy).toHaveBeenCalledWith(hostUrl);
+        expect(apiSpy).toHaveBeenCalledTimes(1);
       },
     );
   });
