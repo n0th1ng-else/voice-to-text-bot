@@ -6,7 +6,8 @@ import {
   DonationStatus,
   type DonationStatusType,
 } from "./sql/donations.js";
-import type { ChatId } from "../telegram/api/core.js";
+import type { ChatId, PaymentChargeId } from "../telegram/api/core.js";
+import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 
 const logger = new Logger("postgres-donations");
 
@@ -41,10 +42,11 @@ export class DonationsClient {
   public updateRow(
     donationId: number,
     status: DonationStatusType,
+    paymentChargeId?: PaymentChargeId,
   ): Promise<DonationRowScheme> {
     this.logInfo(`Updating the row with id=${donationId}`);
     return this.db
-      .updateRow(donationId, status)
+      .updateRow(donationId, status, paymentChargeId)
       .then((row) => {
         const id = this.getRowId(row);
         this.logInfo(
@@ -58,10 +60,14 @@ export class DonationsClient {
       });
   }
 
-  public createRow(chatId: ChatId, price: number): Promise<DonationRowScheme> {
+  public createRow(
+    chatId: ChatId,
+    price: number,
+    currency: Currency,
+  ): Promise<DonationRowScheme> {
     this.logInfo("Creating a new row");
     return this.db
-      .createRow(chatId, price)
+      .createRow(chatId, price, currency)
       .then((row) => {
         const donationId = this.getRowId(row);
         this.logInfo(`The row with id=${donationId} has been created`);

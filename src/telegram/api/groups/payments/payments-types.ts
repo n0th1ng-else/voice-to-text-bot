@@ -1,10 +1,23 @@
 import { z } from "zod";
 import type { Prettify } from "../../../../common/types.js";
-import { TgChatId, TgMessageThreadId } from "../../core.js";
+import {
+  TgChatId,
+  TgMessageThreadId,
+  TgPaymentChargeId,
+  TgUserId,
+} from "../../core.js";
 
-export const TgSubscriptionChangeSchema = z
+export const TgAnswerPreCheckoutQuerySchema = z
   .boolean()
-  .describe("Telegram subscription change result schema");
+  .describe("Telegram answer pre checkout query schema");
+
+export const TgRefundStarPaymentSchema = z
+  .boolean()
+  .describe("Telegram refund star payment schema");
+
+export const TgEditUserStarSubscriptionSchema = z
+  .boolean()
+  .describe("Telegram edit user star subscription schema");
 
 export const TgSubscriptionUrlSchema = z
   .string()
@@ -16,6 +29,8 @@ export const TgCurrencySchema = z
     z.literal("XTR").describe("Stars"),
   ])
   .describe("Telegram currency schema");
+
+export type Currency = Prettify<z.infer<typeof TgCurrencySchema>>;
 
 export const TgPaymentSchema = z
   .object({
@@ -29,11 +44,24 @@ export const TgSuccessfulPaymentSchema = z
   .intersection(
     TgPaymentSchema,
     z.object({
-      telegram_payment_charge_id: z.string(),
+      subscription_expiration_date: z.optional(z.number()),
+      is_recurring: z.optional(z.boolean()),
+      is_first_recurring: z.optional(z.boolean()),
+      telegram_payment_charge_id: TgPaymentChargeId,
       provider_payment_charge_id: z.string(),
     }),
   )
-  .describe("Telegram successful payment schema validator");
+  .describe("[SuccessfulPayment] Telegram successful payment schema validator");
+
+export const TgRefundedPaymentSchema = z
+  .intersection(
+    TgPaymentSchema,
+    z.object({
+      telegram_payment_charge_id: TgPaymentChargeId,
+      provider_payment_charge_id: z.optional(z.string()),
+    }),
+  )
+  .describe("[RefundedPayment] Telegram refunded payment schema validator");
 
 export const LabeledPriceSchema = z
   .object({
@@ -50,7 +78,7 @@ const PaymentObjectSchema = z
     title: z.string(), // Product name
     description: z.string(), // Product description
     payload: z.string(), // Internal data
-    provider_token: z.string(), // Provider token
+    provider_token: z.optional(z.string()), // Provider token, empty when using stars
     currency: TgCurrencySchema,
     prices: z.array(LabeledPriceSchema),
     start_parameter: z.string(), // Donation id
@@ -113,8 +141,9 @@ const TgInvoiceSchema = z
   .intersection(
     TgPaymentBaseSchema,
     z.object({
+      currency: TgCurrencySchema,
       chatId: TgChatId,
-      token: z.string(),
+      token: z.optional(z.string()),
       forumThreadId: z.optional(TgMessageThreadId),
     }),
   )
@@ -144,3 +173,26 @@ const PreCheckoutQuerySchema = z
   .describe("Telegram pre-checkout query schema");
 
 export type PreCheckoutQueryDto = z.infer<typeof PreCheckoutQuerySchema>;
+
+const TgBasePaymentSchema = z
+  .object({
+    user_id: TgUserId,
+    telegram_payment_charge_id: TgPaymentChargeId,
+  })
+  .describe("Base payment pair: userId and paymentId");
+
+export type BasePaymentSchema = z.infer<typeof TgBasePaymentSchema>;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const TgEditStarSubscriptionSchema = z
+  .intersection(
+    TgBasePaymentSchema,
+    z.object({
+      is_canceled: z.boolean(),
+    }),
+  )
+  .describe("Telegram edit subscription parameters");
+
+export type EditUserStarSubscriptionDto = Prettify<
+  z.infer<typeof TgEditStarSubscriptionSchema>
+>;

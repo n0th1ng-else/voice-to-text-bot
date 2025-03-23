@@ -11,6 +11,8 @@ import {
   TgUserId,
   type FileId,
   TgFileId,
+  type PaymentChargeId,
+  TgPaymentChargeId,
 } from "../telegram/api/core.js";
 
 export const asChatId__test = (chatId: number): ChatId =>
@@ -31,3 +33,7 @@ export const asUserId__test = (userId: number): UserId =>
 
 export const asFileId__test = (fileId: string): FileId =>
   TgFileId.parse(fileId);
+
+export const asPaymentChargeId__test = (
+  paymentChargeId: string,
+): PaymentChargeId => TgPaymentChargeId.parse(paymentChargeId);

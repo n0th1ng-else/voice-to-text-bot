@@ -102,6 +102,12 @@ export const mockTableCreation = (testPool: Pool) => {
   testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
   testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
   testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(DonationsSql.migration_22032025_1, () =>
+    Promise.resolve(),
+  );
+  testPool.mockQuery(DonationsSql.migration_22032025_2, () =>
+    Promise.resolve(),
+  );
   testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(DurationsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(IgnoredChatsSql.createTable, () => Promise.resolve());

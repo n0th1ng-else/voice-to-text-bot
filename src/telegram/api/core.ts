@@ -31,3 +31,7 @@ export type FileId = z.infer<typeof TgFileId>;
 export const TgParseMode = z
   .union([z.literal("HTML"), z.literal("Markdown"), z.literal("MarkdownV2")])
   .describe("Message parse more");
+
+export const TgPaymentChargeId = z.string().brand<"PaymentChargeId">();
+
+export type PaymentChargeId = z.infer<typeof TgPaymentChargeId>;

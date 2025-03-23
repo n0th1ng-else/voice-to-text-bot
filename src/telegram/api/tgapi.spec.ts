@@ -232,7 +232,10 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.payments.answerPreCheckoutQuery(queryId);
+          return api.payments.answerPreCheckoutQuery(
+            asChatId__test(234211),
+            queryId,
+          );
         });
 
         it("should send proper error payload", () => {
@@ -251,7 +254,11 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.payments.answerPreCheckoutQuery(queryId, errMessage);
+          return api.payments.answerPreCheckoutQuery(
+            asChatId__test(234211),
+            queryId,
+            errMessage,
+          );
         });
       });
 
@@ -259,6 +266,7 @@ describe("[telegram api client]", () => {
         it("should send proper payload", () => {
           const data: TgInvoice = {
             amount: 1900,
+            currency: "EUR",
             chatId: asChatId__test(234211),
             description: "Invoice reason description",
             label: "Invoice for stuff",
