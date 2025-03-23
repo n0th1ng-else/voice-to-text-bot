@@ -47,7 +47,7 @@ jobs:
 
       - name: Publish to Registry
         if: inputs.docker-tag == ''
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
@@ -59,7 +59,7 @@ jobs:
 
       - name: Publish to Registry and extra tag
         if: inputs.docker-tag != ''
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
