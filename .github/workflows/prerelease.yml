@@ -53,4 +53,4 @@ jobs:
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           environment: production
-          version: v${{ needs.tag-release.outputs.version }}
+          release: v${{ needs.tag-release.outputs.version }}
