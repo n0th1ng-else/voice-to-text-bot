@@ -6,8 +6,6 @@ export const appVersion: string = process.env.APP_VERSION || "dev";
 
 export const enableSSL = process.env.ENABLE_SSL === "true";
 
-export const provider: string = process.env.PROVIDER || "WITAI";
-
 export const selfUrl: string = process.env.SELF_URL || "";
 
 export const nextReplicaUrl: string = process.env.NEXT_REPLICA_URL || "";

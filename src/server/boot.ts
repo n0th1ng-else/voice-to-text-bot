@@ -2,10 +2,7 @@ import * as envy from "../env.js";
 import { BotServer } from "./bot-server.js";
 import { BotServerNew } from "./bot-server-new.js";
 import { httpsOptions } from "../../certs/index.js";
-import {
-  getVoiceConverterInstance,
-  getVoiceConverterProvider,
-} from "../recognition/index.js";
+import { getVoiceConverterInstances } from "../recognition/index.js";
 import { getDb } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
 import { TelegramBotModel } from "../telegram/bot.js";
@@ -24,6 +21,7 @@ import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import type { BotServerModel } from "./types.js";
+import { VOICE_PROVIDERS } from "../const.js";
 
 const logger = new Logger("boot-server");
 
@@ -45,9 +43,11 @@ export const prepareInstance = async (
         sslOptions,
       );
 
-  const parsedProvider = getVoiceConverterProvider(envy.provider);
-
-  const converter = await getVoiceConverterInstance(parsedProvider, envy);
+  const converters = await getVoiceConverterInstances(
+    VOICE_PROVIDERS.basic,
+    VOICE_PROVIDERS.advanced,
+    envy,
+  );
 
   const db = getDb(
     [
@@ -75,7 +75,7 @@ export const prepareInstance = async (
 
   const bot = new TelegramBotModel(
     envy.telegramBotApi,
-    converter,
+    converters,
     db,
   ).setAuthor(envy.authorTelegramAccount);
 

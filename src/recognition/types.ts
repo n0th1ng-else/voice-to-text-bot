@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const VoiceConverterProviderSchema = z
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const VoiceConverterProviderSchema = z
   .union([
     z.literal("WITAI"),
     z.literal("AWS"),
@@ -38,4 +39,9 @@ export const DEFAULT_LANGUAGE: LanguageCode = "en-US";
 export type ConverterMeta = {
   fileId: string;
   prefix: string;
+};
+
+export type VoiceConverters = {
+  basic: VoiceConverter;
+  advanced: VoiceConverter;
 };

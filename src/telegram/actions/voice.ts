@@ -4,7 +4,7 @@ import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
 import {
   type LanguageCode,
-  type VoiceConverter,
+  type VoiceConverters,
 } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
@@ -19,7 +19,7 @@ import type { TgMessage } from "../api/types.js";
 const logger = new Logger("telegram-bot");
 
 export class VoiceAction extends GenericAction {
-  private converter?: VoiceConverter;
+  private converters?: VoiceConverters;
 
   public runAction(
     mdl: BotMessageModel,
@@ -51,8 +51,8 @@ export class VoiceAction extends GenericAction {
     return Promise.resolve(isVoice);
   }
 
-  public setConverter(converter: VoiceConverter): void {
-    this.converter = converter;
+  public setConverters(converters: VoiceConverters): void {
+    this.converters = converters;
   }
 
   private recogniseVoiceMessage(
@@ -64,12 +64,13 @@ export class VoiceAction extends GenericAction {
 
     return this.getFileLInk(model, prefix)
       .then((fileLink) => {
-        if (!this.converter) {
-          return Promise.reject(new Error("Voice converter is not set!"));
+        if (!this.converters) {
+          return Promise.reject(new Error("Voice converters are not set!"));
         }
 
         return Promise.all([
-          this.converter.transformToText(fileLink, lang, {
+          // TODO detect premium user and use this.converters.advanced
+          this.converters.basic.transformToText(fileLink, lang, {
             fileId: model.voiceFileId,
             prefix: prefix.getPrefix(),
           }),

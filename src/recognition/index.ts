@@ -2,7 +2,7 @@ import {
   type LanguageTokens,
   type VoiceConverter,
   type VoiceConverterProvider,
-  VoiceConverterProviderSchema,
+  type VoiceConverters,
 } from "./types.js";
 import { GoogleProvider } from "./google.js";
 import { WithAiProvider } from "./witai/wit.ai.js";
@@ -26,13 +26,7 @@ export type SupportedEnvironment = {
   };
 };
 
-export const getVoiceConverterProvider = (
-  provider: string,
-): VoiceConverterProvider => {
-  return VoiceConverterProviderSchema.parse(provider);
-};
-
-export const getVoiceConverterInstance = async (
+const getVoiceConverterInstance = async (
   provider: VoiceConverterProvider,
   environment: SupportedEnvironment,
 ): Promise<VoiceConverter> => {
@@ -65,4 +59,15 @@ export const getVoiceConverterInstance = async (
     default:
       throw new Error("Voice recognition provider is not specified");
   }
+};
+
+export const getVoiceConverterInstances = async (
+  basicProvider: VoiceConverterProvider,
+  advancedProvider: VoiceConverterProvider,
+  environment: SupportedEnvironment,
+): Promise<VoiceConverters> => {
+  return {
+    basic: await getVoiceConverterInstance(basicProvider, environment),
+    advanced: await getVoiceConverterInstance(advancedProvider, environment),
+  };
 };
