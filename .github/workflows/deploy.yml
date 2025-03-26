@@ -19,7 +19,7 @@ on:
         required: true
 
 jobs:
-  deploy:
+  build:
     uses: ./.github/workflows/docker.yml
     secrets: inherit
     with:
@@ -27,7 +27,7 @@ jobs:
       version: ${{ inputs.version }}
       sha: ${{ inputs.sha }}
 
-  heroku:
+  release:
     uses: ./.github/workflows/heroku.yml
     secrets: inherit
     with:

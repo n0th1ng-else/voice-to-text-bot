@@ -58,8 +58,7 @@ describe("[lifecycle]", () => {
     localhostUrl = init.localhostUrl;
 
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getVoiceConverterInstance = init.getVoiceConverterInstance;
-    const getVoiceConverterProvider = init.getVoiceConverterProvider;
+    const getVoiceConverterInstances = init.getVoiceConverterInstances;
     const DbClient = init.DbClient;
     const getDb = init.getDb;
     const TelegramBotModel = init.TelegramBotModel;
@@ -68,8 +67,9 @@ describe("[lifecycle]", () => {
 
     mockGoogleAuth();
 
-    const converter = await getVoiceConverterInstance(
-      getVoiceConverterProvider("GOOGLE"),
+    const converter = await getVoiceConverterInstances(
+      "GOOGLE",
+      "GOOGLE",
       initTest.getConverterOptions(),
     );
 

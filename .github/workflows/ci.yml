@@ -9,7 +9,7 @@ jobs:
     uses: ./.github/workflows/scan.yml
     secrets: inherit
 
-  deploy:
+  build:
     needs: [scan]
     uses: ./.github/workflows/docker.yml
     secrets: inherit

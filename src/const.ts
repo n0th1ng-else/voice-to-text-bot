@@ -1,3 +1,5 @@
+import type { VoiceConverterProvider } from "./recognition/types.js";
+
 const GITHUB_PROJECT = "https://github.com/n0th1ng-else/voice-to-text-bot";
 
 export const githubUrl = `${GITHUB_PROJECT}/issues`;
@@ -62,4 +64,12 @@ export const donationLevels = {
       meta: "👑",
     },
   ],
+};
+
+export const VOICE_PROVIDERS: {
+  basic: VoiceConverterProvider;
+  advanced: VoiceConverterProvider;
+} = {
+  basic: "WITAI",
+  advanced: "11LABS",
 };

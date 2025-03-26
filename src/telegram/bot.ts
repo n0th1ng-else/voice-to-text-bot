@@ -5,7 +5,7 @@ import {
   type TgUpdate,
 } from "./api/types.js";
 import { Logger } from "../logger/index.js";
-import { type VoiceConverter } from "../recognition/types.js";
+import { type VoiceConverters } from "../recognition/types.js";
 import { TranslationKeys } from "../text/types.js";
 import { BotMessageModel, TelegramMessagePrefix } from "./types.js";
 import { isMessageSupported } from "./helpers.js";
@@ -32,14 +32,14 @@ export class TelegramBotModel {
 
   constructor(
     token: string,
-    converter: VoiceConverter,
+    converters: VoiceConverters,
     stat: ReturnType<typeof getDb>,
   ) {
     this.token = token;
     const reflector = initTgReflector(this.token);
     this.bot = new TelegramApi(this.token, reflector);
     this.actions = new BotActions(stat, this.bot);
-    this.actions.voice.setConverter(converter);
+    this.actions.voice.setConverters(converters);
   }
 
   public getId(): string {

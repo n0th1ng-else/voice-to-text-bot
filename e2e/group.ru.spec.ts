@@ -47,7 +47,6 @@ let stopHandler: VoidPromise = () =>
   Promise.reject(new Error("Server did not start"));
 
 // Define dependencies
-let converter: InstanceType<InjectedFn["VoiceConverter"]>;
 let hostUrl: string;
 let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
 let telegramServer: nock.Scope;
@@ -125,8 +124,7 @@ describe("[russian language]", () => {
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const mockTgSetWebHook = initTest.mockTgSetWebHook;
     const mockTgSetCommands = initTest.mockTgSetCommands;
-    const getVoiceConverterInstance = init.getVoiceConverterInstance;
-    const getVoiceConverterProvider = init.getVoiceConverterProvider;
+    const getVoiceConverterInstances = init.getVoiceConverterInstances;
     const BotServer = init.BotServerNew;
     const appVersion = init.appVersion;
     const TelegramBaseApi = init.TelegramBaseApi;
@@ -137,15 +135,16 @@ describe("[russian language]", () => {
 
     mockGoogleAuth();
 
-    converter = await getVoiceConverterInstance(
-      getVoiceConverterProvider("GOOGLE"),
+    const converters = await getVoiceConverterInstances(
+      "GOOGLE",
+      "GOOGLE",
       initTest.getConverterOptions(),
     );
     hostUrl = `${localhostUrl}:${appPort}`;
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
-    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot = new TelegramBotModel("telegram-api-token", converters, db);
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramBaseApi.url);
     host = request(hostUrl);
