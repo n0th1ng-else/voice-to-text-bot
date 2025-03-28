@@ -4,6 +4,7 @@ import { type AnalyticsEventExt, EVENTS_LIMIT_GA } from "./types.js";
 import { analytics } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { ChatId } from "../../telegram/api/core.js";
+import { API_TIMEOUT_MS } from "../../const.js";
 
 const logger = new Logger("analytics:ga");
 
@@ -20,8 +21,6 @@ export const collectEvents = async (
     }
     return Promise.resolve();
   }
-
-  const timeout = 10_000;
 
   const isTooManyEvents = events.length > EVENTS_LIMIT_GA;
   if (isTooManyEvents) {
@@ -42,7 +41,7 @@ export const collectEvents = async (
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
         "Content-Type": "application/json",
       },
-      timeout,
+      timeout: API_TIMEOUT_MS,
       responseType: "json",
       data: {
         client_id: String(chatId),

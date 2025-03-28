@@ -9,17 +9,16 @@ import {
 } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
+import { injectDependencies } from "../src/testUtils/dependencies.js";
 import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { VoidPromise } from "../src/common/types.js";
+import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
+vi.mock("../src/telegram/api/tgMTProtoApi");
 
 const appPort = 3600;
 const dbPort = appPort + 1;
@@ -31,7 +30,7 @@ let stopHandler: VoidPromise = () =>
 let testPool: MockPool;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let bot: TelegramBotModel;
 
 describe("error cases", () => {
   describe("server routes", () => {
@@ -55,7 +54,7 @@ describe("error cases", () => {
 
       mockGoogleAuth();
 
-      const converter = await getVoiceConverterInstances(
+      const converters = await getVoiceConverterInstances(
         "GOOGLE",
         "GOOGLE",
         initTest.getConverterOptions(),
@@ -74,7 +73,13 @@ describe("error cases", () => {
       const mainDb = new DbClient(dbConfig, 0, testPool);
       const db = getDb([dbConfig], 0, mainDb);
 
-      bot = new TelegramBotModel("telegram-api-token", converter, db);
+      bot = await TelegramBotModel.factory(
+        "telegram-api-token",
+        92345555,
+        "telegram-app-hash",
+        converters,
+        db,
+      );
       bot.setHostLocation(hostUrl, launchTime);
 
       telegramServer = nock(TelegramBaseApi.url);

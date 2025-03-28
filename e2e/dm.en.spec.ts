@@ -19,16 +19,23 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { setCurrentMockFileId } from "../src/telegram/api/__mocks__/tgMTProtoApi.js";
 import { getSupportedAudioFormats } from "../src/text/utils.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
+import {
+  asChatId__test,
+  asMessageId__test,
+  asFileId__test,
+} from "../src/testUtils/types.js";
+import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/analytics/ga/index");
+vi.mock("../src/telegram/api/tgMTProtoApi");
 
 const appPort = 3100;
 const dbPort = appPort + 1;
@@ -41,7 +48,7 @@ let chatType: TgChatType;
 let testMessageId = asMessageId__test(0);
 let testChatId = asChatId__test(0);
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
-let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let testPool: MockPool;
@@ -64,7 +71,6 @@ let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"]
 let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
 let mockTgReceiveRawMessage: InjectedTestFn["mockTgReceiveRawMessage"];
 let mockSpeechRecognition: InjectedTestFn["mockSpeechRecognition"];
-let mockTgGetFileUrl: InjectedTestFn["mockTgGetFileUrl"];
 let mockUpdateBotStatUsage: InjectedTestFn["mockUpdateBotStatUsage"];
 let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];
 let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
@@ -94,7 +100,6 @@ describe("[default language - english]", () => {
     mockSpeechRecognition = initTest.mockSpeechRecognition;
     getDonateButtons = initTest.getDonateButtons;
     mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
-    mockTgGetFileUrl = initTest.mockTgGetFileUrl;
     mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
     mockGetIgnoredChatsRow = initTest.mockGetIgnoredChatsRow;
 
@@ -113,7 +118,7 @@ describe("[default language - english]", () => {
 
     mockGoogleAuth();
 
-    const converter = await getVoiceConverterInstances(
+    const converters = await getVoiceConverterInstances(
       "GOOGLE",
       "GOOGLE",
       initTest.getConverterOptions(),
@@ -133,7 +138,13 @@ describe("[default language - english]", () => {
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
-    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot = await TelegramBotModel.factory(
+      "telegram-api-token",
+      92345555,
+      "telegram-app-hash",
+      converters,
+      db,
+    );
     bot.setHostLocation(hostUrl, launchTime);
 
     telegramServer = nock(TelegramBaseApi.url);
@@ -396,7 +407,7 @@ describe("[default language - english]", () => {
     });
 
     it("converts voice into text (it fits 90 sec limit)", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
@@ -404,7 +415,7 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -428,7 +439,7 @@ describe("[default language - english]", () => {
     });
 
     it("denies to convert big voice files more than 90 sec", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 90;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
@@ -453,7 +464,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on a voice message with wrong mime type", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
       tgMessage.setVoice(
         testMessageId,
@@ -483,7 +494,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on a voice message with broken duration", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       tgMessage.setVoice(testMessageId, voiceFileId, -1);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -500,7 +511,7 @@ describe("[default language - english]", () => {
     });
 
     it("converts audio into text (it fits 90 sec limit)", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
@@ -508,7 +519,7 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -532,7 +543,7 @@ describe("[default language - english]", () => {
     });
 
     it("denies to convert big audio files more than 90 sec", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 90;
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
@@ -557,7 +568,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on an audio message with wrong mime type", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
       tgMessage.setAudio(
         testMessageId,
@@ -587,7 +598,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on an audio message with broken duration", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       tgMessage.setAudio(testMessageId, voiceFileId, -38);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -604,7 +615,7 @@ describe("[default language - english]", () => {
     });
 
     it("converts video_note into text (it fits 90 sec limit)", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setVideoNote(testMessageId, voiceFileId, voiceFileDuration);
@@ -612,7 +623,7 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -636,7 +647,7 @@ describe("[default language - english]", () => {
     });
 
     it("denies to convert big video_note files more than 90 sec", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 90;
       tgMessage.setVideoNote(testMessageId, voiceFileId, voiceFileDuration);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
@@ -661,7 +672,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on an video_note message with broken duration", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       tgMessage.setVideoNote(testMessageId, voiceFileId, -38);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 

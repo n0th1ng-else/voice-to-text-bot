@@ -14,6 +14,9 @@ export const replicaLifecycleInterval: number =
   Number(process.env.REPLICA_LIFECYCLE_INTERVAL_DAYS) || 1;
 
 export const telegramBotApi: string = process.env.TELEGRAM_BOT_API || "";
+export const telegramBotAppId: number =
+  Number(process.env.TELEGRAM_APP_ID) || 0;
+export const telegramBotAppHash: string = process.env.TELEGRAM_APP_HASH || "";
 
 export const telegramBotName: string = process.env.TELEGRAM_BOT_NAME || "";
 

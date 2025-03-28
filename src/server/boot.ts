@@ -73,11 +73,15 @@ export const prepareInstance = async (
 
   const paymentProvider = new StripePayment(envy.stripeToken);
 
-  const bot = new TelegramBotModel(
+  const bot = await TelegramBotModel.factory(
     envy.telegramBotApi,
+    envy.telegramBotAppId,
+    envy.telegramBotAppHash,
     converters,
     db,
-  ).setAuthor(envy.authorTelegramAccount);
+  );
+
+  bot.setAuthor(envy.authorTelegramAccount);
 
   return db
     .init()

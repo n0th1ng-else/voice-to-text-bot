@@ -21,12 +21,18 @@ import {
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
+import {
+  asChatId__test,
+  asMessageId__test,
+  asFileId__test,
+} from "../src/testUtils/types.js";
+import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/analytics/ga/index");
+vi.mock("../src/telegram/api/tgMTProtoApi");
 
 const appPort = 3100;
 const dbPort = appPort + 1;
@@ -39,7 +45,7 @@ let testMessageId = asMessageId__test(0);
 let testChatId = asChatId__test(0);
 
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
-let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let testPool: MockPool;
@@ -76,7 +82,7 @@ describe("ignore chats", () => {
 
     mockGoogleAuth();
 
-    const converter = await getVoiceConverterInstances(
+    const converters = await getVoiceConverterInstances(
       "GOOGLE",
       "GOOGLE",
       initTest.getConverterOptions(),
@@ -96,7 +102,13 @@ describe("ignore chats", () => {
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
-    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot = await TelegramBotModel.factory(
+      "telegram-api-token",
+      92345555,
+      "telegram-app-hash",
+      converters,
+      db,
+    );
     bot.setHostLocation(hostUrl, launchTime);
 
     telegramServer = nock(TelegramBaseApi.url);
@@ -195,7 +207,7 @@ describe("ignore chats", () => {
 
     it(`does not convert voice into text (it fits 90 sec limit) in ${type} chat`, () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 89;
 
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
@@ -208,7 +220,7 @@ describe("ignore chats", () => {
 
     it(`does not answer to convert big voice files more than 90 sec in ${type} chat`, () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 90;
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -220,7 +232,7 @@ describe("ignore chats", () => {
 
     it(`does not respond on a voice message with wrong mime type in ${type} chat`, () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
       tgMessage.setVoice(
         testMessageId,
@@ -237,7 +249,7 @@ describe("ignore chats", () => {
 
     it(`does not convert audio into text (it fits 90 sec limit) in ${type} chat`, () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 89;
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -249,7 +261,7 @@ describe("ignore chats", () => {
 
     it(`does not answer for denies to convert big audio files more than 90 sec in ${type} chat`, () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 90;
       tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration);
 
@@ -261,7 +273,7 @@ describe("ignore chats", () => {
 
     it(`does not respond on an audio message with wrong mime type in ${type} chat`, () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
       tgMessage.setAudio(
         testMessageId,

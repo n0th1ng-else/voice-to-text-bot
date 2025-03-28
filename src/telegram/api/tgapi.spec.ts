@@ -27,6 +27,7 @@ import {
   asMessageId__test,
 } from "../../testUtils/types.js";
 import type { ChatId } from "./core.js";
+import { randomIntFromInterval } from "../../common/timer.js";
 
 const getApiResponse = <Response>(
   ok: boolean,
@@ -61,7 +62,10 @@ const getPromiseError = <R>(fn: () => Promise<R>): Promise<TgError> =>
   });
 
 let testApiToken = nanoid(10);
-let api = new TelegramApi(testApiToken);
+let testAppId = randomIntFromInterval(1, 100000);
+let testAppHash = nanoid(10);
+
+let api = new TelegramApi(testApiToken, testAppId, testAppHash);
 
 let checkApiData = (config: AxiosRequestConfig): void => {
   throw new Error(`Initialize check api data ${JSON.stringify(config)}`);
@@ -89,7 +93,9 @@ describe("[telegram api client]", () => {
   beforeEach(() => {
     clientSpy.mockClear();
     testApiToken = nanoid(10);
-    api = new TelegramApi(testApiToken);
+    testAppId = randomIntFromInterval(1, 100000);
+    testAppHash = nanoid(10);
+    api = new TelegramApi(testApiToken, testAppId, testAppHash);
   });
 
   describe("telegram response", () => {
@@ -160,12 +166,13 @@ describe("[telegram api client]", () => {
       });
 
       it("getFileLink", () => {
-        const testFileId = "debug-file-id";
+        const testChatId = asChatId__test(323426);
+        const testFileId = asFileId__test("debug-file-id");
         const testFilePath = "path/to/tg/data";
 
         testApiResponse = getApiResponse<TgFile>(true, {
           file_id: testFileId,
-          file_unique_id: asFileId__test("unused-identifier"),
+          file_unique_id: "unused-identifier",
           file_path: testFilePath,
         });
 
@@ -176,7 +183,7 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return api.chats.getFileLink(testFileId).then((fileUrl) => {
+        return api.chats.getFile(testFileId, testChatId).then((fileUrl) => {
           expect(fileUrl).toBe(
             `${TelegramBaseApi.url}/file/bot${testApiToken}/${testFilePath}`,
           );
@@ -654,16 +661,17 @@ describe("[telegram api client]", () => {
         const testErrorCode = 918;
         const testErrorDescription = "Really a trouble";
         const testRetryAfter = 1355;
+        const testChatId = asChatId__test(323426);
         const testMigrateToChat = asChatId__test(88723);
 
-        const testFileId = "debug-file-id";
+        const testFileId = asFileId__test("debug-file-id");
         const testFilePath = "path/to/tg/data";
 
         testApiResponse = getApiResponse<TgFile>(
           false,
           {
             file_id: testFileId,
-            file_unique_id: asFileId__test("unused-identifier"),
+            file_unique_id: "unused-identifier",
             file_path: testFilePath,
           },
           testErrorCode,
@@ -679,25 +687,27 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return getPromiseError(() => api.chats.getFileLink(testFileId)).then(
-          (err) => {
-            expect(err.stack).toBeDefined();
-            expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
-            expect(err.code).toBe(testErrorCode);
-            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getFile`);
-            expect(err.response).toBe(undefined);
-            expect(err.migrateToChatId).toBe(testMigrateToChat);
-            expect(err.retryAfter).toBe(testRetryAfter);
-          },
-        );
+        return getPromiseError(() =>
+          api.chats.getFile(testFileId, testChatId),
+        ).then((err) => {
+          expect(err.stack).toBeDefined();
+          expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
+          expect(err.code).toBe(testErrorCode);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getFile`);
+          expect(err.response).toBe(undefined);
+          expect(err.migrateToChatId).toBe(testMigrateToChat);
+          expect(err.retryAfter).toBe(testRetryAfter);
+          expect(err.chatId).toBe(testChatId);
+        });
       });
 
       it("getFileLink no file path", () => {
-        const testFileId = "debug-file-id";
+        const testFileId = asFileId__test("debug-file-id");
+        const testChatId = asChatId__test(323426);
 
         testApiResponse = getApiResponse<TgFile>(true, {
           file_id: testFileId,
-          file_unique_id: asFileId__test("unused-identifier"),
+          file_unique_id: "unused-identifier",
         });
 
         checkApiData = (config) => {
@@ -707,12 +717,14 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return getPromiseError(() => api.chats.getFileLink(testFileId)).then(
-          (err) => {
-            expect(err.stack).toBeDefined();
-            expect(err.message).toBe("ETELEGRAM Unable to get the file link");
-          },
-        );
+        return getPromiseError(() =>
+          api.chats.getFile(testFileId, testChatId),
+        ).then((err) => {
+          expect(err.stack).toBeDefined();
+          expect(err.chatId).toBe(testChatId);
+          expect(err.url).toContain("getFile");
+          expect(err.message).toBe("ETELEGRAM Unable to get the file link");
+        });
       });
     });
   });

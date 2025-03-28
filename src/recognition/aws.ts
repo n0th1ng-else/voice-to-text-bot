@@ -43,6 +43,7 @@ export class AWSProvider extends VoiceConverter {
     fileLink: string,
     _lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
@@ -54,7 +55,7 @@ export class AWSProvider extends VoiceConverter {
             return this.getJobWithDelay(name, data.job);
           }
 
-          return this.processFile(fileLink, name);
+          return this.processFile(fileLink, name, isLocalFile);
         })
         // .then((job) => fetch(job.TranscriptionJob.Transcript.TranscriptFileUri))
         .then((job) =>
@@ -77,8 +78,12 @@ export class AWSProvider extends VoiceConverter {
     );
   }
 
-  private processFile(fileLink: string, name: string): Promise<any> {
-    return getWavBuffer(fileLink)
+  private processFile(
+    fileLink: string,
+    name: string,
+    isLocalFile: boolean,
+  ): Promise<any> {
+    return getWavBuffer(fileLink, isLocalFile)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));

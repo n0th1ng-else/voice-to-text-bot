@@ -3,10 +3,11 @@ import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
 import type { ChatId } from "../core.js";
+import { API_TIMEOUT_MS } from "../../../const.js";
 
 export class TelegramBaseApi {
   public static readonly url = "https://api.telegram.org";
-  public static readonly timeout = 10_000;
+  public static readonly timeout = API_TIMEOUT_MS;
 
   private static readonly path = "bot";
 
@@ -92,7 +93,7 @@ export class TelegramBaseApi {
     );
   }
 
-  private getApiUrl(methodName: string): string {
+  public getApiUrl(methodName: string): string {
     return `/${TelegramBaseApi.path}${this.apiToken}/${methodName}`;
   }
 }

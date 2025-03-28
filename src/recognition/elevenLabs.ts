@@ -8,6 +8,7 @@ import {
 import { addAttachment } from "../monitoring/sentry.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
+import { API_TIMEOUT_MS } from "../const.js";
 
 const logger = new Logger("11-labs-recognition");
 
@@ -16,7 +17,6 @@ type ElevenLabsProviderOptions = {
 };
 
 export class ElevenLabsProvider extends VoiceConverter {
-  public static readonly timeout = 10_000;
   private readonly client: ElevenLabsClient;
 
   constructor(options: ElevenLabsProviderOptions) {
@@ -32,11 +32,12 @@ export class ElevenLabsProvider extends VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const rawWav = await getWavBuffer(fileLink);
+    const rawWav = await getWavBuffer(fileLink, isLocalFile);
 
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     return this.recognise(rawWav, lang);
@@ -56,7 +57,7 @@ export class ElevenLabsProvider extends VoiceConverter {
           diarize: false, // Whether to annotate who is speaking
         },
         {
-          abortSignal: AbortSignal.timeout(ElevenLabsProvider.timeout),
+          abortSignal: AbortSignal.timeout(API_TIMEOUT_MS),
         },
       )
       .then((recognition) => recognition.text);

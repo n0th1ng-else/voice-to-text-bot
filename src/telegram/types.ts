@@ -21,6 +21,7 @@ import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
 import {
   type ChatId,
+  type FileId,
   type MessageId,
   type MessageThreadId,
   type PaymentChargeId,
@@ -65,7 +66,7 @@ export class BotMessageModel {
   public readonly userName: string;
   public readonly fullUserName: string;
   public readonly groupName: string;
-  public readonly voiceFileId: string;
+  public readonly voiceFileId?: FileId;
   public readonly voiceDuration: number;
   public readonly isVideo: boolean;
   public readonly userLanguage: LanguageCode;

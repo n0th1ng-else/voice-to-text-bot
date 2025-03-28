@@ -2,12 +2,12 @@ import { TelegramBaseApi } from "../core.js";
 import { type MessageDto, type TgMessage } from "../../types.js";
 import {
   type EditMessageDto,
-  type FileDto,
-  type TgFile,
   type TgMessageOptions,
   TgLeaveChatSchema,
+  TgFileSchema,
 } from "./chats-types.js";
-import type { ChatId, MessageId, MessageThreadId } from "../../core.js";
+import type { ChatId, FileId, MessageId, MessageThreadId } from "../../core.js";
+import { TgError } from "../../tgerror.js";
 
 export class TelegramChatsApi {
   private readonly client: TelegramBaseApi;
@@ -90,13 +90,23 @@ export class TelegramChatsApi {
     );
   }
 
-  public async getFileLink(fileId: string): Promise<string> {
-    const data = await this.client.request<TgFile, FileDto>("getFile", {
-      file_id: fileId,
-    });
+  public async getFile(fileId: FileId, chatId: ChatId): Promise<string> {
+    const data = await this.client.requestValidate(
+      "getFile",
+      TgFileSchema,
+      {
+        file_id: fileId,
+      },
+      chatId,
+    );
+
     const filePath = data.file_path;
     if (!filePath) {
-      return Promise.reject(new Error("ETELEGRAM Unable to get the file link"));
+      const err = new Error("Unable to get the file link");
+      const tgError = new TgError(err, err.message)
+        .setUrl(this.client.getApiUrl("getFile"), this.apiToken)
+        .setChatId(chatId);
+      return Promise.reject(tgError);
     }
 
     return `${TelegramBaseApi.url}/file/bot${this.apiToken}/${filePath}`;

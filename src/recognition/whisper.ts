@@ -43,6 +43,7 @@ export class WhisperProvider extends VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     if (!this.modelPath) {
       throw new Error("Whisper converter is not initialized");
@@ -52,7 +53,7 @@ export class WhisperProvider extends VoiceConverter {
     addAttachment(name, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
 
-    const filePath = await getWavFilePath(fileLink);
+    const filePath = await getWavFilePath(fileLink, isLocalFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const text = await runWhisper(
       this.modelPath,

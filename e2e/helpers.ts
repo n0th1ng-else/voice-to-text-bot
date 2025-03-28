@@ -14,7 +14,7 @@ import type { LanguageCode } from "../src/recognition/types.js";
 import type { SupportedEnvironment } from "../src/recognition/index.js";
 import type { ValueOf } from "../src/common/types.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
-import type { ChatId, MessageId } from "../src/telegram/api/core.js";
+import type { ChatId, FileId, MessageId } from "../src/telegram/api/core.js";
 import type { Currency } from "../src/telegram/api/groups/payments/payments-types.js";
 import {
   asCallbackQueryId__test,
@@ -30,7 +30,7 @@ type UserNameOptions = {
 
 export class TelegramMessageModel {
   public messageId: MessageId = asMessageId__test(0);
-  public voiceId = "";
+  public voiceId?: FileId;
   public readonly chatId: ChatId;
   public readonly chatType: TgChatType;
 
@@ -75,7 +75,7 @@ export class TelegramMessageModel {
 
   public setVoice(
     messageId: MessageId,
-    id: string,
+    id: FileId,
     duration: number,
     type = "audio/ogg",
   ): this {
@@ -88,7 +88,7 @@ export class TelegramMessageModel {
 
   public setAudio(
     messageId: MessageId,
-    id: string,
+    id: FileId,
     duration: number,
     type = "audio/opus",
   ): this {
@@ -102,7 +102,7 @@ export class TelegramMessageModel {
 
   public setVideoNote(
     messageId: MessageId,
-    id: string,
+    id: FileId,
     duration: number,
     type = "audio/mpeg",
   ): this {
