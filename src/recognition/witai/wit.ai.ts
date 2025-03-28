@@ -32,11 +32,12 @@ export class WithAiProvider extends VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    return getWavBuffer(fileLink)
+    return getWavBuffer(fileLink, isLocalFile)
       .then((bufferData) => {
         logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
         const token = this.getApiToken(lang);

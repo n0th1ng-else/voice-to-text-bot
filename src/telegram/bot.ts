@@ -30,20 +30,48 @@ export class TelegramBotModel {
   private host = "";
   private path = "";
 
-  constructor(
-    token: string,
+  public static async factory(
+    apiToken: string,
+    appId: number,
+    appHash: string,
+    converters: VoiceConverters,
+    stat: ReturnType<typeof getDb>,
+  ): Promise<TelegramBotModel> {
+    const api = new TelegramBotModel(
+      apiToken,
+      appId,
+      appHash,
+      converters,
+      stat,
+    );
+    await api.init();
+    return api;
+  }
+
+  private constructor(
+    apiToken: string,
+    appId: number,
+    appHash: string,
     converters: VoiceConverters,
     stat: ReturnType<typeof getDb>,
   ) {
-    this.token = token;
+    this.token = apiToken;
 
-    this.bot = new TelegramApi(this.token);
+    this.bot = new TelegramApi(this.token, appId, appHash);
     const reflector = initTgReflector({
       leaveChat: (chatId) => this.bot.chats.leaveChat(chatId),
     });
     this.bot.setErrorReflector(reflector);
     this.actions = new BotActions(stat, this.bot);
     this.actions.voice.setConverters(converters);
+  }
+
+  public async init(): Promise<void> {
+    await this.bot.init();
+  }
+
+  public async stop(): Promise<void> {
+    await this.bot.stop();
   }
 
   public getId(): string {

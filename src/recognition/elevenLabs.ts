@@ -32,11 +32,12 @@ export class ElevenLabsProvider extends VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const rawWav = await getWavBuffer(fileLink);
+    const rawWav = await getWavBuffer(fileLink, isLocalFile);
 
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     return this.recognise(rawWav, lang);

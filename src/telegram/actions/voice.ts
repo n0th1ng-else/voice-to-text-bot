@@ -14,7 +14,9 @@ import {
   type TelegramMessagePrefix,
   VoiceContentReason,
 } from "../types.js";
+import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
+import type { TgFileResult } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -61,8 +63,13 @@ export class VoiceAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Processing voice`);
-
     return this.getFileLInk(model, prefix)
+      .then((linkInfo) =>
+        this.bot.downloadFile(
+          getFullFileName(linkInfo.fileName, true),
+          linkInfo.fileId,
+        ),
+      )
       .then((fileLink) => {
         if (!this.converters) {
           return Promise.reject(new Error("Voice converters are not set!"));
@@ -70,10 +77,15 @@ export class VoiceAction extends GenericAction {
 
         return Promise.all([
           // TODO detect premium user and use this.converters.advanced
-          this.converters.basic.transformToText(fileLink, lang, {
-            fileId: model.voiceFileId,
-            prefix: prefix.getPrefix(),
-          }),
+          this.converters.basic.transformToText(
+            fileLink,
+            lang,
+            {
+              fileId: model.voiceFileId,
+              prefix: prefix.getPrefix(),
+            },
+            true,
+          ),
           Promise.resolve(new TimeMeasure()),
           this.sendInProgressMessage(model, lang, prefix),
         ]);
@@ -149,10 +161,10 @@ export class VoiceAction extends GenericAction {
       });
   }
 
-  private getFileLInk(
+  private async getFileLInk(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
-  ): Promise<string> {
+  ): Promise<TgFileResult> {
     logger.info(`${prefix.getPrefix()} Fetching file link`);
 
     if (!model.voiceFileId) {
@@ -161,7 +173,7 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    return this.bot.chats.getFileLink(model.voiceFileId);
+    return await this.bot.chats.getFile(model.voiceFileId, model.chatId);
   }
 
   private sendInProgressMessage(

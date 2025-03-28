@@ -2,10 +2,10 @@ import { TelegramBaseApi } from "../core.js";
 import { type MessageDto, type TgMessage } from "../../types.js";
 import {
   type EditMessageDto,
-  type FileDto,
-  type TgFile,
   type TgMessageOptions,
   TgLeaveChatSchema,
+  TgFileSchema,
+  type TgFileResult,
 } from "./chats-types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../../core.js";
 
@@ -90,15 +90,25 @@ export class TelegramChatsApi {
     );
   }
 
-  public async getFileLink(fileId: string): Promise<string> {
-    const data = await this.client.request<TgFile, FileDto>("getFile", {
-      file_id: fileId,
-    });
+  public async getFile(fileId: string, chatId: ChatId): Promise<TgFileResult> {
+    const data = await this.client.requestValidate(
+      "getFile",
+      TgFileSchema,
+      {
+        file_id: fileId,
+      },
+      chatId,
+    );
+
     const filePath = data.file_path;
     if (!filePath) {
       return Promise.reject(new Error("ETELEGRAM Unable to get the file link"));
     }
 
-    return `${TelegramBaseApi.url}/file/bot${this.apiToken}/${filePath}`;
+    return {
+      fileUrl: `${TelegramBaseApi.url}/file/bot${this.apiToken}/${filePath}`,
+      fileName: filePath.split("/").at(-1) ?? "file.ogg",
+      fileId: data.file_id,
+    };
   }
 }
