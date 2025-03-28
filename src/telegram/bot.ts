@@ -36,8 +36,12 @@ export class TelegramBotModel {
     stat: ReturnType<typeof getDb>,
   ) {
     this.token = token;
-    const reflector = initTgReflector(this.token);
-    this.bot = new TelegramApi(this.token, reflector);
+
+    this.bot = new TelegramApi(this.token);
+    const reflector = initTgReflector({
+      leaveChat: (chatId) => this.bot.chats.leaveChat(chatId),
+    });
+    this.bot.setErrorReflector(reflector);
     this.actions = new BotActions(stat, this.bot);
     this.actions.voice.setConverters(converters);
   }

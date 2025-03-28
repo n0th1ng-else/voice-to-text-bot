@@ -1,44 +1,17 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-
-let initTgReflector;
-let TgError;
+import { describe, it, expect, vi } from "vitest";
+import { initTgReflector } from "./reflector.js";
+import { TgError } from "./api/tgerror.js";
+import { asChatId__test } from "../testUtils/types.js";
 
 vi.mock("../logger/index");
 
-let res: Promise<boolean> = Promise.resolve(true);
-const leaveChatMock = vi.fn().mockImplementation(() => res);
-
-vi.mock("./api/groups/chats/chats-api.js", () => {
-  return {
-    TelegramChatsApi: function () {
-      return {
-        leaveChat: leaveChatMock,
-      };
-    },
-  };
-});
-
 describe("initTgReflector", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  beforeEach(async () => {
-    const r = await import("./reflector.js");
-    const e = await import("./api/tgerror.js");
-    initTgReflector = r.initTgReflector;
-    TgError = e.TgError;
-  });
-
   describe("happy flow", () => {
-    beforeEach(() => {
-      res = Promise.resolve(true);
-    });
-
-    it("should leave the chat if not enough rights to send text messages to the chat", () => {
-      const reflector = initTgReflector("token");
-      const tgErr = new TgError("ooops", new Error("ooops"));
-      const chatId = 1213455;
+    it("should leave the chat if not enough rights to send text messages to the chat", async () => {
+      const leaveChat = vi.fn().mockImplementation(() => Promise.resolve(true));
+      const reflect = initTgReflector({ leaveChat });
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      const chatId = asChatId__test(1213455);
 
       tgErr.setErrorCode(400).setChatId(chatId).setResponse({
         ok: false,
@@ -46,16 +19,16 @@ describe("initTgReflector", () => {
         description:
           "Bad Request: not enough rights to send text messages to the chat",
       });
-
-      return reflector(tgErr).then(() => {
-        expect(leaveChatMock).toHaveBeenCalledTimes(1);
-        expect(leaveChatMock).toHaveBeenCalledWith(chatId);
-      });
+      await reflect(tgErr);
+      expect(leaveChat).toHaveBeenCalledTimes(1);
+      expect(leaveChat).toHaveBeenCalledWith(chatId);
     });
 
-    it("should do nothing if the chatId is empty", () => {
-      const reflector = initTgReflector("token");
-      const tgErr = new TgError("ooops", new Error("ooops"));
+    it("should do nothing if the chatId is empty", async () => {
+      const leaveChat = vi.fn().mockImplementation(() => Promise.resolve(true));
+
+      const reflect = initTgReflector({ leaveChat });
+      const tgErr = new TgError(new Error("ooops"), "ooops");
 
       tgErr.setErrorCode(400).setResponse({
         ok: false,
@@ -64,36 +37,37 @@ describe("initTgReflector", () => {
           "Bad Request: not enough rights to send text messages to the chat",
       });
 
-      return reflector(tgErr).then(() => {
-        expect(leaveChatMock).not.toHaveBeenCalled();
-      });
+      await reflect(tgErr);
+      expect(leaveChat).not.toHaveBeenCalled();
     });
 
-    it("should do nothing if the error is different", () => {
-      const reflector = initTgReflector("token");
-      const tgErr = new TgError("ooops", new Error("ooops"));
+    it("should do nothing if the error is different", async () => {
+      const leaveChat = vi.fn().mockImplementation(() => Promise.resolve(true));
+      const reflect = initTgReflector({ leaveChat });
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      const chatId = asChatId__test(21313);
 
-      tgErr.setErrorCode(400).setChatId(21313).setResponse({
+      tgErr.setErrorCode(400).setChatId(chatId).setResponse({
         ok: false,
         result: undefined,
         description: "Bad Request: another error",
       });
 
-      return reflector(tgErr).then(() => {
-        expect(leaveChatMock).not.toHaveBeenCalled();
-      });
+      await reflect(tgErr);
+      expect(leaveChat).not.toHaveBeenCalled();
     });
   });
 
   describe("unhappy flow", () => {
-    beforeEach(() => {
-      res = Promise.reject(new Error("leave chat fails :("));
-    });
-
-    it("should not fail if leave chat fails", () => {
-      const reflector = initTgReflector("token");
-      const tgErr = new TgError("ooops", new Error("ooops"));
-      const chatId = 1213455;
+    it("should not fail if leave chat fails", async () => {
+      const leaveChat = vi
+        .fn()
+        .mockImplementation(() =>
+          Promise.reject(new Error("leave chat fails :(")),
+        );
+      const reflect = initTgReflector({ leaveChat });
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      const chatId = asChatId__test(1213455);
 
       tgErr.setErrorCode(400).setChatId(chatId).setResponse({
         ok: false,
@@ -102,10 +76,29 @@ describe("initTgReflector", () => {
           "Bad Request: not enough rights to send text messages to the chat",
       });
 
-      return reflector(tgErr).then(() => {
-        expect(leaveChatMock).toHaveBeenCalledTimes(1);
-        expect(leaveChatMock).toHaveBeenCalledWith(chatId);
+      await reflect(tgErr);
+      expect(leaveChat).toHaveBeenCalledTimes(1);
+      expect(leaveChat).toHaveBeenCalledWith(chatId);
+    });
+
+    it("should not fail if leave chat return false", async () => {
+      const leaveChat = vi
+        .fn()
+        .mockImplementation(() => Promise.resolve(false));
+      const reflect = initTgReflector({ leaveChat });
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      const chatId = asChatId__test(1213455);
+
+      tgErr.setErrorCode(400).setChatId(chatId).setResponse({
+        ok: false,
+        result: undefined,
+        description:
+          "Bad Request: not enough rights to send text messages to the chat",
       });
+
+      await reflect(tgErr);
+      expect(leaveChat).toHaveBeenCalledTimes(1);
+      expect(leaveChat).toHaveBeenCalledWith(chatId);
     });
   });
 });

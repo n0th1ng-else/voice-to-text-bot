@@ -12,11 +12,10 @@ export class TelegramBaseApi {
 
   private readonly client: AxiosInstance;
   private readonly apiToken: string;
-  private readonly errorReflector?: ApiErrorReflector;
+  private errorReflector?: ApiErrorReflector;
 
-  constructor(apiToken: string, errorReflector?: ApiErrorReflector) {
+  constructor(apiToken: string) {
     this.apiToken = apiToken;
-    this.errorReflector = errorReflector;
 
     this.client = axios.create({
       method: "POST",
@@ -28,6 +27,10 @@ export class TelegramBaseApi {
       timeout: TelegramBaseApi.timeout,
       responseType: "json",
     });
+  }
+
+  public setErrorReflector(errorReflector: ApiErrorReflector): void {
+    this.errorReflector = errorReflector;
   }
 
   public async requestValidate<
