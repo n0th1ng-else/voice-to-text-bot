@@ -66,11 +66,14 @@ export class BotServerNew
       return reply.status(status).send(dto);
     });
 
-    this.app.post<{ Reply: HealthDto }>("/lifecycle", async (req, reply) => {
-      logger.warn("Received app:restart hook from the buddy node", req.body);
-      const [status, dto] = await this.getStatusHandler();
-      return reply.status(status).send(dto);
-    });
+    this.app.post<{ Reply: HealthDto; Body: Record<string, unknown> }>(
+      "/lifecycle",
+      async (req, reply) => {
+        logger.warn("Received app:restart hook from the buddy node", req.body);
+        const [status, dto] = await this.getStatusHandler();
+        return reply.status(status).send(dto);
+      },
+    );
 
     this.app.setNotFoundHandler<{ Reply: NotFoundDto }>(async (req, reply) => {
       const err = new Error("Unknown route", {

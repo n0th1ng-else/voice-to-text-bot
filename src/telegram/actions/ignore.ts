@@ -26,18 +26,18 @@ export class IgnoreAction extends GenericAction {
   }
 
   public async runCondition(
-    msg: TgMessage,
+    _msg: TgMessage,
     mdl: BotMessageModel,
   ): Promise<boolean> {
-    return this.stat
-      .getIgnoredChatRow(mdl.chatId)
-      .then((row) => {
-        if (!row) {
-          return false;
-        }
+    try {
+      const row = await this.stat.getIgnoredChatRow(mdl.chatId);
+      if (!row) {
+        return false;
+      }
 
-        return row.ignore;
-      })
-      .catch(() => false);
+      return row.ignore;
+    } catch {
+      return false;
+    }
   }
 }

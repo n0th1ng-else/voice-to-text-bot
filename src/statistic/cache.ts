@@ -12,7 +12,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     this.cacheSize = cacheSize;
     this.idKey = idKey;
     if (!this.hasCacheEnabled()) {
-      logger.warn(
+      logger.info(
         `Cache size is ${Logger.y(
           sSuffix("item", cacheSize),
         )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(
@@ -20,7 +20,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
         )} stat`,
       );
     } else {
-      logger.warn(
+      logger.info(
         `Cache size is ${Logger.y(
           sSuffix("item", cacheSize),
         )} initialized for ${Logger.y(String(idKey))} stat`,

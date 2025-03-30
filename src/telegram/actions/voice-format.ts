@@ -22,14 +22,18 @@ export class VoiceFormatAction extends GenericAction {
     return this.sendWrongFormatMessage(mdl, prefix);
   }
 
-  public async runCondition(msg: TgMessage): Promise<boolean> {
+  public async runCondition(
+    msg: TgMessage,
+    _mdl: BotMessageModel,
+    prefix: TelegramMessagePrefix,
+  ): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
     const isWrongFormat = type.type === VoiceContentReason.WrongMimeType;
     const triggersAction = !isVoice && isWrongFormat;
 
     if (triggersAction) {
-      logger.warn("Wrong audio file mime-type", type);
+      logger.warn("Wrong audio file mime-type", { ...type, ...prefix });
     }
 
     return Promise.resolve(triggersAction);

@@ -38,11 +38,10 @@ export class VoiceLengthAction extends GenericAction {
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    logger.warn(
-      `${prefix.getPrefix()} Message is too long duration=${
-        model.voiceDuration
-      }s`,
-    );
+    logger.warn("Message is too long", {
+      durationSec: model.voiceDuration,
+      ...prefix,
+    });
 
     model.analytics.addTime("voice-length", model.voiceDuration * 1_000);
 
