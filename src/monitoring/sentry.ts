@@ -1,6 +1,7 @@
 import {
   init as initSentryGlobal,
   captureException,
+  captureMessage,
   getCurrentScope,
   withIsolationScope,
   setupFastifyErrorHandler,
@@ -43,6 +44,20 @@ export const captureError = (err: unknown): void => {
     return;
   }
   captureException(err);
+};
+
+export const captureWarning = (
+  message: string,
+  context?: Record<string, unknown>,
+): void => {
+  if (!isEnabled()) {
+    return;
+  }
+
+  captureMessage(message, {
+    level: "warning",
+    extra: context,
+  });
 };
 
 export const addAttachment = (

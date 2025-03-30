@@ -41,6 +41,7 @@ export abstract class GenericAction {
   public abstract runCondition(
     msg: TgMessage,
     mdl: BotMessageModel,
+    prefix: TelegramMessagePrefix,
   ): Promise<boolean>;
 
   public async getChatLanguage(

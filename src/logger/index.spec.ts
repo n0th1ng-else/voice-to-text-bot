@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Logger } from "./index.js";
+import { Logger } from "./index.js";
+import * as sentryUtils from "../monitoring/sentry.js";
 
 vi.mock("node:cluster", () => import("../../__mocks__/cluster.js"));
 vi.mock("picocolors", () => {
@@ -15,21 +16,18 @@ vi.mock("picocolors", () => {
 });
 
 vi.mock("./integration");
-vi.mock("../monitoring/sentry");
 vi.mock("../env");
 
-vi.spyOn(global.console, "log");
-vi.spyOn(global.console, "warn");
-vi.spyOn(global.console, "error");
+vi.spyOn(global.console, "log").mockReturnValue();
+vi.spyOn(global.console, "warn").mockReturnValue();
+vi.spyOn(global.console, "error").mockReturnValue();
+vi.spyOn(sentryUtils, "captureError").mockReturnValue();
+vi.spyOn(sentryUtils, "captureWarning").mockReturnValue();
 
 let LOG_LEVEL: string | undefined = undefined;
 
 const testMessage = "some message";
 
-const getLogger = async (): Promise<typeof Logger> => {
-  const init = await import("./index.js");
-  return init.Logger;
-};
 describe("Logger", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -40,29 +38,25 @@ describe("Logger", () => {
       LOG_LEVEL = "ERROR";
     });
 
-    it("should not send debug logs", async () => {
-      const Logger = await getLogger();
+    it("should not send debug logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it("should not send info logs", async () => {
-      const Logger = await getLogger();
+    it("should not send info logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.info(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it("should not send warn logs", async () => {
-      const Logger = await getLogger();
+    it("should not send warn logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.warn(testMessage);
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    it("should send error logs", async () => {
-      const Logger = await getLogger();
+    it("should send error logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const err = new Error("ooops");
       log.error(testMessage, err);
@@ -79,33 +73,34 @@ describe("Logger", () => {
       LOG_LEVEL = "WARN";
     });
 
-    it("should not send debug logs", async () => {
-      const Logger = await getLogger();
+    it("should not send debug logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it("should not send info logs", async () => {
-      const Logger = await getLogger();
+    it("should not send info logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.info(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it("should send warn logs", async () => {
-      const Logger = await getLogger();
+    it("should send warn logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
-      log.warn(testMessage);
+      const context = { foo: "bar" };
+      log.warn(testMessage, context);
       expect(console.warn).toHaveBeenCalledWith(
         expect.any(String),
         testMessage,
-        "",
+        context,
+      );
+      expect(sentryUtils.captureWarning).toHaveBeenCalledWith(
+        testMessage,
+        context,
       );
     });
 
-    it("should send error logs", async () => {
-      const Logger = await getLogger();
+    it("should send error logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const err = new Error("ooops");
       log.error(testMessage, err);
@@ -122,33 +117,34 @@ describe("Logger", () => {
       LOG_LEVEL = "INFO";
     });
 
-    it("should not send debug logs", async () => {
-      const Logger = await getLogger();
+    it("should not send debug logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it("should send info logs", async () => {
-      const Logger = await getLogger();
+    it("should send info logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.info(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
-    it("should send warn logs", async () => {
-      const Logger = await getLogger();
+    it("should send warn logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
-      log.warn(testMessage);
+      const context = { foo: "bar" };
+      log.warn(testMessage, context);
       expect(console.warn).toHaveBeenCalledWith(
         expect.any(String),
         testMessage,
-        "",
+        context,
+      );
+      expect(sentryUtils.captureWarning).toHaveBeenCalledWith(
+        testMessage,
+        context,
       );
     });
 
-    it("should send error logs", async () => {
-      const Logger = await getLogger();
+    it("should send error logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const err = new Error("ooops");
       log.error(testMessage, err);
@@ -165,22 +161,19 @@ describe("Logger", () => {
       LOG_LEVEL = "DEBUG";
     });
 
-    it("should send debug logs", async () => {
-      const Logger = await getLogger();
+    it("should send debug logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.debug(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
-    it("should send info logs", async () => {
-      const Logger = await getLogger();
+    it("should send info logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.info(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
-    it("should send warn logs", async () => {
-      const Logger = await getLogger();
+    it("should send warn logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.warn(testMessage);
       expect(console.warn).toHaveBeenCalledWith(
@@ -190,8 +183,7 @@ describe("Logger", () => {
       );
     });
 
-    it("should send error logs", async () => {
-      const Logger = await getLogger();
+    it("should send error logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const err = new Error("ooops");
       log.error(testMessage, err);
@@ -208,22 +200,19 @@ describe("Logger", () => {
       LOG_LEVEL = "non-recognized";
     });
 
-    it("should not send debug logs", async () => {
-      const Logger = await getLogger();
+    it("should not send debug logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
-    it("should send info logs", async () => {
-      const Logger = await getLogger();
+    it("should send info logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.info(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
-    it("should send warn logs", async () => {
-      const Logger = await getLogger();
+    it("should send warn logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.warn(testMessage);
       expect(console.warn).toHaveBeenCalledWith(
@@ -233,8 +222,7 @@ describe("Logger", () => {
       );
     });
 
-    it("should send error logs", async () => {
-      const Logger = await getLogger();
+    it("should send error logs", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const err = new Error("ooops");
       log.error(testMessage, err);

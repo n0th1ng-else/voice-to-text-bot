@@ -2,7 +2,7 @@ import cluster from "node:cluster";
 import picocolors from "picocolors";
 import { z } from "zod";
 import { sendLogs } from "./integration.js";
-import { captureError } from "../monitoring/sentry.js";
+import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
 
 const LogLevelSchema = z
@@ -100,13 +100,14 @@ export class Logger {
     sendLogs("info", this.id, this.additionalPrefix, msg, data);
   }
 
-  public warn(msg: string, data?: unknown): void {
+  public warn(msg: string, data?: Record<string, unknown>): void {
     if (LOG_LEVEL_PRIORITY.WARN < this.level) {
       return;
     }
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.prefix), msg, data ?? "");
     sendLogs("warn", this.id, this.additionalPrefix, msg, data);
+    captureWarning(msg, data);
   }
 
   public error(msg: string, data: unknown): void {

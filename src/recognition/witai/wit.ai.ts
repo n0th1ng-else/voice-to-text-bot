@@ -167,7 +167,7 @@ export class WithAiProvider extends VoiceConverter {
         if (!finalizedChunks.length) {
           logger.warn(
             `${logPrefix} The final response chunk not found. Transcription is empty.`,
-            chunks.map(({ text }) => text),
+            { text: chunks.map(({ text }) => text) },
           );
         }
         return finalizedChunks;

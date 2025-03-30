@@ -36,7 +36,11 @@ export class VoiceAction extends GenericAction {
       );
   }
 
-  public async runCondition(msg: TgMessage): Promise<boolean> {
+  public async runCondition(
+    msg: TgMessage,
+    _mdl: BotMessageModel,
+    prefix: TelegramMessagePrefix,
+  ): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
     const isNoContent = type.type === VoiceContentReason.NoContent;
@@ -44,7 +48,7 @@ export class VoiceAction extends GenericAction {
     if (!isVoice && !isNoContent) {
       logger.warn(
         "Some problems identified during the voice object detection",
-        type,
+        { ...type, ...prefix },
       );
     }
 

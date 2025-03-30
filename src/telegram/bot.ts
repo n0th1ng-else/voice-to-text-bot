@@ -64,7 +64,7 @@ export class TelegramBotModel {
 
   public applyHostLocationIfNeeded(timeoutMs: number): Promise<boolean> {
     const hookUrl = `${this.host}${this.getPath()}`;
-    logger.warn(`WebHook url is ${Logger.y(hookUrl)}`);
+    logger.info(`WebHook url is ${Logger.y(hookUrl)}`);
 
     return runPromiseWithRetry("bot.getWebHookInfo", () =>
       this.bot.updates.getWebHookInfo(),
@@ -79,7 +79,7 @@ export class TelegramBotModel {
 
   private applyHostLocation(timeoutMs: number): Promise<boolean> {
     const hookUrl = `${this.host}${this.getPath()}`;
-    logger.warn(`Applying WebHook url is ${Logger.y(hookUrl)}`);
+    logger.info(`Applying WebHook url is ${Logger.y(hookUrl)}`);
     return runPromiseWithRetry(
       "bot.applyHostLocation",
       () => this.bot.updates.setWebHook(hookUrl),
@@ -120,7 +120,9 @@ export class TelegramBotModel {
           return this.handleCheckout(message.pre_checkout_query, analytics);
         }
 
-        logger.warn("Message is not recognized", Object.keys(message));
+        logger.warn("Message is not recognized", {
+          messageKeys: Object.keys(message),
+        });
       })
       .catch((err) => {
         logger.error("Failed to handle api request", err);
@@ -161,7 +163,7 @@ export class TelegramBotModel {
       return this.actions.donate.runAction(model, prefix);
     }
 
-    if (await this.actions.voiceFormat.runCondition(msg)) {
+    if (await this.actions.voiceFormat.runCondition(msg, model, prefix)) {
       return this.actions.voiceFormat.runAction(model, prefix);
     }
 
@@ -169,7 +171,7 @@ export class TelegramBotModel {
       return this.actions.voiceLength.runAction(model, prefix);
     }
 
-    if (await this.actions.voice.runCondition(msg)) {
+    if (await this.actions.voice.runCondition(msg, model, prefix)) {
       return this.actions.voice.runAction(model, prefix);
     }
 
@@ -184,7 +186,7 @@ export class TelegramBotModel {
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    logger.warn(`${prefix.getPrefix()} Message is not supported`);
+    logger.warn("Message is not supported", { ...prefix });
     return collectAnalytics(
       model.analytics.setCommand("/app", "Message is not supported"),
     );
