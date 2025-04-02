@@ -49,6 +49,7 @@ export class VoiceAction extends GenericAction {
       logger.warn(
         "Some problems identified during the voice object detection",
         { ...type, ...prefix },
+        true,
       );
     }
 

@@ -55,6 +55,8 @@ export class UptimeDaemon {
     if (interval < minInterval) {
       logger.warn(
         `Lifecycle interval can not be less than 1 day. Falling back to 1 (Received ${interval})`,
+        {},
+        true,
       );
     }
 

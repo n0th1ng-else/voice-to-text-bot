@@ -35,7 +35,7 @@ export const initTgReflector = (
       try {
         const isChatLeft = await api.leaveChat(err.chatId);
         if (isChatLeft) {
-          logger.warn("Left the chat", { chatId: err.chatId });
+          logger.warn("Left the chat", { chatId: err.chatId }, true);
           return;
         }
 

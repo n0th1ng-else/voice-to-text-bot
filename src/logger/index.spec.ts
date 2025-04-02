@@ -54,6 +54,10 @@ describe("Logger", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       log.warn(testMessage);
       expect(console.warn).not.toHaveBeenCalled();
+      expect(sentryUtils.captureWarning).not.toHaveBeenCalled();
+      log.warn(testMessage, {}, true);
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(sentryUtils.captureWarning).not.toHaveBeenCalled();
     });
 
     it("should send error logs", () => {
@@ -89,6 +93,18 @@ describe("Logger", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const context = { foo: "bar" };
       log.warn(testMessage, context);
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.any(String),
+        testMessage,
+        context,
+      );
+      expect(sentryUtils.captureWarning).not.toHaveBeenCalled();
+    });
+
+    it("should send warn logs and report to sentry", () => {
+      const log = new Logger("some-id", LOG_LEVEL);
+      const context = { foo: "bar" };
+      log.warn(testMessage, context, true);
       expect(console.warn).toHaveBeenCalledWith(
         expect.any(String),
         testMessage,
@@ -133,6 +149,18 @@ describe("Logger", () => {
       const log = new Logger("some-id", LOG_LEVEL);
       const context = { foo: "bar" };
       log.warn(testMessage, context);
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.any(String),
+        testMessage,
+        context,
+      );
+      expect(sentryUtils.captureWarning).not.toHaveBeenCalled();
+    });
+
+    it("should send warn logs and report to sentry", () => {
+      const log = new Logger("some-id", LOG_LEVEL);
+      const context = { foo: "bar" };
+      log.warn(testMessage, context, true);
       expect(console.warn).toHaveBeenCalledWith(
         expect.any(String),
         testMessage,

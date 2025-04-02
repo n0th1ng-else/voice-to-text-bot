@@ -22,7 +22,11 @@ const parseWitAILanguageTokens = (
   optionsStr?: string,
 ): LanguageTokens => {
   if (!optionsStr) {
-    logger.warn("Wit.ai tokens v2 not found. Falling back to the old format");
+    logger.warn(
+      "Wit.ai tokens v2 not found. Falling back to the old format",
+      {},
+      true,
+    );
     return tokens;
   }
   try {

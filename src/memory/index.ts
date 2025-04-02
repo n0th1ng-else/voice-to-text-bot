@@ -57,7 +57,7 @@ export const printCurrentMemoryStat = async (
     }
 
     if (statDiff > warningStat) {
-      logger.warn(line);
+      logger.warn(line, {}, true);
       return stat.rss;
     }
 

@@ -154,6 +154,7 @@ export class LangAction extends GenericAction {
           logger.warn(
             `${prefix.getPrefix()} Unable to edit language selector. Most likely it is already updated but the user clicked button multiple times`,
             err,
+            true,
           );
 
           return;

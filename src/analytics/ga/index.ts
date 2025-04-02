@@ -25,7 +25,7 @@ export const collectEvents = async (
 
   const isTooManyEvents = events.length > EVENTS_LIMIT_GA;
   if (isTooManyEvents) {
-    logger.warn("Too many events to send for analytics");
+    logger.warn("Too many events to send for analytics", {}, true);
   }
 
   return axios
