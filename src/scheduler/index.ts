@@ -33,7 +33,11 @@ export class ScheduleDaemon<TickData> {
 
   public start(): this {
     if (this.isRunning) {
-      logger.warn(`${Logger.y(this.printId)} Daemon is already running`);
+      logger.warn(
+        `${Logger.y(this.printId)} Daemon is already running`,
+        {},
+        true,
+      );
       return this;
     }
 
@@ -45,7 +49,11 @@ export class ScheduleDaemon<TickData> {
 
   public stop(): void {
     if (!this.isRunning) {
-      logger.warn(`${Logger.y(this.printId)} Daemon has already stopped`);
+      logger.warn(
+        `${Logger.y(this.printId)} Daemon has already stopped`,
+        {},
+        true,
+      );
       return;
     }
 

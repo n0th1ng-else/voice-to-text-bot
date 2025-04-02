@@ -29,9 +29,13 @@ export const collectEvents = async (
       const sessionId = Number(sessionIdStr);
 
       if (isNaN(sessionId)) {
-        logger.warn("Session id is not a number, got string", {
-          sessionIdStr,
-        });
+        logger.warn(
+          "Session id is not a number, got string",
+          {
+            sessionIdStr,
+          },
+          true,
+        );
       }
       /**
        * SessionId, 19 chars max

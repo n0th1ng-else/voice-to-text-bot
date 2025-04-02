@@ -40,7 +40,7 @@ export const printCurrentStorageUsage = async (
         return cacheSizeMBytes;
       }
       if (cacheSizeMBytes < 100) {
-        logger.warn(message);
+        logger.warn(message, {}, true);
         return cacheSizeMBytes;
       }
 

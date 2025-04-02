@@ -115,5 +115,19 @@
     "text",
     "transcribe",
     "cognitive"
-  ]
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@contrast/fn-inspect",
+      "@newrelic/native-metrics",
+      "@playwright/browser-chromium",
+      "@sentry-internal/node-cpu-profiler",
+      "aws-sdk",
+      "better-sqlite3",
+      "esbuild",
+      "ffmpeg-static",
+      "protobufjs",
+      "unix-dgram"
+    ]
+  }
 }

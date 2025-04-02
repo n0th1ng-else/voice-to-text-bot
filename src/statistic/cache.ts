@@ -52,9 +52,12 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     );
     if (existingItem) {
       logger.warn(
-        `The item with ${String(this.idKey)}=${
-          item[this.idKey]
-        } is already exists. Removing old data from the cache`,
+        "The item already exists. Removing old data from the cache",
+        {
+          key: String(this.idKey),
+          value: item[this.idKey],
+        },
+        true,
       );
 
       this.removeItem(item[this.idKey]);
@@ -69,6 +72,8 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
         )} and have a size of ${Logger.y(
           sSuffix("item", newCacheData.length),
         )}. Old records will be removed to keep storage under the limit`,
+        {},
+        true,
       );
     }
 

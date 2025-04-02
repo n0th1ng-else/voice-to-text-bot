@@ -100,14 +100,20 @@ export class Logger {
     sendLogs("info", this.id, this.additionalPrefix, msg, data);
   }
 
-  public warn(msg: string, data?: Record<string, unknown>): void {
+  public warn(
+    msg: string,
+    data?: Record<string, unknown>,
+    shouldReport = false,
+  ): void {
     if (LOG_LEVEL_PRIORITY.WARN < this.level) {
       return;
     }
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.prefix), msg, data ?? "");
     sendLogs("warn", this.id, this.additionalPrefix, msg, data);
-    captureWarning(msg, data);
+    if (shouldReport) {
+      captureWarning(msg, data);
+    }
   }
 
   public error(msg: string, data: unknown): void {

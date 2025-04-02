@@ -1,4 +1,4 @@
-export const parseChunkedResponse = <Dto>(body = ""): Dto[] => {
+export const parseChunkedResponse = (body = ""): unknown[] => {
   // Split by newline, trim, remove empty lines
   const chunks = body
     .split("\r\n")
@@ -6,11 +6,11 @@ export const parseChunkedResponse = <Dto>(body = ""): Dto[] => {
     .filter((chunk) => Boolean(chunk.length));
 
   // Loop through the chunks and try to Json.parse
-  return chunks.reduce<{ prev: string; acc: Dto[] }>(
+  return chunks.reduce<{ prev: string; acc: unknown[] }>(
     ({ prev, acc }, chunk) => {
       const newPrev = `${prev}${chunk}`;
       try {
-        const newChunk: Dto = JSON.parse(newPrev);
+        const newChunk = JSON.parse(newPrev);
         return { prev: "", acc: [...acc, newChunk] };
       } catch {
         return { prev: newPrev, acc };
