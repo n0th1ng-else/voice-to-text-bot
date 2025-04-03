@@ -44,7 +44,11 @@ export class TelegramBotModel {
       converters,
       stat,
     );
-    await api.init();
+
+    // TODO consumes too much memory?
+    await Promise.resolve();
+    // await api.init();
+
     return api;
   }
 

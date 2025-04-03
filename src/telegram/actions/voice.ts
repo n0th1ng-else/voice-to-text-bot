@@ -14,7 +14,7 @@ import {
   type TelegramMessagePrefix,
   VoiceContentReason,
 } from "../types.js";
-import { getFullFileName } from "../../files/index.js";
+// import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
 
@@ -172,19 +172,20 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    // const fileUrl = await this.bot.chats.getFile(
-    //     model.voiceFileId,
-    //     model.chatId
-    // );
-    //
-    // return [fileUrl, model.voiceFileId, false]
-
-    const filePath = await this.bot.downloadFile(
-      getFullFileName("original_file", true),
+    const fileUrl = await this.bot.chats.getFile(
       model.voiceFileId,
+      model.chatId,
     );
 
-    return [filePath, model.voiceFileId, true];
+    return [fileUrl, model.voiceFileId, false];
+
+    // TODO consumes too much memory?
+    // const filePath = await this.bot.downloadFile(
+    //   getFullFileName("original_file", true),
+    //   model.voiceFileId,
+    // );
+    //
+    // return [filePath, model.voiceFileId, true];
   }
 
   private sendInProgressMessage(
