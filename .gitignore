@@ -117,3 +117,5 @@ file-temp/*
 !file-temp/.gitkeep
 
 .VERSION
+
+client.session*

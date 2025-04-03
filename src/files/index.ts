@@ -59,19 +59,22 @@ export const deleteFileIfExists = async (
   return fileName;
 };
 
-const getFullFileName = (
-  dir: string,
+export const getFullFileName = (
   fileName = generateFileName(),
+  addUniqPrefix = false,
+  dir = "file-temp",
 ): string => {
-  return resolve([".", dir, fileName].filter(Boolean).join("/"));
+  const name = addUniqPrefix ? `${nanoid(10)}_${fileName}` : fileName;
+  return resolve([".", dir, name].filter(Boolean).join("/"));
 };
 
 export const saveStreamToFile = async (
   stream: IncomingMessage,
-  dir: string,
   fileName?: string,
+  addUniqPrefix?: boolean,
+  dir?: string,
 ): Promise<string> => {
-  const name = getFullFileName(dir, fileName);
+  const name = getFullFileName(fileName, addUniqPrefix, dir);
   logger.info(`Saving the stream into filesystem. The file name is ${name}`);
 
   return new Promise<string>((resolve, reject) => {

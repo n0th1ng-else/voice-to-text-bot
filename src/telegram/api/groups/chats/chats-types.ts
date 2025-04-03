@@ -1,26 +1,16 @@
 import { z } from "zod";
 import { TgChatId, TgFileId, TgMessageId, TgParseMode } from "../../core.js";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TgFileSchema = z
+export const TgFileSchema = z
   .object({
-    file_id: z.string(),
-    file_unique_id: TgFileId,
+    file_id: TgFileId,
+    file_unique_id: z.string(),
     file_size: z.optional(z.number()),
     file_path: z.optional(z.string()),
   })
   .describe("Telegram file schema");
 
 export type TgFile = z.infer<typeof TgFileSchema>;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const FileSchema = z
-  .object({
-    file_id: z.string(),
-  })
-  .describe("Telegram file link schema");
-
-export type FileDto = z.infer<typeof FileSchema>;
 
 const TgInlineKeyboardButtonSchema = z
   .object({
@@ -65,7 +55,7 @@ export type EditMessageDto = z.infer<typeof EditMessageSchema>;
 
 export const TgMediaSchema = z
   .object({
-    file_id: z.string(),
+    file_id: TgFileId,
     duration: z.number(),
     mime_type: z.optional(z.string()),
   })

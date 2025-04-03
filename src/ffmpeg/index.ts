@@ -2,7 +2,6 @@ import type { IncomingMessage } from "node:http";
 import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import axios from "axios";
-import { nanoid } from "nanoid";
 import { Logger } from "../logger/index.js";
 import {
   deleteFileIfExists,
@@ -55,29 +54,40 @@ const downloadAsStream = (url: string): Promise<IncomingMessage> =>
     })
     .then(({ data: stream }) => stream);
 
-export const getWavFilePath = async (fileLink: string): Promise<string> => {
-  logger.debug("Converting 🎶 Voice into wav 💿");
-  const originalFileName = fileLink.split("/").at(-1) ?? "file.ogg";
-  const inputFile = `${nanoid(10)}_${originalFileName}`;
-  const stream = await downloadAsStream(fileLink);
-  const pathToFile = await saveStreamToFile(stream, "file-temp", inputFile);
-  logger.info(`Telegram file location: ${Logger.g(pathToFile)}`);
-
+const getWavFilePathFromLocal = async (fsFilePath) => {
   try {
-    const file = await convertFileToWav(pathToFile);
+    const file = await convertFileToWav(fsFilePath);
     logger.info(`WAV 🎶 file location: ${Logger.g(file)}`);
-    await deleteFileIfExists(pathToFile);
+    await deleteFileIfExists(fsFilePath);
     return file;
   } catch (err) {
-    await deleteFileIfExists(pathToFile, err);
+    await deleteFileIfExists(fsFilePath, err);
     throw new Error(
       "Never thrown: deleteFileIfExists throws the original error",
     );
   }
 };
 
-export const getWavBuffer = async (fileLink: string): Promise<Buffer> => {
-  const filename = await getWavFilePath(fileLink);
+export const getWavFilePath = async (
+  fileLink: string,
+  isLocalFile: boolean,
+): Promise<string> => {
+  if (isLocalFile) {
+    return await getWavFilePathFromLocal(fileLink);
+  }
+  logger.debug("Converting 🎶 Voice into wav 💿");
+  const originalFileName = fileLink.split("/").at(-1) ?? "file.ogg";
+  const stream = await downloadAsStream(fileLink);
+  const pathToFile = await saveStreamToFile(stream, originalFileName, true);
+  logger.info(`Telegram file location: ${Logger.g(pathToFile)}`);
+  return await getWavFilePathFromLocal(pathToFile);
+};
+
+export const getWavBuffer = async (
+  fileLink: string,
+  isLocalFile: boolean,
+): Promise<Buffer> => {
+  const filename = await getWavFilePath(fileLink, isLocalFile);
   const buffer = await readFileIntoBuffer(filename);
   await deleteFileIfExists(filename);
   return buffer;

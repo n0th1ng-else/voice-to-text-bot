@@ -20,10 +20,12 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import type { VoidPromise } from "../src/common/types.js";
+import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
+vi.mock("../src/telegram/api/tgMTProtoApi");
 
 const appPort = 3300;
 const dbPort = appPort + 1;
@@ -40,7 +42,7 @@ let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
 let mockTgSetWebHook: InjectedTestFn["mockTgSetWebHook"];
 let mockTgSetCommands: InjectedTestFn["mockTgSetCommands"];
 let mockTgGetWebHookError: InjectedTestFn["mockTgGetWebHookError"];
-let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let bot: TelegramBotModel;
 let localhostUrl: string;
 
 const path = "/health";
@@ -71,7 +73,7 @@ describe("[health]", () => {
 
     mockGoogleAuth();
 
-    const converter = await getVoiceConverterInstances(
+    const converters = await getVoiceConverterInstances(
       "GOOGLE",
       "GOOGLE",
       initTest.getConverterOptions(),
@@ -89,7 +91,13 @@ describe("[health]", () => {
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
-    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot = await TelegramBotModel.factory(
+      "telegram-api-token",
+      92345555,
+      "telegram-app-hash",
+      converters,
+      db,
+    );
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramBaseApi.url);
     host = request(`${localhostUrl}:${appPort}`);

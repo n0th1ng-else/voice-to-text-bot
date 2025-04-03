@@ -39,10 +39,11 @@ export class GoogleProvider extends VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     opts: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     const name = `${opts.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
-    return getWavBuffer(fileLink)
+    return getWavBuffer(fileLink, isLocalFile)
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         return this.service.recognize({

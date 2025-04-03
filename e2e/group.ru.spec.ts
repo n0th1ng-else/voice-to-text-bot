@@ -19,15 +19,22 @@ import {
   injectTestDependencies,
 } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { setCurrentMockFileId } from "../src/telegram/api/__mocks__/tgMTProtoApi.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
+import {
+  asChatId__test,
+  asMessageId__test,
+  asFileId__test,
+} from "../src/testUtils/types.js";
+import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/analytics/ga/index");
+vi.mock("../src/telegram/api/tgMTProtoApi");
 
 const appPort = 3500;
 const dbPort = appPort + 1;
@@ -48,7 +55,7 @@ let stopHandler: VoidPromise = () =>
 
 // Define dependencies
 let hostUrl: string;
-let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let host: request.Agent;
 let chatType: TgChatType;
@@ -59,7 +66,6 @@ let mockTgReceiveUnexpectedMessage: InjectedTestFn["mockTgReceiveUnexpectedMessa
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockUpdateBotStatUsage: InjectedTestFn["mockUpdateBotStatUsage"];
 let mockTgReceiveRawMessage: InjectedTestFn["mockTgReceiveRawMessage"];
-let mockTgGetFileUrl: InjectedTestFn["mockTgGetFileUrl"];
 let mockSpeechRecognition: InjectedTestFn["mockSpeechRecognition"];
 let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
@@ -96,7 +102,6 @@ describe("[russian language]", () => {
     mockTgReceiveUnexpectedMessage = initTest.mockTgReceiveUnexpectedMessage;
     sendTelegramMessage = initTest.sendTelegramMessage;
     mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
-    mockTgGetFileUrl = initTest.mockTgGetFileUrl;
     mockSpeechRecognition = initTest.mockSpeechRecognition;
     randomIntFromInterval = init.randomIntFromInterval;
     TelegramMessageModel = initTest.TelegramMessageModel;
@@ -144,7 +149,13 @@ describe("[russian language]", () => {
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
-    bot = new TelegramBotModel("telegram-api-token", converters, db);
+    bot = await TelegramBotModel.factory(
+      "telegram-api-token",
+      92345555,
+      "telegram-app-hash",
+      converters,
+      db,
+    );
     bot.setHostLocation(hostUrl, launchTime);
     telegramServer = nock(TelegramBaseApi.url);
     host = request(hostUrl);
@@ -603,7 +614,7 @@ describe("[russian language]", () => {
     });
 
     it("converts voice into text (it fits 90 sec limit) - no username", () => {
-      const voiceFileId = "some-file-id";
+      const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 89;
       const voiceFileContent = "supergroup";
       tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
@@ -616,7 +627,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(
@@ -634,7 +645,7 @@ describe("[russian language]", () => {
     });
 
     it("converts voice into text (it fits 90 sec limit) - has username", () => {
-      const voiceFileId = "some-file-id-new";
+      const voiceFileId = asFileId__test("some-file-id-new");
       const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user";
@@ -648,7 +659,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(
@@ -666,7 +677,7 @@ describe("[russian language]", () => {
     });
 
     it("converts voice into text (it fits 90 sec limit) - has first name", () => {
-      const voiceFileId = "some-file-id-new";
+      const voiceFileId = asFileId__test("some-file-id-new");
       const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n2";
@@ -685,7 +696,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(
@@ -703,7 +714,7 @@ describe("[russian language]", () => {
     });
 
     it("converts voice into text (it fits 90 sec limit) - has last name", () => {
-      const voiceFileId = "some-file-id-new";
+      const voiceFileId = asFileId__test("some-file-id-new");
       const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n3";
@@ -722,7 +733,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(
@@ -740,7 +751,7 @@ describe("[russian language]", () => {
     });
 
     it("converts voice into text (it fits 90 sec limit) - has both first and last name", () => {
-      const voiceFileId = "some-file-id-new";
+      const voiceFileId = asFileId__test("some-file-id-new");
       const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n4";
@@ -761,7 +772,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(
@@ -780,7 +791,7 @@ describe("[russian language]", () => {
 
     it("keeps calm on a big voice files more than 90 sec", () => {
       return new Promise<void>((resolve, reject) => {
-        const voiceFileId = "some-file-id";
+        const voiceFileId = asFileId__test("some-file-id");
         const voiceFileDuration = 90;
         tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration);
         mockTgReceiveUnexpectedMessage(telegramServer, reject);
@@ -810,7 +821,7 @@ describe("[russian language]", () => {
 
     it("keeps calm on a voice file with wrong mime type", () => {
       return new Promise<void>((resolve, reject) => {
-        const voiceFileId = "some-file-id";
+        const voiceFileId = asFileId__test("some-file-id");
         const voiceFileDuration = 59;
         tgMessage.setVoice(
           testMessageId,
@@ -832,7 +843,7 @@ describe("[russian language]", () => {
 
     it("keeps calm on a voice file with broken duration", () => {
       return new Promise<void>((resolve, reject) => {
-        const voiceFileId = "some-file-id";
+        const voiceFileId = asFileId__test("some-file-id");
         tgMessage.setVoice(testMessageId, voiceFileId, -53);
 
         mockTgReceiveUnexpectedMessage(telegramServer, reject);
@@ -848,7 +859,7 @@ describe("[russian language]", () => {
 
     it("keeps calm on an audio file with wrong mime type", () => {
       return new Promise<void>((resolve, reject) => {
-        const voiceFileId = "some-file-id";
+        const voiceFileId = asFileId__test("some-file-id");
         const voiceFileDuration = 59;
         tgMessage.setAudio(
           testMessageId,
@@ -870,7 +881,7 @@ describe("[russian language]", () => {
 
     it("keeps calm on an audio file with broken duration", () => {
       return new Promise<void>((resolve, reject) => {
-        const voiceFileId = "some-file-id";
+        const voiceFileId = asFileId__test("some-file-id");
         tgMessage.setAudio(testMessageId, voiceFileId, -123);
 
         mockTgReceiveUnexpectedMessage(telegramServer, reject);
@@ -885,7 +896,7 @@ describe("[russian language]", () => {
     });
 
     it("converts audio into text (it fits 90 sec limit) - has both first and last name", () => {
-      const voiceFileId = "some-file-id-new";
+      const voiceFileId = asFileId__test("some-file-id-new");
       const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n4";
@@ -911,7 +922,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(
@@ -929,7 +940,7 @@ describe("[russian language]", () => {
     });
 
     it("converts video_note into text (it fits 90 sec limit) - has first name", () => {
-      const voiceFileId = "some-file-id-new";
+      const voiceFileId = asFileId__test("some-file-id-new");
       const voiceFileDuration = randomIntFromInterval(1, 89);
       const voiceFileContent = "supergroup";
       const userName = "test-user-n2";
@@ -948,7 +959,7 @@ describe("[russian language]", () => {
       );
 
       const speechScope = mockSpeechRecognition(voiceFileContent);
-      mockTgGetFileUrl(telegramServer, tgMessage.voiceId);
+      setCurrentMockFileId(voiceFileId);
 
       return Promise.all([
         mockTgReceiveRawMessage(

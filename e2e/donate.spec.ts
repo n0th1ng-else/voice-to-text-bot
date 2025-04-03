@@ -8,9 +8,8 @@ import {
   it,
   vi,
 } from "vitest";
-import nock from "nock";
 import request from "supertest";
-import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import nock from "nock";
 import {
   injectDependencies,
   type InjectedFn,
@@ -19,16 +18,19 @@ import {
   type InjectedTestFn,
   injectTestDependencies,
 } from "./helpers/dependencies.js";
+import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import type { Currency } from "../src/telegram/api/groups/payments/payments-types.js";
 import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
+import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/analytics/ga/index");
+vi.mock("../src/telegram/api/tgMTProtoApi");
 
 const appPort = 3900;
 const dbPort = appPort + 1;
@@ -55,7 +57,7 @@ let testChatId = asChatId__test(0);
 
 let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
 let testLangId: LanguageCode;
-let bot: InstanceType<InjectedFn["TelegramBotModel"]>;
+let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let host: request.Agent;
 let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
@@ -107,7 +109,7 @@ describe("[default language - english] donate", () => {
 
     mockGoogleAuth();
 
-    const converter = await getVoiceConverterInstances(
+    const converters = await getVoiceConverterInstances(
       "GOOGLE",
       "GOOGLE",
       initTest.getConverterOptions(),
@@ -116,7 +118,13 @@ describe("[default language - english] donate", () => {
     const db = getDb([dbConfig], 0, mainDb);
 
     const hostUrl = `${localhostUrl}:${appPort}`;
-    bot = new TelegramBotModel("telegram-api-token", converter, db);
+    bot = await TelegramBotModel.factory(
+      "telegram-api-token",
+      92345555,
+      "telegram-app-hash",
+      converters,
+      db,
+    );
     bot.setHostLocation(hostUrl);
     telegramServer = nock(TelegramBaseApi.url);
     host = request(hostUrl);

@@ -21,6 +21,7 @@ export abstract class VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string>;
 }
 

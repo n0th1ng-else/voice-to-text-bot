@@ -16,6 +16,8 @@ export const secondsInOneMinute = 60;
 
 export const durationLimitSec = 90;
 
+export const API_TIMEOUT_MS = 10_000;
+
 export const supportedAudioFormats = [
   {
     mimeType: "audio/ogg",

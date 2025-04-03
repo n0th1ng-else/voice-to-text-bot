@@ -10,7 +10,7 @@ import {
 import { getWavBuffer } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
-import { wavSampleRate } from "../../const.js";
+import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 import { addAttachment } from "../../monitoring/sentry.js";
 
@@ -18,7 +18,6 @@ const logger = new Logger("wit-ai-recognition");
 
 export class WithAiProvider extends VoiceConverter {
   public static readonly url = "https://api.wit.ai";
-  public static readonly timeout = 10_000;
   private static readonly apiVersion = "20230215";
   private readonly tokens: LanguageTokens;
 
@@ -33,11 +32,12 @@ export class WithAiProvider extends VoiceConverter {
     fileLink: string,
     lang: LanguageCode,
     logData: ConverterMeta,
+    isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const bufferData = await getWavBuffer(fileLink);
+    const bufferData = await getWavBuffer(fileLink, isLocalFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const token = this.getApiToken(lang);
     if (!token) {
@@ -87,7 +87,7 @@ export class WithAiProvider extends VoiceConverter {
       })
       .finally(() => {
         const timeTotal = duration.getMs();
-        const timeLimit = 2 * WithAiProvider.timeout + 1_000;
+        const timeLimit = 2 * API_TIMEOUT_MS + 1_000;
         if (timeTotal > timeLimit) {
           logger.error(
             `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`,
@@ -153,8 +153,8 @@ export class WithAiProvider extends VoiceConverter {
           "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
           "Transfer-Encoding": "chunked",
         },
-        timeout: WithAiProvider.timeout,
-        signal: AbortSignal.timeout(WithAiProvider.timeout),
+        timeout: API_TIMEOUT_MS,
+        signal: AbortSignal.timeout(API_TIMEOUT_MS),
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
         responseType: "text",

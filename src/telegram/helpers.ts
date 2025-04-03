@@ -21,7 +21,7 @@ import type {
   Currency,
   TgPhotoDto,
 } from "./api/groups/payments/payments-types.js";
-import type { ChatId } from "./api/core.js";
+import type { ChatId, FileId } from "./api/core.js";
 
 export const isCommandMessage = (
   model: BotMessageModel,
@@ -122,18 +122,18 @@ export const getGroupName = (msg: TgMessage): string => {
   return chatName || chatFullName || "";
 };
 
-export const getVoiceFile = (msg: TgMessage): string => {
+export const getVoiceFile = (msg: TgMessage): FileId | undefined => {
   if (!msg) {
-    return "";
+    return;
   }
 
   const data = getMediaSource(msg);
 
   if (!data) {
-    return "";
+    return;
   }
 
-  return data.file_id || "";
+  return data.file_id;
 };
 
 export const getVoiceDuration = (msg: TgMessage): number => {

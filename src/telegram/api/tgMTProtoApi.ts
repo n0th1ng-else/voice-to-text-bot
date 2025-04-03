@@ -1,0 +1,55 @@
+import { TelegramClient } from "@mtcute/node";
+import type { FileId } from "./core.js";
+import { API_TIMEOUT_MS } from "../../const.js";
+
+export type TgProto = {
+  start: () => Promise<void>;
+  stop: () => Promise<void>;
+  downloadFile: (toFilename: string, fileId: FileId) => Promise<string>;
+};
+
+export const getMTProtoApi = (
+  appId: number,
+  appHash: string,
+  apiToken: string,
+): TgProto => {
+  let isInitialized = false;
+  const client = new TelegramClient({
+    apiId: appId,
+    apiHash: appHash,
+  });
+
+  return {
+    start: async (): Promise<void> => {
+      await client.start({
+        botToken: apiToken,
+      });
+      isInitialized = true;
+    },
+    stop: async (): Promise<void> => {
+      await client.close();
+      isInitialized = false;
+    },
+    downloadFile: async (
+      toFilename: string,
+      fileId: FileId,
+    ): Promise<string> => {
+      if (!isInitialized) {
+        throw new Error("EMTPROTO not initialized");
+      }
+      const ctrl = new AbortController();
+
+      const timeout = setTimeout(() => {
+        ctrl.abort(new Error("EMTPROTO Request timeout"));
+      }, API_TIMEOUT_MS);
+
+      await client.downloadToFile(toFilename, fileId, {
+        abortSignal: ctrl.signal,
+      });
+
+      clearTimeout(timeout);
+
+      return toFilename;
+    },
+  };
+};
