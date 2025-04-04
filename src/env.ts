@@ -88,8 +88,6 @@ export const logLevel = process.env.LOG_LEVEL || "";
 
 export const webhookDoNotWait = process.env.WEBHOOK_DO_NOT_WAIT === "true";
 
-export const newRouter = process.env.NEW_ROUTER === "true";
-
 export const whisperModelFile = process.env.WHISPER_MODEL_FILE || "";
 
 export const whisperEnableGpu = process.env.WHISPER_GPU === "true";

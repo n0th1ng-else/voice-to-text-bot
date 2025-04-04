@@ -1,6 +1,5 @@
 import * as envy from "../env.js";
 import { BotServer } from "./bot-server.js";
-import { BotServerNew } from "./bot-server-new.js";
 import { httpsOptions } from "../../certs/index.js";
 import { getVoiceConverterInstances } from "../recognition/index.js";
 import { getDb } from "../db/index.js";
@@ -29,19 +28,12 @@ export const prepareInstance = async (
   threadId: number,
 ): Promise<BotServerModel> => {
   const sslOptions = envy.enableSSL ? httpsOptions : undefined;
-  const server = envy.newRouter
-    ? new BotServerNew(
-        envy.appPort,
-        envy.appVersion,
-        envy.webhookDoNotWait,
-        sslOptions,
-      )
-    : new BotServer(
-        envy.appPort,
-        envy.appVersion,
-        envy.webhookDoNotWait,
-        sslOptions,
-      );
+  const server = new BotServer(
+    envy.appPort,
+    envy.appVersion,
+    envy.webhookDoNotWait,
+    sslOptions,
+  );
 
   const converters = await getVoiceConverterInstances(
     VOICE_PROVIDERS.basic,

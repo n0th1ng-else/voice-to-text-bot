@@ -32,10 +32,10 @@ const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
 let hostUrl: string;
-let server: InstanceType<InjectedFn["BotServerNew"]>;
+let server: InstanceType<InjectedFn["BotServer"]>;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let BotServer: InjectedFn["BotServerNew"];
+let BotServer: InjectedFn["BotServer"];
 let appVersion: InjectedFn["appVersion"];
 let testPool: MockPool;
 let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
@@ -55,7 +55,7 @@ describe("[health]", () => {
     const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    BotServer = init.BotServerNew;
+    BotServer = init.BotServer;
     appVersion = init.appVersion;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
     mockTgSetWebHook = initTest.mockTgSetWebHook;

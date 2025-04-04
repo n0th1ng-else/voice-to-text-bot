@@ -14,7 +14,7 @@ import {
 } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import * as apiUtils from "../src/server/api.js";
-import { BotServerNew } from "../src/server/bot-server-new.js";
+import { BotServer } from "../src/server/bot-server.js";
 import { WaiterForCalls } from "../src/testUtils/waitFor.js";
 import { localhostUrl } from "../src/const.js";
 import { appVersion } from "../src/env.js";
@@ -51,7 +51,7 @@ let clearIntervalSpy: MockInstance;
 const oneMinute = 60_000;
 const oneDayMinutes = 24 * 60;
 
-let server: BotServerNew;
+let server: BotServer;
 const waiter = new WaiterForCalls();
 const hostUrl = `${localhostUrl}:${appPort}`;
 const webhookDoNotWait = false;
@@ -74,7 +74,7 @@ describe("[uptime daemon]", () => {
       waiter.tick();
     });
 
-    server = new BotServerNew(appPort, appVersion, webhookDoNotWait);
+    server = new BotServer(appPort, appVersion, webhookDoNotWait);
   });
 
   afterEach(async () => {
