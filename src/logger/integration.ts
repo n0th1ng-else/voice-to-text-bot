@@ -1,8 +1,15 @@
 import { createLogger, format, transports } from "winston";
 import stripAnsi from "strip-ansi";
 import Logsene from "winston-logsene";
+import LokiTransport from "winston-loki";
 import { isAxiosError, type AxiosError } from "axios";
-import { selfUrl, logApiTokenV2, appVersion, isDebug } from "../env.js";
+import {
+  selfUrl,
+  logApiTokenV2,
+  appVersion,
+  isDebug,
+  grafana,
+} from "../env.js";
 import { type LogType, SANITIZE_CHARACTER } from "./const.js";
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -53,6 +60,13 @@ const logTransports = [
       level: "info",
       type: "application-logs",
       url: "https://logsene-receiver.eu.sematext.com/_bulk",
+    }),
+  grafana.host &&
+    grafana.token &&
+    new LokiTransport({
+      labels: { version: `app.${appVersion}`, host: `host.${plainHost}` },
+      host: grafana.host,
+      basicAuth: grafana.token,
     }),
 ].filter(Boolean);
 

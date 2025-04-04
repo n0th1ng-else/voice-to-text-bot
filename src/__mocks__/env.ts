@@ -91,3 +91,8 @@ export const whisperEnableGpu = false;
 export const nodeVersion = "0.0.0";
 
 export const elevenLabsKey = "";
+
+export const grafana = {
+  host: process.env.GRAFANA_HOST || "",
+  token: process.env.GRAFANA_TOKEN || "",
+};
