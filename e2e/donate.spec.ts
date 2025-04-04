@@ -104,7 +104,7 @@ describe("[default language - english] donate", () => {
     const TelegramBaseApi = init.TelegramBaseApi;
     const StripePayment = init.StripePayment;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
-    const BotServer = init.BotServerNew;
+    const BotServer = init.BotServer;
     const appVersion = init.appVersion;
 
     mockGoogleAuth();

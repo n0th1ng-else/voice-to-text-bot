@@ -84,8 +84,6 @@ export const logLevel = "debug";
 
 export const webhookDoNotWait = false;
 
-export const newRouter = false;
-
 export const whisperModelFile = "";
 
 export const whisperEnableGpu = false;
