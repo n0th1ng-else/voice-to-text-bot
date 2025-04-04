@@ -51,6 +51,8 @@ const plainHost = selfUrl
   ? selfUrl.replace(/https?:\/\//, "").replace(/\./g, "-")
   : "localhost";
 
+const isLocal = plainHost === "localhost";
+
 const logTags = [`app.${appVersion}`, `host.${plainHost}`];
 
 const logTransports = [
@@ -64,7 +66,11 @@ const logTransports = [
   grafana.host &&
     grafana.token &&
     new LokiTransport({
-      labels: { version: `app.${appVersion}`, host: `host.${plainHost}` },
+      labels: {
+        version: appVersion,
+        host: plainHost,
+        app: isLocal ? "local" : "voice-to-text",
+      },
       host: grafana.host,
       basicAuth: grafana.token,
     }),
