@@ -33,8 +33,6 @@ export const googleApi = {
   privateKey: process.env.GOOGLE_PRIVATE_KEY || "",
 };
 
-export const logApiTokenV2 = process.env.LOG_API_TOKEN_V2 || "";
-
 export const memoryLimit = Number(process.env.MEMORY_LIMIT_MB) || 0;
 
 export const clusterSize = Number(process.env.CLUSTER_SIZE) || 2;
@@ -95,3 +93,8 @@ export const whisperEnableGpu = process.env.WHISPER_GPU === "true";
 export const nodeVersion = process.versions.node;
 
 export const elevenLabsKey = process.env.ELEVENLABS_API_KEY || "";
+
+export const grafana = {
+  host: process.env.GRAFANA_HOST || "",
+  token: process.env.GRAFANA_TOKEN || "",
+};
