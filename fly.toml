@@ -7,5 +7,4 @@ primary_region = "ams"
 [mounts]
   source = "voice_to_text_bot__data"
   destination = "/app/data"
-  processes = ["disk"]
   initial_size = "1gb"
