@@ -5,7 +5,7 @@ primary_region = "ams"
   image = "ghcr.io/n0th1ng-else/voice-to-text-bot/voice-to-speech-app:latest"
 
 [mounts]
-  source = "voice-to-text-bot__data"
+  source = "voice_to_text_bot__data"
   destination = "/app/data"
   processes = ["disk", "app"]
   initial_size = "1gb"
