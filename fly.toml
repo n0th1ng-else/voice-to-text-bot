@@ -1,0 +1,5 @@
+app = "voice-to-text-bot"
+primary_region = "ams"
+
+[build]
+  image = "ghcr.io/n0th1ng-else/voice-to-text-bot/voice-to-speech-app:latest"
