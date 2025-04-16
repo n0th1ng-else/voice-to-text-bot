@@ -34,17 +34,12 @@ export class TelegramBaseApi {
     this.errorReflector = errorReflector;
   }
 
-  public async requestValidate<
-    Output,
-    Def extends z.ZodTypeDef = z.ZodTypeDef,
-    Input = Output,
-    Data = unknown,
-  >(
+  public async requestValidate<Output, Input = Output, Data = unknown>(
     methodName: string,
-    schema: z.ZodType<Output, Def, Input>,
+    schema: z.ZodType<Output, Input>,
     data?: Data,
     chatId?: ChatId,
-  ): Promise<z.infer<z.ZodType<Output, Def, Input>>> {
+  ): Promise<z.infer<z.ZodType<Output, Input>>> {
     const result = await this.request(methodName, data, chatId);
     return schema.parse(result);
   }

@@ -75,12 +75,15 @@ describe("text.loader", () => {
 
       it("should throw an error if it is not complete with the translations", () => {
         readFileSyncMock.mockReturnValue("{}");
+
         expect(() => initializeTranslationsForLocale("en-US")).toThrowError(
           expect.objectContaining({
-            name: "ZodError",
-            message: expect.stringContaining(
-              "Not all translation keys are implemented",
-            ),
+            issues: expect.arrayContaining([
+              expect.objectContaining({
+                code: "custom",
+                message: "Not all translation keys are implemented",
+              }),
+            ]),
           }),
         );
       });

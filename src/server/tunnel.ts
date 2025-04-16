@@ -1,4 +1,3 @@
-import { forward } from "@ngrok/ngrok";
 import { Logger } from "../logger/index.js";
 import { sSuffix } from "../text/utils.js";
 
@@ -11,6 +10,7 @@ const createTunnel = async (
 ): Promise<string> => {
   logger.info("Creating tunnel");
   const localHost = `${sSuffix("http", enableSSL)}://localhost:${port}`;
+  const { forward } = await import("@ngrok/ngrok");
   const host = await forward({
     addr: localHost,
     authtoken: token,
@@ -25,7 +25,7 @@ const createTunnel = async (
   return url;
 };
 
-export const getHostName = (
+export const getHostName = async (
   port: number,
   selfUrl: string,
   enableSSL: boolean,
@@ -33,7 +33,7 @@ export const getHostName = (
 ): Promise<string> => {
   if (selfUrl) {
     logger.info(`Using the host ${Logger.y(selfUrl)}`);
-    return Promise.resolve(selfUrl);
+    return selfUrl;
   }
 
   return createTunnel(port, enableSSL, ngRokToken);

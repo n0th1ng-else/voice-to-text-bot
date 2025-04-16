@@ -125,16 +125,12 @@ export class WithAiProvider extends VoiceConverter {
     );
   }
 
-  private static async runRequest<
-    Output,
-    Def extends z.ZodTypeDef = z.ZodTypeDef,
-    Input = Output,
-  >(
+  private static async runRequest<Output, Input = Output>(
     data: Buffer,
     path: "speech" | "dictation",
-    schema: z.ZodType<Output, Def, Input>,
+    schema: z.ZodType<Output, Input>,
     authToken: string,
-  ): Promise<z.infer<z.ZodType<Output, Def, Input>>[]> {
+  ): Promise<z.infer<z.ZodType<Output, Input>>[]> {
     if (!authToken) {
       return Promise.reject(new Error("The auth token is not provided"));
     }

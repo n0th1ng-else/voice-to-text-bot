@@ -6,7 +6,7 @@
     "moduleResolution": "NodeNext",
     "allowJs": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
