@@ -1,5 +1,4 @@
 import "newrelic";
-import "../otel/init.js";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
