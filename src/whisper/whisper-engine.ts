@@ -1,10 +1,10 @@
 import type { LanguageCode } from "../recognition/types.js";
 import { type WhisperAddonArchitecture } from "./utils.js";
-import getWhisper from "./whisper-addon.cjs";
+import {
+  type WhisperOptions,
+  default as getWhisper,
+} from "./whisper-addon.cjs";
 import { convertLanguageCodeToISO } from "../recognition/common.js";
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-type WhisperOptions = import("./whisper-addon.cjs").WhisperOptions;
 
 /**
  *

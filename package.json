@@ -8,7 +8,7 @@
   },
   "type": "module",
   "scripts": {
-    "ts": "NODE_OPTIONS=\"--loader ts-node/esm\" node --env-file=.env src/scripts/run.js",
+    "ts": "NODE_OPTIONS=\"--loader ts-node/esm \" TS_NODE_TRANSPILE_ONLY=true node --env-file=.env src/scripts/run.js",
     "import": "pnpm run ts import ts",
     "chart": "pnpm run ts chart ts",
     "start": "pnpm run ts start ts",
@@ -54,12 +54,7 @@
     "pg": "8.14.1",
     "picocolors": "1.1.1",
     "signal-exit": "4.1.0",
-    "strip-ansi": "7.1.0",
-    "ts-node": "10.9.2",
-    "typescript": "5.8.2",
-    "winston": "3.17.0",
-    "winston-logsene": "2.1.2",
-    "zod": "3.24.2"
+    "zod": "4.0.0-beta.20250417T043022"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
@@ -81,6 +76,8 @@
     "lint-staged": "15.5.0",
     "nock": "14.0.2",
     "prettier": "3.5.3",
+    "ts-node": "10.9.2",
+    "typescript": "5.8.2",
     "query-string": "9.1.1",
     "supertest": "7.1.0",
     "vitest": "3.1.1",

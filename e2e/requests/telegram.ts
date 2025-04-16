@@ -141,7 +141,16 @@ export const mockTgReceiveMessage = (
 ): Promise<string> => {
   return new Promise<string>((resolve) => {
     host.post("/bottelegram-api-token/sendMessage").reply(200, (_uri, body) => {
-      const answer = typeof body === "string" ? querystring.parse(body) : body;
+      const answer: Record<
+        string,
+        {
+          inline_keyboard: {
+            text: string;
+            url: string;
+            callback_data: string;
+          }[][];
+        }
+      > = typeof body === "string" ? querystring.parse(body) : body;
       expect(answer.chat_id).toBe(chatId);
       const [textKey, textParams] = Array.isArray(textId) ? textId : [textId];
       expect(answer.text).toBe(text.t(textKey, lang, textParams));
@@ -239,8 +248,16 @@ export const mockTgReceiveCallbackMessage = (
     host
       .post("/bottelegram-api-token/editMessageText")
       .reply(200, (uri, body) => {
-        const answer =
-          typeof body === "string" ? querystring.parse(body) : body;
+        const answer: Record<
+          string,
+          {
+            inline_keyboard: {
+              text: string;
+              url: string;
+              callback_data: string;
+            }[][];
+          }
+        > = typeof body === "string" ? querystring.parse(body) : body;
         expect(answer.chat_id).toBe(chatId);
         expect(answer.text).toBe(text.t(textId, langId));
         expect(answer.message_id).toBe(messageId);
