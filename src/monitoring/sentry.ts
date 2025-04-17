@@ -79,6 +79,7 @@ const fetchPropFromUnknown = <T>(
   prop: string,
   defaultVal: T,
 ): unknown => {
+  // @ts-expect-error Sometimes we need this JS spice
   return obj && typeof obj === "object" && prop in obj ? obj[prop] : defaultVal;
 };
 

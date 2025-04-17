@@ -1,7 +1,6 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
 import { z } from "zod";
-import { sendLogs } from "./integration.js";
 import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
 
@@ -48,12 +47,21 @@ export class Logger {
   }
 
   private get prefix(): string {
-    const prefixes = [this.id, this.time];
+    const prefixes = this.getRawPrefixes(true);
+    return prefixes.map((prefix) => `[${prefix}]`).join("");
+  }
+
+  private getRawPrefixes(includeTime = false): string[] {
+    const prefixes = [this.id];
     if (this.additionalPrefix) {
       prefixes.push(this.additionalPrefix);
     }
 
-    return prefixes.map((prefix) => `[${prefix}]`).join(" ");
+    if (includeTime) {
+      prefixes.push(this.time);
+    }
+
+    return prefixes;
   }
 
   private get time(): string {
@@ -88,7 +96,6 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), Logger.d(msg), ...data);
-    sendLogs("info", this.id, this.additionalPrefix, msg, data);
   }
 
   public info(msg: string, ...data: unknown[]): void {
@@ -97,7 +104,6 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), msg, ...data);
-    sendLogs("info", this.id, this.additionalPrefix, msg, data);
   }
 
   public warn(
@@ -110,7 +116,6 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.prefix), msg, data ?? "");
-    sendLogs("warn", this.id, this.additionalPrefix, msg, data);
     if (shouldReport) {
       captureWarning(msg, data);
     }
@@ -122,7 +127,6 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
-    sendLogs("error", this.id, this.additionalPrefix, msg, data);
     captureError(data);
   }
 }

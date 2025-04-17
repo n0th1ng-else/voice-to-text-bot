@@ -54,7 +54,7 @@ const downloadAsStream = (url: string): Promise<IncomingMessage> =>
     })
     .then(({ data: stream }) => stream);
 
-const getWavFilePathFromLocal = async (fsFilePath) => {
+const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
   try {
     const file = await convertFileToWav(fsFilePath);
     logger.info(`WAV 🎶 file location: ${Logger.g(file)}`);

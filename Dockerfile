@@ -10,7 +10,7 @@ WORKDIR $APP_DIR
 RUN npm install -g pnpm@9
 COPY package.json pnpm-lock.yaml tsconfig.json $APP_DIR
 RUN npm pkg delete scripts.prepare
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false
 
 COPY ./assets $APP_DIR/assets
 COPY ./certs $APP_DIR/certs
@@ -46,7 +46,7 @@ COPY --from=builder $APP_DIR/model-cache $APP_DIR/model-cache
 COPY --from=builder $APP_DIR/package.json $APP_DIR
 COPY --from=builder $APP_DIR/pnpm-lock.yaml $APP_DIR
 RUN npm pkg delete scripts.prepare
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
 
 COPY --from=builder $APP_DIR/dist $APP_DIR/dist
 

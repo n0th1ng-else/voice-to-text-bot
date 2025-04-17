@@ -7,44 +7,43 @@ import { type TranslationKey, TranslationKeys } from "../types.js";
 import { BotCommand, type BotCommandType } from "../../telegram/types.js";
 
 const getTranslationKeysSchema = () => {
-  const values = Object.values(TranslationKeys);
+  const values: string[] = Object.values(TranslationKeys);
 
-  const translationKeysSchema = z
+  const translationKeysSchema: z.ZodEnum<Readonly<Record<string, string>>> = z
     .enum([values[0], ...values.slice(1)])
     .describe("Supported translation keys");
 
   return translationKeysSchema;
 };
 
-const createRequiredObjSchema = <K extends string, V extends z.ZodTypeAny>(
+const createRequiredObjSchema = <V extends z.ZodTypeAny>(
   filename: string,
-  keysSchema: z.ZodEnum<[K, ...K[]]>,
+  keysSchema: z.ZodEnum<Readonly<Record<string, string>>>,
   valueSchema: V,
 ) => {
-  return z
-    .record(keysSchema, valueSchema)
-    .superRefine((obj, ctx) => {
-      const missingKeys = keysSchema.options.filter((key) => !obj[key]);
-      if (missingKeys.length) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Not all translation keys are implemented",
-          path: [filename],
-          params: {
-            missingKeys: missingKeys,
-          },
-        });
-      }
-    })
-    .refine((obj): obj is Required<typeof obj> =>
-      keysSchema.options.every((key) => obj[key] != null),
-    );
+  return z.record(keysSchema, valueSchema).superRefine((obj, ctx) => {
+    const missingKeys = keysSchema.options.filter((key) => !obj[key]);
+    if (missingKeys.length) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Not all translation keys are implemented",
+        path: [filename],
+        params: {
+          missingKeys,
+        },
+      });
+    }
+  });
 };
 
 const TRANSLATIONS_DIR = fileURLToPath(new URL("./bundles", import.meta.url));
 
 const getTranslationsFileSchema = (filename: string) =>
-  createRequiredObjSchema(filename, getTranslationKeysSchema(), z.string());
+  createRequiredObjSchema(
+    filename,
+    getTranslationKeysSchema(),
+    z.optional(z.string()),
+  );
 
 const getTranslationFilename = (lang: string) => `translations.${lang}.json`;
 

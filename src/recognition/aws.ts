@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import AWS from "aws-sdk";
 import {
@@ -11,16 +10,33 @@ import { Logger } from "../logger/index.js";
 
 const logger = new Logger("aws-recognition");
 
+type AWSJob = AWS.TranscribeService.Types.GetTranscriptionJobResponse;
+
+type AWSTranscriptionResponse =
+  AWS.TranscribeService.Types.StartTranscriptionJobResponse;
+
+type AWSUpload = AWS.S3.ManagedUpload.SendData;
+
+type AWSDeleteObject = AWS.S3.Types.DeleteObjectOutput;
+
+type TranscriptionData = {
+  results: {
+    transcripts: {
+      transcript: string;
+    }[];
+  };
+};
+
 type AWSVoiceProviderOptions = {
-  bucketRegion?: string;
-  bucket?: string;
+  bucketRegion: string;
+  bucket: string;
   poolId: string;
 };
 
 export class AWSProvider extends VoiceConverter {
-  private bucket: any;
-  private storage: any;
-  private service: any;
+  private readonly bucket: string;
+  private readonly storage: AWS.S3;
+  private readonly service: AWS.TranscribeService;
 
   constructor(options: AWSVoiceProviderOptions) {
     super();
@@ -61,7 +77,7 @@ export class AWSProvider extends VoiceConverter {
         .then((job) =>
           axios.request({
             method: "GET",
-            url: job.TranscriptionJob.Transcript.TranscriptFileUri,
+            url: job.TranscriptionJob?.Transcript?.TranscriptFileUri,
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
@@ -82,14 +98,16 @@ export class AWSProvider extends VoiceConverter {
     fileLink: string,
     name: string,
     isLocalFile: boolean,
-  ): Promise<any> {
+  ): Promise<AWSJob> {
     return getWavBuffer(fileLink, isLocalFile)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));
   }
 
-  private unpackTranscription(translationData): Promise<any> {
+  private unpackTranscription(
+    translationData: TranscriptionData,
+  ): Promise<string> {
     const transcripts = translationData.results.transcripts;
     if (!transcripts?.length) {
       throw new Error("Unable to convert into text");
@@ -98,26 +116,35 @@ export class AWSProvider extends VoiceConverter {
     return Promise.resolve(transcripts[0].transcript);
   }
 
-  private cleanStorage(translationData, name: string): Promise<any> {
+  private cleanStorage(
+    translationData: TranscriptionData,
+    name: string,
+  ): Promise<string> {
     return this.deleteFromS3(name)
       .then(() => this.removeTranscriptionJob(name))
       .then(() => this.unpackTranscription(translationData));
   }
 
-  private getJobWithDelay(name: string, job): Promise<any> {
+  private getJobWithDelay(name: string, job: AWSJob): Promise<AWSJob> {
     logger.info("Scheduling job", name);
-    if (job.TranscriptionJob.TranscriptionJobStatus !== "IN_PROGRESS") {
+    if (job.TranscriptionJob?.TranscriptionJobStatus !== "IN_PROGRESS") {
       return Promise.resolve(job);
     }
 
     return new Promise<void>((resolve) => setTimeout(() => resolve(), 1000))
       .then(() => this.getJob(name))
-      .then((info) => this.getJobWithDelay(name, info.job));
+      .then((info) => {
+        if (!info.isExists) {
+          throw new Error("unable to get the job", { cause: info.err });
+        }
+        return info.job;
+      })
+      .then((job) => this.getJobWithDelay(name, job));
   }
 
-  private uploadToS3(name: string, file): Promise<any> {
+  private uploadToS3(name: string, file: Buffer): Promise<AWSUpload> {
     logger.info("Uploading to S3", name);
-    return new Promise((resolve, reject) => {
+    return new Promise<AWSUpload>((resolve, reject) => {
       this.storage.upload(
         {
           Bucket: this.bucket,
@@ -136,10 +163,10 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private deleteFromS3(name: string): Promise<any> {
+  private deleteFromS3(name: string): Promise<AWSDeleteObject> {
     logger.info("Deleting from S3", name);
 
-    return new Promise((resolve, reject) => {
+    return new Promise<AWSDeleteObject>((resolve, reject) => {
       this.storage.deleteObject(
         {
           Bucket: this.bucket,
@@ -157,9 +184,12 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private convertToText(name: string, uri: string): Promise<any> {
+  private convertToText(
+    name: string,
+    uri: string,
+  ): Promise<AWSTranscriptionResponse> {
     logger.info("Start converting", name, uri);
-    return new Promise((resolve, reject) => {
+    return new Promise<AWSTranscriptionResponse>((resolve, reject) => {
       this.service.startTranscriptionJob(
         {
           Media: {
@@ -181,7 +211,7 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private removeTranscriptionJob(name: string): Promise<any> {
+  private removeTranscriptionJob(name: string): Promise<void> {
     logger.info("Remove transcription job", name);
     return new Promise<void>((resolve, reject) => {
       this.service.deleteTranscriptionJob(
@@ -200,9 +230,13 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private getJob(name: string): Promise<any> {
+  private async getJob(
+    name: string,
+  ): Promise<
+    { isExists: true; job: AWSJob } | { isExists: false; err: unknown }
+  > {
     logger.info("Check the job", name);
-    return new Promise((resolve, reject) => {
+    return new Promise<AWSJob>((resolve, reject) => {
       this.service.getTranscriptionJob(
         {
           TranscriptionJobName: name,
@@ -221,13 +255,13 @@ export class AWSProvider extends VoiceConverter {
         return {
           isExists: true,
           job,
-        };
+        } as const;
       })
       .catch((err: unknown) => {
         return {
           isExists: false,
           err,
-        };
+        } as const;
       });
   }
 }

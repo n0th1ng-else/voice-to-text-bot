@@ -85,6 +85,7 @@ const clientSpy = vi
     expect(config.responseType).toBe("json");
     // @ts-expect-error Some mess with header types
     expect(config.headers?.Accept).toBe("application/json");
+    // @ts-expect-error Some mess with header types again
     expect(config.headers?.["Content-Type"]).toBe("application/json");
     return testClient;
   });
@@ -134,11 +135,15 @@ describe("[telegram api client]", () => {
           },
         ];
 
-        checkApiData = (config) => {
+        checkApiData = (
+          config: AxiosRequestConfig<{
+            commands: { command: string; description: string }[];
+          }>,
+        ) => {
           expect(config.url).toBe(`/bot${testApiToken}/setMyCommands`);
-          expect(config.data.commands).toBeDefined();
-          expect(config.data.commands).toHaveLength(2);
-          config.data.commands.forEach((cmd, ind) => {
+          expect(config.data?.commands).toBeDefined();
+          expect(config.data?.commands).toHaveLength(2);
+          config.data?.commands.forEach((cmd, ind) => {
             expect(cmd.command).toBe(testCommands[ind].command);
             expect(cmd.description).toBe(testCommands[ind].description);
           });
@@ -355,7 +360,7 @@ describe("[telegram api client]", () => {
             (err) => {
               expect(err.issues[0].code).toBe("invalid_type");
               expect(err.issues[0].message).toBe(
-                "Expected boolean, received string",
+                "Invalid input: expected boolean, received string",
               );
             },
           );
@@ -603,11 +608,15 @@ describe("[telegram api client]", () => {
           },
         ];
 
-        checkApiData = (config) => {
+        checkApiData = (
+          config: AxiosRequestConfig<{
+            commands: { command: string; description: string }[];
+          }>,
+        ) => {
           expect(config.url).toBe(`/bot${testApiToken}/setMyCommands`);
-          expect(config.data.commands).toBeDefined();
-          expect(config.data.commands).toHaveLength(2);
-          config.data.commands.forEach((cmd, ind) => {
+          expect(config.data?.commands).toBeDefined();
+          expect(config.data?.commands).toHaveLength(2);
+          config.data?.commands.forEach((cmd, ind) => {
             expect(cmd.command).toBe(testCommands[ind].command);
             expect(cmd.description).toBe(testCommands[ind].description);
           });
