@@ -12,7 +12,7 @@ on:
         required: true
       version:
         type: string
-        description: "Version tag in format: 1.0.0 (no v prefix!) or commit sha"
+        description: "Version tag in format: v1.0.0 (with v prefix!) or commit sha"
         required: true
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/heroku.yml
     secrets: inherit
     with:
-      version: v${{ inputs.version }}
+      version: ${{ inputs.version }}
       servers: '["${{ inputs.server }}"]'
 
   post-trigger:
