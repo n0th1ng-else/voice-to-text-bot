@@ -40,15 +40,11 @@ export const run = async (): Promise<void> => {
       });
 
     cluster.on("exit", (worker, code, signal) => {
-      logger.warn(
-        `One thread has died. Spawning a new one`,
-        {
-          code,
-          signal,
-          threadId: worker.id,
-        },
-        true,
-      );
+      logger.warn(`One thread has died. Spawning a new one`, {
+        code,
+        signal,
+        threadId: worker.id,
+      });
       spawnInstance(host, launchTime);
     });
   } else {
