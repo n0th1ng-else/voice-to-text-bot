@@ -34,5 +34,6 @@
   "subscription.activeSubscriptionEnds": "✨You have an active subscription ✨\n\nThe subscription will not continue after {{date}}",
   "subscription.button.confirmUnsubscribe": "Unsubscribe",
   "subscription.button.back": "Back",
-  "subscription.confirmUnsubscribe": "Stop the subscription"
+  "subscription.confirmUnsubscribe": "Are you sure you want to stop the subscription? \n\nIf you stop the subscription, you will lose the best voice recognition quality and the variety of the supported languages. \n\nYou can still use the maximal capabilities until {{date}}. \n\nAre you sure you want to cancel the subscription?",
+  "subscription.confirmUnsubscribeLang": "Are you sure you want to stop the subscription? \n\nIf you stop the subscription, you will lose the best voice recognition quality and the variety of the supported languages. \n\nYou can still use the maximal capabilities until {{date}}. After that date, we will reset the language to English.\n\nAre you sure you want to cancel the subscription?"
 }

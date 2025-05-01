@@ -36,6 +36,7 @@ export const TranslationKeys = {
   HasActiveSubscriptionEnds: "subscription.activeSubscriptionEnds",
   BtnBack: "subscription.button.back",
   ConfirmUnsubscribe: "subscription.confirmUnsubscribe",
+  ConfirmUnsubscribeLang: "subscription.confirmUnsubscribeLang",
 } as const;
 
 export type TranslationKey =

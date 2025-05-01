@@ -21,6 +21,7 @@ import type { LanguageCode } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { ChatId, MessageId } from "../api/core.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
+import { isPremiumLanguage } from "../../subscription/utils.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -122,11 +123,34 @@ export class SubscriptionAction extends GenericAction {
     prefix: TelegramMessagePrefix,
     lang: LanguageCode,
   ): Promise<void> {
+    const subscription = getSubscriptionFromCache(mdl.chatId);
+
+    if (!subscription) {
+      throw new Error("No subscription found", {
+        cause: { chatId: mdl.chatId },
+      });
+    }
+
     const backButton = getSubscriptionButton("+", prefix.id);
     const backBtn: TgInlineKeyboardButton = {
       text: this.text.t(TranslationKeys.BtnBack, lang),
       callback_data: backButton.getDtoString(),
     };
+
+    const isPremiumLang = isPremiumLanguage(lang);
+    const translationId: TranslationKeyFull = isPremiumLang
+      ? [
+          TranslationKeys.ConfirmUnsubscribeLang,
+          {
+            date: this.text.date(subscription.endDate, lang),
+          },
+        ]
+      : [
+          TranslationKeys.ConfirmUnsubscribe,
+          {
+            date: this.text.date(subscription.endDate, lang),
+          },
+        ];
 
     const unsubscribeButton = getSubscriptionButton("-", prefix.id);
     const unsubscribeBtn: TgInlineKeyboardButton = {
@@ -143,7 +167,7 @@ export class SubscriptionAction extends GenericAction {
           buttons: [[backBtn, unsubscribeBtn]],
         },
       },
-      TranslationKeys.ConfirmUnsubscribe,
+      translationId,
       prefix,
     );
   }
