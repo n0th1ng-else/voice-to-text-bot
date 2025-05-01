@@ -109,8 +109,8 @@ export class SubscriptionAction extends GenericAction {
         );
       case "-":
         return await this.cancelSubscription(model, prefix, lang);
-      case "c":
-        return await this.cancelledConfirmed(model, prefix, lang);
+      // case "c":
+      //   return await this.cancelledConfirmed(model, prefix, lang);
       case "a":
         return await this.autoSubscribe(model, prefix, lang);
       default:
@@ -131,12 +131,6 @@ export class SubscriptionAction extends GenericAction {
       });
     }
 
-    const backButton = getSubscriptionButton("+", prefix.id);
-    const backBtn: TgInlineKeyboardButton = {
-      text: this.text.t(TranslationKeys.BtnBack, lang),
-      callback_data: backButton.getDtoString(),
-    };
-
     const isPremiumLang = isPremiumLanguage(lang);
     const translationId: TranslationKeyFull = isPremiumLang
       ? [
@@ -151,6 +145,12 @@ export class SubscriptionAction extends GenericAction {
             date: this.text.date(subscription.endDate, lang),
           },
         ];
+
+    const backButton = getSubscriptionButton("+", prefix.id);
+    const backBtn: TgInlineKeyboardButton = {
+      text: this.text.t(TranslationKeys.BtnBack, lang),
+      callback_data: backButton.getDtoString(),
+    };
 
     const unsubscribeButton = getSubscriptionButton("-", prefix.id);
     const unsubscribeBtn: TgInlineKeyboardButton = {
@@ -201,14 +201,14 @@ export class SubscriptionAction extends GenericAction {
     return Promise.resolve();
   }
 
-  private async cancelledConfirmed(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-    lang: LanguageCode,
-  ): Promise<void> {
-    logger.warn("TODO implement cancelledConfirmed", { mdl, prefix, lang });
-    return Promise.resolve();
-  }
+  // private async cancelledConfirmed(
+  //   mdl: BotMessageModel,
+  //   prefix: TelegramMessagePrefix,
+  //   lang: LanguageCode,
+  // ): Promise<void> {
+  //   logger.warn("TODO implement cancelledConfirmed", { mdl, prefix, lang });
+  //   return Promise.resolve();
+  // }
 
   private async getButtonTypeClicked(
     button: TelegramButtonModel,
