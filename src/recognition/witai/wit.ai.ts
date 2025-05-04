@@ -165,11 +165,14 @@ export class WithAiProvider extends VoiceConverter {
         return response.data;
       })
       .catch((err) => {
-        const witAiError = new WitAiError(err, err.message)
+        const attachedError = axios.isAxiosError(err) ? err.toJSON() : err;
+        delete attachedError?.config;
+
+        const witAiError = new WitAiError(attachedError, attachedError.message)
           .setUrl(url)
-          .setErrorCode(err?.response?.status)
-          .setResponse(err?.response?.data)
+          .setErrorCode(attachedError?.status)
           .setBufferLength(data);
+
         throw witAiError;
       })
       .then((response) => {
