@@ -6,7 +6,7 @@ import {
   DonationSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
-} from "./types.js";
+} from "./types.js"; // TODO module cycle with ./helpers.ts
 import { telegramBotName } from "../env.js";
 import { type TgCallbackQuery, type TgMessage } from "./api/types.js";
 import {

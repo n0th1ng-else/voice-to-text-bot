@@ -1,10 +1,10 @@
-import { type ApiErrorReflector } from "./types.js";
+import type { ApiErrorReflector } from "./types.js";
+import type { ChatId, FileId } from "./core.js";
 import { TelegramBaseApi } from "./groups/core.js";
 import { TelegramPaymentsApi } from "./groups/payments/payments-api.js";
 import { TelegramUpdatesApi } from "./groups/updates/updates-api.js";
 import { TelegramChatsApi } from "./groups/chats/chats-api.js";
 import { getMTProtoApi, type TgProto } from "./tgMTProtoApi.js";
-import type { FileId } from "./core.js";
 
 export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
 
@@ -40,6 +40,10 @@ export class TelegramApi {
   ): Promise<string> {
     await this.proto.downloadFile(toFilename, fileId);
     return toFilename;
+  }
+
+  public async sendFile(chatId: ChatId, file: File): Promise<void> {
+    await this.proto.sendFile(chatId, file);
   }
 
   public setErrorReflector(errorReflector: ApiErrorReflector): void {

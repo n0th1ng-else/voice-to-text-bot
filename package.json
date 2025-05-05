@@ -14,7 +14,7 @@
     "start": "pnpm run ts start ts",
     "dev": "pnpm run ts dev ts",
     "cluster": "pnpm run ts cluster ts",
-    "js": "node --env-file=.env --experimental-loader newrelic/esm-loader.mjs -r newrelic dist/src/scripts/run.js",
+    "js": "node --env-file=.env dist/src/scripts/run.js",
     "start:js": "pnpm run js start js",
     "dev:js": "pnpm run js dev js",
     "cluster:js": "pnpm run js cluster js",
