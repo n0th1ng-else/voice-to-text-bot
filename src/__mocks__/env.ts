@@ -92,4 +92,4 @@ export const nodeVersion = "0.0.0";
 
 export const elevenLabsKey = "";
 
-export const ownerId = "";
+export const enableSnapshotCapture = false;
