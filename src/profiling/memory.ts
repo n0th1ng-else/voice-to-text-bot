@@ -18,17 +18,3 @@ export const generateMemorySnapshotAsBuffer = async (): Promise<Buffer> => {
   await deleteFileIfExists(filename);
   return buffer;
 };
-
-export const generateMemorySnapshot = async (): Promise<File> => {
-  const date =
-    new Date()
-      .toISOString()
-      .replace(/-/g, "")
-      .replace("T", "-")
-      .replace(/:/g, "")
-      .split(".")
-      .at(0) || "";
-  const buffer = await generateMemorySnapshotAsBuffer();
-  const file = new File([new Blob([buffer])], `Heap-${date}.heapsnapshot`);
-  return file;
-};
