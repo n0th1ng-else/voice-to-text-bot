@@ -18,6 +18,7 @@ import {
 import type { VoidPromise } from "../common/types.js";
 import type { HttpsOptions } from "../../certs/index.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
+import { generateMemorySnapshotAsBuffer } from "../profiling/memory.js";
 
 const logger = new Logger("server");
 
@@ -65,6 +66,14 @@ export class BotServer
       const [status, dto] = await this.getStatusHandler();
       return reply.status(status).send(dto);
     });
+
+    this.app.get<{ Reply: Buffer }>(
+      "/internal-controls",
+      async (_req, reply) => {
+        const buffer = await generateMemorySnapshotAsBuffer();
+        return reply.type("application/octet-stream").send(buffer);
+      },
+    );
 
     this.app.post<{ Reply: HealthDto; Body: Record<string, unknown> }>(
       "/lifecycle",

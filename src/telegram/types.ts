@@ -12,7 +12,7 @@ import {
   getVoiceFile,
   isChatGroup,
   isVideoMessage,
-} from "./helpers.js";
+} from "./helpers.js"; // TODO module cycle with ./types.ts
 import { Logger } from "../logger/index.js";
 import { getTranslator } from "../text/index.js";
 import { type TgMessage } from "./api/types.js";

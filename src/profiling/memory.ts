@@ -10,6 +10,15 @@ import {
  * BLOCKING OPERATION - blocks the even loop while calculating.
  * take ~x2 memory for the container!
  */
+export const generateMemorySnapshotAsBuffer = async (): Promise<Buffer> => {
+  const filename = writeHeapSnapshot(
+    getFullFileName("dump.heapsnapshot", true),
+  );
+  const buffer = await readFile(filename);
+  await deleteFileIfExists(filename);
+  return buffer;
+};
+
 export const generateMemorySnapshot = async (): Promise<File> => {
   const date =
     new Date()
@@ -19,11 +28,7 @@ export const generateMemorySnapshot = async (): Promise<File> => {
       .replace(/:/g, "")
       .split(".")
       .at(0) || "";
-  const filename = writeHeapSnapshot(
-    getFullFileName("dump.heapsnapshot", true),
-  );
-  const buffer = await readFile(filename);
+  const buffer = await generateMemorySnapshotAsBuffer();
   const file = new File([new Blob([buffer])], `Heap-${date}.heapsnapshot`);
-  await deleteFileIfExists(filename);
   return file;
 };
