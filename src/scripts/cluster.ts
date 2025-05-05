@@ -38,6 +38,8 @@ export const run = async (): Promise<void> => {
   if (clusterSize === 1) {
     logger.warn(
       "Cluster size is set to 1. Running the application in a single thread",
+      undefined,
+      true,
     );
     await runServer();
     return;
