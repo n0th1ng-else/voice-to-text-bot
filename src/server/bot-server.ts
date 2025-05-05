@@ -31,8 +31,16 @@ export class BotServer
     version: string,
     webhookDoNotWait: boolean,
     httpsOptions?: HttpsOptions,
+    enableSnapshotCapture?: boolean,
   ) {
-    super("Fastify", port, version, webhookDoNotWait, httpsOptions);
+    super(
+      "Fastify",
+      port,
+      version,
+      webhookDoNotWait,
+      httpsOptions,
+      enableSnapshotCapture,
+    );
 
     initSentryNew();
     trackAPIHandlersNew(this.app);
@@ -67,13 +75,15 @@ export class BotServer
       return reply.status(status).send(dto);
     });
 
-    this.app.get<{ Reply: Buffer }>(
-      "/internal-controls",
-      async (_req, reply) => {
-        const buffer = await generateMemorySnapshotAsBuffer();
-        return reply.type("application/octet-stream").send(buffer);
-      },
-    );
+    if (this.enableSnapshotCapture) {
+      this.app.get<{ Reply: Buffer }>(
+        "/profile-snapshot",
+        async (_req, reply) => {
+          const buffer = await generateMemorySnapshotAsBuffer();
+          return reply.type("application/octet-stream").send(buffer);
+        },
+      );
+    }
 
     this.app.post<{ Reply: HealthDto; Body: Record<string, unknown> }>(
       "/lifecycle",

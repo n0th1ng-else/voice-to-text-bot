@@ -23,6 +23,7 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
   protected readonly version: string;
   protected readonly webhookDoNotWait: boolean;
   protected readonly httpsOptions?: HttpsOptions;
+  protected readonly enableSnapshotCapture?: boolean;
 
   protected constructor(
     serverName: string,
@@ -30,12 +31,14 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
     version: string,
     webhookDoNotWait: boolean,
     httpsOptions?: HttpsOptions,
+    enableSnapshotCapture?: boolean,
   ) {
     this.serverName = serverName;
     this.port = port;
     this.version = version;
     this.webhookDoNotWait = webhookDoNotWait;
     this.httpsOptions = httpsOptions;
+    this.enableSnapshotCapture = enableSnapshotCapture;
     logger.info(`Initializing ${Logger.y(this.serverName)} bot server`);
 
     this.isHttps = Boolean(httpsOptions);
