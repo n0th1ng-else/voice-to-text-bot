@@ -7,7 +7,7 @@ import {
   VoiceContentReason,
   VoiceContentReasonModel,
 } from "./types.js";
-import { telegramBotName } from "../env.js";
+import { telegramBotName, ownerId } from "../env.js";
 import { type TgCallbackQuery, type TgMessage } from "./api/types.js";
 import {
   DEFAULT_LANGUAGE,
@@ -21,7 +21,7 @@ import type {
   Currency,
   TgPhotoDto,
 } from "./api/groups/payments/payments-types.js";
-import type { ChatId, FileId } from "./api/core.js";
+import type { ChatId, FileId, UserId } from "./api/core.js";
 
 export const isCommandMessage = (
   model: BotMessageModel,
@@ -226,4 +226,12 @@ export const getBotLogo = (): TgPhotoDto => {
 
 export const isStars = (currency: Currency): boolean => {
   return currency === "XTR";
+};
+
+export const isOwner = (userId?: UserId): boolean => {
+  if (!ownerId || !userId) {
+    return false;
+  }
+
+  return Number(ownerId) === userId;
 };

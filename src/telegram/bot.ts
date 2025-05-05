@@ -179,6 +179,10 @@ export class TelegramBotModel {
       return TelegramBotModel.logNotSupportedMessage(model, prefix);
     }
 
+    if (await this.actions.internal.runCondition(msg, model)) {
+      return this.actions.internal.runAction(model, prefix);
+    }
+
     if (await this.actions.start.runCondition(msg, model)) {
       return this.actions.start.runAction(model, prefix);
     }

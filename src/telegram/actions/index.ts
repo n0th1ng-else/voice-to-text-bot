@@ -6,6 +6,7 @@ import { CoreAction } from "./common.js";
 import { DonateAction } from "./donate.js";
 import { VoiceFormatAction } from "./voice-format.js";
 import { VoiceLengthAction } from "./voice-length.js";
+import { InternalAction } from "./internal.js";
 import { TelegramButtonModel } from "../types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -30,6 +31,7 @@ export class BotActions {
   public readonly voiceLength: VoiceLengthAction;
   public readonly checkout: CheckoutAction;
   public readonly ignore: IgnoreAction;
+  public readonly internal: InternalAction;
 
   constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
     this.start = new StartAction(stat, bot);
@@ -42,6 +44,7 @@ export class BotActions {
     this.voiceLength = new VoiceLengthAction(stat, bot);
     this.checkout = new CheckoutAction(stat, bot);
     this.ignore = new IgnoreAction(stat, bot);
+    this.internal = new InternalAction(stat, bot);
   }
 
   public setPayment(payment: PaymentService): void {
@@ -84,6 +87,8 @@ export class BotActions {
             return this.donate.runCallback(message, button, analytics);
           case "l":
             return this.lang.runCallback(message, button, analytics, msg);
+          case "i":
+            return this.internal.runCallback(message, button, analytics);
           default:
             throw new Error(`Unknown type passed in callback query ${data}`, {
               cause: data,

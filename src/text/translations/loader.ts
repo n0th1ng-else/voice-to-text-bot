@@ -57,6 +57,7 @@ export const initializeMenuLabels = (): Record<BotCommandType, string> => {
     [BotCommand.Support]: "Show support links",
     [BotCommand.Start]: "Say hello and see bot info",
     [BotCommand.Donate]: "Help us with funding the project",
+    [BotCommand.Internal]: "Internal bot commands",
   } as const;
   return labels;
 };

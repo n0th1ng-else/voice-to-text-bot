@@ -54,6 +54,7 @@ export const BotCommand = {
   Language: "/lang",
   Support: "/support",
   Donate: "/donate",
+  Internal: "/internal",
 } as const;
 
 export type BotCommandType = ValueOf<typeof BotCommand>;
@@ -147,8 +148,13 @@ export class BotCommandOption {
 }
 
 const TelegramButtonTypeSchema = z
-  .union([z.literal("d"), z.literal("l"), z.literal("u")])
-  .describe("Button type schema. d is Donation, l is Language, u is Unknown");
+  .union([
+    z.literal("d").describe("Donation"),
+    z.literal("l").describe("Language"),
+    z.literal("i").describe("Internal"),
+    z.literal("u").describe("Unknown"),
+  ])
+  .describe("Button type schema");
 
 export type TelegramButtonType = z.infer<typeof TelegramButtonTypeSchema>;
 

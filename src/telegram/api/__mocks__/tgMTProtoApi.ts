@@ -35,5 +35,8 @@ export const getMTProtoApi = (): TgProto => {
       currentFileId = undefined;
       return Promise.resolve(toFilename);
     },
+    sendFile(): Promise<void> {
+      return Promise.resolve();
+    },
   };
 };
