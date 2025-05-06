@@ -15,28 +15,7 @@ const ERROR_RATE_LIMIT = 10; // report only 10% of "EWITAI canceled" errors
 let ERROR_RATE_COUNT = 0;
 
 const isEnabled = (): boolean => {
-  return Boolean(sentryDsn);
-};
-
-export const initSentry = (): void => {
-  if (!isEnabled()) {
-    return;
-  }
-  initSentryGlobal({
-    dsn: sentryDsn,
-    environment: nodeEnvironment,
-    release: appVersion,
-    integrations: [
-      // Add profiling
-      nodeProfilingIntegration(),
-    ],
-
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
-    profilesSampleRate: 1.0,
-  });
+  return false;
 };
 
 export const captureError = (err: unknown): void => {
@@ -110,11 +89,12 @@ const fastifyRequestPlugin = (app: FastifyInstance): void => {
   });
 };
 
-export const initSentryNew = (): void => {
+export const initSentry = (): void => {
   if (!isEnabled()) {
     return;
   }
   initSentryGlobal({
+    skipOpenTelemetrySetup: true,
     dsn: sentryDsn,
     environment: nodeEnvironment,
     release: appVersion,
@@ -154,7 +134,7 @@ export const initSentryNew = (): void => {
   });
 };
 
-export const trackAPIHandlersNew = (app: FastifyInstance): void => {
+export const trackAPIHandlers = (app: FastifyInstance): void => {
   if (!isEnabled()) {
     return;
   }

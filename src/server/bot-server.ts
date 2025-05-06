@@ -2,7 +2,7 @@ import { fastify, type FastifyInstance } from "fastify";
 import { Logger } from "../logger/index.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import { BotServerBase } from "./bot-server-base.js";
-import { initSentryNew, trackAPIHandlersNew } from "../monitoring/sentry.js";
+import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";
@@ -18,6 +18,7 @@ import {
 import type { VoidPromise } from "../common/types.js";
 import type { HttpsOptions } from "../../certs/index.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
+import { generateMemorySnapshotAsBuffer } from "../profiling/memory.js";
 
 const logger = new Logger("server");
 
@@ -30,11 +31,19 @@ export class BotServer
     version: string,
     webhookDoNotWait: boolean,
     httpsOptions?: HttpsOptions,
+    enableSnapshotCapture?: boolean,
   ) {
-    super("Fastify", port, version, webhookDoNotWait, httpsOptions);
+    super(
+      "Fastify",
+      port,
+      version,
+      webhookDoNotWait,
+      httpsOptions,
+      enableSnapshotCapture,
+    );
 
-    initSentryNew();
-    trackAPIHandlersNew(this.app);
+    initSentry();
+    trackAPIHandlers(this.app);
 
     this.app.get<{ Reply: string }>("/favicon.ico", async (_req, reply) => {
       return reply.status(204).type("image/vnd.microsoft.icon").send("");
@@ -65,6 +74,16 @@ export class BotServer
       const [status, dto] = await this.getStatusHandler();
       return reply.status(status).send(dto);
     });
+
+    if (this.enableSnapshotCapture) {
+      this.app.get<{ Reply: Buffer }>(
+        "/profile-snapshot",
+        async (_req, reply) => {
+          const buffer = await generateMemorySnapshotAsBuffer();
+          return reply.type("application/octet-stream").send(buffer);
+        },
+      );
+    }
 
     this.app.post<{ Reply: HealthDto; Body: Record<string, unknown> }>(
       "/lifecycle",

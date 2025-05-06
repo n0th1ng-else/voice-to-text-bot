@@ -33,6 +33,7 @@ export const prepareInstance = async (
     envy.appVersion,
     envy.webhookDoNotWait,
     sslOptions,
+    envy.enableSnapshotCapture,
   );
 
   const converters = await getVoiceConverterInstances(
