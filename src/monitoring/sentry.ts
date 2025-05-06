@@ -15,7 +15,7 @@ const ERROR_RATE_LIMIT = 10; // report only 10% of "EWITAI canceled" errors
 let ERROR_RATE_COUNT = 0;
 
 const isEnabled = (): boolean => {
-  return Boolean(sentryDsn);
+  return false;
 };
 
 export const captureError = (err: unknown): void => {
