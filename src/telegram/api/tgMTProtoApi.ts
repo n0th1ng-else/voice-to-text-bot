@@ -1,11 +1,12 @@
 import { TelegramClient } from "@mtcute/node";
-import type { FileId } from "./core.js";
+import type { ChatId, FileId } from "./core.js";
 import { API_TIMEOUT_MS } from "../../const.js";
 
 export type TgProto = {
   start: () => Promise<void>;
   stop: () => Promise<void>;
   downloadFile: (toFilename: string, fileId: FileId) => Promise<string>;
+  sendFile: (chatId: ChatId, file: File) => Promise<void>;
 };
 
 export const getMTProtoApi = (
@@ -50,6 +51,16 @@ export const getMTProtoApi = (
       clearTimeout(timeout);
 
       return toFilename;
+    },
+    sendFile: async (chatId: ChatId, file: File): Promise<void> => {
+      if (!isInitialized) {
+        throw new Error("EMTPROTO not initialized");
+      }
+
+      await client.sendMedia(chatId, {
+        type: "document",
+        file: file,
+      });
     },
   };
 };

@@ -1,10 +1,9 @@
-import { fileURLToPath } from "node:url";
-import { resolve as resolvePath } from "node:path";
 import { readFileSync } from "node:fs";
 import Fastify, { type FastifyInstance } from "fastify";
 import { httpsOptions } from "../../certs/index.js";
 import { enableSSL } from "../env.js";
 import { getMB } from "../memory/index.js";
+import { getStaticFilePaths, type UIComponent } from "../ui/ui.js";
 
 export type FastifyStaticRoute<Body = void, Query = void, Reply = void> = {
   Body: Body;
@@ -12,14 +11,8 @@ export type FastifyStaticRoute<Body = void, Query = void, Reply = void> = {
   Reply: Reply | { result: "ok" } | { result: "error"; error: string };
 };
 
-export const initStaticServer = (
-  script: "import" | "chart",
-): FastifyInstance => {
-  const currentDir = fileURLToPath(new URL(".", import.meta.url));
-  const files = {
-    html: resolvePath(currentDir, `../${script}/index.html`),
-    js: resolvePath(currentDir, `../${script}/index.js`),
-  };
+export const initStaticServer = (script: UIComponent): FastifyInstance => {
+  const files = getStaticFilePaths(script);
 
   const httpsOpts = enableSSL
     ? {

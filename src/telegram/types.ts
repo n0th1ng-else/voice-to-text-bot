@@ -12,7 +12,7 @@ import {
   getVoiceFile,
   isChatGroup,
   isVideoMessage,
-} from "./helpers.js";
+} from "./helpers.js"; // TODO module cycle with ./types.ts
 import { Logger } from "../logger/index.js";
 import { getTranslator } from "../text/index.js";
 import { type TgMessage } from "./api/types.js";
@@ -147,8 +147,12 @@ export class BotCommandOption {
 }
 
 const TelegramButtonTypeSchema = z
-  .union([z.literal("d"), z.literal("l"), z.literal("u")])
-  .describe("Button type schema. d is Donation, l is Language, u is Unknown");
+  .union([
+    z.literal("d").describe("Donation"),
+    z.literal("l").describe("Language"),
+    z.literal("u").describe("Unknown"),
+  ])
+  .describe("Button type schema");
 
 export type TelegramButtonType = z.infer<typeof TelegramButtonTypeSchema>;
 
