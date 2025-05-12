@@ -5,6 +5,9 @@ import {
   getCurrentScope,
   withIsolationScope,
   setupFastifyErrorHandler,
+  validateOpenTelemetrySetup,
+  SentryContextManager,
+  type NodeClient,
 } from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
@@ -89,11 +92,12 @@ const fastifyRequestPlugin = (app: FastifyInstance): void => {
   });
 };
 
-export const initSentry = (): void => {
+export const initSentry = (): NodeClient | undefined => {
   if (!isEnabled()) {
     return;
   }
-  initSentryGlobal({
+  return initSentryGlobal({
+    skipOpenTelemetrySetup: true,
     dsn: sentryDsn,
     environment: nodeEnvironment,
     release: appVersion,
@@ -131,6 +135,14 @@ export const initSentry = (): void => {
       return event;
     },
   });
+};
+
+export const validateTelemetry = (): void => {
+  validateOpenTelemetrySetup();
+};
+
+export const getContextManager = () => {
+  return new SentryContextManager();
 };
 
 export const trackAPIHandlers = (app: FastifyInstance): void => {

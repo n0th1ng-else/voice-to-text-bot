@@ -21,6 +21,8 @@ import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import type { BotServerModel } from "./types.js";
 import { VOICE_PROVIDERS } from "../const.js";
+import { isOtelEnabled } from "../otel/utils.js";
+import { stopOtelMonitoring } from "../otel/init.js";
 
 const logger = new Logger("boot-server");
 
@@ -76,6 +78,10 @@ export const prepareInstance = async (
 
   bot.setAuthor(envy.authorTelegramAccount);
 
+  if (!isOtelEnabled()) {
+    logger.warn("OpenTelemetry monitoring is disabled!");
+  }
+
   return db
     .init()
     .then(() =>
@@ -108,9 +114,10 @@ export const prepareStopListener = (): StopListener => {
     await sendStorageStatAnalytics(value, envy.appVersion);
   }).start();
 
-  const stopListener = new StopListener().addTrigger(() => {
+  const stopListener = new StopListener().addTrigger(async () => {
     memoryDaemon.stop();
     storageDaemon.stop();
+    await stopOtelMonitoring();
   });
 
   return stopListener;
