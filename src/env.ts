@@ -33,8 +33,6 @@ export const googleApi = {
   privateKey: process.env.GOOGLE_PRIVATE_KEY || "",
 };
 
-export const logApiTokenV2 = process.env.LOG_API_TOKEN_V2 || "";
-
 export const memoryLimit = Number(process.env.MEMORY_LIMIT_MB) || 0;
 
 export const clusterSize = Number(process.env.CLUSTER_SIZE) || 2;
@@ -98,3 +96,8 @@ export const elevenLabsKey = process.env.ELEVENLABS_API_KEY || "";
 
 export const enableSnapshotCapture =
   process.env.ENABLE_SNAPSHOT_CAPTURE === "true";
+
+export const grafana = {
+  host: process.env.GRAFANA_HOST || "",
+  token: process.env.GRAFANA_TOKEN || "",
+};

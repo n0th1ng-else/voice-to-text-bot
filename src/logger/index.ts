@@ -3,6 +3,7 @@ import picocolors from "picocolors";
 import { z } from "zod";
 import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
+import { getOtelLogger, type OtelLogger } from "../otel/logs.js";
 
 const LogLevelSchema = z
   .union([
@@ -81,6 +82,7 @@ export class Logger {
   private readonly additionalPrefix: string;
   private readonly level: number;
   private readonly id: string;
+  private readonly otelLogger?: OtelLogger;
 
   constructor(id = "", level = logLevel) {
     this.id = id;
@@ -88,6 +90,7 @@ export class Logger {
     this.additionalPrefix = `thread-${threadId}`;
     const logType = LogLevelSchema.parse(level);
     this.level = LOG_LEVEL_PRIORITY[logType];
+    this.otelLogger = getOtelLogger(this.id);
   }
 
   public debug(msg: string, ...data: unknown[]): void {
@@ -96,6 +99,7 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), Logger.d(msg), ...data);
+    this.otelLogger?.debug(this.getRawPrefixes(), msg, data);
   }
 
   public info(msg: string, ...data: unknown[]): void {
@@ -104,6 +108,7 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.log(Logger.g(this.prefix), msg, ...data);
+    this.otelLogger?.info(this.getRawPrefixes(), msg, data);
   }
 
   public warn(
@@ -116,6 +121,8 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.prefix), msg, data ?? "");
+    this.otelLogger?.warn(this.getRawPrefixes(), msg, data);
+
     if (shouldReport) {
       captureWarning(msg, data);
     }
@@ -127,6 +134,7 @@ export class Logger {
     }
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
+    this.otelLogger?.error(this.getRawPrefixes(), msg, data);
     captureError(data);
   }
 }

@@ -17,11 +17,23 @@ import {
 import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
+import {
+  getDurationMetricRecorder,
+  type DurationMetric,
+} from "../../otel/metrics/voiceDuration.js";
+import type { getDb } from "../../db/index.js";
+import type { TelegramApi } from "../api/tgapi.js";
 
 const logger = new Logger("telegram-bot");
 
 export class VoiceAction extends GenericAction {
   private converters?: VoiceConverters;
+  private readonly metric: DurationMetric;
+
+  constructor(stat: ReturnType<typeof getDb>, bot: TelegramApi) {
+    super(stat, bot);
+    this.metric = getDurationMetricRecorder();
+  }
 
   public runAction(
     mdl: BotMessageModel,
@@ -29,6 +41,7 @@ export class VoiceAction extends GenericAction {
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     logger.info(`${prefix.getPrefix()} Voice message`);
+    this.metric(mdl.voiceDuration);
     return this.getChatLanguage(mdl, prefix)
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
       .then(() =>
