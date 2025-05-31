@@ -4,10 +4,9 @@ import {
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
-import { BotCommand } from "../commands.js";
+import { BotCommand, isCommandMessage } from "../commands.js";
 import { BotMessageModel } from "../model.js";
 import { getLanguageByText, getRawUserLanguage } from "../helpers.js";
-import { isCommandMessage } from "../commands.js";
 import { type TranslationKey, TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";

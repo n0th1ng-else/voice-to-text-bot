@@ -1,9 +1,8 @@
 import { GenericAction } from "./common.js";
 import { TelegramButtonModel, TelegramMessagePrefix } from "../types.js";
-import { BotCommand } from "../commands.js";
+import { BotCommand, isCommandMessage } from "../commands.js";
 import { BotMessageModel } from "../model.js";
 import { getBotLogo, getDonationDtoString, isStars } from "../helpers.js";
-import { isCommandMessage } from "../commands.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";

@@ -1,10 +1,9 @@
 import { GenericAction } from "./common.js";
-import { isCommandMessage } from "../commands.js";
+import { BotCommand, isCommandMessage } from "../commands.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { type TelegramMessagePrefix } from "../types.js";
-import { BotCommand } from "../commands.js";
 import type { BotMessageModel } from "../model.js";
 import type { TgMessage } from "../api/types.js";
 
