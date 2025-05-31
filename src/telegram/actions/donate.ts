@@ -1,10 +1,10 @@
 import { GenericAction } from "./common.js";
 import {
   BotCommand,
-  BotMessageModel,
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
+import { BotMessageModel } from "../model.js";
 import {
   getBotLogo,
   getDonationDtoString,

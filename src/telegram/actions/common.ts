@@ -6,11 +6,8 @@ import {
   type TelegramApi,
 } from "../api/tgapi.js";
 import type { TgMessage } from "../api/types.js";
-import type {
-  BotMessageModel,
-  MessageOptions,
-  TelegramMessagePrefix,
-} from "../types.js";
+import type { MessageOptions, TelegramMessagePrefix } from "../types.js";
+import type { BotMessageModel } from "../model.js";
 import type { getDb } from "../../db/index.js";
 import type { LanguageCode } from "../../recognition/types.js";
 import {

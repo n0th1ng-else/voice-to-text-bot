@@ -2,10 +2,10 @@ import { GenericAction } from "./common.js";
 import {
   BotCommand,
   BotLangData,
-  BotMessageModel,
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
+import { BotMessageModel } from "../model.js";
 import {
   getLanguageByText,
   getRawUserLanguage,

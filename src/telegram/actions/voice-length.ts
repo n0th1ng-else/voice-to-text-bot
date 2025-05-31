@@ -3,11 +3,8 @@ import { isVoiceMessage, isVoiceMessageLong } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
-import {
-  type BotMessageModel,
-  type TelegramMessagePrefix,
-  VoiceContentReason,
-} from "../types.js";
+import { type TelegramMessagePrefix, VoiceContentReason } from "../types.js";
+import type { BotMessageModel } from "../model.js";
 import type { TgMessage } from "../api/types.js";
 import { getMaxDuration } from "../../text/utils.js";
 import type { LanguageCode } from "../../recognition/types.js";
