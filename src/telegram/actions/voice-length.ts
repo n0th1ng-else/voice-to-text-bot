@@ -1,5 +1,5 @@
 import { GenericAction } from "./common.js";
-import { isVoiceMessage, isVoiceMessageLong } from "../helpers.js";
+import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -8,11 +8,16 @@ import type { BotMessageModel } from "../model.js";
 import type { TgMessage } from "../api/types.js";
 import { getMaxDuration } from "../../text/utils.js";
 import type { LanguageCode } from "../../recognition/types.js";
+import { durationLimitSec } from "../../const.js";
 
 const logger = new Logger("telegram-bot");
 
 export class VoiceLengthAction extends GenericAction {
   private static readonly maxVoiceDuration = getMaxDuration();
+
+  private static isVoiceMessageLong(model: BotMessageModel): boolean {
+    return model.voiceDuration >= durationLimitSec;
+  }
 
   public runAction(
     mdl: BotMessageModel,
@@ -28,7 +33,9 @@ export class VoiceLengthAction extends GenericAction {
   ): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
-    return Promise.resolve(isVoice && isVoiceMessageLong(mdl));
+    return Promise.resolve(
+      isVoice && VoiceLengthAction.isVoiceMessageLong(mdl),
+    );
   }
 
   private async sendVoiceIsTooLongMessage(
