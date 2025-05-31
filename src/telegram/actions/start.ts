@@ -1,13 +1,11 @@
 import { GenericAction } from "./common.js";
-import { isCommandMessage } from "../helpers.js";
+import { BotCommand } from "../commands.js";
+import { isCommandMessage } from "../commandsChecker.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
-import {
-  BotCommand,
-  type BotMessageModel,
-  type TelegramMessagePrefix,
-} from "../types.js";
+import { type TelegramMessagePrefix } from "../types.js";
+import type { BotMessageModel } from "../model.js";
 import type { TgMessage } from "../api/types.js";
 
 const logger = new Logger("telegram-bot");

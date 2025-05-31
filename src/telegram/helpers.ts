@@ -1,20 +1,17 @@
 import {
-  type BotCommandType,
-  type BotMessageModel,
   type DonationDto,
   type DonationPayload,
   DonationSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
 } from "./types.js";
-import { telegramBotName } from "../env.js";
 import { type TgCallbackQuery, type TgMessage } from "./api/types.js";
 import {
   DEFAULT_LANGUAGE,
   type LanguageCode,
   LanguageSchema,
 } from "../recognition/types.js";
-import { BOT_LOGO, durationLimitSec, supportedAudioFormats } from "../const.js";
+import { BOT_LOGO, supportedAudioFormats } from "../const.js";
 import { convertLanguageCodeFromISO } from "../recognition/common.js";
 import { type TgMedia } from "./api/groups/chats/chats-types.js";
 import type {
@@ -23,37 +20,11 @@ import type {
 } from "./api/groups/payments/payments-types.js";
 import type { ChatId, FileId } from "./api/core.js";
 
-export const isCommandMessage = (
-  model: BotMessageModel,
-  msg: TgMessage,
-  command: BotCommandType,
-): boolean => {
-  if (!msg?.text) {
-    return false;
-  }
-
-  if (msg.text === String(command)) {
-    return true;
-  }
-
-  if (!telegramBotName) {
-    return false;
-  }
-
-  return (
-    model.isGroup &&
-    msg.text.toLowerCase() === `${command}@${telegramBotName.toLowerCase()}`
-  );
-};
-
 export const isVideoMessage = (msg: TgMessage): boolean =>
   Boolean(msg.video_note);
 
 const getMediaSource = (msg: TgMessage): TgMedia | undefined =>
   msg.voice || msg.audio || msg.video_note;
-
-export const isVoiceMessageLong = (model: BotMessageModel): boolean =>
-  model.voiceDuration >= durationLimitSec;
 
 export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   if (!msg) {

@@ -9,7 +9,7 @@ import {
   initializeTranslationsForLocale,
   type TranslationsFileType,
 } from "./translations/loader.js";
-import type { BotCommandType } from "../telegram/types.js";
+import type { BotCommandType } from "../telegram/commands.js";
 
 type Translator = {
   getFallbackLanguage: () => LanguageCode;

@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { type LanguageCode } from "../../recognition/types.js";
 import { type TranslationKey, TranslationKeys } from "../types.js";
-import { BotCommand, type BotCommandType } from "../../telegram/types.js";
+import { BotCommand, type BotCommandType } from "../../telegram/commands.js";
 
 const getTranslationKeysSchema = () => {
   const values: string[] = Object.values(TranslationKeys);

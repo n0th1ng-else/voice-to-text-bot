@@ -1,16 +1,13 @@
 import { GenericAction } from "./common.js";
 import {
-  BotCommand,
   BotLangData,
-  BotMessageModel,
   TelegramButtonModel,
   TelegramMessagePrefix,
 } from "../types.js";
-import {
-  getLanguageByText,
-  getRawUserLanguage,
-  isCommandMessage,
-} from "../helpers.js";
+import { BotCommand } from "../commands.js";
+import { isCommandMessage } from "../commandsChecker.js";
+import { BotMessageModel } from "../model.js";
+import { getLanguageByText, getRawUserLanguage } from "../helpers.js";
 import { type TranslationKey, TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";

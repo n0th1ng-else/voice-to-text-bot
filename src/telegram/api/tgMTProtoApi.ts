@@ -28,7 +28,7 @@ export const getMTProtoApi = (
       isInitialized = true;
     },
     stop: async (): Promise<void> => {
-      await client.close();
+      await client.destroy();
       isInitialized = false;
     },
     downloadFile: async (
