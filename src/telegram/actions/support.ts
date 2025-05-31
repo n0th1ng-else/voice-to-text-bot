@@ -1,5 +1,6 @@
 import { GenericAction } from "./common.js";
-import { BotCommand, isCommandMessage } from "../commands.js";
+import { BotCommand } from "../commands.js";
+import { isCommandMessage } from "../commandsChecker.js";
 import { TranslationKeys } from "../../text/types.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
