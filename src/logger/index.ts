@@ -1,6 +1,6 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
 

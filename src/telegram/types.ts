@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { nanoid } from "nanoid";
 import { Logger } from "../logger/index.js";
 import { getTranslator } from "../text/index.js";

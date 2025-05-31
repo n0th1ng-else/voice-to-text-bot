@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Logger } from "../../logger/index.js";
 import {
   type LanguageTokens,

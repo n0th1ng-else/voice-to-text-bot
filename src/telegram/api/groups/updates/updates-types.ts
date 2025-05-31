@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { Prettify } from "../../../../common/types.js";
 
 export const TgWebHookSchema = z
