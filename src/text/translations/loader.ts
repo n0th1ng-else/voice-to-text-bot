@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { type LanguageCode } from "../../recognition/types.js";
 import { type TranslationKey, TranslationKeys } from "../types.js";
-import { BotCommand, type BotCommandType } from "../../telegram/types.js";
+import { BotCommand, type BotCommandType } from "../../telegram/commands.js";
 
 const getTranslationKeysSchema = () => {
   const values: string[] = Object.values(TranslationKeys);

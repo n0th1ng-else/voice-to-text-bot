@@ -6,6 +6,7 @@ import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
 import { type ChatId, TgChatId } from "./api/core.js";
 import type { TgMessageOptions } from "./api/groups/chats/chats-types.js";
+import type { BotCommandType } from "./commands.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -25,15 +26,6 @@ export class VoiceContentReasonModel {
     this.info = info;
   }
 }
-
-export const BotCommand = {
-  Start: "/start",
-  Language: "/lang",
-  Support: "/support",
-  Donate: "/donate",
-} as const;
-
-export type BotCommandType = ValueOf<typeof BotCommand>;
 
 export type MessageOptions = {
   lang: LanguageCode;

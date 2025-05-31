@@ -33,6 +33,7 @@ export const injectDependencies = async () => {
   const tunnel = await import("../server/tunnel.js");
   const translator = await import("../text/index.js");
   const translationsLoader = await import("../text/translations/loader.js");
+  const commands = await import("../telegram/commands.js");
 
   return {
     ...certs,
@@ -69,6 +70,7 @@ export const injectDependencies = async () => {
     ...scheduler,
     ...tunnel,
     ...usages,
+    ...commands,
   };
 };
 
