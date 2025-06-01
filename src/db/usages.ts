@@ -91,7 +91,7 @@ export class UsagesClient {
   /**
    * @deprecated Use it only for migration
    */
-  public importRow(
+  public async importRow(
     chatId: ChatId,
     usageCount: number,
     langId: string,
@@ -99,23 +99,19 @@ export class UsagesClient {
     createdAt: Date,
     updatedAt: Date,
   ): Promise<UsageRowScheme> {
-    return this.getRows(chatId)
-      .then((rows) => {
-        const row = rows.shift();
-        return row
-          ? row
-          : this.db.createRow(chatId, langId, username, usageCount);
-      })
-      .then((row) =>
-        this.db.updateRowWithDate(
-          row.usage_id,
-          langId,
-          usageCount,
-          username,
-          createdAt,
-          updatedAt,
-        ),
-      );
+    const rows = await this.getRows(chatId);
+    const existingRow = rows.shift();
+    const row =
+      existingRow ??
+      (await this.db.createRow(chatId, langId, username, usageCount));
+    return await this.db.updateRowWithDate(
+      row.usage_id,
+      langId,
+      usageCount,
+      username,
+      createdAt,
+      updatedAt,
+    );
   }
 
   /**

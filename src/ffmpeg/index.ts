@@ -63,10 +63,8 @@ const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
     await deleteFileIfExists(fsFilePath);
     return file;
   } catch (err) {
-    await deleteFileIfExists(fsFilePath, err);
-    throw new Error(
-      "Never thrown: deleteFileIfExists throws the original error",
-    );
+    await deleteFileIfExists(fsFilePath);
+    throw err;
   }
 };
 
