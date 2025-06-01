@@ -14,7 +14,10 @@ import type { BotMessageModel } from "../model.js";
 import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
-import { trackUnsuccessfullyProcessedFile } from "../../monitoring/newrelic.js";
+import {
+  trackStartProcessingFile,
+  trackUnsuccessfullyProcessedFile,
+} from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -66,6 +69,8 @@ export class VoiceAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Processing voice`);
+    trackStartProcessingFile();
+
     return this.getFileLInk(model, prefix)
       .then(([fileLink, fileId, isLocalFile]) => {
         if (!this.converters) {
