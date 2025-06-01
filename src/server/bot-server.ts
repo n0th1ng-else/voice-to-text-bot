@@ -235,32 +235,30 @@ export class BotServer
       `Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`,
     );
 
-    return new Promise((resolve) => {
-      this.app.listen({ port: this.port, host: "0.0.0.0" }, () => {
-        logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
-        resolve(
-          () =>
-            new Promise((resolveFn, rejectFn) => {
-              logger.warn("Shutting down the server instance");
-              if (this.uptimeDaemon.isRunning) {
-                logger.warn("Stopping the daemon");
-                this.uptimeDaemon.stop();
-              }
+    const { promise, resolve } = Promise.withResolvers<VoidPromise>();
 
-              this.app
-                .close()
-                .then(() => {
-                  logger.warn("The bot server has stopped");
-                  resolveFn();
-                })
-                .catch((err) => {
-                  logger.error("Unable to stop the bot server", err);
-                  rejectFn(err);
-                });
-            }),
-        );
+    this.app.listen({ port: this.port, host: "0.0.0.0" }, () => {
+      logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
+
+      resolve(async () => {
+        logger.warn("Shutting down the server instance");
+
+        if (this.uptimeDaemon.isRunning) {
+          logger.warn("Stopping the daemon");
+          this.uptimeDaemon.stop();
+        }
+
+        try {
+          await this.app.close();
+          logger.warn("The bot server has stopped");
+        } catch (err) {
+          logger.error("Unable to stop the bot server", err);
+          throw err;
+        }
       });
     });
+
+    return promise;
   }
 
   public async triggerDaemon(
