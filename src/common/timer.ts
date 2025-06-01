@@ -7,8 +7,11 @@ export const randomIntFromInterval = (min: number, max: number): number => {
   return Math.floor(normalizedNum * (max - min + 1) + min);
 };
 
-export const sleepFor = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(() => resolve(), ms));
+export const sleepFor = (ms: number): Promise<void> => {
+  const { promise, resolve } = Promise.withResolvers<void>();
+  setTimeout(() => resolve(), ms);
+  return promise;
+};
 
 export const sleepForRandom = (): Promise<void> => {
   const ms = randomIntFromInterval(100, 3000);

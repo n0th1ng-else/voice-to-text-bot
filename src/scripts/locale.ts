@@ -5,17 +5,19 @@ import { Logger } from "../logger/index.js";
 const logger = new Logger("locale-script");
 
 const askLocale = (): Promise<string> => {
-  return new Promise((resolve) => {
-    const reader = createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
+  const { promise, resolve } = Promise.withResolvers<string>();
 
-    reader.question("Specify the locale to work with: ", (locale) => {
-      reader.close();
-      resolve(locale);
-    });
+  const reader = createInterface({
+    input: process.stdin,
+    output: process.stdout,
   });
+
+  reader.question("Specify the locale to work with: ", (locale) => {
+    reader.close();
+    resolve(locale);
+  });
+
+  return promise;
 };
 
 const run = async (): Promise<void> => {

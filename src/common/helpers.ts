@@ -28,10 +28,6 @@ export const runPromiseWithRetry = <D>(
     });
 };
 
-export const flattenPromise = () => {
-  // Flatten promise
-};
-
 export const splitTextIntoParts = (
   text: string,
   lang: LanguageCode,

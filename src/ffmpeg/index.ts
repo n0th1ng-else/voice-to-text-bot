@@ -19,30 +19,32 @@ const logger = new Logger("media-to-wav");
  */
 const convertFileToWav = async (inputFile: string): Promise<string> => {
   const outputFile = `${inputFile}.wav`;
-  return new Promise((resolve, reject) => {
-    if (typeof ffmpegBinPath !== "string") {
-      return Promise.reject(new Error("Ffmpeg binary was now found!"));
-    }
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
 
-    ffmpeg.setFfmpegPath(ffmpegBinPath);
+  if (typeof ffmpegBinPath !== "string") {
+    return Promise.reject(new Error("Ffmpeg binary was now found!"));
+  }
 
-    ffmpeg()
-      .setFfmpegPath(ffmpegBinPath)
-      .input(inputFile)
-      .outputOptions([
-        "-analyzeduration 0",
-        "-loglevel 0",
-        `-ar ${wavSampleRate}`,
-        "-ac 1",
-      ])
-      .saveToFile(outputFile)
-      .on("end", () => {
-        resolve(outputFile);
-      })
-      .on("error", (error: Error) => {
-        reject(error);
-      });
-  });
+  ffmpeg.setFfmpegPath(ffmpegBinPath);
+
+  ffmpeg()
+    .setFfmpegPath(ffmpegBinPath)
+    .input(inputFile)
+    .outputOptions([
+      "-analyzeduration 0",
+      "-loglevel 0",
+      `-ar ${wavSampleRate}`,
+      "-ac 1",
+    ])
+    .saveToFile(outputFile)
+    .on("end", () => {
+      resolve(outputFile);
+    })
+    .on("error", (error: Error) => {
+      reject(error);
+    });
+
+  return promise;
 };
 
 const downloadAsStream = (url: string): Promise<IncomingMessage> =>

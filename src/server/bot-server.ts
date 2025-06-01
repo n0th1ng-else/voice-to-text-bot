@@ -6,7 +6,6 @@ import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";
-import { flattenPromise } from "../common/helpers.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { getMB } from "../memory/index.js";
 import {
@@ -236,32 +235,30 @@ export class BotServer
       `Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`,
     );
 
-    return new Promise((resolve) => {
-      this.app.listen({ port: this.port, host: "0.0.0.0" }, () => {
-        logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
-        resolve(
-          () =>
-            new Promise((resolveFn, rejectFn) => {
-              logger.warn("Shutting down the server instance");
-              if (this.uptimeDaemon.isRunning) {
-                logger.warn("Stopping the daemon");
-                this.uptimeDaemon.stop();
-              }
+    const { promise, resolve } = Promise.withResolvers<VoidPromise>();
 
-              this.app
-                .close()
-                .then(() => {
-                  logger.warn("The bot server has stopped");
-                  resolveFn();
-                })
-                .catch((err) => {
-                  logger.error("Unable to stop the bot server", err);
-                  rejectFn(err);
-                });
-            }),
-        );
+    this.app.listen({ port: this.port, host: "0.0.0.0" }, () => {
+      logger.info(`The bot server is listening on ${Logger.y(this.port)}`);
+
+      resolve(async () => {
+        logger.warn("Shutting down the server instance");
+
+        if (this.uptimeDaemon.isRunning) {
+          logger.warn("Stopping the daemon");
+          this.uptimeDaemon.stop();
+        }
+
+        try {
+          await this.app.close();
+          logger.warn("The bot server has stopped");
+        } catch (err) {
+          logger.error("Unable to stop the bot server", err);
+          throw err;
+        }
       });
     });
+
+    return promise;
   }
 
   public async triggerDaemon(
@@ -289,17 +286,14 @@ export class BotServer
       .setUrls(this.selfUrl, nextReplicaUrl)
       .setIntervalDays(lifecycleInterval);
 
-    return this.applyHostLocation(timeoutMs).then(() => {
-      this.uptimeDaemon.start();
+    await this.applyHostLocation(timeoutMs);
+    this.uptimeDaemon.start();
 
-      if (!this.stat) {
-        return;
-      }
+    if (!this.stat) {
+      return;
+    }
 
-      return this.stat
-        .updateNodeState(this.selfUrl, true, this.version)
-        .then(flattenPromise);
-    });
+    await this.stat.updateNodeState(this.selfUrl, true, this.version);
   }
 
   private async getStatusHandler(): Promise<[number, HealthDto]> {

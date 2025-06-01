@@ -12,7 +12,7 @@ export interface BotServerModel extends BotServerModelBase {
     nextReplicaUrl: string,
     lifecycleInterval: number,
     timeoutMs: number,
-  ): void;
+  ): Promise<void>;
   setBots(bots: TelegramBotModel[]): this;
 }
 

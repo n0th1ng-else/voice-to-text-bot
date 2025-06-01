@@ -17,7 +17,6 @@ import {
   TranslationKeys,
 } from "../../src/text/types.js";
 import { getBotMenuCommands } from "../../src/telegram/data.js";
-import { flattenPromise } from "../../src/common/helpers.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
 import { parseDonationPayload } from "../../src/telegram/helpers.js";
 import type { TgUpdate } from "../../src/telegram/api/types.js";
@@ -203,15 +202,15 @@ export const mockTgReceiveMessage = (
   });
 };
 
-export const mockTgReceiveMessages = (
+export const mockTgReceiveMessages = async (
   host: NockScope,
   chatId: ChatId,
   lang: LanguageCode,
   textIds: TranslationKeyFull[],
 ): Promise<void> => {
-  return Promise.all(
+  await Promise.all(
     textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)),
-  ).then(flattenPromise);
+  );
 };
 
 export const mockTgGetFileUrl = (host: NockScope, fileId: string): void => {

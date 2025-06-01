@@ -103,24 +103,26 @@ class DataModel {
 }
 
 const onFileSelect = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target.result);
-        if (!data.results) {
-          reject(new Error("No results in data.results"));
-        }
-        resolve({
-          items: data.results,
-          total: data.results.length,
-        });
-      } catch (err) {
-        reject(err);
+  const { promise, resolve, reject } = Promise.withResolvers();
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (!data.results) {
+        reject(new Error("No results in data.results"));
       }
-    };
-    reader.readAsText(file);
-  });
+      resolve({
+        items: data.results,
+        total: data.results.length,
+      });
+    } catch (err) {
+      reject(err);
+    }
+  };
+  reader.readAsText(file);
+
+  return promise;
 };
 
 const onReset = () => {
