@@ -137,3 +137,7 @@ export const DonationSchema = z
   );
 
 export type DonationDto = z.infer<typeof DonationSchema>;
+
+export type ChatType = "private" | "group" | "supergroup" | "channel" | "forum";
+
+export type VoiceType = "audio" | "video_note" | "voice_note" | "unknown";
