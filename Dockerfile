@@ -1,6 +1,6 @@
 FROM node:22.13.1-slim AS builder
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 ARG APP_DIR=/usr/src/app/
 
@@ -25,12 +25,12 @@ FROM node:22.13.1-slim
 
 EXPOSE 8080
 
-ENV NEW_RELIC_NO_CONFIG_FILE true
+ENV NEW_RELIC_NO_CONFIG_FILE=true
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 ARG APP_VERSION=local
-ENV APP_VERSION ${APP_VERSION}
+ENV APP_VERSION=${APP_VERSION}
 
 RUN echo ${APP_VERSION}
 
