@@ -15,8 +15,8 @@ import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
 import {
-  trackStartProcessingFile,
-  trackUnsuccessfullyProcessedFile,
+  trackProcessFile,
+  trackVoiceDuration,
 } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
@@ -69,7 +69,7 @@ export class VoiceAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Processing voice`);
-    trackStartProcessingFile();
+    trackProcessFile("progress");
 
     return this.getFileLInk(model, prefix)
       .then(([fileLink, fileId, isLocalFile]) => {
@@ -125,6 +125,11 @@ export class VoiceAction extends GenericAction {
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
+        trackVoiceDuration(
+          model.voiceType,
+          model.chatType,
+          model.voiceDuration,
+        );
         return this.updateUsageCount(model, prefix);
       })
       .catch((err) => {
@@ -140,7 +145,7 @@ export class VoiceAction extends GenericAction {
         }
 
         model.analytics.addError(errorMessage);
-        trackUnsuccessfullyProcessedFile();
+        trackProcessFile("failed");
 
         if (model.isGroup) {
           return;

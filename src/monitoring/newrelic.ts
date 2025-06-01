@@ -1,9 +1,23 @@
 import newrelic from "newrelic";
+import type { ChatType, VoiceType } from "../telegram/types.js";
 
-export const trackUnsuccessfullyProcessedFile = (): void => {
-  newrelic.incrementMetric("FileProcessing/Failed");
+const formatMetric = (metric: string): string => {
+  // Snake_case to PascalCase
+  return metric
+    .split("_")
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join("");
 };
 
-export const trackStartProcessingFile = (): void => {
-  newrelic.incrementMetric("FileProcessing/Progress");
+export const trackProcessFile = (metric: "progress" | "failed"): void => {
+  newrelic.incrementMetric(`FileProcessing/${formatMetric(metric)}`);
+};
+
+export const trackVoiceDuration = (
+  category: VoiceType,
+  metric: ChatType,
+  durationSec: number,
+): void => {
+  const metricName = `VoiceFiles/${formatMetric(category)}/${formatMetric(metric)}`;
+  newrelic.recordMetric(metricName, durationSec);
 };

@@ -11,6 +11,7 @@ import type { AnalyticsData } from "../analytics/ga/types.js";
 import type { TgMessage } from "./api/types.js";
 import {
   getChatId,
+  getChatType,
   getFullUserName,
   getGroupName,
   getRawUserLanguage,
@@ -19,9 +20,10 @@ import {
   getVoiceDuration,
   getVoiceFile,
   isChatGroup,
-  isVideoMessage,
+  getVoiceType,
   parseDonationPayload,
 } from "./helpers.js";
+import type { ChatType, VoiceType } from "./types.js";
 
 export class BotMessageModel {
   public readonly id: MessageId;
@@ -33,13 +35,14 @@ export class BotMessageModel {
   public readonly groupName: string;
   public readonly voiceFileId?: FileId;
   public readonly voiceDuration: number;
-  public readonly isVideo: boolean;
+  public readonly voiceType: VoiceType;
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
   public readonly donationId: number;
   public readonly paymentChargeId?: PaymentChargeId;
   public readonly isSubscriptionPayment: boolean;
   public readonly forumThreadId?: MessageThreadId;
+  public readonly chatType: ChatType;
 
   constructor(msg: TgMessage, analytics: AnalyticsData) {
     this.id = msg.message_id;
@@ -51,7 +54,7 @@ export class BotMessageModel {
     this.groupName = getGroupName(msg);
     this.voiceFileId = getVoiceFile(msg);
     this.voiceDuration = getVoiceDuration(msg);
-    this.isVideo = isVideoMessage(msg);
+    this.voiceType = getVoiceType(msg);
     this.userLanguage = getUserLanguage(msg);
     this.donationId = parseDonationPayload(
       msg.successful_payment?.invoice_payload,
@@ -61,6 +64,7 @@ export class BotMessageModel {
     if (msg.is_topic_message && msg.message_thread_id) {
       this.forumThreadId = msg.message_thread_id;
     }
+    this.chatType = getChatType(msg);
     this.analytics = analytics
       .setId(this.chatId)
       .setLang(getRawUserLanguage(msg));

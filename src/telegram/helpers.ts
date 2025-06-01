@@ -1,9 +1,11 @@
 import {
+  type ChatType,
   type DonationDto,
   type DonationPayload,
   DonationSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
+  type VoiceType,
 } from "./types.js";
 import { type TgCallbackQuery, type TgMessage } from "./api/types.js";
 import {
@@ -20,8 +22,21 @@ import type {
 } from "./api/groups/payments/payments-types.js";
 import type { ChatId, FileId } from "./api/core.js";
 
-export const isVideoMessage = (msg: TgMessage): boolean =>
-  Boolean(msg.video_note);
+export const getVoiceType = (msg: TgMessage): VoiceType => {
+  if (msg.video_note) {
+    return "video_note";
+  }
+
+  if (msg.audio) {
+    return "audio";
+  }
+
+  if (msg.voice) {
+    return "voice_note";
+  }
+
+  return "unknown";
+};
 
 const getMediaSource = (msg: TgMessage): TgMedia | undefined =>
   msg.voice || msg.audio || msg.video_note;
@@ -45,7 +60,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   }
 
   const mimeType = data.mime_type || "";
-  const isVideo = isVideoMessage(msg);
+  const isVideo = getVoiceType(msg) === "video_note";
 
   const formats = supportedAudioFormats.reduce(
     (union, format) => union.add(format.mimeType.toLowerCase()),
@@ -71,6 +86,14 @@ export const getChatId = (msg: TgMessage): ChatId => msg.chat.id;
 
 export const isChatGroup = (msg: TgMessage): boolean =>
   msg.chat.type !== "private";
+
+export const getChatType = (msg: TgMessage): ChatType => {
+  if (msg.is_topic_message && msg.message_thread_id) {
+    return "forum";
+  }
+
+  return msg.chat.type;
+};
 
 export const getUserName = (msg: TgMessage): string => {
   const fromUserName = msg.from?.username;
