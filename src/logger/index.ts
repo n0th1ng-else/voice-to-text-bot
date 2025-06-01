@@ -3,6 +3,7 @@ import picocolors from "picocolors";
 import { z } from "zod/v4";
 import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
+import { trackApplicationErrors } from "../monitoring/newrelic.js";
 
 const LogLevelSchema = z
   .union([
@@ -128,5 +129,6 @@ export class Logger {
     // eslint-disable-next-line no-console
     console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
     captureError(data);
+    trackApplicationErrors();
   }
 }

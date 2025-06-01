@@ -7,6 +7,8 @@ import {
 } from "./types.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
+import { TimeMeasure } from "../common/timer.js";
+import { trackRecognitionTime } from "../monitoring/newrelic.js";
 
 const logger = new Logger("aws-recognition");
 
@@ -63,6 +65,8 @@ export class AWSProvider extends VoiceConverter {
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
+    const duration = new TimeMeasure();
+
     return (
       this.getJob(name)
         .then((data) => {
@@ -89,6 +93,7 @@ export class AWSProvider extends VoiceConverter {
         )
         .then((text) => {
           logger.info(`Job ${name} completed`);
+          trackRecognitionTime("AWS", duration.getMs());
           return text;
         })
     );
