@@ -14,6 +14,7 @@ import type { BotMessageModel } from "../model.js";
 import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
+import { trackUnsuccessfullyProcessedFile } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -59,7 +60,7 @@ export class VoiceAction extends GenericAction {
     this.converters = converters;
   }
 
-  private recogniseVoiceMessage(
+  private async recogniseVoiceMessage(
     model: BotMessageModel,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
@@ -134,6 +135,7 @@ export class VoiceAction extends GenericAction {
         }
 
         model.analytics.addError(errorMessage);
+        trackUnsuccessfullyProcessedFile();
 
         if (model.isGroup) {
           return;

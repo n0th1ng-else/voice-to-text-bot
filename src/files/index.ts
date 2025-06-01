@@ -37,10 +37,7 @@ const deleteFile = async (fileName: string): Promise<void> => {
     });
 };
 
-export const deleteFileIfExists = async (
-  fileName: string,
-  err?: unknown,
-): Promise<string> => {
+export const deleteFileIfExists = async (fileName: string): Promise<string> => {
   logger.info(`Deleting ${Logger.g(fileName)} from the filesystem`);
 
   const isExist = await isFileExist(fileName);
@@ -49,11 +46,6 @@ export const deleteFileIfExists = async (
     await deleteFile(fileName);
   } else {
     logger.info(`${fileName} does not exists`);
-  }
-
-  if (err) {
-    logger.error(`${fileName} comes with an error`, err);
-    return Promise.reject(err);
   }
 
   return fileName;
@@ -92,7 +84,10 @@ export const saveStreamToFile = async (
 
   stream.pipe(fileStream);
 
-  return promise.catch((err) => deleteFileIfExists(name, err));
+  return promise.catch(async (err) => {
+    await deleteFileIfExists(name);
+    throw err;
+  });
 };
 
 export const readFileIntoBuffer = async (fileName: string): Promise<Buffer> => {

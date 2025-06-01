@@ -72,6 +72,9 @@ importers:
       '@types/fluent-ffmpeg':
         specifier: 2.1.27
         version: 2.1.27
+      '@types/newrelic':
+        specifier: 9.14.8
+        version: 9.14.8
       '@types/node':
         specifier: 22.15.29
         version: 22.15.29
@@ -2193,6 +2196,9 @@ packages:
 
   '@types/mysql@2.15.26':
     resolution: {integrity: sha512-DSLCOXhkvfS5WNNPbfn2KdICAmk8lLc+/PNvnPnF7gOdMZCxopXduqv0OQ13y/yA/zXTSikZZqVgybUxOEg6YQ==}
+
+  '@types/newrelic@9.14.8':
+    resolution: {integrity: sha512-rkOTEVR7Lui4TTEykDUxIxCbFkcI/yw3C8URLOWM84zjuHh9W35RAequHTEvGBbbrLCdn43FVTHMLji4uunDWQ==}
 
   '@types/node@10.17.60':
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
@@ -9036,6 +9042,8 @@ snapshots:
   '@types/mysql@2.15.26':
     dependencies:
       '@types/node': 22.15.29
+
+  '@types/newrelic@9.14.8': {}
 
   '@types/node@10.17.60': {}
 
