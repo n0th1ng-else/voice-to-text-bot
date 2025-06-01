@@ -28,9 +28,9 @@ export class WaiterForCalls {
     this.times = times;
     this.calledTimes = 0;
 
-    this.promise = new Promise((resolve) => {
-      this.resolve = resolve;
-    });
+    const { promise, resolve } = Promise.withResolvers<void>();
+    this.promise = promise;
+    this.resolve = resolve;
   }
 
   public toString(): string {

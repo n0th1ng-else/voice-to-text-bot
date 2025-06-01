@@ -77,21 +77,22 @@ export const saveStreamToFile = async (
   const name = getFullFileName(fileName, addUniqPrefix, dir);
   logger.info(`Saving the stream into filesystem. The file name is ${name}`);
 
-  return new Promise<string>((resolve, reject) => {
-    const fileStream = createWriteStream(name);
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
+  const fileStream = createWriteStream(name);
 
-    fileStream
-      .on("error", (err: Error) => {
-        logger.error("Unable to dump the file", err);
-        reject(err);
-      })
-      .on("finish", () => {
-        logger.info("Dump complete");
-        resolve(name);
-      });
+  fileStream
+    .on("error", (err: Error) => {
+      logger.error("Unable to dump the file", err);
+      reject(err);
+    })
+    .on("finish", () => {
+      logger.info("Dump complete");
+      resolve(name);
+    });
 
-    stream.pipe(fileStream);
-  }).catch((err) => deleteFileIfExists(name, err));
+  stream.pipe(fileStream);
+
+  return promise.catch((err) => deleteFileIfExists(name, err));
 };
 
 export const readFileIntoBuffer = async (fileName: string): Promise<Buffer> => {
