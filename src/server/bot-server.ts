@@ -6,7 +6,6 @@ import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";
-import { flattenPromise } from "../common/helpers.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { getMB } from "../memory/index.js";
 import {
@@ -289,17 +288,14 @@ export class BotServer
       .setUrls(this.selfUrl, nextReplicaUrl)
       .setIntervalDays(lifecycleInterval);
 
-    return this.applyHostLocation(timeoutMs).then(() => {
-      this.uptimeDaemon.start();
+    await this.applyHostLocation(timeoutMs);
+    this.uptimeDaemon.start();
 
-      if (!this.stat) {
-        return;
-      }
+    if (!this.stat) {
+      return;
+    }
 
-      return this.stat
-        .updateNodeState(this.selfUrl, true, this.version)
-        .then(flattenPromise);
-    });
+    await this.stat.updateNodeState(this.selfUrl, true, this.version);
   }
 
   private async getStatusHandler(): Promise<[number, HealthDto]> {

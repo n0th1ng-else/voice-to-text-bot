@@ -71,13 +71,13 @@ export class AnalyticsData {
   private readonly appVersion: string;
   private readonly url: string;
   private readonly threadId: number;
-  private events: AnalyticsEvent[] = [];
+  private readonly events: AnalyticsEvent[] = [];
   private id: ChatId = 0 as ChatId;
   private lang = defaultLang;
   private command: AnalyticsAction = "/app";
   private commandTitle = "";
   private commandMeta = "";
-  private title = "Audio Message Bot";
+  private readonly title = "Audio Message Bot";
 
   constructor(appVersion: string, url: string, threadId: number) {
     this.appVersion = appVersion;

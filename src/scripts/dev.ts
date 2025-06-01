@@ -1,7 +1,6 @@
 import { Logger } from "../logger/index.js";
 import { getLaunchDelay } from "../common/timer.js";
 import { prepareInstance, prepareStopListener } from "../server/boot.js";
-import { flattenPromise } from "../common/helpers.js";
 import type { BotServerModel } from "../server/types.js";
 
 const logger = new Logger("dev-script");
@@ -13,11 +12,9 @@ const startServer = async (
   const launchDelay = getLaunchDelay(threadId);
   const stopListener = prepareStopListener();
 
-  return server
-    .applyHostLocation(launchDelay)
-    .then(() => server.start())
-    .then((onStop) => stopListener.addTrigger(() => onStop()))
-    .then(flattenPromise);
+  await server.applyHostLocation(launchDelay);
+  const onStop = await server.start();
+  stopListener.addTrigger(() => onStop());
 };
 
 export const run = async (threadId = 0): Promise<void> => {
