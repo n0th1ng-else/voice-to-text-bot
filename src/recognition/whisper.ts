@@ -14,6 +14,8 @@ import {
   type WhisperAddonArchitecture,
 } from "../whisper/utils.js";
 import { whisperEnableGpu, whisperModelFile } from "../env.js";
+import { TimeMeasure } from "../common/timer.js";
+import { trackRecognitionTime } from "../monitoring/newrelic.js";
 
 const logger = new Logger("whisper-recognition");
 
@@ -49,6 +51,7 @@ export class WhisperProvider extends VoiceConverter {
       throw new Error("Whisper converter is not initialized");
     }
 
+    const duration = new TimeMeasure();
     const name = logData.fileId;
     addAttachment(name, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
@@ -63,6 +66,7 @@ export class WhisperProvider extends VoiceConverter {
       whisperEnableGpu,
     );
     await deleteFileIfExists(filePath);
+    trackRecognitionTime("WHISPER", duration.getMs());
     return text;
   }
 }

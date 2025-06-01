@@ -9,6 +9,8 @@ import { addAttachment } from "../monitoring/sentry.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { API_TIMEOUT_MS } from "../const.js";
+import { TimeMeasure } from "../common/timer.js";
+import { trackRecognitionTime } from "../monitoring/newrelic.js";
 
 const logger = new Logger("11-labs-recognition");
 
@@ -44,22 +46,25 @@ export class ElevenLabsProvider extends VoiceConverter {
   }
 
   private async recognise(data: Buffer, lang: LanguageCode): Promise<string> {
+    const duration = new TimeMeasure();
     const audioBlob = new Blob([data], {
       type: "audio/wav",
     });
-    return await this.client.speechToText
-      .convert(
-        {
-          file: audioBlob,
-          model_id: "scribe_v1",
-          tag_audio_events: false, // Tag audio events like laughter, applause, etc.
-          language_code: convertLanguageCodeToISO(lang),
-          diarize: false, // Whether to annotate who is speaking
-        },
-        {
-          abortSignal: AbortSignal.timeout(API_TIMEOUT_MS),
-        },
-      )
-      .then((recognition) => recognition.text);
+
+    const recognition = await this.client.speechToText.convert(
+      {
+        file: audioBlob,
+        model_id: "scribe_v1",
+        tag_audio_events: false, // Tag audio events like laughter, applause, etc.
+        language_code: convertLanguageCodeToISO(lang),
+        diarize: false, // Whether to annotate who is speaking
+      },
+      {
+        abortSignal: AbortSignal.timeout(API_TIMEOUT_MS),
+      },
+    );
+
+    trackRecognitionTime("11LABS", duration.getMs());
+    return recognition.text;
   }
 }

@@ -13,6 +13,7 @@ import { TimeMeasure } from "../../common/timer.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 import { addAttachment } from "../../monitoring/sentry.js";
+import { trackRecognitionTime } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -86,18 +87,19 @@ export class WithAiProvider extends VoiceConverter {
         return finalizedChunks.map(({ text }) => text || "").join(" ") || "";
       })
       .finally(() => {
-        const timeTotal = duration.getMs();
+        const timeTotalMs = duration.getMs();
         const timeLimit = 2 * API_TIMEOUT_MS + 1_000;
-        if (timeTotal > timeLimit) {
+        if (timeTotalMs > timeLimit) {
           logger.error(
-            `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`,
+            `${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`,
             new Error("Voice recognition api took too long"),
           );
           return;
         }
         logger.info(
-          `${logPrefix} Voice recognition api took ${duration.getMs()}ms to finish`,
+          `${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`,
         );
+        trackRecognitionTime("WITAI", timeTotalMs);
       });
   }
 

@@ -7,6 +7,8 @@ import {
 } from "./types.js";
 import { Logger } from "../logger/index.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
+import { TimeMeasure } from "../common/timer.js";
+import { trackRecognitionTime } from "../monitoring/newrelic.js";
 
 const logger = new Logger("google-recognition");
 
@@ -43,6 +45,8 @@ export class GoogleProvider extends VoiceConverter {
   ): Promise<string> {
     const name = `${opts.fileId}.ogg`;
     logger.info(`Starting process for ${Logger.y(name)}`);
+    const duration = new TimeMeasure();
+
     return getWavBuffer(fileLink, isLocalFile)
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
@@ -61,6 +65,7 @@ export class GoogleProvider extends VoiceConverter {
       .then(([translationData]) => this.unpackTranscription(translationData))
       .then((text) => {
         logger.info(`Job ${Logger.y(name)} completed`);
+        trackRecognitionTime("GOOGLE", duration.getMs());
         return text;
       });
   }
