@@ -54,6 +54,7 @@
     "pg": "8.16.0",
     "picocolors": "1.1.1",
     "signal-exit": "4.1.0",
+    "strip-ansi": "7.1.0",
     "zod": "3.25.43"
   },
   "devDependencies": {
