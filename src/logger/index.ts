@@ -1,5 +1,6 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
+import { sendLogs } from "./integration.js";
 import { z } from "zod/v4";
 import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
@@ -47,19 +48,22 @@ export class Logger {
     return dim(msg);
   }
 
-  private get prefix(): string {
-    const prefixes = this.getRawPrefixes(true);
+  private getFullPrefix(includeTime = true): string {
+    const prefixes = this.getRawPrefixes(includeTime);
     return prefixes.map((prefix) => `[${prefix}]`).join("");
   }
 
-  private getRawPrefixes(includeTime = false): string[] {
-    const prefixes = [this.id];
-    if (this.additionalPrefix) {
-      prefixes.push(this.additionalPrefix);
-    }
+  private getRawPrefixes(includeTime: boolean): string[] {
+    const prefixes = [];
 
     if (includeTime) {
       prefixes.push(this.time);
+    }
+
+    prefixes.push(this.id);
+
+    if (this.additionalPrefix) {
+      prefixes.push(this.additionalPrefix);
     }
 
     return prefixes;
@@ -96,7 +100,8 @@ export class Logger {
       return;
     }
     // eslint-disable-next-line no-console
-    console.log(Logger.g(this.prefix), Logger.d(msg), ...data);
+    console.log(Logger.g(this.getFullPrefix()), Logger.d(msg), ...data);
+    sendLogs("info", this.getFullPrefix(false), msg, data);
   }
 
   public info(msg: string, ...data: unknown[]): void {
@@ -104,7 +109,8 @@ export class Logger {
       return;
     }
     // eslint-disable-next-line no-console
-    console.log(Logger.g(this.prefix), msg, ...data);
+    console.log(Logger.g(this.getFullPrefix()), msg, ...data);
+    sendLogs("info", this.getFullPrefix(false), msg, data);
   }
 
   public warn(
@@ -116,7 +122,8 @@ export class Logger {
       return;
     }
     // eslint-disable-next-line no-console
-    console.warn(Logger.y(this.prefix), msg, data ?? "");
+    console.warn(Logger.y(this.getFullPrefix()), msg, data ?? "");
+    sendLogs("warn", this.getFullPrefix(false), msg, data);
     if (shouldReport) {
       captureWarning(msg, data);
     }
@@ -127,7 +134,8 @@ export class Logger {
       return;
     }
     // eslint-disable-next-line no-console
-    console.error(Logger.r(this.prefix), Logger.r(msg), data ?? "");
+    console.error(Logger.r(this.getFullPrefix()), Logger.r(msg), data ?? "");
+    sendLogs("error", this.getFullPrefix(false), msg, data);
     captureError(data);
     trackApplicationErrors();
   }

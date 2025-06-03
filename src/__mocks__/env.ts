@@ -30,8 +30,6 @@ export const googleApi = {
   privateKey: "",
 };
 
-export const logApiTokenV2 = "";
-
 export const memoryLimit = 0;
 
 export const clusterSize = 2;
@@ -69,8 +67,6 @@ export const witAiApi = {
 };
 
 export const wtiAiTokens = "";
-
-export const isDebug = false;
 
 export const stripeToken = "";
 
