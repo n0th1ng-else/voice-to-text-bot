@@ -10,6 +10,7 @@ export type TgProto = {
   sendFile: (chatId: ChatId, file: File) => Promise<void>;
 };
 
+// https://my.telegram.org/apps
 export const getMTProtoApi = (
   appId: number,
   appHash: string,

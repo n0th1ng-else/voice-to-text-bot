@@ -7,6 +7,7 @@ import { collectAnalytics } from "../../analytics/index.js";
 import { type TelegramMessagePrefix } from "../types.js";
 import type { BotMessageModel } from "../model.js";
 import type { TgMessage } from "../api/types.js";
+import { trackUserActivity } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -17,6 +18,7 @@ export class StartAction extends GenericAction {
   ): Promise<void> {
     mdl.analytics.addFirstVisit();
     mdl.analytics.addPageVisit();
+    trackUserActivity({ activityType: "start" }, mdl.userId);
     return this.sendHelloMessage(mdl, prefix);
   }
 

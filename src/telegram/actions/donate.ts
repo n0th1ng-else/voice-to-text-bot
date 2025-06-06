@@ -20,6 +20,7 @@ import {
   TgCurrencySchema,
   type TgInvoice,
 } from "../api/groups/payments/payments-types.js";
+import { trackUserActivity } from "../../monitoring/newrelic.js";
 
 const getDonateButton = (
   price: number,
@@ -51,6 +52,7 @@ export class DonateAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
+    trackUserActivity({ activityType: "donate" }, mdl.userId);
     return this.sendDonateMessage(mdl, prefix);
   }
 

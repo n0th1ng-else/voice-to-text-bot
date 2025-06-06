@@ -34,3 +34,16 @@ export const trackRecognitionTime = (
 export const trackApplicationErrors = (type: "Error" | "Warning"): void => {
   newrelic.incrementMetric(`ApplicationHealth/${type}`);
 };
+
+type UserActivityData = {
+  activityType: "voice" | "lang" | "start" | "donate" | "support";
+};
+export const trackUserActivity = (
+  data: UserActivityData,
+  userId?: number,
+): void => {
+  newrelic.recordCustomEvent("UserActivity", {
+    userId: userId ? String(userId) : "unknownId",
+    ...data,
+  });
+};

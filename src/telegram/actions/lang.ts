@@ -20,6 +20,7 @@ import {
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
+import { trackUserActivity } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -41,6 +42,7 @@ export class LangAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
+    trackUserActivity({ activityType: "lang" }, mdl.userId);
     return this.showLanguageSelection(mdl, prefix);
   }
 
