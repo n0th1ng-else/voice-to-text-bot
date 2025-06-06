@@ -12,6 +12,7 @@ export const setCurrentMockFileId = (id: FileId): void => {
 
 export const getMTProtoApi = (): TgProto => {
   return {
+    isInitialized: () => true,
     start: async (): Promise<void> => {
       return Promise.resolve();
     },

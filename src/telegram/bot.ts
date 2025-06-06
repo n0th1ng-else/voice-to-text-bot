@@ -45,7 +45,14 @@ export class TelegramBotModel {
       converters,
       stat,
     );
-    await api.init();
+    try {
+      await api.init();
+    } catch (err) {
+      logger.error(
+        "MTProto client is unable to initialize. Falling back to API download",
+        err,
+      );
+    }
     return api;
   }
 
