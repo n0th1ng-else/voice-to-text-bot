@@ -72,7 +72,7 @@ export class VoiceAction extends GenericAction {
     trackProcessFile("progress");
 
     return this.getFileLInk(model, prefix)
-      .then(([fileLink, fileId, isLocalFile]) => {
+      .then(([fileId, fileLink, isLocalFile]) => {
         if (!this.converters) {
           return Promise.reject(new Error("Voice converters are not set!"));
         }
@@ -172,7 +172,7 @@ export class VoiceAction extends GenericAction {
   private async getFileLInk(
     model: BotMessageModel,
     prefix: TelegramMessagePrefix,
-  ): Promise<[string, FileId, boolean]> {
+  ): Promise<[FileId, string, boolean]> {
     logger.info(`${prefix.getPrefix()} Fetching file link`);
 
     if (!model.voiceFileId) {
@@ -181,19 +181,17 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    // const fileUrl = await this.bot.chats.getFile(
-    //     model.voiceFileId,
-    //     model.chatId
-    // );
-    //
-    // return [fileUrl, model.voiceFileId, false]
-
-    const filePath = await this.bot.downloadFile(
+    const [fileLink, isLocalFile] = await this.bot.downloadFile(
       getFullFileName("original_file", true),
       model.voiceFileId,
+      model.chatId,
     );
 
-    return [filePath, model.voiceFileId, true];
+    if (!isLocalFile) {
+      logger.warn("Using the API download! Reload the application");
+    }
+
+    return [model.voiceFileId, fileLink, isLocalFile];
   }
 
   private sendInProgressMessage(

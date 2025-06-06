@@ -3,6 +3,7 @@ import type { ChatId, FileId } from "./core.js";
 import { API_TIMEOUT_MS } from "../../const.js";
 
 export type TgProto = {
+  isInitialized: () => boolean;
   start: () => Promise<void>;
   stop: () => Promise<void>;
   downloadFile: (toFilename: string, fileId: FileId) => Promise<string>;
@@ -21,6 +22,9 @@ export const getMTProtoApi = (
   });
 
   return {
+    isInitialized: (): boolean => {
+      return isInitialized;
+    },
     start: async (): Promise<void> => {
       await client.start({
         botToken: apiToken,
