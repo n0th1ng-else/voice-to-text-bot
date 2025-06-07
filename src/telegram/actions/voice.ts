@@ -189,8 +189,10 @@ export class VoiceAction extends GenericAction {
       model.chatId,
     );
 
-    if (!isLocalFile) {
-      logger.warn("Using the API download! Reload the application");
+    if (isLocalFile) {
+      logger.info("Downloaded the file using the MTProto");
+    } else {
+      logger.warn("Downloaded the file using the API! Reload the application");
     }
 
     return [model.voiceFileId, fileLink, isLocalFile];

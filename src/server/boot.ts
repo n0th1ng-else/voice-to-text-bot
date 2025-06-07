@@ -21,12 +21,15 @@ import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import type { BotServerModel } from "./types.js";
 import { VOICE_PROVIDERS } from "../const.js";
+import { trackApplicationErrors } from "../monitoring/newrelic.js";
 
 const logger = new Logger("boot-server");
 
 export const prepareInstance = async (
   threadId: number,
 ): Promise<BotServerModel> => {
+  logger.info("The server is starting...");
+  trackApplicationErrors("Launch");
   const sslOptions = envy.enableSSL ? httpsOptions : undefined;
   const server = new BotServer(
     envy.appPort,

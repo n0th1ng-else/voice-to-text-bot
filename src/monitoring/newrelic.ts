@@ -31,7 +31,9 @@ export const trackRecognitionTime = (
   newrelic.recordMetric(metricName, durationMSec);
 };
 
-export const trackApplicationErrors = (type: "Error" | "Warning"): void => {
+export const trackApplicationErrors = (
+  type: "Error" | "Warning" | "Launch",
+): void => {
   newrelic.incrementMetric(`ApplicationHealth/${type}`);
 };
 
