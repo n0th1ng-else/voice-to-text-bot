@@ -57,7 +57,7 @@ jobs:
 
   newrelic:
     runs-on: ubuntu-latest
-    name: Send release into sentry
+    name: Send release into newrelic
     needs: [tag-release]
     timeout-minutes: 1
     steps:
@@ -66,6 +66,6 @@ jobs:
         with:
           apiKey: ${{ secrets.NEWRELIC_API_KEY }}
           region: "EU"
-          guid: ${{ secrets.NEWRELIC_APP_GUIDs }}
+          guid: ${{ secrets.NEWRELIC_APP_GUID }}
           version: v${{ needs.tag-release.outputs.version }}
           user: "${{ github.actor }}"
