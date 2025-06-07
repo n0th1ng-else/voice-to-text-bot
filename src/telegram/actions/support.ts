@@ -9,6 +9,7 @@ import { type TelegramMessagePrefix } from "../types.js";
 import type { BotMessageModel } from "../model.js";
 import type { TgMessage } from "../api/types.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
+import { trackUserActivity } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -20,6 +21,7 @@ export class SupportAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
+    trackUserActivity({ activityType: "support" }, mdl.userId);
     return this.sendSupportMessage(mdl, prefix);
   }
 

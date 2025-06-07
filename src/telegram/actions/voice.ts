@@ -16,6 +16,7 @@ import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
 import {
   trackProcessFile,
+  trackUserActivity,
   trackVoiceDuration,
 } from "../../monitoring/newrelic.js";
 
@@ -29,6 +30,8 @@ export class VoiceAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
+    trackProcessFile("progress");
+    trackUserActivity({ activityType: "voice" }, mdl.userId);
     logger.info(`${prefix.getPrefix()} Voice message`);
     return this.getChatLanguage(mdl, prefix)
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
@@ -69,7 +72,6 @@ export class VoiceAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.info(`${prefix.getPrefix()} Processing voice`);
-    trackProcessFile("progress");
 
     return this.getFileLInk(model, prefix)
       .then(([fileId, fileLink, isLocalFile]) => {
