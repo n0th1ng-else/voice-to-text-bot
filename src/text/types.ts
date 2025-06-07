@@ -23,6 +23,7 @@ export const TranslationKeys = {
   PaymentDescription: "donate.payment.description",
   DonationTitle: "donate.payment.form.title",
   DonationDescription: "donate.payment.form.description",
+  DonationDescriptionStars: "donate.payment.form.descriptionStars",
   DonationLabel: "donate.payment.form.label",
   FormattedTimeMinutes: "recognition.voice.time.minutes",
   FormattedTimeSeconds: "recognition.voice.time.seconds",

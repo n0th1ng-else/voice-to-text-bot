@@ -250,13 +250,16 @@ export class DonateAction extends GenericAction {
     token?: string,
     forumThreadId?: MessageThreadId,
   ): Promise<void> {
+    const payWithStarts = isStars(currency);
     const title = this.text.t(TranslationKeys.DonationTitle, lang);
-    const description = this.text.t(TranslationKeys.DonationDescription, lang);
+    const description = payWithStarts
+      ? this.text.t(TranslationKeys.DonationDescriptionStars, lang)
+      : this.text.t(TranslationKeys.DonationDescription, lang);
     const label = this.text.t(TranslationKeys.DonationLabel, lang);
 
     const invoice: TgInvoice = {
       chatId,
-      amount: isStars(currency) ? amount : amount * 100,
+      amount: payWithStarts ? amount : amount * 100,
       currency,
       meta: String(donationId),
       token,
