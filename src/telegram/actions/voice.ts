@@ -192,7 +192,7 @@ export class VoiceAction extends GenericAction {
     if (isLocalFile) {
       logger.info("Downloaded the file using the MTProto");
     } else {
-      logger.warn("Downloaded the file using the API! Reload the application");
+      logger.info("Downloaded the file using the API");
     }
 
     return [model.voiceFileId, fileLink, isLocalFile];

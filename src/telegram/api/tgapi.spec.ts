@@ -65,7 +65,7 @@ let testApiToken = nanoid(10);
 let testAppId = randomIntFromInterval(1, 100000);
 let testAppHash = nanoid(10);
 
-let api = new TelegramApi(testApiToken, testAppId, testAppHash);
+let api = new TelegramApi(testApiToken, testAppId, testAppHash, true);
 
 let checkApiData = (config: AxiosRequestConfig): void => {
   throw new Error(`Initialize check api data ${JSON.stringify(config)}`);
@@ -96,7 +96,7 @@ describe("[telegram api client]", () => {
     testApiToken = nanoid(10);
     testAppId = randomIntFromInterval(1, 100000);
     testAppHash = nanoid(10);
-    api = new TelegramApi(testApiToken, testAppId, testAppHash);
+    api = new TelegramApi(testApiToken, testAppId, testAppHash, true);
   });
 
   describe("telegram response", () => {
