@@ -13,14 +13,13 @@ import type { TgMessage } from "../api/types.js";
 import type { PaymentService } from "../../donate/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { LanguageCode } from "../../recognition/types.js";
-import type { ChatId, MessageThreadId } from "../api/core.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
 import {
   type Currency,
   TgCurrencySchema,
   type TgInvoice,
 } from "../api/groups/payments/payments-types.js";
-import { trackUserActivity } from "../../monitoring/newrelic.js";
+import { trackDonation, trackUserActivity } from "../../monitoring/newrelic.js";
 
 const getDonateButton = (
   price: number,
@@ -176,14 +175,13 @@ export class DonateAction extends GenericAction {
             : this.payment.getLink(price, donationId, lang);
 
           return this.sendInvoice(
-            model.chatId,
-            price,
+            model,
+            isStars(currency) ? price : price * 100,
             currency,
             donationId,
             lang,
             prefix,
             token,
-            model.forumThreadId,
           );
         })
         .catch((err) => {
@@ -241,39 +239,45 @@ export class DonateAction extends GenericAction {
   }
 
   private async sendInvoice(
-    chatId: ChatId,
+    model: BotMessageModel,
     amount: number,
     currency: Currency,
     donationId: number,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
     token?: string,
-    forumThreadId?: MessageThreadId,
   ): Promise<void> {
-    const payWithStarts = isStars(currency);
     const title = this.text.t(TranslationKeys.DonationTitle, lang);
-    const description = payWithStarts
+    const description = isStars(currency)
       ? this.text.t(TranslationKeys.DonationDescriptionStars, lang)
       : this.text.t(TranslationKeys.DonationDescription, lang);
     const label = this.text.t(TranslationKeys.DonationLabel, lang);
 
     const invoice: TgInvoice = {
-      chatId,
-      amount: payWithStarts ? amount : amount * 100,
+      chatId: model.chatId,
+      amount,
       currency,
       meta: String(donationId),
       token,
       title,
       description,
       label,
-      payload: getDonationDtoString(donationId, chatId, prefix.id),
+      payload: getDonationDtoString(donationId, model.chatId, prefix.id),
       photo: getBotLogo(),
-      forumThreadId,
+      forumThreadId: model.forumThreadId,
     };
 
     try {
       await this.bot.payments.sendInvoice(invoice);
       logger.info(`${prefix.getPrefix()} Invoice sent`);
+      trackDonation(
+        {
+          activityType: "start",
+          currency,
+          amount,
+        },
+        model.userId,
+      );
     } catch (err) {
       logger.error(`${prefix.getPrefix()} Unable to send the invoice`, err);
       throw err;

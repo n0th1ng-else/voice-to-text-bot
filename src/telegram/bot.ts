@@ -218,7 +218,7 @@ export class TelegramBotModel {
       return this.actions.voice.runAction(model, prefix);
     }
 
-    if (await this.actions.checkout.runCondition(msg)) {
+    if (await this.actions.checkout.runCondition(msg, model)) {
       return this.actions.checkout.runAction(model, prefix);
     }
 

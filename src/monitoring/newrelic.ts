@@ -1,6 +1,7 @@
 import newrelic from "newrelic";
 import type { ChatType, VoiceType } from "../telegram/types.js";
 import type { VoiceConverterProvider } from "../recognition/types.js";
+import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 
 const formatMetric = (metric: string): string => {
   // Snake_case to PascalCase
@@ -45,6 +46,21 @@ export const trackUserActivity = (
   userId?: number,
 ): void => {
   newrelic.recordCustomEvent("UserActivity", {
+    userId: userId ? String(userId) : "unknownId",
+    ...data,
+  });
+};
+
+type DonationActivityData = {
+  activityType: "start" | "success";
+  currency: Currency;
+  amount: number;
+};
+export const trackDonation = (
+  data: DonationActivityData,
+  userId?: number,
+): void => {
+  newrelic.recordCustomEvent("DonationActivity", {
     userId: userId ? String(userId) : "unknownId",
     ...data,
   });
