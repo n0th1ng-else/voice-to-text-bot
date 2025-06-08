@@ -7,6 +7,7 @@ import type { BotMessageModel } from "../model.js";
 import type { TgCheckoutQuery, TgMessage } from "../api/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { PaymentChargeId } from "../api/core.js";
+import { trackDonation } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -16,6 +17,7 @@ export class CheckoutAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     mdl.analytics.addPageVisit();
+    this.trackDonation(mdl);
     const donationId = mdl.donationId;
     const chargeId = mdl.paymentChargeId;
     if (!donationId) {
@@ -28,8 +30,13 @@ export class CheckoutAction extends GenericAction {
     return this.markAsSuccessful(donationId, prefix, chargeId);
   }
 
-  public async runCondition(msg: TgMessage): Promise<boolean> {
-    return Promise.resolve(Boolean(msg.successful_payment));
+  public async runCondition(
+    _msg: TgMessage,
+    mdl: BotMessageModel,
+  ): Promise<boolean> {
+    const isPayment = Boolean(mdl.paymentChargeId);
+    const isSubscription = mdl.isSubscriptionPayment;
+    return Promise.resolve(isPayment && !isSubscription);
   }
 
   public async confirmCheckout(
@@ -94,5 +101,20 @@ export class CheckoutAction extends GenericAction {
           err,
         );
       });
+  }
+
+  private trackDonation(model: BotMessageModel): void {
+    if (!model.paymentAmount || !model.paymentCurrency) {
+      return;
+    }
+
+    trackDonation(
+      {
+        activityType: "success",
+        amount: model.paymentAmount,
+        currency: model.paymentCurrency,
+      },
+      model.userId,
+    );
   }
 }
