@@ -24,7 +24,7 @@ export const getMTProtoApi = (
 
   return {
     isInitialized: (): boolean => {
-      return isInitialized;
+      return false;
     },
     start: async (): Promise<void> => {
       await client.start({
