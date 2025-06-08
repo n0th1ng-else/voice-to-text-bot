@@ -27,7 +27,7 @@ export default defineConfig({
     environment: "node",
     include: [],
     exclude: [...defaultExclude],
-    workspace: [
+    projects: [
       {
         extends: true,
         test: {

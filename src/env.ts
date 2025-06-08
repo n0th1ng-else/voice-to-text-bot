@@ -94,3 +94,5 @@ export const elevenLabsKey = process.env.ELEVENLABS_API_KEY || "";
 
 export const enableSnapshotCapture =
   process.env.ENABLE_SNAPSHOT_CAPTURE === "true";
+
+export const useMTProto = process.env.USE_MTPROTO === "true";

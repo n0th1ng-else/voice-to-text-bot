@@ -35,6 +35,7 @@ export class TelegramBotModel {
     apiToken: string,
     appId: number,
     appHash: string,
+    useMTProto: boolean,
     converters: VoiceConverters,
     stat: ReturnType<typeof getDb>,
   ): Promise<TelegramBotModel> {
@@ -42,6 +43,7 @@ export class TelegramBotModel {
       apiToken,
       appId,
       appHash,
+      useMTProto,
       converters,
       stat,
     );
@@ -60,12 +62,13 @@ export class TelegramBotModel {
     apiToken: string,
     appId: number,
     appHash: string,
+    useMTProto: boolean,
     converters: VoiceConverters,
     stat: ReturnType<typeof getDb>,
   ) {
     this.token = apiToken;
 
-    this.bot = new TelegramApi(this.token, appId, appHash);
+    this.bot = new TelegramApi(this.token, appId, appHash, useMTProto);
     const reflector = initTgReflector({
       leaveChat: (chatId) => this.bot.chats.leaveChat(chatId),
     });

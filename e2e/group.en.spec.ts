@@ -148,6 +148,7 @@ describe("[default language - english]", () => {
       "telegram-api-token",
       92345555,
       "telegram-app-hash",
+      true,
       converters,
       db,
     );

@@ -73,6 +73,7 @@ export const prepareInstance = async (
     envy.telegramBotApi,
     envy.telegramBotAppId,
     envy.telegramBotAppHash,
+    envy.useMTProto,
     converters,
     db,
   );

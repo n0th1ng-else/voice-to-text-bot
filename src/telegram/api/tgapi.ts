@@ -11,26 +11,37 @@ export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
 export class TelegramApi {
   private readonly baseClient: TelegramBaseApi;
   private readonly proto: TgProto;
+  private readonly useMTProto: boolean;
 
   public readonly chats: TelegramChatsApi;
   public readonly updates: TelegramUpdatesApi;
   public readonly payments: TelegramPaymentsApi;
 
-  constructor(apiToken: string, appId: number, appHash: string) {
+  constructor(
+    apiToken: string,
+    appId: number,
+    appHash: string,
+    useMTProto: boolean,
+  ) {
     this.baseClient = new TelegramBaseApi(apiToken);
     this.proto = getMTProtoApi(appId, appHash, apiToken);
     this.chats = new TelegramChatsApi(this.baseClient, apiToken);
     this.updates = new TelegramUpdatesApi(this.baseClient);
     this.payments = new TelegramPaymentsApi(this.baseClient);
+    this.useMTProto = useMTProto;
   }
 
   public async init(): Promise<this> {
-    await this.proto.start();
+    if (this.useMTProto) {
+      await this.proto.start();
+    }
     return this;
   }
 
   public async stop(): Promise<this> {
-    await this.proto.stop();
+    if (this.useMTProto) {
+      await this.proto.stop();
+    }
     return this;
   }
 
@@ -39,7 +50,7 @@ export class TelegramApi {
     fileId: FileId,
     chatId: ChatId,
   ): Promise<[string, boolean]> {
-    if (this.proto.isInitialized()) {
+    if (this.useMTProto && this.proto.isInitialized()) {
       await this.proto.downloadFile(toFilename, fileId);
       return [toFilename, true];
     }
