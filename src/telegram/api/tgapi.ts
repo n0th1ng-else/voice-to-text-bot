@@ -39,10 +39,10 @@ export class TelegramApi {
     fileId: FileId,
     chatId: ChatId,
   ): Promise<[string, boolean]> {
-    if (this.proto.isInitialized()) {
-      await this.proto.downloadFile(toFilename, fileId);
-      return [toFilename, true];
-    }
+    // if (this.proto.isInitialized()) {
+    //   await this.proto.downloadFile(toFilename, fileId);
+    //   return [toFilename, true];
+    // }
 
     const fileUrl = await this.chats.getFile(fileId, chatId);
     return [fileUrl, false];
