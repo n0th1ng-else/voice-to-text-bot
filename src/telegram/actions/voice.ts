@@ -15,6 +15,7 @@ import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";
 import {
+  trackFullRecognitionTime,
   trackProcessFile,
   trackUserActivity,
   trackVoiceDuration,
@@ -32,14 +33,16 @@ export class VoiceAction extends GenericAction {
     mdl.analytics.addPageVisit();
     trackProcessFile("progress");
     trackUserActivity({ activityType: "voice" }, mdl.userId);
+    const duration = new TimeMeasure();
     logger.info(`${prefix.getPrefix()} Voice message`);
     return this.getChatLanguage(mdl, prefix)
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
-      .then(() =>
-        collectAnalytics(
+      .then(() => {
+        trackFullRecognitionTime(duration.getMs());
+        return collectAnalytics(
           mdl.analytics.setCommand("/voice", "Voice message", "Init"),
-        ),
-      );
+        );
+      });
   }
 
   public async runCondition(
