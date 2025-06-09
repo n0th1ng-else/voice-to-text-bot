@@ -32,6 +32,11 @@ export const trackRecognitionTime = (
   newrelic.recordMetric(metricName, durationMSec);
 };
 
+export const trackFullRecognitionTime = (durationMSec: number): void => {
+  const metricName = "VoiceRecognition/RecognitionTimeMs";
+  newrelic.recordMetric(metricName, durationMSec);
+};
+
 export const trackApplicationErrors = (
   type: "Error" | "Warning" | "Launch",
 ): void => {
