@@ -1,13 +1,14 @@
 import { GenericAction } from "./common.js";
 import { DonationStatus } from "../../db/sql/donations.js";
 import { Logger } from "../../logger/index.js";
-import { parseDonationPayload } from "../helpers.js";
+import { parsePaymentPayload } from "../helpers.js";
 import { TelegramMessagePrefix } from "../types.js";
 import type { BotMessageModel } from "../model.js";
 import type { TgCheckoutQuery, TgMessage } from "../api/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { PaymentChargeId } from "../api/core.js";
 import { trackDonation } from "../../monitoring/newrelic.js";
+import { isDonation } from "../../payments/helpers.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -18,25 +19,24 @@ export class CheckoutAction extends GenericAction {
   ): Promise<void> {
     mdl.analytics.addPageVisit();
     this.trackDonation(mdl);
-    const donationId = mdl.donationId;
+    const paymentInternalId = mdl.paymentInternalId;
     const chargeId = mdl.paymentChargeId;
-    if (!donationId) {
+    if (!paymentInternalId) {
       logger.error(
-        `${prefix.getPrefix()} Unable to parse the donationId in runAction. Will not update the DB row!`,
-        new Error("Unable to parse the donationId in runAction"),
+        `${prefix.getPrefix()} Unable to parse the paymentInternalId in runAction. Will not update the DB row!`,
+        new Error("Unable to parse the paymentInternalId in runAction"),
       );
       return Promise.resolve();
     }
-    return this.markAsSuccessful(donationId, prefix, chargeId);
+    // We unified the paymentId field, but will not change the donationId type
+    return this.markAsSuccessful(Number(paymentInternalId), prefix, chargeId);
   }
 
   public async runCondition(
     _msg: TgMessage,
     mdl: BotMessageModel,
   ): Promise<boolean> {
-    const isPayment = Boolean(mdl.paymentChargeId);
-    const isSubscription = mdl.isSubscriptionPayment;
-    return Promise.resolve(isPayment && !isSubscription);
+    return Promise.resolve(isDonation(mdl));
   }
 
   public async confirmCheckout(
@@ -45,23 +45,26 @@ export class CheckoutAction extends GenericAction {
   ): Promise<void> {
     analytics.addPageVisit();
     const {
-      donationId,
+      paymentInternalId,
       chatId,
       prefix: prefixId,
-    } = parseDonationPayload(msg.invoice_payload);
+    } = parsePaymentPayload(msg.invoice_payload);
     const prefix = new TelegramMessagePrefix(chatId, prefixId);
 
     return this.bot.payments
       .answerPreCheckoutQuery(chatId, msg.id)
       .then(() => {
-        if (!donationId) {
+        if (!paymentInternalId) {
           logger.error(
-            `${prefix.getPrefix()} Unable to parse the donationId in confirmCheckout. Will not update the DB row!`,
-            new Error("Unable to parse the donationId in confirmCheckout"),
+            `${prefix.getPrefix()} Unable to parse the paymentInternalId in confirmCheckout. Will not update the DB row!`,
+            new Error(
+              "Unable to parse the paymentInternalId in confirmCheckout",
+            ),
           );
           return;
         }
-        return this.markAsPending(donationId, prefix);
+        // We unified the paymentId field, but will not change the paymentInternalId type
+        return this.markAsPending(Number(paymentInternalId), prefix);
       })
       .catch((err) => {
         logger.error(`${prefix.getPrefix()} Unable to confirm checkout.`, err);

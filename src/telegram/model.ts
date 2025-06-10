@@ -21,7 +21,7 @@ import {
   getVoiceFile,
   isChatGroup,
   getVoiceType,
-  parseDonationPayload,
+  parsePaymentPayload,
 } from "./helpers.js";
 import type { ChatType, VoiceType } from "./types.js";
 import type { Currency } from "./api/groups/payments/payments-types.js";
@@ -39,7 +39,7 @@ export class BotMessageModel {
   public readonly voiceType: VoiceType;
   public readonly userLanguage: LanguageCode;
   public readonly analytics: AnalyticsData;
-  public readonly donationId: number;
+  public readonly paymentInternalId: string;
   public readonly paymentChargeId?: PaymentChargeId;
   public readonly paymentAmount?: number;
   public readonly paymentCurrency?: Currency;
@@ -60,13 +60,13 @@ export class BotMessageModel {
     this.voiceType = getVoiceType(msg);
     this.userLanguage = getUserLanguage(msg);
 
-    this.donationId = parseDonationPayload(
-      msg.successful_payment?.invoice_payload,
-    ).donationId;
-    this.paymentChargeId = msg.successful_payment?.telegram_payment_charge_id;
-    this.isSubscriptionPayment = msg.successful_payment?.is_recurring ?? false;
-    this.paymentAmount = msg.successful_payment?.total_amount;
-    this.paymentCurrency = msg.successful_payment?.currency;
+    const payment = msg.successful_payment;
+    const paymentPayload = parsePaymentPayload(payment?.invoice_payload);
+    this.paymentInternalId = paymentPayload.paymentInternalId;
+    this.paymentChargeId = payment?.telegram_payment_charge_id;
+    this.isSubscriptionPayment = payment?.is_recurring ?? false;
+    this.paymentAmount = payment?.total_amount;
+    this.paymentCurrency = payment?.currency;
 
     if (msg.is_topic_message && msg.message_thread_id) {
       this.forumThreadId = msg.message_thread_id;

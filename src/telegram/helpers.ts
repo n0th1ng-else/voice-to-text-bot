@@ -1,8 +1,8 @@
 import {
   type ChatType,
-  type DonationDto,
-  type DonationPayload,
-  DonationSchema,
+  type PaymentInvoiceDto,
+  type PaymentPayload,
+  PaymentInvoiceSchema,
   VoiceContentReason,
   VoiceContentReasonModel,
   type VoiceType,
@@ -178,13 +178,13 @@ export const getLanguageByText = (
   }
 };
 
-export const getDonationDtoString = (
-  donationId: number,
+export const getPaymentInvoiceData = (
+  paymentInternalId: string,
   chatId: ChatId,
   logPrefix: string,
 ): string => {
-  const dto: DonationDto = {
-    d: donationId,
+  const dto: PaymentInvoiceDto = {
+    id: String(paymentInternalId),
     c: chatId,
     l: logPrefix,
   };
@@ -192,17 +192,17 @@ export const getDonationDtoString = (
   return JSON.stringify(dto);
 };
 
-export const parseDonationPayload = (dtoString = ""): DonationPayload => {
+export const parsePaymentPayload = (dtoString = ""): PaymentPayload => {
   try {
-    const obj = DonationSchema.parse(JSON.parse(dtoString));
+    const obj = PaymentInvoiceSchema.parse(JSON.parse(dtoString));
     return {
-      donationId: obj.d,
+      paymentInternalId: obj.d ? String(obj.d) || "" : obj.id || "",
       chatId: obj.c,
       prefix: obj.l,
     };
   } catch {
     return {
-      donationId: 0,
+      paymentInternalId: "",
       // TODO dangerous, why do I need to fallback on something?
       chatId: 0 as ChatId,
       prefix: "",
