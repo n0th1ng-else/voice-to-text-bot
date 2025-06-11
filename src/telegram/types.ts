@@ -120,23 +120,32 @@ export class TelegramButtonModel<V extends string = string> {
   }
 }
 
-export type DonationPayload = {
-  donationId: number;
+export type PaymentPayload = {
+  paymentInternalId: string;
   chatId: ChatId;
   prefix: string;
 };
 
-export const DonationSchema = z
+export const PaymentInvoiceSchema = z
   .object({
-    d: z.number(),
+    id: z
+      .string()
+      .optional()
+      .describe(
+        "Payment id, can be DonationId, SubscriptionId etc.. Optional for backward compatibility!",
+      ),
+    d: z
+      .number()
+      .optional()
+      .describe(
+        "Donation id [DEPRECATED Backward compatible with old implementation]",
+      ),
     c: TgChatId,
-    l: z.string(),
+    l: z.string().describe("Log prefix"),
   })
-  .describe(
-    "Donation schema used in Telegram callback. d is DonationId, c is ChatId, l is Log prefix",
-  );
+  .describe("Payment invoice schema used in Telegram callback");
 
-export type DonationDto = z.infer<typeof DonationSchema>;
+export type PaymentInvoiceDto = z.infer<typeof PaymentInvoiceSchema>;
 
 export type ChatType = "private" | "group" | "supergroup" | "channel" | "forum";
 

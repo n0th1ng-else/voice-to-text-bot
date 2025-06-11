@@ -18,7 +18,7 @@ import {
 } from "../../src/text/types.js";
 import { getBotMenuCommands } from "../../src/telegram/data.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
-import { parseDonationPayload } from "../../src/telegram/helpers.js";
+import { parsePaymentPayload } from "../../src/telegram/helpers.js";
 import type { TgUpdate } from "../../src/telegram/api/types.js";
 import type { LanguageCode } from "../../src/recognition/types.js";
 import type { ChatId } from "../../src/telegram/api/core.js";
@@ -310,10 +310,9 @@ export const mockTgReceiveCallbackMessage = (
 export const mockTgReceiveInvoiceMessage = (
   host: NockScope,
   chatId: ChatId,
-  messageId: number,
   langId: LanguageCode,
   paymentToken: string,
-  donationId: number,
+  paymentInternalId: string,
   price: number,
 ): Promise<void> => {
   return new Promise((resolve) => {
@@ -323,10 +322,10 @@ export const mockTgReceiveInvoiceMessage = (
       expect(answer.chat_id).toBe(chatId);
       expect(answer.currency).toBe("EUR");
       expect(answer.provider_token).toBe(paymentToken);
-      expect(answer.start_parameter).toBe(String(donationId));
-      const payload = parseDonationPayload(answer.payload);
+      expect(answer.start_parameter).toBe(paymentInternalId);
+      const payload = parsePaymentPayload(answer.payload);
       expect(payload.chatId).toBe(chatId);
-      expect(payload.donationId).toBe(donationId);
+      expect(payload.paymentInternalId).toBe(paymentInternalId);
       expect(payload.prefix).toBeDefined();
 
       expect(answer.title).toBe(text.t(TranslationKeys.DonationTitle, langId));

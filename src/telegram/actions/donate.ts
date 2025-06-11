@@ -3,7 +3,7 @@ import { TelegramButtonModel, TelegramMessagePrefix } from "../types.js";
 import { BotCommand } from "../commands.js";
 import { isCommandMessage } from "../commandsChecker.js";
 import { BotMessageModel } from "../model.js";
-import { getBotLogo, getDonationDtoString, isStars } from "../helpers.js";
+import { getBotLogo, getPaymentInvoiceData, isStars } from "../helpers.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
@@ -262,7 +262,11 @@ export class DonateAction extends GenericAction {
       title,
       description,
       label,
-      payload: getDonationDtoString(donationId, model.chatId, prefix.id),
+      payload: getPaymentInvoiceData(
+        String(donationId),
+        model.chatId,
+        prefix.id,
+      ),
       photo: getBotLogo(),
       forumThreadId: model.forumThreadId,
     };
