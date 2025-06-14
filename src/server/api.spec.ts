@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import axios, { type AxiosRequestConfig } from "axios";
+import axios, {
+  AxiosError,
+  type AxiosRequestConfig,
+  AxiosHeaders,
+} from "axios";
 import { requestHealthData } from "./api.js";
 import { type HealthDto, HealthSsl, HealthStatus } from "./types.js";
 
@@ -40,15 +44,17 @@ describe("requestHealthData", () => {
   });
 
   it("should construct health error with standard message", async () => {
-    const errCause = {
-      message: undefined,
-      response: {
-        status: 400,
-        data: {
-          foo: "bar",
-        },
+    const errCause = new AxiosError(undefined, "400", undefined, undefined, {
+      status: 400,
+      config: {
+        headers: new AxiosHeaders(),
       },
-    };
+      headers: {},
+      statusText: "Bad Request",
+      data: {
+        foo: "bar",
+      },
+    });
     mockRequest(() => Promise.reject(errCause));
 
     try {
@@ -59,21 +65,29 @@ describe("requestHealthData", () => {
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe("EINTERNAL Health request was unsuccessful");
       expect(err.code).toBe(400);
-      expect(err.response).toBe(errCause.response.data);
+      expect(err.response).toBe(errCause.response?.data);
       expect(err.url).toBe(`${TEST_URL}/health`);
     }
   });
 
   it("should construct health error with custom message", async () => {
-    const errCause = {
-      message: "something went wrong...",
-      response: {
+    const errCause = new AxiosError(
+      "something went wrong...",
+      "400",
+      undefined,
+      undefined,
+      {
         status: 400,
+        config: {
+          headers: new AxiosHeaders(),
+        },
+        headers: {},
+        statusText: "Bad Request",
         data: {
           foo: "bar",
         },
       },
-    };
+    );
     mockRequest(() => Promise.reject(errCause));
 
     try {
@@ -84,7 +98,7 @@ describe("requestHealthData", () => {
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`EINTERNAL ${errCause.message}`);
       expect(err.code).toBe(400);
-      expect(err.response).toBe(errCause.response.data);
+      expect(err.response).toBe(errCause.response?.data);
       expect(err.url).toBe(`${TEST_URL}/health`);
     }
   });

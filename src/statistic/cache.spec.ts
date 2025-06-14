@@ -85,17 +85,19 @@ describe("[cache]", () => {
     cache.addItem(item);
     expect(cache.getCacheSize()).toBe(1);
 
-    new Array(1000).fill(null).forEach(() => {
-      const cacheItem = cache.getItem(testId);
-      expect(cacheItem).toBeDefined();
+    Array.from({ length: 1000 })
+      .fill(null)
+      .forEach(() => {
+        const cacheItem = cache.getItem(testId);
+        expect(cacheItem).toBeDefined();
 
-      if (!cacheItem) {
-        throw new Error("item expect to be defined");
-      }
-      expect(cacheItem.testId).toBe(testId);
-      expect(cacheItem.testData).toBe(testData);
-      expect(cache.getCacheSize()).toBe(1);
-    });
+        if (!cacheItem) {
+          throw new Error("item expect to be defined");
+        }
+        expect(cacheItem.testId).toBe(testId);
+        expect(cacheItem.testData).toBe(testData);
+        expect(cache.getCacheSize()).toBe(1);
+      });
   });
 
   it("can not put the item with empty id", () => {

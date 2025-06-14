@@ -203,7 +203,7 @@ describe("ignore chats", () => {
     it(`does nothing if the message is from another bot in ${type} chat`, () => {
       tgMessage.setName(testMessageId, {}, true);
 
-      return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
+      return sendTelegramMessage(host, bot, tgMessage);
     });
 
     it(`does not convert voice into text (it fits 90 sec limit) in ${type} chat`, () => {

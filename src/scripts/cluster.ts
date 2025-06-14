@@ -46,7 +46,7 @@ export const run = async (): Promise<void> => {
   }
 
   if (cluster.isPrimary) {
-    Array(clusterSize)
+    Array.from({ length: clusterSize })
       .fill(null)
       .forEach(() => {
         spawnInstance(host, launchTime);

@@ -204,7 +204,7 @@ describe("[russian language]", () => {
     it("keeps calm on a message without voice content", () => {
       tgMessage.setText(testMessageId, "some text");
 
-      return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
+      return sendTelegramMessage(host, bot, tgMessage);
     });
 
     it("responds on a /start message", () => {

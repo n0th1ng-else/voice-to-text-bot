@@ -6,8 +6,9 @@ class HealthError extends Error {
   public response?: unknown;
   public url = "";
 
-  constructor(cause: Error, message = "Health request was unsuccessful") {
-    super(`EINTERNAL ${message}`, { cause });
+  constructor(cause: Error, message?: string) {
+    const msg = message || "Health request was unsuccessful";
+    super(`EINTERNAL ${msg}`, { cause });
   }
 
   public setErrorCode(code = 0): this {

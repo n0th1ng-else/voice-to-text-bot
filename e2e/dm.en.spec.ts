@@ -404,7 +404,7 @@ describe("[default language - english]", () => {
     it("does nothing if the message is from another bot", () => {
       tgMessage.setName(testMessageId, {}, true);
 
-      return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
+      return sendTelegramMessage(host, bot, tgMessage);
     });
 
     it("converts voice into text (it fits 90 sec limit)", () => {

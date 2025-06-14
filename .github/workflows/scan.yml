@@ -37,6 +37,7 @@ jobs:
           [
             { command: "typecheck", label: "typecheck" },
             { command: "lint:all", label: "lint" },
+            { command: "oxlint:all", label: "oxlint" },
             { command: "format:check", label: "code formatting check" },
           ]
     env:
