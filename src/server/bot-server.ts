@@ -82,6 +82,21 @@ export class BotServer
           return reply.type("application/octet-stream").send(buffer);
         },
       );
+
+      this.app.get<{ Reply: string }>("/manual-gc", async (_req, reply) => {
+        let isLaunched = false;
+        if (global?.gc) {
+          global.gc();
+          isLaunched = true;
+        }
+
+        return reply
+          .status(200)
+          .type("text/plain")
+          .send(
+            isLaunched ? "GC has been triggered" : "Nothing really happened",
+          );
+      });
     }
 
     this.app.post<{ Reply: HealthDto; Body: Record<string, unknown> }>(
