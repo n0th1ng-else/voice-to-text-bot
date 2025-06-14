@@ -197,7 +197,7 @@ describe("[default language - english]", () => {
     it("keeps calm on a message without voice content", () => {
       tgMessage.setText(asMessageId__test(testMessageId), "some text");
 
-      return Promise.all([sendTelegramMessage(host, bot, tgMessage)]);
+      return sendTelegramMessage(host, bot, tgMessage);
     });
 
     it("responds on a /start message", () => {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import axios, {
   AxiosHeaders,
-  type AxiosError,
+  AxiosError,
   type AxiosRequestConfig,
   type CreateAxiosDefaults,
 } from "axios";
@@ -56,7 +56,7 @@ const testClient = axios.create();
 const getPromiseError = <R>(fn: () => Promise<R>): Promise<TgError> =>
   new Promise((resolve, reject) => {
     fn().then(
-      (data) => reject(data),
+      (data) => reject(new Error("Should fail", { cause: data })),
       (err) => resolve(err),
     );
   });
@@ -787,11 +787,12 @@ describe("[telegram api client]", () => {
       const errData = "err data";
       const testErr = new Error(testErrMsg);
       vi.spyOn(testClient, "request").mockImplementationOnce(() => {
-        const networkErr: AxiosError = {
-          stack: testErr.stack,
-          message: testErr.message,
-          name: testErr.name,
-          response: {
+        const networkErr = new AxiosError(
+          testErr.message,
+          "400",
+          undefined,
+          undefined,
+          {
             status: errCode,
             statusText: "cool co co cool",
             data: errData,
@@ -801,13 +802,9 @@ describe("[telegram api client]", () => {
             headers: {},
             request: {},
           },
-          isAxiosError: true,
-          request: {},
-          config: {
-            headers: new AxiosHeaders(),
-          },
-          toJSON: () => ({}),
-        };
+        );
+        networkErr.stack = testErr.stack;
+        networkErr.name = testErr.name;
         return Promise.reject(networkErr);
       });
 

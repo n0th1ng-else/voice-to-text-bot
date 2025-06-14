@@ -23,6 +23,8 @@
     "format:check": "prettier --check .",
     "lint": "eslint",
     "lint:all": "eslint .",
+    "oxlint": "oxlint",
+    "oxlint:all": "oxlint .",
     "typecheck": "tsc --noEmit",
     "build": "tsc && pnpm run copy-assets",
     "copy-assets": "node ./dist/copy-files.js",
@@ -77,6 +79,7 @@
     "husky": "9.1.7",
     "lint-staged": "16.1.0",
     "nock": "14.0.5",
+    "oxlint": "1.1.0",
     "prettier": "3.5.3",
     "ts-blank-space": "0.6.1",
     "typescript": "5.8.3",
@@ -91,7 +94,8 @@
     ],
     "*.{js,ts,json}": [
       "pnpm run format",
-      "pnpm run lint"
+      "pnpm run lint",
+      "pnpm run oxlint"
     ]
   },
   "author": "n0th1ng-else",
