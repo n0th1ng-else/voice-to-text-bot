@@ -14,6 +14,7 @@ import type { BotCommandType } from "../telegram/commands.js";
 type Translator = {
   getFallbackLanguage: () => LanguageCode;
   menu: (command: BotCommandType) => string;
+  date: (date: Date, locale: LanguageCode) => string;
   t: (
     key: TranslationKey,
     locale: LanguageCode,
@@ -46,6 +47,14 @@ const initTranslations = (): Translator => {
   return {
     getFallbackLanguage,
     menu: (command: BotCommandType): string => menuLabels[command],
+    date: (date: Date, locale: LanguageCode) => {
+      const formatter = new Intl.DateTimeFormat([locale, "en-US"], {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      return formatter.format(date);
+    },
     t: (
       key: TranslationKey,
       locale: LanguageCode,
