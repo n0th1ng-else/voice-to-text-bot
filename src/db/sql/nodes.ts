@@ -1,5 +1,5 @@
-import type { Pool } from "pg";
 import { nanoid } from "nanoid";
+import { CoreDbClient } from "./core-db.js";
 import { NodesSql } from "./nodes.sql.js";
 
 export type NodeRowScheme = {
@@ -11,14 +11,7 @@ export type NodeRowScheme = {
   updated_at: Date;
 };
 
-export class NodesDb {
-  private initialized = false;
-  private readonly pool: Pool;
-
-  constructor(pool: Pool) {
-    this.pool = pool;
-  }
-
+export class NodesDb extends CoreDbClient {
   public async init(): Promise<void> {
     const query = NodesSql.createTable;
     return this.pool.query(query).then(() => {

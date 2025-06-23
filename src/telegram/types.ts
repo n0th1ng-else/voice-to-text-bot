@@ -72,8 +72,9 @@ const TelegramButtonTypeSchema = z
     z.literal("d").describe("Donation"),
     z.literal("l").describe("Language"),
     z.literal("u").describe("Unknown"),
+    z.literal("s").describe("Subscription"),
   ])
-  .describe("Button type schema");
+  .describe("Supported Button type schemas (in messages)");
 
 export type TelegramButtonType = z.infer<typeof TelegramButtonTypeSchema>;
 

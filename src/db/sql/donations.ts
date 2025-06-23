@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import { CoreDbClient } from "./core-db.js";
 import { DonationsSql } from "./donations.sql.js";
 import type { ValueOf } from "../../common/types.js";
 import type { ChatId, PaymentChargeId } from "../../telegram/api/core.js";
@@ -24,14 +24,7 @@ export type DonationRowScheme = {
   updated_at: Date;
 };
 
-export class DonationsDb {
-  private initialized = false;
-  private readonly pool: Pool;
-
-  constructor(pool: Pool) {
-    this.pool = pool;
-  }
-
+export class DonationsDb extends CoreDbClient {
   public async init(): Promise<void> {
     const query = DonationsSql.createTable;
     await this.pool.query(query);

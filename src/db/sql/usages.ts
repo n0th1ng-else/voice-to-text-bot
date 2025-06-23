@@ -1,5 +1,5 @@
-import type { Pool } from "pg";
 import { nanoid } from "nanoid";
+import { CoreDbClient } from "./core-db.js";
 import { UsagesSql } from "./usages.sql.js";
 import type { ChatId } from "../../telegram/api/core.js";
 
@@ -13,14 +13,7 @@ export type UsageRowScheme = {
   updated_at: Date;
 };
 
-export class UsagesDb {
-  private initialized = false;
-  private readonly pool: Pool;
-
-  constructor(pool: Pool) {
-    this.pool = pool;
-  }
-
+export class UsagesDb extends CoreDbClient {
   public async init(): Promise<void> {
     const query = UsagesSql.createTable;
     return this.pool.query(query).then(() => {

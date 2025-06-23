@@ -10,10 +10,7 @@ import type { MessageOptions, TelegramMessagePrefix } from "../types.js";
 import type { BotMessageModel } from "../model.js";
 import type { getDb } from "../../db/index.js";
 import type { LanguageCode } from "../../recognition/types.js";
-import {
-  type TranslationKey,
-  type TranslationKeyFull,
-} from "../../text/types.js";
+import type { TranslationKeyFull } from "../../text/types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
 import type { TgMessageOptions } from "../api/groups/chats/chats-types.js";
 
@@ -97,14 +94,15 @@ export abstract class GenericAction {
     chatId: ChatId,
     messageId: MessageId,
     meta: MessageOptions,
-    id: TranslationKey,
+    id: TranslationKeyFull,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
+    const [partKey, partParams] = Array.isArray(id) ? id : [id];
     return this.bot.chats
       .editMessageText(
         chatId,
         messageId,
-        this.text.t(id, meta.lang),
+        this.text.t(partKey, meta.lang, partParams),
         meta.options,
       )
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`));

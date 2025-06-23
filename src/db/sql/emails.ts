@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import { CoreDbClient } from "./core-db.js";
 import { UsedEmailsSql } from "./emails.sql.js";
 
 export type UsedEmailRowScheme = {
@@ -8,14 +8,7 @@ export type UsedEmailRowScheme = {
   stop_at: Date;
 };
 
-export class UsedEmailDb {
-  private initialized = false;
-  private readonly pool: Pool;
-
-  constructor(pool: Pool) {
-    this.pool = pool;
-  }
-
+export class UsedEmailDb extends CoreDbClient {
   public async init(): Promise<void> {
     const query = UsedEmailsSql.createTable;
     return this.pool.query(query).then(() => {

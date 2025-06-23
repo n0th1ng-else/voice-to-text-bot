@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import { CoreDbClient } from "./core-db.js";
 import { IgnoredChatsSql } from "./ignoredchats.sql.js";
 import type { ChatId } from "../../telegram/api/core.js";
 
@@ -10,14 +10,7 @@ export type IgnoredChatsRowScheme = {
   updated_at: Date;
 };
 
-export class IgnoredChatsDb {
-  private initialized = false;
-  private readonly pool: Pool;
-
-  constructor(pool: Pool) {
-    this.pool = pool;
-  }
-
+export class IgnoredChatsDb extends CoreDbClient {
   public async init(): Promise<void> {
     const query = IgnoredChatsSql.createTable;
     return this.pool.query(query).then(() => {
