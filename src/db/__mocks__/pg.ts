@@ -6,6 +6,7 @@ import { DonationsSql } from "../sql/donations.sql.js";
 import { UsedEmailsSql } from "../sql/emails.sql.js";
 import { IgnoredChatsSql } from "../sql/ignoredchats.sql.js";
 import { DurationsSql } from "../sql/durations.sql.js";
+import { SubscriptionsSql } from "../sql/subscriptions.sql.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyTypeForMock = any;
@@ -111,4 +112,8 @@ export const mockTableCreation = (testPool: Pool) => {
   testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(DurationsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(IgnoredChatsSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(SubscriptionsSql.createTable, () => Promise.resolve());
+  testPool.mockQuery(SubscriptionsSql.createUserIdAndEndDateIndex, () =>
+    Promise.resolve(),
+  );
 };

@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
 import { type NodeRowScheme, NodesDb } from "./sql/nodes.js";
+import type { NodeInstanceId } from "./sql/types.js";
 
 const logger = new Logger("postgres-nodes");
 
@@ -44,7 +45,7 @@ export class NodesClient {
   }
 
   private updateRow(
-    nodeId: string,
+    nodeId: NodeInstanceId,
     isActive: boolean,
     version: string,
   ): Promise<NodeRowScheme> {

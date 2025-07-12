@@ -2,9 +2,10 @@ import { nanoid } from "nanoid";
 import { CoreDbClient } from "./core-db.js";
 import { DurationsSql } from "./durations.sql.js";
 import type { ChatId } from "../../telegram/api/core.js";
+import type { DurationId } from "./types.js";
 
 export type DurationRowScheme = {
-  duration_id: string;
+  duration_id: DurationId;
   chat_id: number;
   duration: number;
   created_at: Date;
@@ -40,7 +41,7 @@ export class DurationsDb extends CoreDbClient {
     return row;
   }
 
-  public getId(row: DurationRowScheme): string {
+  public getId(row: DurationRowScheme): DurationId {
     return row.duration_id;
   }
 }

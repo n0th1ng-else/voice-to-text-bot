@@ -1,8 +1,9 @@
 import { CoreDbClient } from "./core-db.js";
 import { UsedEmailsSql } from "./emails.sql.js";
+import type { EmailId } from "./types.js";
 
 export type UsedEmailRowScheme = {
-  email_id: number;
+  email_id: EmailId;
   email: string;
   start_at: Date;
   stop_at: Date;
@@ -37,7 +38,7 @@ export class UsedEmailDb extends CoreDbClient {
       });
   }
 
-  public async updateRow(emailId: number): Promise<UsedEmailRowScheme> {
+  public async updateRow(emailId: EmailId): Promise<UsedEmailRowScheme> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table usedemails is not initialized yet"),
@@ -71,7 +72,7 @@ export class UsedEmailDb extends CoreDbClient {
       .then((queryData) => queryData.rows);
   }
 
-  public getId(row: UsedEmailRowScheme): number {
+  public getId(row: UsedEmailRowScheme): EmailId {
     return row.email_id;
   }
 }

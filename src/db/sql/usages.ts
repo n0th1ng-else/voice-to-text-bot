@@ -2,10 +2,11 @@ import { nanoid } from "nanoid";
 import { CoreDbClient } from "./core-db.js";
 import { UsagesSql } from "./usages.sql.js";
 import type { ChatId } from "../../telegram/api/core.js";
+import type { UsageId } from "./types.js";
 
 export type UsageRowScheme = {
-  usage_id: string;
-  chat_id: number;
+  usage_id: UsageId;
+  chat_id: ChatId;
   user_name: string;
   usage_count: number;
   lang_id: string;
@@ -56,7 +57,7 @@ export class UsagesDb extends CoreDbClient {
   }
 
   public async updateRow(
-    usageId: string,
+    usageId: UsageId,
     langId: string,
     usageCount: number,
     username: string,
@@ -82,7 +83,7 @@ export class UsagesDb extends CoreDbClient {
    * @deprecated Use it only for migration
    */
   public async updateRowWithDate(
-    usageId: string,
+    usageId: UsageId,
     langId: string,
     usageCount: number,
     username: string,
@@ -126,7 +127,7 @@ export class UsagesDb extends CoreDbClient {
       .then((queryData) => queryData.rows);
   }
 
-  public getId(row: UsageRowScheme): string {
+  public getId(row: UsageRowScheme): UsageId {
     return row.usage_id;
   }
 

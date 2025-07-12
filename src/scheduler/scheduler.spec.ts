@@ -10,40 +10,32 @@ import {
   type Mock,
 } from "vitest";
 import { nanoid } from "nanoid";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../testUtils/dependencies.js";
 import type { VoidPromise } from "../common/types.js";
+import { ScheduleDaemon } from "./index.js";
+import { WaiterForCalls } from "../testUtils/waitFor.js";
 
 vi.mock("../logger/index");
 
 const oneMinute = 60_000;
 
 let finishResult = Promise.resolve();
-let finishWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
+let finishWatcher: WaiterForCalls;
 let finishFn: Mock<VoidPromise>;
 
 let shouldFinishResult = false;
-let shouldFinishWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
+let shouldFinishWatcher: WaiterForCalls;
 let shouldFinishFn: Mock<() => boolean>;
 
 let tickResult = Promise.resolve("");
-let tickWatcher: InstanceType<InjectedFn["WaiterForCalls"]>;
+let tickWatcher: WaiterForCalls;
 let tickFn: Mock<() => Promise<string>>;
 
-let ScheduleDaemon: InjectedFn["ScheduleDaemon"];
-let WaiterForCalls: InjectedFn["WaiterForCalls"];
 let testId = nanoid(10);
-let scheduler: InstanceType<InjectedFn["ScheduleDaemon"]>;
+let scheduler: ScheduleDaemon<unknown>;
 
 describe("Scheduler", () => {
-  beforeAll(async () => {
+  beforeAll(() => {
     vi.useFakeTimers();
-    const init = await injectDependencies();
-    ScheduleDaemon = init.ScheduleDaemon;
-    WaiterForCalls = init.WaiterForCalls;
-
     finishWatcher = new WaiterForCalls();
     finishFn = vi.fn<VoidPromise>().mockImplementation(() => {
       finishWatcher.tick();
@@ -143,6 +135,15 @@ describe("Scheduler", () => {
       const offset = 1;
       scheduler.start();
       vi.advanceTimersByTime(offset * oneMinute);
+      expect(tickFn).toBeCalledTimes(offset + 1);
+    });
+
+    it("will run tick every single custom interval", () => {
+      const customInterval = 10_000_000;
+      scheduler = new ScheduleDaemon<unknown>(testId, tickFn, customInterval);
+      const offset = 1;
+      scheduler.start();
+      vi.advanceTimersByTime(offset * customInterval);
       expect(tickFn).toBeCalledTimes(offset + 1);
     });
 

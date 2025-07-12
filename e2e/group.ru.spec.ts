@@ -27,6 +27,7 @@ import {
   asChatId__test,
   asMessageId__test,
   asFileId__test,
+  asUsageId__test,
 } from "../src/testUtils/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
@@ -198,7 +199,8 @@ describe("[russian language]", () => {
     beforeEach(() => {
       tgMessage = new TelegramMessageModel(testChatId, chatType);
       botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
-      botStat.setObjectId(randomIntFromInterval(1, 100000));
+      const usageId = asUsageId__test(String(randomIntFromInterval(1, 100000)));
+      botStat.setObjectId(usageId);
     });
 
     it("keeps calm on a message without voice content", () => {

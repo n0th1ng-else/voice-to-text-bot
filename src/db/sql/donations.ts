@@ -1,22 +1,20 @@
+import { z } from "zod/v4";
 import { CoreDbClient } from "./core-db.js";
 import { DonationsSql } from "./donations.sql.js";
-import type { ValueOf } from "../../common/types.js";
 import type { ChatId, PaymentChargeId } from "../../telegram/api/core.js";
 import type { Currency } from "../../telegram/api/groups/payments/payments-types.js";
+import type { DonationId } from "./types.js";
 
-export const DonationStatus = {
-  Initialized: "INITIALIZED",
-  Pending: "PENDING",
-  Canceled: "CANCELED",
-  Received: "RECEIVED",
-} as const;
+export const DbDonationStatus = z
+  .enum(["INITIALIZED", "PENDING", "CANCELED", "RECEIVED"])
+  .describe("Supported donation status");
 
-export type DonationStatusType = ValueOf<typeof DonationStatus>;
+export type DonationStatus = z.infer<typeof DbDonationStatus>;
 
 export type DonationRowScheme = {
-  donation_id: number;
-  status: string;
-  chat_id: number;
+  donation_id: DonationId;
+  status: DonationStatus;
+  chat_id: ChatId;
   price: number;
   currency?: Currency;
   charge_id?: PaymentChargeId;
@@ -48,14 +46,8 @@ export class DonationsDb extends CoreDbClient {
     const query = DonationsSql.insertRow;
     const createdAt = new Date();
     const updatedAt = createdAt;
-    const values = [
-      chatId,
-      DonationStatus.Initialized,
-      price,
-      currency,
-      createdAt,
-      updatedAt,
-    ];
+    const status: DonationStatus = "INITIALIZED";
+    const values = [chatId, status, price, currency, createdAt, updatedAt];
     return this.pool
       .query<DonationRowScheme>(query, values)
       .then((queryData) => {
@@ -68,8 +60,8 @@ export class DonationsDb extends CoreDbClient {
   }
 
   public updateRow(
-    donationId: number,
-    status: DonationStatusType,
+    donationId: DonationId,
+    status: DonationStatus,
     paymentChargeId?: PaymentChargeId,
   ): Promise<DonationRowScheme> {
     if (!this.initialized) {
@@ -91,7 +83,7 @@ export class DonationsDb extends CoreDbClient {
       });
   }
 
-  public getRows(status: DonationStatusType): Promise<DonationRowScheme[]> {
+  public getRows(status: DonationStatus): Promise<DonationRowScheme[]> {
     if (!this.initialized) {
       return Promise.reject(
         new Error("The table donations is not initialized yet"),
@@ -104,7 +96,7 @@ export class DonationsDb extends CoreDbClient {
       .then((queryData) => queryData.rows);
   }
 
-  public getId(row: DonationRowScheme): number {
+  public getId(row: DonationRowScheme): DonationId {
     return row.donation_id;
   }
 }

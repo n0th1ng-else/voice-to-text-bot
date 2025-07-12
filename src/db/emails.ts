@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
 import { UsedEmailDb, type UsedEmailRowScheme } from "./sql/emails.js";
+import type { EmailId } from "./sql/types.js";
 
 const logger = new Logger("postgres-emails");
 
@@ -32,7 +33,7 @@ export class UsedEmailClient {
     this.secondary = true;
   }
 
-  public updateRow(emailId: number): Promise<UsedEmailRowScheme> {
+  public updateRow(emailId: EmailId): Promise<UsedEmailRowScheme> {
     this.logInfo(`Updating the row with id=${emailId}`);
 
     return this.db

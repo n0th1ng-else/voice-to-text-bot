@@ -1,10 +1,11 @@
 import { CoreDbClient } from "./core-db.js";
 import { IgnoredChatsSql } from "./ignoredchats.sql.js";
 import type { ChatId } from "../../telegram/api/core.js";
+import type { IgnoredChatId } from "./types.js";
 
 export type IgnoredChatsRowScheme = {
-  row_id: string;
-  chat_id: number;
+  row_id: IgnoredChatId;
+  chat_id: ChatId;
   ignore: boolean;
   created_at: Date;
   updated_at: Date;
@@ -34,7 +35,7 @@ export class IgnoredChatsDb extends CoreDbClient {
       });
   }
 
-  public getId(row: IgnoredChatsRowScheme): string {
+  public getId(row: IgnoredChatsRowScheme): IgnoredChatId {
     return row.row_id;
   }
 }

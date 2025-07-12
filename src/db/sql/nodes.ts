@@ -1,9 +1,10 @@
 import { nanoid } from "nanoid";
 import { CoreDbClient } from "./core-db.js";
 import { NodesSql } from "./nodes.sql.js";
+import type { NodeInstanceId } from "./types.js";
 
 export type NodeRowScheme = {
-  node_id: string;
+  node_id: NodeInstanceId;
   self_url: string;
   is_active: boolean;
   version: string;
@@ -44,7 +45,7 @@ export class NodesDb extends CoreDbClient {
   }
 
   public async updateRow(
-    nodeId: string,
+    nodeId: NodeInstanceId,
     isActive: boolean,
     version: string,
   ): Promise<NodeRowScheme> {
@@ -78,7 +79,7 @@ export class NodesDb extends CoreDbClient {
       .then((queryData) => queryData.rows);
   }
 
-  public getId(row: NodeRowScheme): string {
+  public getId(row: NodeRowScheme): NodeInstanceId {
     return row.node_id;
   }
 }

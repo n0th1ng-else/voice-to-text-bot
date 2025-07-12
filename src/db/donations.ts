@@ -3,11 +3,11 @@ import { Logger } from "../logger/index.js";
 import {
   type DonationRowScheme,
   DonationsDb,
-  DonationStatus,
-  type DonationStatusType,
+  type DonationStatus,
 } from "./sql/donations.js";
 import type { ChatId, PaymentChargeId } from "../telegram/api/core.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
+import type { DonationId } from "./sql/types.js";
 
 const logger = new Logger("postgres-donations");
 
@@ -40,8 +40,8 @@ export class DonationsClient {
   }
 
   public updateRow(
-    donationId: number,
-    status: DonationStatusType,
+    donationId: DonationId,
+    status: DonationStatus,
     paymentChargeId?: PaymentChargeId,
   ): Promise<DonationRowScheme> {
     this.logInfo(`Updating the row with id=${donationId}`);
@@ -80,25 +80,21 @@ export class DonationsClient {
   }
 
   public getPendingRows(): Promise<DonationRowScheme[]> {
-    this.logInfo(`Looking for rows for status=${DonationStatus.Pending}`);
+    const status: DonationStatus = "PENDING";
+    this.logInfo(`Looking for rows for status=${status}`);
     return this.db
-      .getRows(DonationStatus.Pending)
+      .getRows(status)
       .then((rows) => {
-        this.logInfo(
-          `Row search has been executed for status=${DonationStatus.Pending}`,
-        );
+        this.logInfo(`Row search has been executed for status=${status}`);
         return rows;
       })
       .catch((err) => {
-        logger.error(
-          `Unable provide a search for status=${DonationStatus.Pending}`,
-          err,
-        );
+        logger.error(`Unable provide a search for status=${status}`, err);
         throw err;
       });
   }
 
-  public getRowId(row: DonationRowScheme): number {
+  public getRowId(row: DonationRowScheme): DonationId {
     return this.db.getId(row);
   }
 

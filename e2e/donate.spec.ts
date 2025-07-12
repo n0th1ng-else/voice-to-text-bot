@@ -23,7 +23,11 @@ import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import type { Currency } from "../src/telegram/api/groups/payments/payments-types.js";
-import { asChatId__test, asMessageId__test } from "../src/testUtils/types.js";
+import {
+  asChatId__test,
+  asDonationId__test,
+  asMessageId__test,
+} from "../src/testUtils/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
@@ -176,7 +180,7 @@ describe("[default language - english] donate", () => {
 
       it("responds on a /donate message with extra buttons and sends payment link", () => {
         tgMessage.setText(testMessageId, BotCommand.Donate);
-        const donationId = 43646456;
+        const donationId = asDonationId__test(43646456);
         const price = 7;
         const currency: Currency = "EUR";
 
@@ -229,7 +233,7 @@ describe("[default language - english] donate", () => {
       it("responds on a /donate message with extra buttons and sends payment link", () => {
         tgMessage.setText(testMessageId, BotCommand.Donate);
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
-        const donationId = 214566;
+        const donationId = asDonationId__test(214566);
         const price = 3;
         const currency: Currency = "EUR";
 
@@ -288,7 +292,7 @@ describe("[default language - english] donate", () => {
       });
 
       it("responds on a /donate message with extra buttons and sends payment link", () => {
-        const donationId = 5780;
+        const donationId = asDonationId__test(5780);
         const price = 5;
         const currency: Currency = "EUR";
 
@@ -342,7 +346,7 @@ describe("[default language - english] donate", () => {
       it("responds on a /donate message with extra buttons and sends payment link", () => {
         tgMessage.setText(testMessageId, BotCommand.Donate);
         const botStat = new BotStatRecordModel(tgMessage.chatId, testLangId);
-        const donationId = 911;
+        const donationId = asDonationId__test(911);
         const price = 7;
         const currency: Currency = "EUR";
 
