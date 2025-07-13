@@ -3,8 +3,14 @@ import type { VoidPromise } from "../common/types.js";
 
 const logger = new Logger("daemon");
 
+type Options = {
+  interval?: number;
+  skipInitialTick?: boolean;
+};
+
 export class ScheduleDaemon<TickData> {
   private readonly interval: number;
+  private readonly skipInitialTick: boolean;
   private readonly printId: string;
   private readonly id: string;
   private readonly onTick: () => Promise<TickData>;
@@ -16,11 +22,16 @@ export class ScheduleDaemon<TickData> {
     return !!this.handler;
   }
 
-  constructor(id: string, onTick: () => Promise<TickData>, interval = 60_000) {
+  constructor(
+    id: string,
+    onTick: () => Promise<TickData>,
+    options: Options = {},
+  ) {
     this.id = id;
     this.onTick = onTick;
     this.printId = `[${this.id}]`;
-    this.interval = interval;
+    this.interval = options.interval ?? 60_000;
+    this.skipInitialTick = options.skipInitialTick ?? false;
   }
 
   public setStopHandler(
@@ -43,7 +54,11 @@ export class ScheduleDaemon<TickData> {
     }
 
     logger.info(`${Logger.g(this.printId)} Launching the daemon`);
-    this.runTick();
+    if (!this.skipInitialTick) {
+      this.runTick();
+    } else {
+      logger.info(`${Logger.g(this.printId)} Skipped initial tick`);
+    }
     this.handler = setInterval(() => this.runTick(), this.interval);
     return this;
   }

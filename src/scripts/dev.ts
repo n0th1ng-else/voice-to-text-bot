@@ -10,7 +10,7 @@ const startServer = async (
   threadId: number,
 ): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
-  const stopListener = prepareStopListener();
+  const stopListener = await prepareStopListener();
 
   await server.applyHostLocation(launchDelay);
   const onStop = await server.start();

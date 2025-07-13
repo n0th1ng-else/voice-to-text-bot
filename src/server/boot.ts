@@ -19,9 +19,13 @@ import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
-import type { BotServerModel } from "./types.js";
+import { type BotServerModel, HealthStatus } from "./types.js";
 import { VOICE_PROVIDERS } from "../const.js";
-import { trackApplicationErrors } from "../monitoring/newrelic.js";
+import {
+  trackApplicationErrors,
+  trackApplicationHealth,
+} from "../monitoring/newrelic.js";
+import { requestHealthData } from "./api.js";
 
 const logger = new Logger("boot-server");
 
@@ -102,7 +106,14 @@ export const prepareInstance = async (
     });
 };
 
-export const prepareStopListener = (): StopListener => {
+export const prepareStopListener = async (): Promise<StopListener> => {
+  const selfUrl = await getHostName(
+    envy.appPort,
+    envy.selfUrl,
+    envy.enableSSL,
+    envy.ngRokToken,
+  );
+
   const memoryDaemon = new ScheduleDaemon("memory", async () => {
     const value = await printCurrentMemoryStat(envy.memoryLimit);
     await sendMemoryStatAnalytics(value, envy.appVersion);
@@ -111,10 +122,22 @@ export const prepareStopListener = (): StopListener => {
     const value = await printCurrentStorageUsage("file-temp");
     await sendStorageStatAnalytics(value, envy.appVersion);
   }).start();
+  const healthDaemon = new ScheduleDaemon(
+    "health",
+    async () => {
+      const value = await requestHealthData(selfUrl);
+      const status = value.status === HealthStatus.Online ? "UP" : "DOWN";
+      trackApplicationHealth(status);
+    },
+    {
+      skipInitialTick: true,
+    },
+  ).start();
 
   const stopListener = new StopListener().addTrigger(() => {
     memoryDaemon.stop();
     storageDaemon.stop();
+    healthDaemon.stop();
   });
 
   return stopListener;

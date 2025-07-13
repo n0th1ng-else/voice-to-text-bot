@@ -11,7 +11,7 @@ const startServer = async (
   threadId: number,
 ): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
-  const stopListener = prepareStopListener();
+  const stopListener = await prepareStopListener();
 
   return server.start().then((stopFn) => {
     stopListener.addTrigger(stopFn);
