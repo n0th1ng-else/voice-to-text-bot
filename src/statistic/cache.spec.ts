@@ -1,8 +1,5 @@
-import { expect, describe, it, vi, beforeAll } from "vitest";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../testUtils/dependencies.js";
+import { expect, describe, it, vi } from "vitest";
+import { CacheProvider } from "./cache.js";
 
 vi.mock("../logger/index");
 
@@ -24,15 +21,9 @@ const testData3 = "some-test-data-3";
 const item3: TestCacheData = { testId: testId3, testData: testData3 };
 
 let cacheSize = 0;
-let CacheProvider: InjectedFn["CacheProvider"];
-let cache: InstanceType<InjectedFn["CacheProvider"]>;
+let cache: CacheProvider<TestCacheData, "testId">;
 
 describe("[cache]", () => {
-  beforeAll(async () => {
-    const init = await injectDependencies();
-    CacheProvider = init.CacheProvider;
-  });
-
   it("does nothing when cache size is 0", () => {
     cacheSize = 0;
     cache = new CacheProvider<TestCacheData, "testId">(cacheSize, "testId");

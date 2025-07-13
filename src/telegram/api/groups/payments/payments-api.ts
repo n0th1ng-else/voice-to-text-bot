@@ -108,7 +108,7 @@ export class TelegramPaymentsApi {
     chatId: ChatId,
     userId: UserId,
     paymentChargeId: PaymentChargeId,
-    isCanceled = true,
+    isCanceled: boolean,
   ): Promise<boolean> {
     const data: EditUserStarSubscriptionDto = {
       user_id: userId,

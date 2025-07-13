@@ -14,6 +14,16 @@ import {
   type PaymentChargeId,
   TgPaymentChargeId,
 } from "../telegram/api/core.js";
+import {
+  DbDonationId,
+  DbEmailId,
+  DbSubscriptionId,
+  DbUsageId,
+  type DonationId,
+  type EmailId,
+  type SubscriptionId,
+  type UsageId,
+} from "../db/sql/types.js";
 
 export const asChatId__test = (chatId: number): ChatId =>
   TgChatId.parse(chatId);
@@ -37,3 +47,16 @@ export const asFileId__test = (fileId: string): FileId =>
 export const asPaymentChargeId__test = (
   paymentChargeId: string,
 ): PaymentChargeId => TgPaymentChargeId.parse(paymentChargeId);
+
+export const asSubscriptionId__test = (
+  subscriptionId: string,
+): SubscriptionId => DbSubscriptionId.parse(subscriptionId);
+
+export const asUsageId__test = (usageId: string): UsageId =>
+  DbUsageId.parse(usageId);
+
+export const asDonationId__test = (donationId: number): DonationId =>
+  DbDonationId.parse(donationId);
+
+export const asEmailId__test = (emailId: number): EmailId =>
+  DbEmailId.parse(emailId);

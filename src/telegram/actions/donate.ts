@@ -20,6 +20,7 @@ import {
   type TgInvoice,
 } from "../api/groups/payments/payments-types.js";
 import { trackDonation, trackUserActivity } from "../../monitoring/newrelic.js";
+import type { DonationId } from "../../db/sql/types.js";
 
 const getDonateButton = (
   price: number,
@@ -222,7 +223,7 @@ export class DonateAction extends GenericAction {
     price: number,
     currency: Currency,
     prefix: TelegramMessagePrefix,
-  ): Promise<number> {
+  ): Promise<DonationId> {
     try {
       const row = await this.stat.createDonationRow(
         model.chatId,

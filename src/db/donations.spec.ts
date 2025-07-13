@@ -1,9 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type pg from "pg";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import { asChatId__test, asPaymentChargeId__test } from "../testUtils/types.js";
+import {
+  asChatId__test,
+  asDonationId__test,
+  asPaymentChargeId__test,
+} from "../testUtils/types.js";
 import { DonationsClient } from "./donations.js";
-import { type DonationRowScheme, DonationStatus } from "./sql/donations.js";
+import type { DonationRowScheme, DonationStatus } from "./sql/donations.js";
 import { DonationsSql } from "./sql/donations.sql.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 
@@ -38,8 +42,9 @@ describe("Donations DB", () => {
     });
 
     it("can not update row", async () => {
+      const status: DonationStatus = "PENDING";
       await expect(
-        client.updateRow(23, DonationStatus.Pending),
+        client.updateRow(asDonationId__test(23), status),
       ).rejects.toThrowError("The table donations is not initialized yet");
     });
 
@@ -73,7 +78,7 @@ describe("Donations DB", () => {
       const chatId = asChatId__test(83222);
       const price = 10;
       const currency: Currency = "EUR";
-      const status = DonationStatus.Initialized;
+      const status: DonationStatus = "INITIALIZED";
 
       testPool.mockQuery(DonationsSql.insertRow, (values) => {
         expect(values).toHaveLength(6);
@@ -89,7 +94,7 @@ describe("Donations DB", () => {
         return Promise.resolve<{ rows: DonationRowScheme[] }>({
           rows: [
             {
-              donation_id: 21,
+              donation_id: asDonationId__test(21),
               status: rStatus,
               chat_id: rChatId,
               price: rPrice,
@@ -111,8 +116,8 @@ describe("Donations DB", () => {
     });
 
     it("updates some row as Canceled", () => {
-      const donationId = 342;
-      const status = DonationStatus.Canceled;
+      const donationId = asDonationId__test(342);
+      const status: DonationStatus = "CANCELED";
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
         expect(values).toHaveLength(4);
@@ -128,7 +133,7 @@ describe("Donations DB", () => {
               donation_id: rDonationId,
               status: rStatus,
               charge_id: rPaymentChargeId,
-              chat_id: 34444,
+              chat_id: asChatId__test(34444),
               price: 4,
               created_at: new Date(),
               updated_at: rUpdatedAt,
@@ -146,8 +151,8 @@ describe("Donations DB", () => {
     });
 
     it("updates some row as Received", () => {
-      const donationId = 342;
-      const status = DonationStatus.Received;
+      const donationId = asDonationId__test(342);
+      const status: DonationStatus = "RECEIVED";
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
         expect(values).toHaveLength(4);
@@ -163,7 +168,7 @@ describe("Donations DB", () => {
             {
               donation_id: rDonationId,
               status: rStatus,
-              chat_id: 21344,
+              chat_id: asChatId__test(21344),
               charge_id: rPaymentChargeId,
               price: 4,
               created_at: new Date(),
@@ -182,8 +187,8 @@ describe("Donations DB", () => {
     });
 
     it("updates some row as Pending", () => {
-      const donationId = 342;
-      const status = DonationStatus.Pending;
+      const donationId = asDonationId__test(342);
+      const status: DonationStatus = "PENDING";
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
         expect(values).toHaveLength(4);
@@ -200,7 +205,7 @@ describe("Donations DB", () => {
               donation_id: rDonationId,
               status: rStatus,
               charge_id: rPaymentChargeId,
-              chat_id: 21344,
+              chat_id: asChatId__test(21344),
               price: 4,
               created_at: new Date(),
               updated_at: rUpdatedAt,
@@ -218,8 +223,8 @@ describe("Donations DB", () => {
     });
 
     it("updates some row with chargeId", () => {
-      const donationId = 342;
-      const status = DonationStatus.Pending;
+      const donationId = asDonationId__test(342);
+      const status: DonationStatus = "PENDING";
       const chargeId = asPaymentChargeId__test("asdadassda");
 
       testPool.mockQuery(DonationsSql.updateRow, (values) => {
@@ -237,7 +242,7 @@ describe("Donations DB", () => {
               donation_id: rDonationId,
               status: rStatus,
               charge_id: rPaymentChargeId,
-              chat_id: 21344,
+              chat_id: asChatId__test(21344),
               price: 4,
               created_at: new Date(),
               updated_at: rUpdatedAt,

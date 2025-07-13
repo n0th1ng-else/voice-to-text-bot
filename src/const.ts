@@ -1,4 +1,5 @@
 import type { VoiceConverterProvider } from "./recognition/types.js";
+import type { PaymentChargeId } from "./telegram/api/core.js";
 
 const GITHUB_PROJECT = "https://github.com/n0th1ng-else/voice-to-text-bot";
 
@@ -15,6 +16,14 @@ export const wavSampleRate = 16_000; // 16kHz
 export const secondsInOneMinute = 60;
 
 export const durationLimitSec = 90;
+
+export const subscriptionDurationSeconds = 2_592_000; // 30d * 24h * 60m * 60s
+
+export const subscriptionTrialDurationSeconds = 604_800; // 7d * 24h * 60m * 60s
+
+export const subscriptionTrialPaymentId = "trial-no-payment" as PaymentChargeId;
+
+export const subscriptionPrice = 150; // 150 Stars
 
 export const API_TIMEOUT_MS = 10_000;
 

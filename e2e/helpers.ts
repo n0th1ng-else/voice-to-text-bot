@@ -21,6 +21,7 @@ import {
   asMessageId__test,
   asUserId__test,
 } from "../src/testUtils/types.js";
+import type { UsageId } from "../src/db/sql/types.js";
 
 type UserNameOptions = {
   userName?: string;
@@ -240,7 +241,7 @@ export class TelegramMessageMetaItem {
 }
 
 export class BotStatRecordModel {
-  public objectId?: string;
+  public objectId?: UsageId;
   public user = "";
   public usageCount = 0;
   public chatId: ChatId;
@@ -251,8 +252,8 @@ export class BotStatRecordModel {
     this.langId = langId;
   }
 
-  public setObjectId(objectId: number): this {
-    this.objectId = String(objectId);
+  public setObjectId(objectId: UsageId): this {
+    this.objectId = objectId;
     return this;
   }
 

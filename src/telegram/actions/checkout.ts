@@ -1,5 +1,4 @@
 import { GenericAction } from "./common.js";
-import { DonationStatus } from "../../db/sql/donations.js";
 import { Logger } from "../../logger/index.js";
 import { parsePaymentPayload } from "../helpers.js";
 import { TelegramMessagePrefix } from "../types.js";
@@ -9,6 +8,7 @@ import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { PaymentChargeId } from "../api/core.js";
 import { trackDonation } from "../../monitoring/newrelic.js";
 import { isDonation } from "../../payments/helpers.js";
+import type { DonationId } from "../../db/sql/types.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -28,7 +28,7 @@ export class CheckoutAction extends GenericAction {
       );
       return Promise.resolve();
     }
-    // We unified the paymentId field, but will not change the donationId type
+    // @ts-expect-error We unified the paymentId field, but will not change the donationId type
     return this.markAsSuccessful(Number(paymentInternalId), prefix, chargeId);
   }
 
@@ -63,7 +63,7 @@ export class CheckoutAction extends GenericAction {
           );
           return;
         }
-        // We unified the paymentId field, but will not change the paymentInternalId type
+        // @ts-expect-error We unified the paymentId field, but will not change the paymentInternalId type
         return this.markAsPending(Number(paymentInternalId), prefix);
       })
       .catch((err) => {
@@ -72,11 +72,11 @@ export class CheckoutAction extends GenericAction {
   }
 
   private async markAsPending(
-    donationId: number,
+    donationId: DonationId,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     return this.stat
-      .updateDonationRow(donationId, DonationStatus.Pending)
+      .updateDonationRow(donationId, "PENDING")
       .then(() => {
         logger.info(`${prefix.getPrefix()} Donation marked as PENDING`);
       })
@@ -89,12 +89,12 @@ export class CheckoutAction extends GenericAction {
   }
 
   private async markAsSuccessful(
-    donationId: number,
+    donationId: DonationId,
     prefix: TelegramMessagePrefix,
     paymentChargeId?: PaymentChargeId,
   ): Promise<void> {
     return this.stat
-      .updateDonationRow(donationId, DonationStatus.Received, paymentChargeId)
+      .updateDonationRow(donationId, "RECEIVED", paymentChargeId)
       .then(() => {
         logger.info(`${prefix.getPrefix()} Donation marked as SUCCESSFUL`);
       })

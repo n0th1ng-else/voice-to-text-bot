@@ -4,7 +4,7 @@ import type { VoidPromise } from "../common/types.js";
 const logger = new Logger("daemon");
 
 export class ScheduleDaemon<TickData> {
-  private readonly interval = 60_000;
+  private readonly interval: number;
   private readonly printId: string;
   private readonly id: string;
   private readonly onTick: () => Promise<TickData>;
@@ -16,10 +16,11 @@ export class ScheduleDaemon<TickData> {
     return !!this.handler;
   }
 
-  constructor(id: string, onTick: () => Promise<TickData>) {
+  constructor(id: string, onTick: () => Promise<TickData>, interval = 60_000) {
     this.id = id;
     this.onTick = onTick;
     this.printId = `[${this.id}]`;
+    this.interval = interval;
   }
 
   public setStopHandler(

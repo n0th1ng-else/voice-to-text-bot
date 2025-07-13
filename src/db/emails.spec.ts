@@ -1,17 +1,8 @@
-import {
-  describe,
-  beforeEach,
-  afterEach,
-  expect,
-  it,
-  vi,
-  beforeAll,
-} from "vitest";
+import { describe, beforeEach, afterEach, expect, it, vi } from "vitest";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../testUtils/dependencies.js";
+import { UsedEmailClient } from "./emails.js";
+import { UsedEmailsSql } from "./sql/emails.sql.js";
+import { asEmailId__test } from "../testUtils/types.js";
 
 vi.mock("../logger/index");
 
@@ -23,18 +14,10 @@ const dbConfig = {
   port: 5432,
 };
 
-let UsedEmailsSql: InjectedFn["UsedEmailsSql"];
-let UsedEmailClient: InjectedFn["UsedEmailClient"];
-let client: InstanceType<InjectedFn["UsedEmailClient"]>;
+let client: UsedEmailClient;
 let testPool = new MockPool(dbConfig);
 
 describe("Used Emails DB", () => {
-  beforeAll(async () => {
-    const init = await injectDependencies();
-    UsedEmailsSql = init.UsedEmailsSql;
-    UsedEmailClient = init.UsedEmailClient;
-  });
-
   beforeEach(() => {
     testPool = new MockPool(dbConfig);
     client = new UsedEmailClient(testPool);
@@ -52,7 +35,7 @@ describe("Used Emails DB", () => {
     });
 
     it("can not update row", async () => {
-      await expect(client.updateRow(12)).rejects.toThrowError(
+      await expect(client.updateRow(asEmailId__test(12))).rejects.toThrowError(
         "The table usedemails is not initialized yet",
       );
     });
@@ -109,7 +92,7 @@ describe("Used Emails DB", () => {
     });
 
     it("updates some row", () => {
-      const emailId = 32;
+      const emailId = asEmailId__test(32);
 
       testPool.mockQuery(UsedEmailsSql.updateRow, (values) => {
         expect(values).toHaveLength(2);

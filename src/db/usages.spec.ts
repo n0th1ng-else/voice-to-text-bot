@@ -1,19 +1,9 @@
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../testUtils/dependencies.js";
 import type { LanguageCode } from "../recognition/types.js";
 import { asChatId__test } from "../testUtils/types.js";
+import { UsagesClient } from "./usages.js";
+import { UsagesSql } from "./sql/usages.sql.js";
 
 vi.mock("../logger/index");
 
@@ -25,18 +15,10 @@ const dbConfig = {
   port: 5432,
 };
 
-let UsagesClient: InjectedFn["UsagesClient"];
-let UsagesSql: InjectedFn["UsagesSql"];
 let testPool = new MockPool(dbConfig);
-let client: InstanceType<InjectedFn["UsagesClient"]>;
+let client: UsagesClient;
 
 describe("Usages DB", () => {
-  beforeAll(async () => {
-    const init = await injectDependencies();
-    UsagesClient = init.UsagesClient;
-    UsagesSql = init.UsagesSql;
-  });
-
   beforeEach(() => {
     testPool = new MockPool(dbConfig);
     client = new UsagesClient(testPool);

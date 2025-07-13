@@ -6,6 +6,7 @@ import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
 import { UsagesSql } from "../../../src/db/sql/usages.sql.js";
 import { type UsageRowScheme } from "../../../src/db/sql/usages.js";
 import type { ChatId } from "../../../src/telegram/api/core.js";
+import { asUsageId__test } from "../../../src/testUtils/types.js";
 
 export const mockGetBotStatItem = (
   pool: MockPool,
@@ -60,8 +61,8 @@ const mockBotStatCreate = (
   lang: LanguageCode,
 ): BotStatRecordModel => {
   const stat = new BotStatRecordModel(chatId, lang);
-  const objectId = randomIntFromInterval(1, 100000);
-  stat.setObjectId(objectId).setUserName(userName);
+  const usageId = asUsageId__test(String(randomIntFromInterval(1, 100000)));
+  stat.setObjectId(usageId).setUserName(userName);
 
   pool.mockQuery(UsagesSql.insertRow, (values) => {
     expect(values).toHaveLength(7);
@@ -123,7 +124,7 @@ const mockBotStatUpdateLang = (
 
 const getDbDto = (item: BotStatRecordModel): UsageRowScheme => {
   return {
-    usage_id: item.objectId || "",
+    usage_id: item.objectId || asUsageId__test("usage-id"),
     chat_id: item.chatId,
     user_name: item.user,
     usage_count: item.usageCount,

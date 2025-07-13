@@ -4,6 +4,7 @@ import { Logger } from "../logger/index.js";
 import { type UsageRowScheme, UsagesDb } from "./sql/usages.js";
 import { getLanguageByText } from "../telegram/helpers.js";
 import type { ChatId } from "../telegram/api/core.js";
+import type { UsageId } from "./sql/types.js";
 
 const logger = new Logger("postgres-usages");
 
@@ -136,7 +137,7 @@ export class UsagesClient {
   }
 
   private updateRow(
-    usageId: string,
+    usageId: UsageId,
     langId: string,
     usageCount: number,
     username: string,
