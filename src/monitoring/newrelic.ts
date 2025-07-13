@@ -43,6 +43,10 @@ export const trackApplicationErrors = (
   newrelic.incrementMetric(`ApplicationHealth/${type}`);
 };
 
+export const trackApplicationHealth = (type: "UP" | "DOWN"): void => {
+  newrelic.recordMetric("ApplicationHealth/Status", type === "UP" ? 1 : 0);
+};
+
 type UserActivityData = {
   activityType: "voice" | "lang" | "start" | "donate" | "support";
 };

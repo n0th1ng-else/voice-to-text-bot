@@ -90,6 +90,18 @@ describe("Scheduler", () => {
     expect(scheduler.isRunning).toBe(false);
   });
 
+  it("will NOT run tick immediately after start if the options are set", () => {
+    scheduler = new ScheduleDaemon<unknown>(testId, tickFn, {
+      skipInitialTick: true,
+    });
+    scheduler.start();
+    expect(vi.getTimerCount()).toBe(1);
+    expect(scheduler.isRunning).toBe(true);
+    expect(tickFn).not.toBeCalled();
+    scheduler.stop();
+    expect(scheduler.isRunning).toBe(false);
+  });
+
   it("can start only once", () => {
     scheduler.start();
     expect(vi.getTimerCount()).toBe(1);
@@ -140,7 +152,9 @@ describe("Scheduler", () => {
 
     it("will run tick every single custom interval", () => {
       const customInterval = 10_000_000;
-      scheduler = new ScheduleDaemon<unknown>(testId, tickFn, customInterval);
+      scheduler = new ScheduleDaemon<unknown>(testId, tickFn, {
+        interval: customInterval,
+      });
       const offset = 1;
       scheduler.start();
       vi.advanceTimersByTime(offset * customInterval);

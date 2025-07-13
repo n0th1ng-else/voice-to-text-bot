@@ -1,4 +1,4 @@
-import axios, { type AxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import type { HealthDto } from "./types.js";
 
 class HealthError extends Error {
@@ -6,7 +6,7 @@ class HealthError extends Error {
   public response?: unknown;
   public url = "";
 
-  constructor(cause: Error, message?: string) {
+  constructor(cause: unknown, message?: string) {
     const msg = message || "Health request was unsuccessful";
     super(`EINTERNAL ${msg}`, { cause });
   }
@@ -31,20 +31,26 @@ const getHealthUrl = (instanceUrl: string): string => {
   return `${instanceUrl}/health`;
 };
 
-export const requestHealthData = (domain: string): Promise<HealthDto> => {
+export const requestHealthData = async (domain: string): Promise<HealthDto> => {
   const url = getHealthUrl(domain);
-  return axios
-    .request<HealthDto>({
+  try {
+    const response = await axios.request<HealthDto>({
       method: "GET",
       url,
       responseType: "json",
-    })
-    .then(({ data: health }) => health)
-    .catch((err: AxiosError) => {
-      const healthError = new HealthError(err, err.message)
+    });
+    return response.data;
+  } catch (err) {
+    if (isAxiosError(err)) {
+      const healthError = new HealthError(err, err?.message)
         .setUrl(url)
         .setErrorCode(err?.response?.status)
         .setResponse(err?.response?.data);
       throw healthError;
-    });
+    } else {
+      // @ts-expect-error the error is most likely Error type, no unknown here but whatever
+      const healthError = new HealthError(err, err?.message).setUrl(url);
+      throw healthError;
+    }
+  }
 };
