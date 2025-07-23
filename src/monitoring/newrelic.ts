@@ -44,7 +44,7 @@ export const trackApplicationErrors = (
 };
 
 export const trackApplicationHealth = (type: "UP" | "DOWN"): void => {
-  newrelic.recordMetric("ApplicationHealth/Status", type === "UP" ? 1 : 0);
+  newrelic.recordMetric("ApplicationHealth/Status", type === "UP" ? 2 : 1);
 };
 
 type UserActivityData = {
