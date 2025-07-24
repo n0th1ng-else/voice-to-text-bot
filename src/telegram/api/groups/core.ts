@@ -1,5 +1,5 @@
 import axios, { type AxiosError, type AxiosInstance } from "axios";
-import type { z } from "zod/v4";
+import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
 import type { ChatId } from "../core.js";

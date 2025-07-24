@@ -1,7 +1,7 @@
 import cluster from "node:cluster";
 import picocolors from "picocolors";
 import { sendLogs } from "./integration.js";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { captureError, captureWarning } from "../monitoring/sentry.js";
 import { logLevel } from "../env.js";
 import { trackApplicationErrors } from "../monitoring/newrelic.js";
