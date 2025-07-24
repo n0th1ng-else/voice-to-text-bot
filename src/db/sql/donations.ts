@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { CoreDbClient } from "./core-db.js";
 import { DonationsSql } from "./donations.sql.js";
 import type { ChatId, PaymentChargeId } from "../../telegram/api/core.js";

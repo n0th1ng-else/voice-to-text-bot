@@ -1,4 +1,4 @@
-import { ElevenLabsClient } from "elevenlabs";
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
 import {
   VoiceConverter,
@@ -54,9 +54,9 @@ export class ElevenLabsProvider extends VoiceConverter {
     const recognition = await this.client.speechToText.convert(
       {
         file: audioBlob,
-        model_id: "scribe_v1",
-        tag_audio_events: false, // Tag audio events like laughter, applause, etc.
-        language_code: convertLanguageCodeToISO(lang),
+        modelId: "scribe_v1",
+        tagAudioEvents: false, // Tag audio events like laughter, applause, etc.
+        languageCode: convertLanguageCodeToISO(lang),
         diarize: false, // Whether to annotate who is speaking
       },
       {

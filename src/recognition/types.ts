@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const VoiceConverterProviderSchema = z

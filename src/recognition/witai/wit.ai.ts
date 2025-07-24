@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import {

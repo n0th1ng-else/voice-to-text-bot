@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { TgChatId, TgFileId, TgMessageId, TgParseMode } from "../../core.js";
 
 export const TgFileSchema = z
