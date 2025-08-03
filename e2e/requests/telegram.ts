@@ -25,11 +25,9 @@ import type { ChatId } from "../../src/telegram/api/core.js";
 import { asUpdateId__test } from "../../src/testUtils/types.js";
 
 const text = getTranslator();
-const telegramApiResponseOk = JSON.stringify({ ok: true });
 
-const makeTelegramResponse = <D>(result: D) => {
-  return [200, JSON.stringify({ ok: true, result })];
-};
+const makeTelegramResponse = <D>(result?: D, ok = true) =>
+  JSON.stringify({ ok, result });
 
 export const sendTelegramMessage = (
   host: RequestAgent,
@@ -68,7 +66,7 @@ export const sendTelegramCallbackMessage = (
 };
 
 export const mockTgSetCommands = (host: NockScope): void => {
-  host.post("/bottelegram-api-token/setMyCommands").reply((uri, body) => {
+  host.post("/bottelegram-api-token/setMyCommands").reply(200, (uri, body) => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.commands).toBeDefined();
     const commands = answer.commands;
@@ -80,12 +78,12 @@ export const mockTgSetCommands = (host: NockScope): void => {
       expect(commands[ind].command).toBe(botCommand.command);
       expect(commands[ind].description).toBe(botCommand.description);
     });
-    return [200, telegramApiResponseOk];
+    return makeTelegramResponse(true);
   });
 };
 
 export const mockTgSetWebHook = (host: NockScope, hookUrl: string): void => {
-  host.post("/bottelegram-api-token/setWebHook").reply((uri, body) => {
+  host.post("/bottelegram-api-token/setWebHook").reply(200, (uri, body) => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.url).toBe(hookUrl);
     return makeTelegramResponse(true);
@@ -93,7 +91,7 @@ export const mockTgSetWebHook = (host: NockScope, hookUrl: string): void => {
 };
 
 export const mockTgGetWebHook = (host: NockScope, hookUrl: string): void => {
-  host.post("/bottelegram-api-token/getWebhookInfo").reply(() => {
+  host.post("/bottelegram-api-token/getWebhookInfo").reply(200, () => {
     return makeTelegramResponse({ url: hookUrl });
   });
 };
@@ -126,7 +124,7 @@ export const mockTgReceiveRawMessage = (
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(message);
       resolve();
-      return telegramApiResponseOk;
+      return makeTelegramResponse();
     });
   });
 };
@@ -197,7 +195,7 @@ export const mockTgReceiveMessage = (
         expect(answer.reply_markup).not.toBeDefined();
       }
       resolve(prefixId);
-      return telegramApiResponseOk;
+      return makeTelegramResponse();
     });
   });
 };
@@ -302,7 +300,7 @@ export const mockTgReceiveCallbackMessage = (
           expect(answer.reply_markup).not.toBeDefined();
         }
         resolve();
-        return telegramApiResponseOk;
+        return makeTelegramResponse();
       });
   });
 };
@@ -339,7 +337,7 @@ export const mockTgReceiveInvoiceMessage = (
       );
 
       resolve();
-      return telegramApiResponseOk;
+      return makeTelegramResponse();
     });
   });
 };

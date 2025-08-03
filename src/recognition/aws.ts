@@ -147,7 +147,10 @@ export class AWSProvider extends VoiceConverter {
       .then((job) => this.getJobWithDelay(name, job));
   }
 
-  private uploadToS3(name: string, file: Buffer): Promise<AWSUpload> {
+  private uploadToS3(
+    name: string,
+    file: Buffer<ArrayBufferLike>,
+  ): Promise<AWSUpload> {
     logger.info("Uploading to S3", name);
     return new Promise<AWSUpload>((resolve, reject) => {
       this.storage.upload(

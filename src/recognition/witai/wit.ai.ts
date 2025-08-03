@@ -55,7 +55,7 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private static async recognise(
-    data: Buffer,
+    data: Buffer<ArrayBufferLike>,
     authToken: string,
     logPrefix: string,
   ): Promise<string> {
@@ -104,7 +104,7 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private static async recogniseSpeech(
-    data: Buffer,
+    data: Buffer<ArrayBufferLike>,
     authToken: string,
   ): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(
@@ -116,7 +116,7 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private static async recogniseDictation(
-    data: Buffer,
+    data: Buffer<ArrayBufferLike>,
     authToken: string,
   ): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(
@@ -128,7 +128,7 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private static async runRequest<Output, Input = Output>(
-    data: Buffer,
+    data: Buffer<ArrayBufferLike>,
     path: "speech" | "dictation",
     schema: z.ZodType<Output, Input>,
     authToken: string,

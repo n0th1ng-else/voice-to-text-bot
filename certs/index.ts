@@ -17,6 +17,6 @@ export const httpsOptions: HttpsOptions = {
 };
 
 export type HttpsOptions = {
-  cert?: Buffer;
-  key?: Buffer;
+  cert?: Buffer<ArrayBuffer>;
+  key?: Buffer<ArrayBuffer>;
 };

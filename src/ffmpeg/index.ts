@@ -86,7 +86,7 @@ export const getWavFilePath = async (
 export const getWavBuffer = async (
   fileLink: string,
   isLocalFile: boolean,
-): Promise<Buffer> => {
+): Promise<Buffer<ArrayBufferLike>> => {
   const filename = await getWavFilePath(fileLink, isLocalFile);
   const buffer = await readFileIntoBuffer(filename);
   await deleteFileIfExists(filename);

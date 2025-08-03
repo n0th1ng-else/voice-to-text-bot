@@ -33,7 +33,7 @@ export class WitAiError extends Error {
     return this;
   }
 
-  public setBufferLength(buff: Buffer): this {
+  public setBufferLength(buff: Buffer<ArrayBufferLike>): this {
     this.bufferLength = buff?.length ?? -1;
     return this;
   }

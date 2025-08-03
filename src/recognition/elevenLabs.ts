@@ -45,15 +45,15 @@ export class ElevenLabsProvider extends VoiceConverter {
     return this.recognise(rawWav, lang);
   }
 
-  private async recognise(data: Buffer, lang: LanguageCode): Promise<string> {
+  private async recognise(
+    buffer: Buffer<ArrayBufferLike>,
+    lang: LanguageCode,
+  ): Promise<string> {
     const duration = new TimeMeasure();
-    const audioBlob = new Blob([data], {
-      type: "audio/wav",
-    });
 
     const recognition = await this.client.speechToText.convert(
       {
-        file: audioBlob,
+        file: buffer,
         modelId: "scribe_v1",
         tagAudioEvents: false, // Tag audio events like laughter, applause, etc.
         languageCode: convertLanguageCodeToISO(lang),
