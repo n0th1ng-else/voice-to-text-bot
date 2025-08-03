@@ -5,6 +5,7 @@ import {
   type TgWebHook,
   TgWebHookSchema,
   TgSetWebHookSchema,
+  TgAnswerSetCommands,
 } from "./updates-types.js";
 
 export class TelegramUpdatesApi {
@@ -25,8 +26,13 @@ export class TelegramUpdatesApi {
   }
 
   public setMyCommands(commands: BotCommandDto[]): Promise<boolean> {
-    return this.client.request<boolean, BotCommandListDto>("setMyCommands", {
+    const data: BotCommandListDto = {
       commands,
-    });
+    };
+    return this.client.requestValidate(
+      "setMyCommands",
+      TgAnswerSetCommands,
+      data,
+    );
   }
 }

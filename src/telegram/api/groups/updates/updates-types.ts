@@ -30,3 +30,7 @@ const BotCommandListSchema = z
   .describe("Telegram bot command list schema");
 
 export type BotCommandListDto = z.infer<typeof BotCommandListSchema>;
+
+export const TgAnswerSetCommands = z
+  .boolean()
+  .describe("Telegram answer on bot set commands");
