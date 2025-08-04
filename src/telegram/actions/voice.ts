@@ -20,6 +20,7 @@ import {
   trackUserActivity,
   trackVoiceDuration,
 } from "../../monitoring/newrelic.js";
+import { getConverterType } from "../../subscription/utils.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -82,9 +83,10 @@ export class VoiceAction extends GenericAction {
           return Promise.reject(new Error("Voice converters are not set!"));
         }
 
+        const converter = getConverterType(model);
+
         return Promise.all([
-          // TODO detect premium user and use this.converters.advanced
-          this.converters.basic.transformToText(
+          this.converters[converter].transformToText(
             fileLink,
             lang,
             {

@@ -1,4 +1,7 @@
-import type { VoiceConverterProvider } from "./recognition/types.js";
+import type {
+  ConverterType,
+  VoiceConverterProvider,
+} from "./recognition/types.js";
 import type { PaymentChargeId } from "./telegram/api/core.js";
 
 const GITHUB_PROJECT = "https://github.com/n0th1ng-else/voice-to-text-bot";
@@ -77,10 +80,7 @@ export const donationLevels = {
   ],
 };
 
-export const VOICE_PROVIDERS: {
-  basic: VoiceConverterProvider;
-  advanced: VoiceConverterProvider;
-} = {
-  basic: "WITAI",
+export const VOICE_PROVIDERS: Record<ConverterType, VoiceConverterProvider> = {
+  main: "WITAI",
   advanced: "11LABS",
 };

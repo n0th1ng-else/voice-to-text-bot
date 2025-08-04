@@ -42,7 +42,6 @@ export type ConverterMeta = {
   prefix: string;
 };
 
-export type VoiceConverters = {
-  basic: VoiceConverter;
-  advanced: VoiceConverter;
-};
+export type ConverterType = "main" | "advanced";
+
+export type VoiceConverters = Record<ConverterType, VoiceConverter>;

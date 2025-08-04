@@ -67,12 +67,12 @@ const getVoiceConverterInstance = async (
 };
 
 export const getVoiceConverterInstances = async (
-  basicProvider: VoiceConverterProvider,
+  mainProvider: VoiceConverterProvider,
   advancedProvider: VoiceConverterProvider,
   environment: SupportedEnvironment,
 ): Promise<VoiceConverters> => {
   return {
-    basic: await getVoiceConverterInstance(basicProvider, environment),
+    main: await getVoiceConverterInstance(mainProvider, environment),
     advanced: await getVoiceConverterInstance(advancedProvider, environment),
   };
 };
