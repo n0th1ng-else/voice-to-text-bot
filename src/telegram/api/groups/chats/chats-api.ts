@@ -1,5 +1,9 @@
 import { TelegramBaseApi } from "../core.js";
-import { type MessageDto, type TgMessage } from "../../types.js";
+import {
+  type MessageDto,
+  type TgMessage,
+  TgMessageSchema,
+} from "../../types.js";
 import {
   type EditMessageDto,
   type TgMessageOptions,
@@ -43,8 +47,9 @@ export class TelegramChatsApi {
       };
     }
 
-    return this.client.request<TgMessage, MessageDto>(
+    return this.client.requestValidate(
       "sendMessage",
+      TgMessageSchema,
       data,
       chatId,
     );
@@ -72,8 +77,9 @@ export class TelegramChatsApi {
       };
     }
 
-    return this.client.request<TgMessage, EditMessageDto>(
+    return this.client.requestValidate(
       "editMessageText",
+      TgMessageSchema,
       data,
       chatId,
     );

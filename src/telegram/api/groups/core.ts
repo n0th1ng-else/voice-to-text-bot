@@ -34,6 +34,10 @@ export class TelegramBaseApi {
     this.errorReflector = errorReflector;
   }
 
+  public getApiUrl(methodName: string): string {
+    return `/${TelegramBaseApi.path}${this.apiToken}/${methodName}`;
+  }
+
   public async requestValidate<Output, Input = Output, Data = unknown>(
     methodName: string,
     schema: z.ZodType<Output, Input>,
@@ -44,10 +48,7 @@ export class TelegramBaseApi {
     return schema.parse(result);
   }
 
-  /**
-   * @deprecated Use requestValidate instead
-   */
-  public request<Response, Data>(
+  private request<Response, Data>(
     methodName: string,
     data?: Data,
     chatId?: ChatId,
@@ -86,9 +87,5 @@ export class TelegramBaseApi {
         throw tgError;
       },
     );
-  }
-
-  public getApiUrl(methodName: string): string {
-    return `/${TelegramBaseApi.path}${this.apiToken}/${methodName}`;
   }
 }

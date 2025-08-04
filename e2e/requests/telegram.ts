@@ -19,15 +19,34 @@ import {
 import { getBotMenuCommands } from "../../src/telegram/data.js";
 import { TelegramButtonModel } from "../../src/telegram/types.js";
 import { parsePaymentPayload } from "../../src/telegram/helpers.js";
-import type { TgUpdate } from "../../src/telegram/api/types.js";
+import type { TgMessage, TgUpdate } from "../../src/telegram/api/types.js";
 import type { LanguageCode } from "../../src/recognition/types.js";
 import type { ChatId } from "../../src/telegram/api/core.js";
-import { asUpdateId__test } from "../../src/testUtils/types.js";
+import {
+  asChatId__test,
+  asMessageId__test,
+  asUpdateId__test,
+} from "../../src/testUtils/types.js";
 
 const text = getTranslator();
 
 const makeTelegramResponse = <D>(result?: D, ok = true) =>
   JSON.stringify({ ok, result });
+
+const makeSampleTelegramMessageResponse = (
+  chatId: unknown,
+  messageId?: unknown,
+): TgMessage => {
+  const msgId = messageId ?? 124235;
+  return {
+    message_id: asMessageId__test(msgId as number),
+    date: new Date().getTime(),
+    chat: {
+      id: asChatId__test(chatId as number),
+      type: "private",
+    },
+  };
+};
 
 export const sendTelegramMessage = (
   host: RequestAgent,
@@ -124,7 +143,9 @@ export const mockTgReceiveRawMessage = (
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(message);
       resolve();
-      return makeTelegramResponse();
+      return makeTelegramResponse<TgMessage>(
+        makeSampleTelegramMessageResponse(answer.chat_id),
+      );
     });
   });
 };
@@ -195,7 +216,9 @@ export const mockTgReceiveMessage = (
         expect(answer.reply_markup).not.toBeDefined();
       }
       resolve(prefixId);
-      return makeTelegramResponse();
+      return makeTelegramResponse<TgMessage>(
+        makeSampleTelegramMessageResponse(answer.chat_id),
+      );
     });
   });
 };
@@ -300,7 +323,9 @@ export const mockTgReceiveCallbackMessage = (
           expect(answer.reply_markup).not.toBeDefined();
         }
         resolve();
-        return makeTelegramResponse();
+        return makeTelegramResponse<TgMessage>(
+          makeSampleTelegramMessageResponse(answer.chat_id, answer.message_id),
+        );
       });
   });
 };
