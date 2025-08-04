@@ -44,7 +44,7 @@ export const prepareInstance = async (
   );
 
   const converters = await getVoiceConverterInstances(
-    VOICE_PROVIDERS.basic,
+    VOICE_PROVIDERS.main,
     VOICE_PROVIDERS.advanced,
     envy,
   );
