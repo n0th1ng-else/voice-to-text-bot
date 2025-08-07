@@ -18,6 +18,15 @@ spec:
         - image: "docker.pkg.github.com/n0th1ng-else/voice-to-text-bot/voice-to-speech-app:latest"
           imagePullPolicy: Always
           name: voice-to-speech
+          resources:
+            requests:
+              memory: "400Mi"
+              cpu: "100m"
+              ephemeral-storage: "1536Mi"
+            limits:
+              memory: "512Mi"
+              cpu: "300m"
+              ephemeral-storage: "2048Mi"
           ports:
             - name: app-port
               containerPort: 8080

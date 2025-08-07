@@ -5,7 +5,6 @@ import type { ValueOf } from "../common/types.js";
 import { type ChatId, TgChatId } from "./api/core.js";
 import type { TgMessageOptions } from "./api/groups/chats/chats-types.js";
 import type { BotCommandType } from "./commands.js";
-import type { TelegramMessagePrefix } from "./models/messagePrefix.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -30,16 +29,6 @@ export type MessageOptions = {
   lang: LanguageCode;
   options?: TgMessageOptions;
 };
-
-export class BotLangData {
-  public readonly langId: LanguageCode;
-  public readonly prefix: TelegramMessagePrefix;
-
-  constructor(langId: LanguageCode, prefix: TelegramMessagePrefix) {
-    this.langId = langId;
-    this.prefix = prefix;
-  }
-}
 
 export class BotCommandOption {
   public readonly description: string;
