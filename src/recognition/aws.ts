@@ -238,38 +238,32 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private async getJob(
-    name: string,
-  ): Promise<
-    { isExists: true; job: AWSJob } | { isExists: false; err: unknown }
-  > {
+  private async getJob(name: string): Promise<JobResponse> {
     logger.info("Check the job", name);
-    return new Promise<AWSJob>((resolve, reject) => {
+    return new Promise<JobResponse>((resolve) => {
       this.service.getTranscriptionJob(
         {
           TranscriptionJobName: name,
         },
         (err, data) => {
           if (err) {
-            reject(err);
+            resolve({
+              isExists: false,
+              err,
+            } as const);
             return;
           }
 
-          resolve(data);
+          resolve({
+            isExists: true,
+            job: data,
+          } as const);
         },
       );
-    })
-      .then((job) => {
-        return {
-          isExists: true,
-          job,
-        } as const;
-      })
-      .catch((err: unknown) => {
-        return {
-          isExists: false,
-          err,
-        } as const;
-      });
+    });
   }
 }
+
+type JobResponse =
+  | { isExists: true; job: AWSJob }
+  | { isExists: false; err: unknown };
