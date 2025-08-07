@@ -10,7 +10,7 @@ import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";
 import { type TelegramMessagePrefix, VoiceContentReason } from "../types.js";
-import type { BotMessageModel } from "../model.js";
+import type { BotMessageModel } from "../models/botMessage.js";
 import { getFullFileName } from "../../files/index.js";
 import type { TgMessage } from "../api/types.js";
 import type { FileId } from "../api/core.js";

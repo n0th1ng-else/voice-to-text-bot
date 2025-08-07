@@ -4,7 +4,7 @@ import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { type TelegramMessagePrefix, VoiceContentReason } from "../types.js";
-import type { BotMessageModel } from "../model.js";
+import type { BotMessageModel } from "../models/botMessage.js";
 import type { TgMessage } from "../api/types.js";
 import { getSupportedAudioFormats } from "../../text/utils.js";
 

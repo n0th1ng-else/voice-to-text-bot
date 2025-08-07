@@ -5,10 +5,10 @@ import type {
   MessageThreadId,
   PaymentChargeId,
   UserId,
-} from "./api/core.js";
-import type { LanguageCode } from "../recognition/types.js";
-import type { AnalyticsData } from "../analytics/ga/types.js";
-import type { TgMessage } from "./api/types.js";
+} from "../api/core.js";
+import type { LanguageCode } from "../../recognition/types.js";
+import type { AnalyticsData } from "../../analytics/ga/types.js";
+import type { TgMessage } from "../api/types.js";
 import {
   getChatId,
   getChatType,
@@ -22,9 +22,9 @@ import {
   isChatGroup,
   getVoiceType,
   parsePaymentPayload,
-} from "./helpers.js";
-import type { ChatType, VoiceType } from "./types.js";
-import type { Currency } from "./api/groups/payments/payments-types.js";
+} from "../helpers.js";
+import type { ChatType, VoiceType } from "../types.js";
+import type { Currency } from "../api/groups/payments/payments-types.js";
 
 export class BotMessageModel {
   public readonly id: MessageId;

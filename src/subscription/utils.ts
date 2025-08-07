@@ -1,5 +1,5 @@
 import type { ConverterType, LanguageCode } from "../recognition/types.js";
-import type { BotMessageModel } from "../telegram/model.js";
+import type { BotMessageModel } from "../telegram/models/botMessage.js";
 import type { UserId } from "../telegram/api/core.js";
 
 const FREE_LANGUAGES: readonly LanguageCode[] = ["en-US", "ru-RU"];

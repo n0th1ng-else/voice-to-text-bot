@@ -2,7 +2,7 @@ import { GenericAction } from "./common.js";
 import { TelegramButtonModel, TelegramMessagePrefix } from "../types.js";
 import { BotCommand } from "../commands.js";
 import { isCommandMessage } from "../commandsChecker.js";
-import { BotMessageModel } from "../model.js";
+import { BotMessageModel } from "../models/botMessage.js";
 import { getBotLogo, getPaymentInvoiceData, isStars } from "../helpers.js";
 import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";

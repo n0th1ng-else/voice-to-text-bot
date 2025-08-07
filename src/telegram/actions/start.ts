@@ -5,7 +5,7 @@ import { TranslationKeys } from "../../text/types.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { type TelegramMessagePrefix } from "../types.js";
-import type { BotMessageModel } from "../model.js";
+import type { BotMessageModel } from "../models/botMessage.js";
 import type { TgMessage } from "../api/types.js";
 import { trackUserActivity } from "../../monitoring/newrelic.js";
 
