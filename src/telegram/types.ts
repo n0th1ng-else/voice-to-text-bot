@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { nanoid } from "nanoid";
-import { Logger } from "../logger/index.js";
 import { getTranslator } from "../text/index.js";
 import type { LanguageCode } from "../recognition/types.js";
 import type { ValueOf } from "../common/types.js";
 import { type ChatId, TgChatId } from "./api/core.js";
 import type { TgMessageOptions } from "./api/groups/chats/chats-types.js";
 import type { BotCommandType } from "./commands.js";
+import type { TelegramMessagePrefix } from "./models/messagePrefix.js";
 
 export const VoiceContentReason = {
   Ok: "Ok",
@@ -31,20 +30,6 @@ export type MessageOptions = {
   lang: LanguageCode;
   options?: TgMessageOptions;
 };
-
-export class TelegramMessagePrefix {
-  public readonly chatId: ChatId;
-  public readonly id: string;
-
-  constructor(chatId: ChatId, id = nanoid(10)) {
-    this.chatId = chatId;
-    this.id = id;
-  }
-
-  public getPrefix(): string {
-    return `[Id=${Logger.y(this.id)}] [ChatId=${Logger.y(this.chatId)}]`;
-  }
-}
 
 export class BotLangData {
   public readonly langId: LanguageCode;

@@ -7,7 +7,7 @@ import {
 import { Logger } from "../logger/index.js";
 import { type VoiceConverters } from "../recognition/types.js";
 import { TranslationKeys } from "../text/types.js";
-import { TelegramMessagePrefix } from "./types.js";
+import { TelegramMessagePrefix } from "./models/messagePrefix.js";
 import { BotMessageModel } from "./models/botMessage.js";
 import { isMessageSupported } from "./helpers.js";
 import { runPromiseWithRetry } from "../common/helpers.js";

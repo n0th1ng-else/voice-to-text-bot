@@ -1,7 +1,7 @@
 import { GenericAction } from "./common.js";
 import { Logger } from "../../logger/index.js";
 import { parsePaymentPayload } from "../helpers.js";
-import { TelegramMessagePrefix } from "../types.js";
+import { TelegramMessagePrefix } from "../models/messagePrefix.js";
 import type { BotMessageModel } from "../models/botMessage.js";
 import type { TgCheckoutQuery, TgMessage } from "../api/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";

@@ -5,7 +5,7 @@ import { TranslationKeys } from "../../text/types.js";
 import { githubUrl, officialChannelAccount } from "../../const.js";
 import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
-import { type TelegramMessagePrefix } from "../types.js";
+import type { TelegramMessagePrefix } from "../models/messagePrefix.js";
 import type { BotMessageModel } from "../models/botMessage.js";
 import type { TgMessage } from "../api/types.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
