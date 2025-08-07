@@ -1,4 +1,4 @@
-import type { BotMessageModel } from "../telegram/model.js";
+import type { BotMessageModel } from "../telegram/models/botMessage.js";
 
 export const isDonation = (mdl: BotMessageModel): boolean => {
   const isPayment = Boolean(mdl.paymentChargeId);

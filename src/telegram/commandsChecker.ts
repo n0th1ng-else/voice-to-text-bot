@@ -1,5 +1,5 @@
 import { telegramBotName } from "../env.js";
-import type { BotMessageModel } from "./model.js";
+import type { BotMessageModel } from "./models/botMessage.js";
 import type { TgMessage } from "./api/types.js";
 import type { BotCommandType } from "./commands.js";
 

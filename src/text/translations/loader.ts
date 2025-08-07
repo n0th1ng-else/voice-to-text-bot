@@ -90,7 +90,9 @@ export const createTranslationsFileForLocale = (lang: string): void => {
     : "{}";
   const data: Record<string, string> = JSON.parse(oldContent);
 
-  const translationKeys = Object.values(TranslationKeys).sort();
+  const translationKeys = Object.values(TranslationKeys).sort((a, b) =>
+    a.localeCompare(b),
+  );
   const content = translationKeys.reduce<Partial<Record<TranslationKey, "">>>(
     (acc, key) => {
       return {
