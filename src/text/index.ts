@@ -88,10 +88,7 @@ const initTranslations = (): Translator => {
 let translatorSingleton: undefined | Translator = undefined;
 
 export const getTranslator = (): Translator => {
-  if (!translatorSingleton) {
-    translatorSingleton = initTranslations();
-  }
-
+  translatorSingleton ??= initTranslations();
   return translatorSingleton;
 };
 
