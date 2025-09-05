@@ -65,6 +65,9 @@ export class ElevenLabsProvider extends VoiceConverter {
     );
 
     trackRecognitionTime("11LABS", duration.getMs());
-    return recognition.text;
+    if ("text" in recognition) {
+      return recognition.text;
+    }
+    throw new Error("Wrong response payload");
   }
 }
