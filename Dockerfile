@@ -1,4 +1,4 @@
-FROM node:24.11.0-slim AS builder
+FROM node:24.11.0 AS builder
 
 ENV NODE_ENV=production
 
