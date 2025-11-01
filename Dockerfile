@@ -1,4 +1,4 @@
-FROM node:22.19.0-slim AS builder
+FROM node:24.11.0-slim AS builder
 
 ENV NODE_ENV=production
 
@@ -21,7 +21,7 @@ COPY ./copy-files.ts $APP_DIR
 
 RUN pnpm run build
 
-FROM node:22.19.0-slim
+FROM node:24.11.0-slim
 
 EXPOSE 8080
 
