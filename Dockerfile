@@ -2,9 +2,11 @@ FROM node:24.11.0-slim AS builder
 
 ENV NODE_ENV=production
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get --no-install-recommends install -y \
     python3 make g++ \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHON=python3
 
 ARG APP_DIR=/usr/src/app/
 
