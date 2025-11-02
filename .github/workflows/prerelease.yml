@@ -19,7 +19,7 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Install NodeJS and NPM modules
         uses: ./.github/actions/npm
@@ -43,10 +43,10 @@ jobs:
         run: echo "Picked the app version ${GITHUB_SHA}"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Create Sentry release
-        uses: getsentry/action-release@v3.1.1
+        uses: getsentry/action-release@128c5058bbbe93c8e02147fe0a9c713f166259a6 # v3.4.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
@@ -62,7 +62,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: New Relic release marker
-        uses: newrelic/deployment-marker-action@v2.5.1
+        uses: newrelic/deployment-marker-action@d88a59ea8f713ad6935e60de27273157790b1e3b # v2.6.2
         with:
           apiKey: ${{ secrets.NEWRELIC_API_KEY }}
           region: "EU"
