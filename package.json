@@ -44,7 +44,7 @@
     "@google-cloud/speech": "4.5.5",
     "@mtcute/node": "0.26.3",
     "@ngrok/ngrok": "1.5.2",
-    "@sentry/node": "10.22.0",
+    "@sentry/node": "10.27.0",
     "@sentry/profiling-node": "10.22.0",
     "aws-sdk": "2.1310.0",
     "axios": "1.13.1",
