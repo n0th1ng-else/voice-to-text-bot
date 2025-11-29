@@ -26,10 +26,7 @@ export const getMB = (mb: number): number => {
   return SIZE_UNIT * SIZE_UNIT * mb;
 };
 
-export const printCurrentMemoryStat = async (
-  limit?: number,
-  offset = 15,
-): Promise<number> => {
+export const printCurrentMemoryStat = async (limit?: number, offset = 15): Promise<number> => {
   return Promise.resolve().then(() => {
     const stat = getMemoryUsageMb();
     const line = `Current usage [rss=${stat.rss}Mb] [heapTotal=${stat.heapTotal}Mb] [heapUsed=${stat.heapUsed}Mb]`;

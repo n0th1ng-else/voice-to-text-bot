@@ -46,18 +46,10 @@ export class TelegramPaymentsApi {
       data.message_thread_id = opts.forumThreadId;
     }
 
-    return this.client.requestValidate(
-      "sendInvoice",
-      TgMessageSchema,
-      data,
-      opts.chatId,
-    );
+    return this.client.requestValidate("sendInvoice", TgMessageSchema, data, opts.chatId);
   }
 
-  public createInvoiceLink(
-    chatId: ChatId,
-    opts: TgSubscription,
-  ): Promise<string> {
+  public createInvoiceLink(chatId: ChatId, opts: TgSubscription): Promise<string> {
     const data: SubscriptionDto = {
       title: opts.title,
       description: opts.description,
@@ -76,12 +68,7 @@ export class TelegramPaymentsApi {
       photo_height: opts.photo.height,
       start_parameter: opts.meta,
     };
-    return this.client.requestValidate(
-      "createInvoiceLink",
-      TgSubscriptionUrlSchema,
-      data,
-      chatId,
-    );
+    return this.client.requestValidate("createInvoiceLink", TgSubscriptionUrlSchema, data, chatId);
   }
 
   public refundStarPayment(
@@ -123,11 +110,7 @@ export class TelegramPaymentsApi {
     );
   }
 
-  public answerPreCheckoutQuery(
-    chatId: ChatId,
-    queryId: string,
-    error?: string,
-  ): Promise<boolean> {
+  public answerPreCheckoutQuery(chatId: ChatId, queryId: string, error?: string): Promise<boolean> {
     const data: PreCheckoutQueryDto = {
       pre_checkout_query_id: queryId,
       ok: !error,

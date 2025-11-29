@@ -1,22 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
-import axios, {
-  AxiosError,
-  type AxiosRequestConfig,
-  AxiosHeaders,
-} from "axios";
+import axios, { AxiosError, type AxiosRequestConfig, AxiosHeaders } from "axios";
 import { requestHealthData } from "./api.js";
 import { type HealthDto, HealthSsl, HealthStatus } from "./types.js";
 
-const mockRequest = (
-  fn: (config?: AxiosRequestConfig) => Promise<HealthDto>,
-) => {
-  vi.spyOn(axios, "request").mockImplementationOnce(
-    (config?: AxiosRequestConfig) => {
-      expect(config?.method).toBe("GET");
-      expect(config?.responseType).toBe("json");
-      return Promise.resolve().then(() => fn(config));
-    },
-  );
+const mockRequest = (fn: (config?: AxiosRequestConfig) => Promise<HealthDto>) => {
+  vi.spyOn(axios, "request").mockImplementationOnce((config?: AxiosRequestConfig) => {
+    expect(config?.method).toBe("GET");
+    expect(config?.responseType).toBe("json");
+    return Promise.resolve().then(() => fn(config));
+  });
 };
 
 const TEST_URL = "https://google.com";
@@ -71,23 +63,17 @@ describe("requestHealthData", () => {
   });
 
   it("should construct health error with custom message", async () => {
-    const errCause = new AxiosError(
-      "something went wrong...",
-      "400",
-      undefined,
-      undefined,
-      {
-        status: 400,
-        config: {
-          headers: new AxiosHeaders(),
-        },
-        headers: {},
-        statusText: "Bad Request",
-        data: {
-          foo: "bar",
-        },
+    const errCause = new AxiosError("something went wrong...", "400", undefined, undefined, {
+      status: 400,
+      config: {
+        headers: new AxiosHeaders(),
       },
-    );
+      headers: {},
+      statusText: "Bad Request",
+      data: {
+        foo: "bar",
+      },
+    });
     mockRequest(() => Promise.reject(errCause));
 
     try {

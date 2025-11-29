@@ -8,28 +8,18 @@ import type { TgMessage } from "../api/types.js";
 const logger = new Logger("telegram-bot");
 
 export class IgnoreAction extends GenericAction {
-  public async runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public async runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addFirstVisit();
     mdl.analytics.addPageVisit();
     logger.warn(`${prefix.getPrefix()} Chat is in the ignore list, skipping`, {
       chatId: mdl.chatId,
     });
     return collectAnalytics(
-      mdl.analytics.setCommand(
-        "/ignore",
-        "Chat is in the ignore list",
-        String(mdl.chatId),
-      ),
+      mdl.analytics.setCommand("/ignore", "Chat is in the ignore list", String(mdl.chatId)),
     );
   }
 
-  public async runCondition(
-    _msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(_msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     try {
       const row = await this.stat.getIgnoredChatRow(mdl.chatId);
       if (!row) {

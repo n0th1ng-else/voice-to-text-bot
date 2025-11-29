@@ -21,9 +21,7 @@ class DbCore {
     mainClient?: DbClient,
   ) {
     this.main = mainClient ?? new DbClient(main, threadId);
-    this.clients = configs.map((config) =>
-      new DbClient(config, threadId).setSecondary(),
-    );
+    this.clients = configs.map((config) => new DbClient(config, threadId).setSecondary());
   }
 
   public async init(): Promise<void> {
@@ -53,10 +51,7 @@ class DbCore {
     return row;
   }
 
-  public async updateLanguage(
-    chatId: ChatId,
-    langId: LanguageCode,
-  ): Promise<UsageRowScheme> {
+  public async updateLanguage(chatId: ChatId, langId: LanguageCode): Promise<UsageRowScheme> {
     const row = await this.main.usages.updateLangId(chatId, langId);
     return row;
   }
@@ -66,11 +61,7 @@ class DbCore {
     username: string,
     langId: LanguageCode,
   ): Promise<UsageRowScheme> {
-    const row = await this.main.usages.updateUsageCount(
-      chatId,
-      username,
-      langId,
-    );
+    const row = await this.main.usages.updateUsageCount(chatId, username, langId);
     return row;
   }
 
@@ -107,11 +98,7 @@ class DbCore {
     status: DonationStatus,
     paymentChargeId?: PaymentChargeId,
   ): Promise<DonationRowScheme> {
-    const row = await this.main.donations.updateRow(
-      donationId,
-      status,
-      paymentChargeId,
-    );
+    const row = await this.main.donations.updateRow(donationId, status, paymentChargeId);
     return row;
   }
 
@@ -128,9 +115,7 @@ class DbCore {
     return this.main.donations.getRowId(row);
   }
 
-  public async getIgnoredChatRow(
-    chatId: ChatId,
-  ): Promise<IgnoredChatsRowScheme | null> {
+  public async getIgnoredChatRow(chatId: ChatId): Promise<IgnoredChatsRowScheme | null> {
     return this.main.ignoredChats.getRow(chatId);
   }
 

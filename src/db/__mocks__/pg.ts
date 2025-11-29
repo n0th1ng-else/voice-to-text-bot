@@ -41,20 +41,13 @@ export class Pool extends pg.Pool {
     return;
   }
 
-  public query(
-    queryStream: AnyTypeForMock,
-    values?: AnyTypeForMock,
-  ): Promise<AnyTypeForMock> {
-    const queryRecord = this.mockQueue.find(
-      (mockItem) => mockItem.sql === queryStream,
-    );
+  public query(queryStream: AnyTypeForMock, values?: AnyTypeForMock): Promise<AnyTypeForMock> {
+    const queryRecord = this.mockQueue.find((mockItem) => mockItem.sql === queryStream);
     if (!queryRecord) {
       return Promise.reject(new Error(`Unexpected sql ${queryStream}`));
     }
 
-    this.mockQueue = this.mockQueue.filter(
-      (mockItem) => mockItem.id !== queryRecord.id,
-    );
+    this.mockQueue = this.mockQueue.filter((mockItem) => mockItem.id !== queryRecord.id);
     return queryRecord.handler(values);
   }
 
@@ -86,14 +79,9 @@ export const defaults = {
 class MockSql {
   public readonly id = nanoid();
   public readonly sql: string;
-  public readonly handler: (
-    values: AnyTypeForMock[],
-  ) => Promise<AnyTypeForMock>;
+  public readonly handler: (values: AnyTypeForMock[]) => Promise<AnyTypeForMock>;
 
-  constructor(
-    sql: string,
-    handler: (values: AnyTypeForMock[]) => Promise<AnyTypeForMock>,
-  ) {
+  constructor(sql: string, handler: (values: AnyTypeForMock[]) => Promise<AnyTypeForMock>) {
     this.sql = sql;
     this.handler = handler;
   }
@@ -103,17 +91,11 @@ export const mockTableCreation = (testPool: Pool) => {
   testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
   testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
   testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
-  testPool.mockQuery(DonationsSql.migration_22032025_1, () =>
-    Promise.resolve(),
-  );
-  testPool.mockQuery(DonationsSql.migration_22032025_2, () =>
-    Promise.resolve(),
-  );
+  testPool.mockQuery(DonationsSql.migration_22032025_1, () => Promise.resolve());
+  testPool.mockQuery(DonationsSql.migration_22032025_2, () => Promise.resolve());
   testPool.mockQuery(UsedEmailsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(DurationsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(IgnoredChatsSql.createTable, () => Promise.resolve());
   testPool.mockQuery(SubscriptionsSql.createTable, () => Promise.resolve());
-  testPool.mockQuery(SubscriptionsSql.createUserIdAndEndDateIndex, () =>
-    Promise.resolve(),
-  );
+  testPool.mockQuery(SubscriptionsSql.createUserIdAndEndDateIndex, () => Promise.resolve());
 };

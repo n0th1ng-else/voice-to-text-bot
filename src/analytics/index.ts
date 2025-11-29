@@ -5,9 +5,7 @@ import { type AnalyticsData } from "./ga/types.js";
 
 const logger = new Logger("analytics");
 
-export const collectAnalytics = async (
-  analytics: AnalyticsData,
-): Promise<void> => {
+export const collectAnalytics = async (analytics: AnalyticsData): Promise<void> => {
   logger.debug("Collecting analytic data");
   const evts = analytics.getEvents();
   const id = analytics.getId();

@@ -17,12 +17,7 @@ const spawnInstance = (host: string, time: number): void => {
 export const run = async (): Promise<void> => {
   const launchTime = new Date().getTime();
 
-  const host = await getHostName(
-    envy.appPort,
-    envy.selfUrl,
-    envy.enableSSL,
-    envy.ngRokToken,
-  );
+  const host = await getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken);
 
   let clusterSize = envy.clusterSize;
   const isCLusterSizeValid = clusterSize && clusterSize > 0;

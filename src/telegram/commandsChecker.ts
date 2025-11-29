@@ -20,8 +20,5 @@ export const isCommandMessage = (
     return false;
   }
 
-  return (
-    model.isGroup &&
-    msg.text.toLowerCase() === `${command}@${telegramBotName.toLowerCase()}`
-  );
+  return model.isGroup && msg.text.toLowerCase() === `${command}@${telegramBotName.toLowerCase()}`;
 };

@@ -18,18 +18,13 @@ describe("common helpers", () => {
     it("should return the parts of the text if the text is longer than max size", () => {
       const text = "one two three";
       const maxLength = 7;
-      expect(splitTextIntoParts(text, "en-US", maxLength)).toEqual([
-        "one two",
-        "three",
-      ]);
+      expect(splitTextIntoParts(text, "en-US", maxLength)).toEqual(["one two", "three"]);
     });
 
     it("should not return the trailing whitespace in the last part", () => {
       const text = "one two three ";
       const maxLength = text.length - 1;
-      expect(splitTextIntoParts(text, "en-US", maxLength)).toEqual([
-        "one two three",
-      ]);
+      expect(splitTextIntoParts(text, "en-US", maxLength)).toEqual(["one two three"]);
     });
   });
 });

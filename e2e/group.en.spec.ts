@@ -1,33 +1,14 @@
 import request from "supertest";
 import nock from "nock";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
-import {
-  type InjectedTestFn,
-  injectTestDependencies,
-} from "./helpers/dependencies.js";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
+import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { setCurrentMockFileId } from "../src/telegram/api/__mocks__/tgMTProtoApi.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import {
-  asChatId__test,
-  asMessageId__test,
-  asFileId__test,
-} from "../src/testUtils/types.js";
+import { asChatId__test, asMessageId__test, asFileId__test } from "../src/testUtils/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
@@ -50,8 +31,7 @@ const dbConfig = {
 const testPool = new MockPool(dbConfig);
 mockTableCreation(testPool);
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 // Define dependencies
 let hostUrl: string;
@@ -205,41 +185,28 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          [
-            TranslationKeys.WelcomeMessage,
-            TranslationKeys.WelcomeMessageGroup,
-            TranslationKeys.WelcomeMessageMore,
-            TranslationKeys.DonateMessage,
-          ],
-        ),
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
+          TranslationKeys.WelcomeMessage,
+          TranslationKeys.WelcomeMessageGroup,
+          TranslationKeys.WelcomeMessageMore,
+          TranslationKeys.DonateMessage,
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
     });
 
     it("responds on a /start message with bot name", () => {
-      tgMessage.setText(
-        testMessageId,
-        `${BotCommand.Start}@${telegramBotName}`,
-      );
+      tgMessage.setText(testMessageId, `${BotCommand.Start}@${telegramBotName}`);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          [
-            TranslationKeys.WelcomeMessage,
-            TranslationKeys.WelcomeMessageGroup,
-            TranslationKeys.WelcomeMessageMore,
-            TranslationKeys.DonateMessage,
-          ],
-        ),
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
+          TranslationKeys.WelcomeMessage,
+          TranslationKeys.WelcomeMessageGroup,
+          TranslationKeys.WelcomeMessageMore,
+          TranslationKeys.DonateMessage,
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -278,10 +245,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on a /support message with bot name", () => {
-      tgMessage.setText(
-        testMessageId,
-        `${BotCommand.Support}@${telegramBotName}`,
-      );
+      tgMessage.setText(testMessageId, `${BotCommand.Support}@${telegramBotName}`);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -356,10 +320,7 @@ describe("[default language - english]", () => {
     it("responds on a /support message with author url and with bot name", () => {
       const authorUrl = "some-author-url";
       bot.setAuthor(authorUrl);
-      tgMessage.setText(
-        testMessageId,
-        `${BotCommand.Support}@${telegramBotName}`,
-      );
+      tgMessage.setText(testMessageId, `${BotCommand.Support}@${telegramBotName}`);
 
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
@@ -416,10 +377,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on a /lang message with bot name", () => {
-      tgMessage.setText(
-        testMessageId,
-        `${BotCommand.Language}@${telegramBotName}`,
-      );
+      tgMessage.setText(testMessageId, `${BotCommand.Language}@${telegramBotName}`);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -452,11 +410,7 @@ describe("[default language - english]", () => {
       ]).then(([prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId: LanguageCode = "ru-RU";
-        cbMessage.setLangCallback(
-          asMessageId__test(tgMessage.messageId + 1),
-          newLangId,
-          prefixId,
-        );
+        cbMessage.setLangCallback(asMessageId__test(tgMessage.messageId + 1), newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -472,10 +426,7 @@ describe("[default language - english]", () => {
     });
 
     it("changes language using the /lang callback message with bot name", () => {
-      tgMessage.setText(
-        testMessageId,
-        `${BotCommand.Language}@${telegramBotName}`,
-      );
+      tgMessage.setText(testMessageId, `${BotCommand.Language}@${telegramBotName}`);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -491,11 +442,7 @@ describe("[default language - english]", () => {
       ]).then(([prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId: LanguageCode = "ru-RU";
-        cbMessage.setLangCallback(
-          asMessageId__test(tgMessage.messageId + 1),
-          newLangId,
-          prefixId,
-        );
+        cbMessage.setLangCallback(asMessageId__test(tgMessage.messageId + 1), newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -581,10 +528,7 @@ describe("[default language - english]", () => {
     });
 
     it("responds on a /donate message with bot name", () => {
-      tgMessage.setText(
-        testMessageId,
-        `${BotCommand.Donate}@${telegramBotName}`,
-      );
+      tgMessage.setText(testMessageId, `${BotCommand.Donate}@${telegramBotName}`);
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
@@ -732,12 +676,7 @@ describe("[default language - english]", () => {
       return new Promise<void>((resolve, reject) => {
         const voiceFileId = asFileId__test("some-file-id");
         const voiceFileDuration = 59;
-        tgMessage.setVoice(
-          testMessageId,
-          voiceFileId,
-          voiceFileDuration,
-          "application/json",
-        );
+        tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration, "application/json");
 
         mockTgReceiveUnexpectedMessage(telegramServer, reject);
 
@@ -754,12 +693,7 @@ describe("[default language - english]", () => {
       return new Promise<void>((resolve, reject) => {
         const voiceFileId = asFileId__test("some-file-id");
         const voiceFileDuration = 59;
-        tgMessage.setAudio(
-          testMessageId,
-          voiceFileId,
-          voiceFileDuration,
-          "audio/flac",
-        );
+        tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration, "audio/flac");
 
         mockTgReceiveUnexpectedMessage(telegramServer, reject);
 

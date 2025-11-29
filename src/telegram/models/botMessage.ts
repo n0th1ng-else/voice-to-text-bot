@@ -76,9 +76,7 @@ export class BotMessageModel {
       this.forumThreadId = msg.message_thread_id;
     }
     this.chatType = getChatType(msg);
-    this.analytics = analytics
-      .setId(this.chatId)
-      .setLang(getRawUserLanguage(msg));
+    this.analytics = analytics.setId(this.chatId).setLang(getRawUserLanguage(msg));
   }
 
   public get name(): string {

@@ -14,11 +14,17 @@ const item: TestCacheData = { testId, testData };
 
 const testId2 = "some-id-2";
 const testData2 = "some-test-data-2";
-const item2: TestCacheData = { testId: testId2, testData: testData2 };
+const item2: TestCacheData = {
+  testId: testId2,
+  testData: testData2,
+};
 
 const testId3 = "some-id-3";
 const testData3 = "some-test-data-3";
-const item3: TestCacheData = { testId: testId3, testData: testData3 };
+const item3: TestCacheData = {
+  testId: testId3,
+  testData: testData3,
+};
 
 let cacheSize = 0;
 let cache: CacheProvider<TestCacheData, "testId">;
@@ -112,7 +118,10 @@ describe("[cache]", () => {
     cache.addItem(item);
     cache.addItem(item2);
 
-    const item3: TestCacheData = { testId, testData: testData3 };
+    const item3: TestCacheData = {
+      testId,
+      testData: testData3,
+    };
     cache.addItem(item3);
 
     expect(cache.getCacheSize()).toBe(2);

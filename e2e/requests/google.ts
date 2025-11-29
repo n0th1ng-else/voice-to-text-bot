@@ -34,11 +34,9 @@ export const mockSpeechRecognition = (text: string): nock.Scope => {
       ]
     : [];
   const scope = nock("https://speech.googleapis.com");
-  scope
-    .post("/$rpc/google.cloud.speech.v1.Speech/Recognize")
-    .reply(200, response, {
-      "Content-Type": "application/x-protobuf",
-      "Content-Encoding": "gzip",
-    });
+  scope.post("/$rpc/google.cloud.speech.v1.Speech/Recognize").reply(200, response, {
+    "Content-Type": "application/x-protobuf",
+    "Content-Encoding": "gzip",
+  });
   return scope;
 };

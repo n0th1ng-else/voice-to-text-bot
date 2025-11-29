@@ -2,10 +2,7 @@ import { expect } from "vitest";
 import { type Pool as MockPool } from "../../../src/db/__mocks__/pg.js";
 import { type BotStatRecordModel } from "../../helpers.js";
 import { DonationsSql } from "../../../src/db/sql/donations.sql.js";
-import {
-  type DonationRowScheme,
-  type DonationStatus,
-} from "../../../src/db/sql/donations.js";
+import { type DonationRowScheme, type DonationStatus } from "../../../src/db/sql/donations.js";
 import type { ChatId } from "../../../src/telegram/api/core.js";
 import type { Currency } from "../../../src/telegram/api/groups/payments/payments-types.js";
 import type { DonationId } from "../../../src/db/sql/types.js";

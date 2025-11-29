@@ -1,7 +1,4 @@
-import type {
-  ConverterType,
-  VoiceConverterProvider,
-} from "./recognition/types.js";
+import type { ConverterType, VoiceConverterProvider } from "./recognition/types.js";
 import type { PaymentChargeId } from "./telegram/api/core.js";
 
 const GITHUB_PROJECT = "https://github.com/n0th1ng-else/voice-to-text-bot";

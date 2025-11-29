@@ -25,10 +25,7 @@ export const captureError = (err: unknown): void => {
   captureException(err);
 };
 
-export const captureWarning = (
-  message: string,
-  context?: Record<string, unknown>,
-): void => {
+export const captureWarning = (message: string, context?: Record<string, unknown>): void => {
   if (!isEnabled()) {
     return;
   }
@@ -39,10 +36,7 @@ export const captureWarning = (
   });
 };
 
-export const addAttachment = (
-  filename: string,
-  data: string | Uint8Array,
-): void => {
+export const addAttachment = (filename: string, data: string | Uint8Array): void => {
   getCurrentScope().addAttachment({
     filename,
     data,
@@ -53,11 +47,7 @@ export const addAttachment = (
 /**
  * @see https://github.com/getsentry/sentry-javascript/pull/9138/files
  */
-const fetchPropFromUnknown = <T>(
-  obj: unknown,
-  prop: string,
-  defaultVal: T,
-): unknown => {
+const fetchPropFromUnknown = <T>(obj: unknown, prop: string, defaultVal: T): unknown => {
   // @ts-expect-error Sometimes we need this JS spice
   return obj && typeof obj === "object" && prop in obj ? obj[prop] : defaultVal;
 };

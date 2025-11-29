@@ -8,18 +8,11 @@ import {
   type VoiceType,
 } from "./types.js";
 import { type TgCallbackQuery, type TgMessage } from "./api/types.js";
-import {
-  DEFAULT_LANGUAGE,
-  type LanguageCode,
-  LanguageSchema,
-} from "../recognition/types.js";
+import { DEFAULT_LANGUAGE, type LanguageCode, LanguageSchema } from "../recognition/types.js";
 import { BOT_LOGO, supportedAudioFormats } from "../const.js";
 import { convertLanguageCodeFromISO } from "../recognition/common.js";
 import { type TgMedia } from "./api/groups/chats/chats-types.js";
-import type {
-  Currency,
-  TgPhotoDto,
-} from "./api/groups/payments/payments-types.js";
+import type { Currency, TgPhotoDto } from "./api/groups/payments/payments-types.js";
 import type { ChatId, FileId } from "./api/core.js";
 
 export const getVoiceType = (msg: TgMessage): VoiceType => {
@@ -53,10 +46,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   }
 
   if (typeof data.duration !== "number" || data.duration < 0) {
-    return new VoiceContentReasonModel(
-      VoiceContentReason.NoDuration,
-      data.duration,
-    );
+    return new VoiceContentReasonModel(VoiceContentReason.NoDuration, data.duration);
   }
 
   const mimeType = data.mime_type || "";
@@ -71,10 +61,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
 
   return isAudioSupported || isVideo
     ? new VoiceContentReasonModel(VoiceContentReason.Ok)
-    : new VoiceContentReasonModel(
-        VoiceContentReason.WrongMimeType,
-        data.mime_type,
-      );
+    : new VoiceContentReasonModel(VoiceContentReason.WrongMimeType, data.mime_type);
 };
 
 export const isMessageSupported = (msg: TgMessage): boolean => {
@@ -84,8 +71,7 @@ export const isMessageSupported = (msg: TgMessage): boolean => {
 
 export const getChatId = (msg: TgMessage): ChatId => msg.chat.id;
 
-export const isChatGroup = (msg: TgMessage): boolean =>
-  msg.chat.type !== "private";
+export const isChatGroup = (msg: TgMessage): boolean => msg.chat.type !== "private";
 
 export const getChatType = (msg: TgMessage): ChatType => {
   if (msg.is_topic_message && msg.message_thread_id) {
@@ -102,17 +88,14 @@ export const getUserName = (msg: TgMessage): string => {
 
 export const getFullUserName = (msg: TgMessage): string => {
   const fromUserFullName =
-    msg.from &&
-    [msg.from.first_name, msg.from.last_name].filter((k) => k).join(" ");
+    msg.from && [msg.from.first_name, msg.from.last_name].filter((k) => k).join(" ");
 
   return fromUserFullName || "";
 };
 
 export const getGroupName = (msg: TgMessage): string => {
   const chatName = msg.chat.title;
-  const chatFullName = [msg.chat.first_name, msg.chat.last_name]
-    .filter((k) => k)
-    .join(" ");
+  const chatFullName = [msg.chat.first_name, msg.chat.last_name].filter((k) => k).join(" ");
   return chatName || chatFullName || "";
 };
 
@@ -156,16 +139,11 @@ export const getUserLanguage = (msg: TgMessage): LanguageCode => {
   }
 };
 
-export const getRawUserLanguage = (
-  msg: TgMessage | TgCallbackQuery,
-): string => {
+export const getRawUserLanguage = (msg: TgMessage | TgCallbackQuery): string => {
   return msg.from?.language_code || "";
 };
 
-export const getLanguageByText = (
-  lang: string,
-  throwOnError = false,
-): LanguageCode => {
+export const getLanguageByText = (lang: string, throwOnError = false): LanguageCode => {
   try {
     const lng = LanguageSchema.parse(lang);
     return lng;

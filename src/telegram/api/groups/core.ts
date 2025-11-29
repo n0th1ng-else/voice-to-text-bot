@@ -58,10 +58,7 @@ export class TelegramBaseApi {
       (response) => {
         const answer = response.data;
         if (!answer.ok) {
-          const tgError = new TgError(
-            new Error(answer.description),
-            answer.description,
-          )
+          const tgError = new TgError(new Error(answer.description), answer.description)
             .setUrl(url, this.apiToken)
             .setErrorCode(answer.error_code)
             .setRetryAfter(answer?.parameters?.retry_after)

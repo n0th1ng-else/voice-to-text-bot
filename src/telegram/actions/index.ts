@@ -48,10 +48,7 @@ export class BotActions {
     this.donate.setPayment(payment);
   }
 
-  public async handleCallback(
-    msg: TgCallbackQuery,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  public async handleCallback(msg: TgCallbackQuery, analytics: AnalyticsData): Promise<void> {
     const message = msg.message;
     const data = msg.data;
 
@@ -60,9 +57,7 @@ export class BotActions {
       const msgError = new Error(errorMessage);
       logger.error(msgError.message, msgError);
       analytics.addError(errorMessage);
-      return collectAnalytics(
-        analytics.setCommand("/app", "Callback query error", "No message"),
-      );
+      return collectAnalytics(analytics.setCommand("/app", "Callback query error", "No message"));
     }
 
     if (!data) {
@@ -70,9 +65,7 @@ export class BotActions {
       const msgError = new Error(errorMessage);
       logger.error(msgError.message, msgError);
       analytics.addError(errorMessage);
-      return collectAnalytics(
-        analytics.setCommand("/app", "Callback query error", "No data"),
-      );
+      return collectAnalytics(analytics.setCommand("/app", "Callback query error", "No data"));
     }
 
     return Promise.resolve()
@@ -94,16 +87,11 @@ export class BotActions {
         const errorMessage = "Failed to execute callback query";
         logger.error(errorMessage, err);
         analytics.addError(errorMessage);
-        return collectAnalytics(
-          analytics.setCommand("/app", "Callback query error", "Unknown"),
-        );
+        return collectAnalytics(analytics.setCommand("/app", "Callback query error", "Unknown"));
       });
   }
 
-  public handleCheckout(
-    msg: TgCheckoutQuery,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  public handleCheckout(msg: TgCheckoutQuery, analytics: AnalyticsData): Promise<void> {
     return this.checkout.confirmCheckout(msg, analytics);
   }
 }

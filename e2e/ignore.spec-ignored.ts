@@ -1,31 +1,12 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
-import {
-  type InjectedTestFn,
-  injectTestDependencies,
-} from "./helpers/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
+import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import {
-  asChatId__test,
-  asMessageId__test,
-  asFileId__test,
-} from "../src/testUtils/types.js";
+import { asChatId__test, asMessageId__test, asFileId__test } from "../src/testUtils/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
@@ -38,8 +19,7 @@ const appPort = 3100;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 let testMessageId = asMessageId__test(0);
 let testChatId = asChatId__test(0);
@@ -142,12 +122,7 @@ describe("ignore chats", () => {
     expect(trackNotMatchedRoutes()).toBe(true);
   });
 
-  const chatTypes: readonly TgChatType[] = [
-    "private",
-    "group",
-    "supergroup",
-    "channel",
-  ] as const;
+  const chatTypes: readonly TgChatType[] = ["private", "group", "supergroup", "channel"] as const;
 
   chatTypes.forEach((type) => {
     it(`does not respond on a message without voice content in ${type} chat`, () => {
@@ -235,12 +210,7 @@ describe("ignore chats", () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
       const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        voiceFileDuration,
-        "broken/type",
-      );
+      tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration, "broken/type");
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
@@ -276,12 +246,7 @@ describe("ignore chats", () => {
       tgMessage = new TelegramMessageModel(testChatId, type);
       const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
-      tgMessage.setAudio(
-        testMessageId,
-        voiceFileId,
-        voiceFileDuration,
-        "broken/test",
-      );
+      tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration, "broken/test");
 
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),

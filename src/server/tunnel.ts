@@ -3,11 +3,7 @@ import { sSuffix } from "../text/utils.js";
 
 const logger = new Logger("tunnel");
 
-const createTunnel = async (
-  port: number,
-  enableSSL: boolean,
-  token?: string,
-): Promise<string> => {
+const createTunnel = async (port: number, enableSSL: boolean, token?: string): Promise<string> => {
   logger.info("Creating tunnel");
   const localHost = `${sSuffix("http", enableSSL)}://localhost:${port}`;
   const { forward } = await import("@ngrok/ngrok");

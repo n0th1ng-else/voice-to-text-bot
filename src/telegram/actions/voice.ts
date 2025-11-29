@@ -2,10 +2,7 @@ import { GenericAction } from "./common.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
-import {
-  type LanguageCode,
-  type VoiceConverters,
-} from "../../recognition/types.js";
+import { type LanguageCode, type VoiceConverters } from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";
@@ -28,10 +25,7 @@ const logger = new Logger("telegram-bot");
 export class VoiceAction extends GenericAction {
   private converters?: VoiceConverters;
 
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     trackProcessFile("progress");
     trackUserActivity({ activityType: "voice" }, mdl.userId);
@@ -41,9 +35,7 @@ export class VoiceAction extends GenericAction {
       .then((lang) => this.recogniseVoiceMessage(mdl, lang, prefix))
       .then(() => {
         trackFullRecognitionTime(duration.getMs());
-        return collectAnalytics(
-          mdl.analytics.setCommand("/voice", "Voice message", "Init"),
-        );
+        return collectAnalytics(mdl.analytics.setCommand("/voice", "Voice message", "Init"));
       });
   }
 
@@ -133,11 +125,7 @@ export class VoiceAction extends GenericAction {
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
-        trackVoiceDuration(
-          model.voiceType,
-          model.chatType,
-          model.voiceDuration,
-        );
+        trackVoiceDuration(model.voiceType, model.chatType, model.voiceDuration);
         return this.updateUsageCount(model, prefix);
       })
       .catch((err) => {
@@ -170,8 +158,7 @@ export class VoiceAction extends GenericAction {
         );
       })
       .catch((err) => {
-        const errorMessage =
-          "Unable to send a message that file is unable to recognize";
+        const errorMessage = "Unable to send a message that file is unable to recognize";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.addError(errorMessage);
       });
@@ -184,9 +171,7 @@ export class VoiceAction extends GenericAction {
     logger.info(`${prefix.getPrefix()} Fetching file link`);
 
     if (!model.voiceFileId) {
-      return Promise.reject(
-        new Error("Unable to find a voice file in the message"),
-      );
+      return Promise.reject(new Error("Unable to find a voice file in the message"));
     }
 
     const [fileLink, isLocalFile] = await this.bot.downloadFile(
@@ -236,10 +221,7 @@ export class VoiceAction extends GenericAction {
     });
   }
 
-  private updateUsageCount(
-    model: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  private updateUsageCount(model: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     logger.info(`${prefix.getPrefix()} Updating usage count`);
 
     return this.stat

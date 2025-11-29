@@ -6,14 +6,8 @@ import { getDb } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
 import { TelegramBotModel } from "../telegram/bot.js";
 import { ScheduleDaemon } from "../scheduler/index.js";
-import {
-  printCurrentMemoryStat,
-  sendMemoryStatAnalytics,
-} from "../memory/index.js";
-import {
-  printCurrentStorageUsage,
-  sendStorageStatAnalytics,
-} from "../storage/index.js";
+import { printCurrentMemoryStat, sendMemoryStatAnalytics } from "../memory/index.js";
+import { printCurrentStorageUsage, sendStorageStatAnalytics } from "../storage/index.js";
 import { StopListener } from "../process/index.js";
 import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
@@ -21,17 +15,12 @@ import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import { type BotServerModel, HealthStatus } from "./types.js";
 import { VOICE_PROVIDERS } from "../const.js";
-import {
-  trackApplicationErrors,
-  trackApplicationHealth,
-} from "../monitoring/newrelic.js";
+import { trackApplicationErrors, trackApplicationHealth } from "../monitoring/newrelic.js";
 import { requestHealthData } from "./api.js";
 
 const logger = new Logger("boot-server");
 
-export const prepareInstance = async (
-  threadId: number,
-): Promise<BotServerModel> => {
+export const prepareInstance = async (threadId: number): Promise<BotServerModel> => {
   logger.info("The server is starting...");
   trackApplicationErrors("Launch");
   const sslOptions = envy.enableSSL ? httpsOptions : undefined;
@@ -86,9 +75,7 @@ export const prepareInstance = async (
 
   return db
     .init()
-    .then(() =>
-      getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken),
-    )
+    .then(() => getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken))
     .then((host) => {
       logger.info(
         `Telling telegram our location is ${Logger.y(
@@ -107,12 +94,7 @@ export const prepareInstance = async (
 };
 
 export const prepareStopListener = async (): Promise<StopListener> => {
-  const selfUrl = await getHostName(
-    envy.appPort,
-    envy.selfUrl,
-    envy.enableSSL,
-    envy.ngRokToken,
-  );
+  const selfUrl = await getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken);
 
   const memoryDaemon = new ScheduleDaemon("memory", async () => {
     const value = await printCurrentMemoryStat(envy.memoryLimit);

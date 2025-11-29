@@ -1,12 +1,4 @@
-import {
-  vi,
-  expect,
-  afterEach,
-  it,
-  describe,
-  beforeAll,
-  afterAll,
-} from "vitest";
+import { vi, expect, afterEach, it, describe, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import nock from "nock";
 import { injectDependencies } from "../src/testUtils/dependencies.js";
@@ -24,8 +16,7 @@ const appPort = 3600;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 let testPool: MockPool;
 let telegramServer: nock.Scope;
@@ -91,11 +82,7 @@ describe("error cases", () => {
       mockTgSetCommands(telegramServer);
 
       const server = new BotServer(appPort, appVersion, webhookDoNotWait);
-      stopHandler = await server
-        .setSelfUrl(hostUrl)
-        .setBots([bot])
-        .setStat(db)
-        .start();
+      stopHandler = await server.setSelfUrl(hostUrl).setBots([bot]).setStat(db).start();
       await server.applyHostLocation();
     });
 

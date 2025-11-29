@@ -57,9 +57,7 @@ export class DbClient {
     this.initialized = configState !== "invalid";
     if (!this.initialized) {
       logger.error(
-        `Missing connection data for postgres server. Check the config for ${Logger.y(
-          domain,
-        )}`,
+        `Missing connection data for postgres server. Check the config for ${Logger.y(domain)}`,
         new Error("Missing connection data for postgres server", {
           cause: {
             domain,

@@ -46,9 +46,9 @@ describe("Subscriptions DB", () => {
     });
 
     it("can not get rows by userId", async () => {
-      await expect(
-        client.getRowsByUserId(asUserId__test(1231), 20),
-      ).rejects.toThrowError("The table subscriptions is not initialized yet");
+      await expect(client.getRowsByUserId(asUserId__test(1231), 20)).rejects.toThrowError(
+        "The table subscriptions is not initialized yet",
+      );
     });
 
     it("can not create row", async () => {
@@ -65,18 +65,16 @@ describe("Subscriptions DB", () => {
     });
 
     it("can not mark subscription is canceled", async () => {
-      await expect(
-        client.markAsCanceled(asSubscriptionId__test("subscr-id")),
-      ).rejects.toThrowError("The table subscriptions is not initialized yet");
+      await expect(client.markAsCanceled(asSubscriptionId__test("subscr-id"))).rejects.toThrowError(
+        "The table subscriptions is not initialized yet",
+      );
     });
   });
 
   describe("initialized", () => {
     beforeEach(() => {
       testPool.mockQuery(SubscriptionsSql.createTable, () => Promise.resolve());
-      testPool.mockQuery(SubscriptionsSql.createUserIdAndEndDateIndex, () =>
-        Promise.resolve(),
-      );
+      testPool.mockQuery(SubscriptionsSql.createUserIdAndEndDateIndex, () => Promise.resolve());
       return client.init();
     });
 
@@ -151,14 +149,7 @@ describe("Subscriptions DB", () => {
         });
 
         await expect(
-          client.createRow(
-            testUserId,
-            testChargeId,
-            new Date(),
-            testAmount,
-            testCurrency,
-            true,
-          ),
+          client.createRow(testUserId, testChargeId, new Date(), testAmount, testCurrency, true),
         ).rejects.toThrowError(err);
       });
     });
@@ -201,9 +192,7 @@ describe("Subscriptions DB", () => {
           return Promise.reject(err);
         });
 
-        await expect(
-          client.markAsCanceled(testSubscriptionId),
-        ).rejects.toThrowError(err);
+        await expect(client.markAsCanceled(testSubscriptionId)).rejects.toThrowError(err);
       });
     });
 
@@ -246,9 +235,7 @@ describe("Subscriptions DB", () => {
           return Promise.reject(err);
         });
 
-        await expect(client.getRowsByDate(new Date())).rejects.toThrowError(
-          err,
-        );
+        await expect(client.getRowsByDate(new Date())).rejects.toThrowError(err);
       });
     });
 
@@ -292,9 +279,7 @@ describe("Subscriptions DB", () => {
           return Promise.reject(err);
         });
 
-        await expect(
-          client.getRowsByUserId(testUserId, 10),
-        ).rejects.toThrowError(err);
+        await expect(client.getRowsByUserId(testUserId, 10)).rejects.toThrowError(err);
       });
     });
   });

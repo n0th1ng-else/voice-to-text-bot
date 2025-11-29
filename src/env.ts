@@ -14,16 +14,14 @@ export const replicaLifecycleInterval: number =
   Number(process.env.REPLICA_LIFECYCLE_INTERVAL_DAYS) || 1;
 
 export const telegramBotApi: string = process.env.TELEGRAM_BOT_API || "";
-export const telegramBotAppId: number =
-  Number(process.env.TELEGRAM_APP_ID) || 0;
+export const telegramBotAppId: number = Number(process.env.TELEGRAM_APP_ID) || 0;
 export const telegramBotAppHash: string = process.env.TELEGRAM_APP_HASH || "";
 
 export const telegramBotName: string = process.env.TELEGRAM_BOT_NAME || "";
 
 export const ngRokToken: string = process.env.NGROK_TOKEN || "";
 
-export const authorTelegramAccount: string =
-  process.env.AUTHOR_TELEGRAM_ACCOUNT || "";
+export const authorTelegramAccount: string = process.env.AUTHOR_TELEGRAM_ACCOUNT || "";
 
 export const cacheSize: number = Number(process.env.CACHE_SIZE) || 0;
 
@@ -37,8 +35,7 @@ export const memoryLimit = Number(process.env.MEMORY_LIMIT_MB) || 0;
 
 export const clusterSize = Number(process.env.CLUSTER_SIZE) || 2;
 
-export const launchTime =
-  Number(process.env.LAUNCH_TIME) || new Date().getTime();
+export const launchTime = Number(process.env.LAUNCH_TIME) || new Date().getTime();
 
 export const dbPostgres = {
   user: process.env.DB_USER || "",
@@ -92,7 +89,6 @@ export const nodeVersion = process.versions.node;
 
 export const elevenLabsKey = process.env.ELEVENLABS_API_KEY || "";
 
-export const enableSnapshotCapture =
-  process.env.ENABLE_SNAPSHOT_CAPTURE === "true";
+export const enableSnapshotCapture = process.env.ENABLE_SNAPSHOT_CAPTURE === "true";
 
 export const useMTProto = process.env.USE_MTPROTO === "true";

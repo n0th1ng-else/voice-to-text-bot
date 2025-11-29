@@ -20,9 +20,7 @@ const TgInlineKeyboardButtonSchema = z
   })
   .describe("Telegram inline keyboard button schema");
 
-export type TgInlineKeyboardButton = z.infer<
-  typeof TgInlineKeyboardButtonSchema
->;
+export type TgInlineKeyboardButton = z.infer<typeof TgInlineKeyboardButtonSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TgMessageOptionsSchema = z
@@ -64,12 +62,7 @@ export const TgMediaSchema = z
 export type TgMedia = z.infer<typeof TgMediaSchema>;
 
 export const TgChatTypeSchema = z
-  .union([
-    z.literal("private"),
-    z.literal("group"),
-    z.literal("supergroup"),
-    z.literal("channel"),
-  ])
+  .union([z.literal("private"), z.literal("group"), z.literal("supergroup"), z.literal("channel")])
   .describe("Telegram chat type schema validator");
 
 export type TgChatType = z.infer<typeof TgChatTypeSchema>;
@@ -85,8 +78,6 @@ export const TgChatSchema = z
   })
   .describe("Telegram chat schema validator");
 
-export const TgLeaveChatSchema = z
-  .boolean()
-  .describe("Telegram leave chat schema");
+export const TgLeaveChatSchema = z.boolean().describe("Telegram leave chat schema");
 
 export type TgLeaveChatSchema = z.infer<typeof TgLeaveChatSchema>;

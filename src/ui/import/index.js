@@ -11,9 +11,7 @@ const onAction = () => {
     .then((data) => {
       const status = data.idle ? "Idling" : "Running";
       const percentage = data.total ? (100 * data.done) / data.total : 0;
-      const text = `${status} ${percentage.toFixed(2)} (${data.done} of ${
-        data.total
-      })`;
+      const text = `${status} ${percentage.toFixed(2)} (${data.done} of ${data.total})`;
       const el = document.getElementById("statusEl");
       el.textContent = text;
 
@@ -42,6 +40,4 @@ const onFileSelect = () => {
 };
 
 // Attaching event handlers
-document
-  .querySelector("#fileEl")
-  .addEventListener("onchange", () => onFileSelect());
+document.querySelector("#fileEl").addEventListener("onchange", () => onFileSelect());

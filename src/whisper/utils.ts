@@ -11,29 +11,22 @@ import { isFileExist, readDirectoryFiles } from "../files/index.js";
 // Downloading the model from GDrive loses the file name and extension
 const WHISPER_MODEL_EXTENSIONS = [".part", ".bin"] as const;
 
-export const lookupModel = async (
-  specificModelPath?: string,
-): Promise<string> => {
+export const lookupModel = async (specificModelPath?: string): Promise<string> => {
   /**
    * For local development we use the env variable.
    * For docker, the path starts with ./dist/src/...
    * TODO we can potentially fix it using the process.cwd() as an entrypoint
    */
   const cacheDir = new URL("../../../model-cache", import.meta.url);
-  const files = specificModelPath
-    ? [specificModelPath]
-    : await readDirectoryFiles(cacheDir);
+  const files = specificModelPath ? [specificModelPath] : await readDirectoryFiles(cacheDir);
   const modelFile = files.find((file) => {
     return WHISPER_MODEL_EXTENSIONS.some((ext) => file.endsWith(ext));
   });
 
   if (!modelFile) {
-    throw new Error(
-      "No Whisper model specified (no env path and no cache files found)",
-      {
-        cause: files,
-      },
-    );
+    throw new Error("No Whisper model specified (no env path and no cache files found)", {
+      cause: files,
+    });
   }
 
   const isExists = await isFileExist(modelFile);
@@ -54,6 +47,4 @@ export const WhisperAddonArchitectureSchema = z
   .catch("arm")
   .describe("Supported Whisper addon architectures");
 
-export type WhisperAddonArchitecture = z.infer<
-  typeof WhisperAddonArchitectureSchema
->;
+export type WhisperAddonArchitecture = z.infer<typeof WhisperAddonArchitectureSchema>;

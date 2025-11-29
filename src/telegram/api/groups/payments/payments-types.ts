@@ -1,11 +1,6 @@
 import { z } from "zod";
 import type { Prettify } from "../../../../common/types.js";
-import {
-  TgChatId,
-  TgMessageThreadId,
-  TgPaymentChargeId,
-  TgUserId,
-} from "../../core.js";
+import { TgChatId, TgMessageThreadId, TgPaymentChargeId, TgUserId } from "../../core.js";
 
 export const TgAnswerPreCheckoutQuerySchema = z
   .boolean()
@@ -24,10 +19,7 @@ export const TgSubscriptionUrlSchema = z
   .describe("Telegram subscription url result schema");
 
 export const TgCurrencySchema = z
-  .union([
-    z.literal("EUR").describe("Euro"),
-    z.literal("XTR").describe("Stars"),
-  ])
+  .union([z.literal("EUR").describe("Euro"), z.literal("XTR").describe("Stars")])
   .describe("Telegram currency schema");
 
 export type Currency = Prettify<z.infer<typeof TgCurrencySchema>>;
@@ -193,6 +185,4 @@ const TgEditStarSubscriptionSchema = z
   )
   .describe("Telegram edit subscription parameters");
 
-export type EditUserStarSubscriptionDto = Prettify<
-  z.infer<typeof TgEditStarSubscriptionSchema>
->;
+export type EditUserStarSubscriptionDto = Prettify<z.infer<typeof TgEditStarSubscriptionSchema>>;

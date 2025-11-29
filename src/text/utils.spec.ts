@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  sSuffix,
-  getSupportedAudioFormats,
-  getMaxDuration,
-  toCurrency,
-} from "./utils.js";
+import { sSuffix, getSupportedAudioFormats, getMaxDuration, toCurrency } from "./utils.js";
 
 describe("text/utils", () => {
   describe("sSuffix", () => {

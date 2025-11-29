@@ -1,33 +1,14 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
-import {
-  type InjectedTestFn,
-  injectTestDependencies,
-} from "./helpers/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
+import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import type { Currency } from "../src/telegram/api/groups/payments/payments-types.js";
-import {
-  asChatId__test,
-  asDonationId__test,
-  asMessageId__test,
-} from "../src/testUtils/types.js";
+import { asChatId__test, asDonationId__test, asMessageId__test } from "../src/testUtils/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
@@ -52,8 +33,7 @@ const paymentToken = "stripe-token";
 const testPool = new MockPool(dbConfig);
 mockTableCreation(testPool);
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 let chatType: TgChatType;
 let testMessageId = asMessageId__test(0);
@@ -184,11 +164,7 @@ describe("[default language - english] donate", () => {
         const price = 7;
         const currency: Currency = "EUR";
 
-        const statModel = mockGetBotStatItem(
-          testPool,
-          tgMessage.chatId,
-          testLangId,
-        );
+        const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, testLangId);
 
         return Promise.all([
           mockTgReceiveMessage(
@@ -237,12 +213,7 @@ describe("[default language - english] donate", () => {
         const price = 3;
         const currency: Currency = "EUR";
 
-        const statModel = mockGetBotStatItem(
-          testPool,
-          tgMessage.chatId,
-          botStat.langId,
-          botStat,
-        );
+        const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, botStat.langId, botStat);
 
         return Promise.all([
           mockTgReceiveMessage(
@@ -297,11 +268,7 @@ describe("[default language - english] donate", () => {
         const currency: Currency = "EUR";
 
         tgMessage.setText(testMessageId, BotCommand.Donate);
-        const statModel = mockGetBotStatItem(
-          testPool,
-          tgMessage.chatId,
-          testLangId,
-        );
+        const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, testLangId);
 
         return Promise.all([
           mockTgReceiveMessage(
@@ -350,12 +317,7 @@ describe("[default language - english] donate", () => {
         const price = 7;
         const currency: Currency = "EUR";
 
-        const statModel = mockGetBotStatItem(
-          testPool,
-          tgMessage.chatId,
-          botStat.langId,
-          botStat,
-        );
+        const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, botStat.langId, botStat);
 
         return Promise.all([
           mockTgReceiveMessage(

@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { TranslationKeys } from "./types.js";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../testUtils/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../testUtils/dependencies.js";
 
 vi.mock("./translations/loader");
 
@@ -27,9 +24,7 @@ describe("text.index", () => {
 
   describe("isTranslationKey", () => {
     it("should return true if the value is proper translation key", () => {
-      expect(
-        isTranslationKey(TranslationKeys.AudioNotSupportedMessage),
-      ).toEqual(true);
+      expect(isTranslationKey(TranslationKeys.AudioNotSupportedMessage)).toEqual(true);
     });
 
     it.each([
@@ -54,9 +49,7 @@ describe("text.index", () => {
     });
 
     it("should return translation api", () => {
-      expect(TEST_TRANSLATOR.t("start.welcomeMessage", "en-US")).toEqual(
-        "translation text",
-      );
+      expect(TEST_TRANSLATOR.t("start.welcomeMessage", "en-US")).toEqual("translation text");
     });
 
     it("should not re-initialize the instance (singleton)", () => {
@@ -68,25 +61,17 @@ describe("text.index", () => {
     describe("interpolation", () => {
       it("should interpolate the {{var}} with the params array", () => {
         const formatsInterpolation = "any kind of file";
-        const text = TEST_TRANSLATOR.t(
-          "recognition.voice.supportedFormats",
-          "en-US",
-          {
-            formats: formatsInterpolation,
-          },
-        );
+        const text = TEST_TRANSLATOR.t("recognition.voice.supportedFormats", "en-US", {
+          formats: formatsInterpolation,
+        });
         expect(text).toEqual(formatsInterpolation);
       });
 
       it("should interpolate all variables", () => {
-        const text = TEST_TRANSLATOR.t(
-          "recognition.voice.time.minutes",
-          "en-US",
-          {
-            minutes: 7,
-            seconds: 21,
-          },
-        );
+        const text = TEST_TRANSLATOR.t("recognition.voice.time.minutes", "en-US", {
+          minutes: 7,
+          seconds: 21,
+        });
         expect(text).toEqual("7 min 21 sec");
       });
 

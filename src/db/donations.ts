@@ -1,10 +1,6 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
-import {
-  type DonationRowScheme,
-  DonationsDb,
-  type DonationStatus,
-} from "./sql/donations.js";
+import { type DonationRowScheme, DonationsDb, type DonationStatus } from "./sql/donations.js";
 import type { ChatId, PaymentChargeId } from "../telegram/api/core.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 import type { DonationId } from "./sql/types.js";
@@ -23,14 +19,9 @@ export class DonationsClient {
     this.logInfo("Initializing the table");
     return this.db
       .init()
-      .then(() =>
-        this.logInfo(`Table ${Logger.y("donations")} has been initialized`),
-      )
+      .then(() => this.logInfo(`Table ${Logger.y("donations")} has been initialized`))
       .catch((err) => {
-        logger.error(
-          `Unable to initialize ${Logger.y("donations")} table`,
-          err,
-        );
+        logger.error(`Unable to initialize ${Logger.y("donations")} table`, err);
         throw err;
       });
   }
@@ -49,9 +40,7 @@ export class DonationsClient {
       .updateRow(donationId, status, paymentChargeId)
       .then((row) => {
         const id = this.getRowId(row);
-        this.logInfo(
-          `The row with id=${donationId} has been updated ${id === donationId}`,
-        );
+        this.logInfo(`The row with id=${donationId} has been updated ${id === donationId}`);
         return row;
       })
       .catch((err) => {
@@ -60,11 +49,7 @@ export class DonationsClient {
       });
   }
 
-  public createRow(
-    chatId: ChatId,
-    price: number,
-    currency: Currency,
-  ): Promise<DonationRowScheme> {
+  public createRow(chatId: ChatId, price: number, currency: Currency): Promise<DonationRowScheme> {
     this.logInfo("Creating a new row");
     return this.db
       .createRow(chatId, price, currency)

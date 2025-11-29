@@ -76,9 +76,10 @@ export const run = async (): Promise<void> => {
         rowsTotal = 0;
         rowsDone = 0;
 
-        return res
-          .status(500)
-          .send({ result: "error", error: "Something went wrong" });
+        return res.status(500).send({
+          result: "error",
+          error: "Something went wrong",
+        });
       });
   });
 
@@ -95,7 +96,9 @@ export const run = async (): Promise<void> => {
   await db.init();
 
   try {
-    const fullUrl = await app.listen({ port: envy.appPort });
+    const fullUrl = await app.listen({
+      port: envy.appPort,
+    });
     logger.info(`Server is listening on ${Logger.y(fullUrl)}`);
   } catch {
     process.exit(1);

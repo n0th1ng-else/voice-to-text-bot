@@ -12,9 +12,7 @@ const VoiceConverterProviderSchema = z
   .catch("WITAI")
   .describe("Validation schema for the Voice converter providers we support");
 
-export type VoiceConverterProvider = z.infer<
-  typeof VoiceConverterProviderSchema
->;
+export type VoiceConverterProvider = z.infer<typeof VoiceConverterProviderSchema>;
 
 export abstract class VoiceConverter {
   public abstract transformToText(
@@ -25,9 +23,7 @@ export abstract class VoiceConverter {
   ): Promise<string>;
 }
 
-export const LanguageSchema = z
-  .enum(["en-US", "ru-RU"])
-  .describe("Supported language codes");
+export const LanguageSchema = z.enum(["en-US", "ru-RU"]).describe("Supported language codes");
 
 export type LanguageCode = z.infer<typeof LanguageSchema>;
 

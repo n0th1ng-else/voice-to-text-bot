@@ -11,21 +11,14 @@ import { TelegramApi } from "./tgapi.js";
 import { type TgError } from "./tgerror.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
 import { TelegramBaseApi } from "./groups/core.js";
-import {
-  type BotCommandDto,
-  type TgWebHook,
-} from "./groups/updates/updates-types.js";
+import { type BotCommandDto, type TgWebHook } from "./groups/updates/updates-types.js";
 import {
   type TgFile,
   type TgInlineKeyboardButton,
   type TgLeaveChatSchema,
 } from "./groups/chats/chats-types.js";
 import { type TgInvoice } from "./groups/payments/payments-types.js";
-import {
-  asChatId__test,
-  asFileId__test,
-  asMessageId__test,
-} from "../../testUtils/types.js";
+import { asChatId__test, asFileId__test, asMessageId__test } from "../../testUtils/types.js";
 import type { ChatId } from "./core.js";
 import { randomIntFromInterval } from "../../common/timer.js";
 
@@ -73,22 +66,20 @@ let checkApiData = (config: AxiosRequestConfig): void => {
 
 let testApiResponse: TgCore<unknown>;
 
-const clientSpy = vi
-  .spyOn(axios, "create")
-  .mockImplementation((config?: CreateAxiosDefaults) => {
-    if (!config) {
-      throw new Error("config can not be empty");
-    }
-    expect(config.baseURL).toBe(TelegramBaseApi.url);
-    expect(config.timeout).toBe(TelegramBaseApi.timeout);
-    expect(config.method).toBe("POST");
-    expect(config.responseType).toBe("json");
-    // @ts-expect-error Some mess with header types
-    expect(config.headers?.Accept).toBe("application/json");
-    // @ts-expect-error Some mess with header types again
-    expect(config.headers?.["Content-Type"]).toBe("application/json");
-    return testClient;
-  });
+const clientSpy = vi.spyOn(axios, "create").mockImplementation((config?: CreateAxiosDefaults) => {
+  if (!config) {
+    throw new Error("config can not be empty");
+  }
+  expect(config.baseURL).toBe(TelegramBaseApi.url);
+  expect(config.timeout).toBe(TelegramBaseApi.timeout);
+  expect(config.method).toBe("POST");
+  expect(config.responseType).toBe("json");
+  // @ts-expect-error Some mess with header types
+  expect(config.headers?.Accept).toBe("application/json");
+  // @ts-expect-error Some mess with header types again
+  expect(config.headers?.["Content-Type"]).toBe("application/json");
+  return testClient;
+});
 
 describe("[telegram api client]", () => {
   beforeEach(() => {
@@ -103,7 +94,9 @@ describe("[telegram api client]", () => {
     beforeEach(() => {
       vi.spyOn(testClient, "request").mockImplementationOnce((config) => {
         checkApiData(config);
-        return Promise.resolve().then(() => ({ data: testApiResponse }));
+        return Promise.resolve().then(() => ({
+          data: testApiResponse,
+        }));
       });
     });
 
@@ -137,7 +130,10 @@ describe("[telegram api client]", () => {
 
         checkApiData = (
           config: AxiosRequestConfig<{
-            commands: { command: string; description: string }[];
+            commands: {
+              command: string;
+              description: string;
+            }[];
           }>,
         ) => {
           expect(config.url).toBe(`/bot${testApiToken}/setMyCommands`);
@@ -157,7 +153,9 @@ describe("[telegram api client]", () => {
       it("getWebHookInfo", () => {
         const testHook = "some-test-hook-url-tttt";
 
-        testApiResponse = getApiResponse<TgWebHook>(true, { url: testHook });
+        testApiResponse = getApiResponse<TgWebHook>(true, {
+          url: testHook,
+        });
 
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/getWebhookInfo`);
@@ -189,9 +187,7 @@ describe("[telegram api client]", () => {
         };
 
         return api.chats.getFile(testFileId, testChatId).then((fileUrl) => {
-          expect(fileUrl).toBe(
-            `${TelegramBaseApi.url}/file/bot${testApiToken}/${testFilePath}`,
-          );
+          expect(fileUrl).toBe(`${TelegramBaseApi.url}/file/bot${testApiToken}/${testFilePath}`);
         });
       });
 
@@ -218,14 +214,12 @@ describe("[telegram api client]", () => {
           expect(config.data.parse_mode).toBe("HTML");
         };
 
-        return api.chats
-          .editMessageText(testChatId, testMessageId, testText)
-          .then((data) => {
-            expect(data).toBeDefined();
-            expect(data.message_id).toBe(testMessageId);
-            expect(data.chat.id).toBe(testChatId);
-            expect(data.chat.type).toBe(testChatType);
-          });
+        return api.chats.editMessageText(testChatId, testMessageId, testText).then((data) => {
+          expect(data).toBeDefined();
+          expect(data.message_id).toBe(testMessageId);
+          expect(data.chat.id).toBe(testChatId);
+          expect(data.chat.type).toBe(testChatType);
+        });
       });
 
       describe("answerPreCheckoutQuery", () => {
@@ -234,9 +228,7 @@ describe("[telegram api client]", () => {
           testApiResponse = getApiResponse(true, true);
 
           checkApiData = (config) => {
-            expect(config.url).toBe(
-              `/bot${testApiToken}/answerPreCheckoutQuery`,
-            );
+            expect(config.url).toBe(`/bot${testApiToken}/answerPreCheckoutQuery`);
             expect(config.data).toStrictEqual({
               pre_checkout_query_id: queryId,
               ok: true,
@@ -244,10 +236,7 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.payments.answerPreCheckoutQuery(
-            asChatId__test(234211),
-            queryId,
-          );
+          return api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId);
         });
 
         it("should send proper error payload", () => {
@@ -256,9 +245,7 @@ describe("[telegram api client]", () => {
           testApiResponse = getApiResponse(true, true);
 
           checkApiData = (config) => {
-            expect(config.url).toBe(
-              `/bot${testApiToken}/answerPreCheckoutQuery`,
-            );
+            expect(config.url).toBe(`/bot${testApiToken}/answerPreCheckoutQuery`);
             expect(config.data).toStrictEqual({
               pre_checkout_query_id: queryId,
               ok: false,
@@ -266,11 +253,7 @@ describe("[telegram api client]", () => {
             });
           };
 
-          return api.payments.answerPreCheckoutQuery(
-            asChatId__test(234211),
-            queryId,
-            errMessage,
-          );
+          return api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId, errMessage);
         });
       });
 
@@ -353,9 +336,7 @@ describe("[telegram api client]", () => {
 
           return api.chats.leaveChat(testChatId).then(
             () => {
-              throw new Error(
-                "should not resolve, should receive validation error",
-              );
+              throw new Error("should not resolve, should receive validation error");
             },
             (err) => {
               expect(err.issues[0].code).toBe("invalid_type");
@@ -419,16 +400,16 @@ describe("[telegram api client]", () => {
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.text).toBe(testText);
           expect(config.data.parse_mode).toBe("HTML");
-          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
-            testButton.text,
+          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
+          expect(config.data.reply_markup.inline_keyboard[0][0].callback_data).toBe(
+            testButton.callback_data,
           );
-          expect(
-            config.data.reply_markup.inline_keyboard[0][0].callback_data,
-          ).toBe(testButton.callback_data);
         };
 
         return api.chats
-          .sendMessage(testChatId, testText, { buttons: [[testButton]] })
+          .sendMessage(testChatId, testText, {
+            buttons: [[testButton]],
+          })
           .then((data) => {
             expect(data).toBeDefined();
             expect(data.chat.id).toBe(testChatId);
@@ -460,7 +441,9 @@ describe("[telegram api client]", () => {
         };
 
         return api.chats
-          .sendMessage(testChatId, testText, { disableMarkup: true })
+          .sendMessage(testChatId, testText, {
+            disableMarkup: true,
+          })
           .then((data) => {
             expect(data).toBeDefined();
             expect(data.chat.id).toBe(testChatId);
@@ -492,12 +475,10 @@ describe("[telegram api client]", () => {
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.text).toBe(testText);
           expect(config.data.parse_mode).toBe(undefined);
-          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
-            testButton.text,
+          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
+          expect(config.data.reply_markup.inline_keyboard[0][0].callback_data).toBe(
+            testButton.callback_data,
           );
-          expect(
-            config.data.reply_markup.inline_keyboard[0][0].callback_data,
-          ).toBe(testButton.callback_data);
         };
 
         return api.chats
@@ -536,16 +517,14 @@ describe("[telegram api client]", () => {
           expect(config.data.chat_id).toBe(testChatId);
           expect(config.data.text).toBe(testText);
           expect(config.data.parse_mode).toBe("HTML");
-          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(
-            testButton.text,
-          );
-          expect(config.data.reply_markup.inline_keyboard[0][0].url).toBe(
-            testButton.url,
-          );
+          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
+          expect(config.data.reply_markup.inline_keyboard[0][0].url).toBe(testButton.url);
         };
 
         return api.chats
-          .sendMessage(testChatId, testText, { buttons: [[testButton]] })
+          .sendMessage(testChatId, testText, {
+            buttons: [[testButton]],
+          })
           .then((data) => {
             expect(data).toBeDefined();
             expect(data.chat.id).toBe(testChatId);
@@ -559,12 +538,7 @@ describe("[telegram api client]", () => {
         const testErrorCode = 984;
         const testErrorDescription = "Nobody bat an eye";
 
-        testApiResponse = getApiResponse<boolean>(
-          false,
-          true,
-          testErrorCode,
-          testErrorDescription,
-        );
+        testApiResponse = getApiResponse<boolean>(false, true, testErrorCode, testErrorDescription);
         const testHook = "some-test-hook-url";
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/setWebHook`);
@@ -572,17 +546,15 @@ describe("[telegram api client]", () => {
           expect(config.data.url).toBe(testHook);
         };
 
-        return getPromiseError(() => api.updates.setWebHook(testHook)).then(
-          (err) => {
-            expect(err.stack).toBeDefined();
-            expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
-            expect(err.code).toBe(testErrorCode);
-            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setWebHook`);
-            expect(err.response).toBe(undefined);
-            expect(err.migrateToChatId).toBe(0);
-            expect(err.retryAfter).toBe(0);
-          },
-        );
+        return getPromiseError(() => api.updates.setWebHook(testHook)).then((err) => {
+          expect(err.stack).toBeDefined();
+          expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
+          expect(err.code).toBe(testErrorCode);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/setWebHook`);
+          expect(err.response).toBe(undefined);
+          expect(err.migrateToChatId).toBe(0);
+          expect(err.retryAfter).toBe(0);
+        });
       });
 
       it("telegram returned error code, description, retryAfter", () => {
@@ -610,7 +582,10 @@ describe("[telegram api client]", () => {
 
         checkApiData = (
           config: AxiosRequestConfig<{
-            commands: { command: string; description: string }[];
+            commands: {
+              command: string;
+              description: string;
+            }[];
           }>,
         ) => {
           expect(config.url).toBe(`/bot${testApiToken}/setMyCommands`);
@@ -622,9 +597,7 @@ describe("[telegram api client]", () => {
           });
         };
 
-        return getPromiseError(() =>
-          api.updates.setMyCommands(testCommands),
-        ).then((err) => {
+        return getPromiseError(() => api.updates.setMyCommands(testCommands)).then((err) => {
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
@@ -640,30 +613,22 @@ describe("[telegram api client]", () => {
 
         const testHook = "new-h-url";
 
-        testApiResponse = getApiResponse<TgWebHook>(
-          false,
-          { url: testHook },
-          testErrorCode,
-        );
+        testApiResponse = getApiResponse<TgWebHook>(false, { url: testHook }, testErrorCode);
 
         checkApiData = (config) => {
           expect(config.url).toBe(`/bot${testApiToken}/getWebhookInfo`);
           expect(config.data).not.toBeDefined();
         };
 
-        return getPromiseError(() => api.updates.getWebHookInfo()).then(
-          (err) => {
-            expect(err.stack).toBeDefined();
-            expect(err.message).toBe(
-              "ETELEGRAM Telegram request was unsuccessful",
-            );
-            expect(err.code).toBe(testErrorCode);
-            expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getWebhookInfo`);
-            expect(err.response).toBe(undefined);
-            expect(err.migrateToChatId).toBe(0);
-            expect(err.retryAfter).toBe(0);
-          },
-        );
+        return getPromiseError(() => api.updates.getWebHookInfo()).then((err) => {
+          expect(err.stack).toBeDefined();
+          expect(err.message).toBe("ETELEGRAM Telegram request was unsuccessful");
+          expect(err.code).toBe(testErrorCode);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/getWebhookInfo`);
+          expect(err.response).toBe(undefined);
+          expect(err.migrateToChatId).toBe(0);
+          expect(err.retryAfter).toBe(0);
+        });
       });
 
       it("telegram returned error code, description, retryAfter, migrateChatId", () => {
@@ -696,9 +661,7 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return getPromiseError(() =>
-          api.chats.getFile(testFileId, testChatId),
-        ).then((err) => {
+        return getPromiseError(() => api.chats.getFile(testFileId, testChatId)).then((err) => {
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
@@ -726,9 +689,7 @@ describe("[telegram api client]", () => {
           expect(config.data.file_id).toBe(testFileId);
         };
 
-        return getPromiseError(() =>
-          api.chats.getFile(testFileId, testChatId),
-        ).then((err) => {
+        return getPromiseError(() => api.chats.getFile(testFileId, testChatId)).then((err) => {
           expect(err.stack).toBeDefined();
           expect(err.chatId).toBe(testChatId);
           expect(err.url).toContain("getFile");
@@ -787,22 +748,16 @@ describe("[telegram api client]", () => {
       const errData = "err data";
       const testErr = new Error(testErrMsg);
       vi.spyOn(testClient, "request").mockImplementationOnce(() => {
-        const networkErr = new AxiosError(
-          testErr.message,
-          "400",
-          undefined,
-          undefined,
-          {
-            status: errCode,
-            statusText: "cool co co cool",
-            data: errData,
-            config: {
-              headers: new AxiosHeaders(),
-            },
-            headers: {},
-            request: {},
+        const networkErr = new AxiosError(testErr.message, "400", undefined, undefined, {
+          status: errCode,
+          statusText: "cool co co cool",
+          data: errData,
+          config: {
+            headers: new AxiosHeaders(),
           },
-        );
+          headers: {},
+          request: {},
+        });
         networkErr.stack = testErr.stack;
         networkErr.name = testErr.name;
         return Promise.reject(networkErr);
@@ -828,9 +783,7 @@ describe("[telegram api client]", () => {
         expect(config.data.parse_mode).toBe("HTML");
       };
 
-      return getPromiseError(() =>
-        api.chats.sendMessage(testChatId, testText),
-      ).then((err) => {
+      return getPromiseError(() => api.chats.sendMessage(testChatId, testText)).then((err) => {
         expect(err.stack).toBeDefined();
         expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
         expect(err.code).toBe(errCode);

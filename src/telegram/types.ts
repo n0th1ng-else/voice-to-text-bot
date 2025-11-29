@@ -112,9 +112,7 @@ export const PaymentInvoiceSchema = z
     d: z
       .number()
       .optional()
-      .describe(
-        "Donation id [DEPRECATED Backward compatible with old implementation]",
-      ),
+      .describe("Donation id [DEPRECATED Backward compatible with old implementation]"),
     c: TgChatId,
     l: z.string().describe("Log prefix"),
   })

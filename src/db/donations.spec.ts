@@ -1,11 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type pg from "pg";
 import { Pool as MockPool } from "./__mocks__/pg.js";
-import {
-  asChatId__test,
-  asDonationId__test,
-  asPaymentChargeId__test,
-} from "../testUtils/types.js";
+import { asChatId__test, asDonationId__test, asPaymentChargeId__test } from "../testUtils/types.js";
 import { DonationsClient } from "./donations.js";
 import type { DonationRowScheme, DonationStatus } from "./sql/donations.js";
 import { DonationsSql } from "./sql/donations.sql.js";
@@ -36,16 +32,16 @@ describe("Donations DB", () => {
 
   describe("not initialized", () => {
     it("can not create row", async () => {
-      await expect(
-        client.createRow(asChatId__test(23444), 3, "EUR"),
-      ).rejects.toThrowError("The table donations is not initialized yet");
+      await expect(client.createRow(asChatId__test(23444), 3, "EUR")).rejects.toThrowError(
+        "The table donations is not initialized yet",
+      );
     });
 
     it("can not update row", async () => {
       const status: DonationStatus = "PENDING";
-      await expect(
-        client.updateRow(asDonationId__test(23), status),
-      ).rejects.toThrowError("The table donations is not initialized yet");
+      await expect(client.updateRow(asDonationId__test(23), status)).rejects.toThrowError(
+        "The table donations is not initialized yet",
+      );
     });
 
     it("can not iterate rows", async () => {
@@ -56,21 +52,17 @@ describe("Donations DB", () => {
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrowError();
-      await expect(
-        client.createRow(asChatId__test(5231), 5, "EUR"),
-      ).rejects.toThrowError("The table donations is not initialized yet");
+      await expect(client.createRow(asChatId__test(5231), 5, "EUR")).rejects.toThrowError(
+        "The table donations is not initialized yet",
+      );
     });
   });
 
   describe("initialized", () => {
     beforeEach(() => {
       testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());
-      testPool.mockQuery(DonationsSql.migration_22032025_1, () =>
-        Promise.resolve(),
-      );
-      testPool.mockQuery(DonationsSql.migration_22032025_2, () =>
-        Promise.resolve(),
-      );
+      testPool.mockQuery(DonationsSql.migration_22032025_1, () => Promise.resolve());
+      testPool.mockQuery(DonationsSql.migration_22032025_2, () => Promise.resolve());
       return client.init();
     });
 
@@ -82,8 +74,7 @@ describe("Donations DB", () => {
 
       testPool.mockQuery(DonationsSql.insertRow, (values) => {
         expect(values).toHaveLength(6);
-        const [rChatId, rStatus, rPrice, rCurrency, rCreated, rUpdated] =
-          values;
+        const [rChatId, rStatus, rPrice, rCurrency, rCreated, rUpdated] = values;
 
         expect(rChatId).toBe(chatId);
         expect(rStatus).toBe(status);
@@ -91,7 +82,9 @@ describe("Donations DB", () => {
         expect(rCreated).toBe(rUpdated);
         expect(rCurrency).toBe(currency);
 
-        return Promise.resolve<{ rows: DonationRowScheme[] }>({
+        return Promise.resolve<{
+          rows: DonationRowScheme[];
+        }>({
           rows: [
             {
               donation_id: asDonationId__test(21),
@@ -127,7 +120,9 @@ describe("Donations DB", () => {
         expect(rDonationId).toBe(donationId);
         expect(rUpdatedAt).toBeDefined();
 
-        return Promise.resolve<{ rows: DonationRowScheme[] }>({
+        return Promise.resolve<{
+          rows: DonationRowScheme[];
+        }>({
           rows: [
             {
               donation_id: rDonationId,
@@ -163,7 +158,9 @@ describe("Donations DB", () => {
         expect(rUpdatedAt).toBeDefined();
         expect(rPaymentChargeId).toBe(undefined);
 
-        return Promise.resolve<{ rows: DonationRowScheme[] }>({
+        return Promise.resolve<{
+          rows: DonationRowScheme[];
+        }>({
           rows: [
             {
               donation_id: rDonationId,
@@ -199,7 +196,9 @@ describe("Donations DB", () => {
         expect(rUpdatedAt).toBeDefined();
         expect(rPaymentChargeId).toBe(undefined);
 
-        return Promise.resolve<{ rows: DonationRowScheme[] }>({
+        return Promise.resolve<{
+          rows: DonationRowScheme[];
+        }>({
           rows: [
             {
               donation_id: rDonationId,
@@ -236,7 +235,9 @@ describe("Donations DB", () => {
         expect(rUpdatedAt).toBeDefined();
         expect(rPaymentChargeId).toBe(chargeId);
 
-        return Promise.resolve<{ rows: DonationRowScheme[] }>({
+        return Promise.resolve<{
+          rows: DonationRowScheme[];
+        }>({
           rows: [
             {
               donation_id: rDonationId,

@@ -48,19 +48,13 @@ const logger = new Logger("telegram-bot");
 export class DonateAction extends GenericAction {
   private payment?: PaymentService;
 
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     trackUserActivity({ activityType: "donate" }, mdl.userId);
     return this.sendDonateMessage(mdl, prefix);
   }
 
-  public async runCondition(
-    msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isDonateMessage = isCommandMessage(mdl, msg, BotCommand.Donate);
     return Promise.resolve(isDonateMessage);
   }
@@ -91,21 +85,11 @@ export class DonateAction extends GenericAction {
     return this.getChatLanguage(model, prefix)
       .then((lang) => {
         const donationStars = donationLevels.stars.map((level) =>
-          DonateAction.getDonationButton(
-            level.amount,
-            "XTR",
-            prefix.id,
-            level.meta,
-          ),
+          DonateAction.getDonationButton(level.amount, "XTR", prefix.id, level.meta),
         );
 
         const donationEuros = donationLevels.euros.map((level) =>
-          DonateAction.getDonationButton(
-            level.amount,
-            "EUR",
-            prefix.id,
-            level.meta,
-          ),
+          DonateAction.getDonationButton(level.amount, "EUR", prefix.id, level.meta),
         );
 
         const buttons: TgInlineKeyboardButton[][] = [];
@@ -130,13 +114,7 @@ export class DonateAction extends GenericAction {
         model.analytics.addError(errorMessage);
       })
       .then(() =>
-        collectAnalytics(
-          model.analytics.setCommand(
-            BotCommand.Donate,
-            "Donate message",
-            "Init",
-          ),
-        ),
+        collectAnalytics(model.analytics.setCommand(BotCommand.Donate, "Donate message", "Init")),
       );
   }
 
@@ -156,8 +134,7 @@ export class DonateAction extends GenericAction {
       ])
         .then(([lang, donationId]) => {
           if (!this.payment) {
-            const errorMessage =
-              "Payment service is not set for callback query";
+            const errorMessage = "Payment service is not set for callback query";
             logger.error(
               `${prefix.getPrefix()} ${errorMessage}`,
               new Error("Payment service is not set"),
@@ -187,10 +164,7 @@ export class DonateAction extends GenericAction {
           );
         })
         .catch((err) => {
-          logger.error(
-            `${prefix.getPrefix()} Unable to send the donations link`,
-            err,
-          );
+          logger.error(`${prefix.getPrefix()} Unable to send the donations link`, err);
         });
     } catch (err) {
       const errorMessage = `Price is not a number, got ${button.value}`;
@@ -226,11 +200,7 @@ export class DonateAction extends GenericAction {
     prefix: TelegramMessagePrefix,
   ): Promise<DonationId> {
     try {
-      const row = await this.stat.createDonationRow(
-        model.chatId,
-        price,
-        currency,
-      );
+      const row = await this.stat.createDonationRow(model.chatId, price, currency);
       return this.stat.getDonationId(row);
     } catch (err) {
       const errorMessage = `Unable to create donationId for price=${price}`;
@@ -264,11 +234,7 @@ export class DonateAction extends GenericAction {
       title,
       description,
       label,
-      payload: getPaymentInvoiceData(
-        String(donationId),
-        model.chatId,
-        prefix.id,
-      ),
+      payload: getPaymentInvoiceData(String(donationId), model.chatId, prefix.id),
       photo: getBotLogo(),
       forumThreadId: model.forumThreadId,
     };

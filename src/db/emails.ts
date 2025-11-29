@@ -17,14 +17,9 @@ export class UsedEmailClient {
     this.logInfo("Initializing the table");
     return this.db
       .init()
-      .then(() =>
-        this.logInfo(`Table ${Logger.y("usedemails")} has been initialized`),
-      )
+      .then(() => this.logInfo(`Table ${Logger.y("usedemails")} has been initialized`))
       .catch((err) => {
-        logger.error(
-          `Unable to initialize ${Logger.y("usedemails")} table`,
-          err,
-        );
+        logger.error(`Unable to initialize ${Logger.y("usedemails")} table`, err);
         throw err;
       });
   }
@@ -40,9 +35,7 @@ export class UsedEmailClient {
       .updateRow(emailId)
       .then((row) => {
         const id = this.getRowId(row);
-        this.logInfo(
-          `The row with id=${emailId} has been updated ${id === emailId}`,
-        );
+        this.logInfo(`The row with id=${emailId} has been updated ${id === emailId}`);
         return row;
       })
       .catch((err) => {

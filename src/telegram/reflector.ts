@@ -18,9 +18,7 @@ class ReflectorError extends Error {
   }
 }
 
-export const initTgReflector = (
-  api: ApiErrorReflectorHandlers,
-): ApiErrorReflector => {
+export const initTgReflector = (api: ApiErrorReflectorHandlers): ApiErrorReflector => {
   const reflect = async (err: unknown): Promise<void> => {
     if (!(err instanceof TgError)) {
       return;
@@ -39,9 +37,7 @@ export const initTgReflector = (
           return;
         }
 
-        const rfErr = new ReflectorError(
-          "Tried to leave the chat, receive false as a result",
-        );
+        const rfErr = new ReflectorError("Tried to leave the chat, receive false as a result");
         rfErr.chatId = err.chatId;
         rfErr.isChatLeft = isChatLeft;
         logger.error(rfErr.message, rfErr);

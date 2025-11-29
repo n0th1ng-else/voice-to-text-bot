@@ -16,19 +16,13 @@ const logger = new Logger("telegram-bot");
 export class SupportAction extends GenericAction {
   private authorUrl?: string;
 
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     trackUserActivity({ activityType: "support" }, mdl.userId);
     return this.sendSupportMessage(mdl, prefix);
   }
 
-  public async runCondition(
-    msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isSupportMessage = isCommandMessage(mdl, msg, BotCommand.Support);
     return Promise.resolve(isSupportMessage);
   }
@@ -37,10 +31,7 @@ export class SupportAction extends GenericAction {
     this.authorUrl = url;
   }
 
-  private sendSupportMessage(
-    model: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  private sendSupportMessage(model: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending support message`);
 
     return this.getChatLanguage(model, prefix)
@@ -82,13 +73,7 @@ export class SupportAction extends GenericAction {
         model.analytics.addError(errorMessage);
       })
       .then(() =>
-        collectAnalytics(
-          model.analytics.setCommand(
-            BotCommand.Support,
-            "Support message",
-            "Init",
-          ),
-        ),
+        collectAnalytics(model.analytics.setCommand(BotCommand.Support, "Support message", "Init")),
       );
   }
 }

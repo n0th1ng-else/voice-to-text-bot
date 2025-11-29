@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { type Prettify } from "../../common/types.js";
-import {
-  TgChatSchema,
-  TgMediaSchema,
-  TgReplyMarkup,
-} from "./groups/chats/chats-types.js";
+import { TgChatSchema, TgMediaSchema, TgReplyMarkup } from "./groups/chats/chats-types.js";
 import {
   TgPaymentSchema,
   TgRefundedPaymentSchema,

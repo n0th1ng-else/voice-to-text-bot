@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../../testUtils/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../../testUtils/dependencies.js";
 
 const existsSyncMock = vi.fn();
 const readFileSyncMock = vi.fn();

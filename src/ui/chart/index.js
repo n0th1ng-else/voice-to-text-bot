@@ -2,10 +2,7 @@
 
 // TODO optimize if too many items in the array
 
-import {
-  Chart,
-  registerables,
-} from "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/+esm";
+import { Chart, registerables } from "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/+esm";
 import TrendlinePlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@2.1.0/+esm";
 import LabelsPlugin from "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/+esm";
 
@@ -201,7 +198,12 @@ const onDraw = () => {
         chart = drawChart(chartType, data.items);
       })
       .catch((err) => {
-        printError(new Error("Unable to get the rows", { cause: err }), err);
+        printError(
+          new Error("Unable to get the rows", {
+            cause: err,
+          }),
+          err,
+        );
       });
     return;
   }
@@ -705,7 +707,12 @@ const onDisconnect = () => {
       toggleDbForm(true);
     })
     .catch((err) => {
-      printError(new Error("Failed to disconnect db", { cause: err }), err);
+      printError(
+        new Error("Failed to disconnect db", {
+          cause: err,
+        }),
+        err,
+      );
     });
 };
 
@@ -717,7 +724,13 @@ const onConnect = () => {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ user, pwd, host, port, database }),
+    body: JSON.stringify({
+      user,
+      pwd,
+      host,
+      port,
+      database,
+    }),
   })
     .then((response) => {
       if (!response.ok) {
@@ -738,10 +751,6 @@ const onConnect = () => {
 window.addEventListener("DOMContentLoaded", () => onReset());
 document.querySelector(".draw-btn").addEventListener("click", () => onDraw());
 document.querySelector(".reset-btn").addEventListener("click", () => onReset());
-document
-  .querySelector(".off-btn")
-  .addEventListener("click", () => onDisconnect());
+document.querySelector(".off-btn").addEventListener("click", () => onDisconnect());
 document.querySelector(".on-btn").addEventListener("click", () => onConnect());
-document
-  .querySelector("#legacyEl")
-  .addEventListener("change", () => switchMethod());
+document.querySelector("#legacyEl").addEventListener("change", () => switchMethod());

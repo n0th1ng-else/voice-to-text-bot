@@ -39,21 +39,11 @@ export class TelegramBotModel {
     converters: VoiceConverters,
     stat: ReturnType<typeof getDb>,
   ): Promise<TelegramBotModel> {
-    const api = new TelegramBotModel(
-      apiToken,
-      appId,
-      appHash,
-      useMTProto,
-      converters,
-      stat,
-    );
+    const api = new TelegramBotModel(apiToken, appId, appHash, useMTProto, converters, stat);
     try {
       await api.init();
     } catch (err) {
-      logger.error(
-        "MTProto client is unable to initialize. Falling back to API download",
-        err,
-      );
+      logger.error("MTProto client is unable to initialize. Falling back to API download", err);
     }
     return api;
   }
@@ -109,15 +99,15 @@ export class TelegramBotModel {
     const hookUrl = `${this.host}${this.getPath()}`;
     logger.info(`WebHook url is ${Logger.y(hookUrl)}`);
 
-    return runPromiseWithRetry("bot.getWebHookInfo", () =>
-      this.bot.updates.getWebHookInfo(),
-    ).then((info) => {
-      if (info.url === hookUrl) {
-        return true;
-      }
+    return runPromiseWithRetry("bot.getWebHookInfo", () => this.bot.updates.getWebHookInfo()).then(
+      (info) => {
+        if (info.url === hookUrl) {
+          return true;
+        }
 
-      return this.applyHostLocation(timeoutMs);
-    });
+        return this.applyHostLocation(timeoutMs);
+      },
+    );
   }
 
   private applyHostLocation(timeoutMs: number): Promise<boolean> {
@@ -147,10 +137,7 @@ export class TelegramBotModel {
     return `${this.path}/${id}`;
   }
 
-  public async handleApiMessage(
-    message: TgUpdate,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  public async handleApiMessage(message: TgUpdate, analytics: AnalyticsData): Promise<void> {
     return Promise.resolve()
       .then(() => {
         if (message.message) {
@@ -172,10 +159,7 @@ export class TelegramBotModel {
       });
   }
 
-  private async handleMessage(
-    msg: TgMessage,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  private async handleMessage(msg: TgMessage, analytics: AnalyticsData): Promise<void> {
     const model = new BotMessageModel(msg, analytics);
     const prefix = new TelegramMessagePrefix(model.chatId);
 
@@ -230,9 +214,7 @@ export class TelegramBotModel {
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     logger.warn("Message is not supported", { ...prefix });
-    return collectAnalytics(
-      model.analytics.setCommand("/app", "Message is not supported"),
-    );
+    return collectAnalytics(model.analytics.setCommand("/app", "Message is not supported"));
   }
 
   private async sendNoVoiceMessage(
@@ -241,9 +223,7 @@ export class TelegramBotModel {
   ): Promise<void> {
     if (model.isGroup) {
       logger.info(`${prefix.getPrefix()} No content`);
-      return collectAnalytics(
-        model.analytics.setCommand("/voice", "No voice content", "Group"),
-      );
+      return collectAnalytics(model.analytics.setCommand("/voice", "No voice content", "Group"));
     }
 
     logger.info(`${prefix.getPrefix()} Sending no content`);
@@ -264,23 +244,15 @@ export class TelegramBotModel {
         model.analytics.addError(errorMessage);
       })
       .then(() =>
-        collectAnalytics(
-          model.analytics.setCommand("/voice", "No voice content", "Private"),
-        ),
+        collectAnalytics(model.analytics.setCommand("/voice", "No voice content", "Private")),
       );
   }
 
-  private handleCallbackQuery(
-    msg: TgCallbackQuery,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  private handleCallbackQuery(msg: TgCallbackQuery, analytics: AnalyticsData): Promise<void> {
     return this.actions.handleCallback(msg, analytics);
   }
 
-  private handleCheckout(
-    msg: TgCheckoutQuery,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  private handleCheckout(msg: TgCheckoutQuery, analytics: AnalyticsData): Promise<void> {
     return this.actions.handleCheckout(msg, analytics);
   }
 }

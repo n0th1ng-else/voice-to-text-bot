@@ -46,11 +46,7 @@ export class WithAiProvider extends VoiceConverter {
         cause: { lang },
       });
     }
-    const result = await WithAiProvider.recognise(
-      bufferData,
-      token,
-      logData.prefix,
-    );
+    const result = await WithAiProvider.recognise(bufferData, token, logData.prefix);
     return result;
   }
 
@@ -71,18 +67,16 @@ export class WithAiProvider extends VoiceConverter {
       .then((chunks) => {
         const errorChunk = chunks.find((chunk) => chunk.error);
         if (errorChunk) {
-          const witAiError = new WitAiChunkError(
-            errorChunk,
-            errorChunk.error,
-          ).setId(errorChunk.code);
+          const witAiError = new WitAiChunkError(errorChunk, errorChunk.error).setId(
+            errorChunk.code,
+          );
           throw witAiError;
         }
         const finalizedChunks = chunks.filter((chunk) => chunk.is_final);
         if (!finalizedChunks.length) {
-          logger.warn(
-            `${logPrefix} The final response chunk not found. Transcription is empty.`,
-            { text: chunks.map((chunk) => chunk.text || "").join(" ") || "" },
-          );
+          logger.warn(`${logPrefix} The final response chunk not found. Transcription is empty.`, {
+            text: chunks.map((chunk) => chunk.text || "").join(" ") || "",
+          });
         }
         return finalizedChunks.map(({ text }) => text || "").join(" ") || "";
       })
@@ -96,9 +90,7 @@ export class WithAiProvider extends VoiceConverter {
           );
           return;
         }
-        logger.info(
-          `${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`,
-        );
+        logger.info(`${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`);
         trackRecognitionTime("WITAI", timeTotalMs);
       });
   }
@@ -107,24 +99,14 @@ export class WithAiProvider extends VoiceConverter {
     data: Buffer<ArrayBufferLike>,
     authToken: string,
   ): Promise<WitAiResponse[]> {
-    return await WithAiProvider.runRequest(
-      data,
-      "speech",
-      WitAiResponseSchema,
-      authToken,
-    );
+    return await WithAiProvider.runRequest(data, "speech", WitAiResponseSchema, authToken);
   }
 
   private static async recogniseDictation(
     data: Buffer<ArrayBufferLike>,
     authToken: string,
   ): Promise<WitAiResponse[]> {
-    return await WithAiProvider.runRequest(
-      data,
-      "dictation",
-      WitAiResponseSchema,
-      authToken,
-    );
+    return await WithAiProvider.runRequest(data, "dictation", WitAiResponseSchema, authToken);
   }
 
   private static async runRequest<Output, Input = Output>(

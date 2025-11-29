@@ -23,9 +23,7 @@ export const getConverterType = (
  * In this case we should use chatId as userId (they are the same at this moment)
  *
  */
-export const getAsUserId = (
-  model: Pick<BotMessageModel, "userId" | "chatId">,
-): UserId => {
+export const getAsUserId = (model: Pick<BotMessageModel, "userId" | "chatId">): UserId => {
   if (model.userId) {
     return model.userId;
   }

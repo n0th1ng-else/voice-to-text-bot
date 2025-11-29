@@ -30,34 +30,21 @@ export class SubscriptionDb extends CoreDbClient {
 
   public async getRowsByDate(endDate: Date): Promise<SubscriptionRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table subscriptions is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
     }
     const query = SubscriptionsSql.getRowsByDate;
     const values = [endDate];
-    const queryData = await this.pool.query<SubscriptionRowScheme>(
-      query,
-      values,
-    );
+    const queryData = await this.pool.query<SubscriptionRowScheme>(query, values);
     return queryData.rows;
   }
 
-  public async getRowsByUserId(
-    userId: UserId,
-    limit: number,
-  ): Promise<SubscriptionRowScheme[]> {
+  public async getRowsByUserId(userId: UserId, limit: number): Promise<SubscriptionRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table subscriptions is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
     }
     const query = SubscriptionsSql.getRowsByUserId;
     const values = [userId, limit];
-    const queryData = await this.pool.query<SubscriptionRowScheme>(
-      query,
-      values,
-    );
+    const queryData = await this.pool.query<SubscriptionRowScheme>(query, values);
     return queryData.rows;
   }
 
@@ -70,9 +57,7 @@ export class SubscriptionDb extends CoreDbClient {
     isTrial: boolean,
   ): Promise<SubscriptionRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table subscriptions is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
     }
     const query = SubscriptionsSql.insertRow;
     const subscriptionId = nanoid(15);
@@ -97,10 +82,7 @@ export class SubscriptionDb extends CoreDbClient {
       updatedAt,
     ];
 
-    const queryData = await this.pool.query<SubscriptionRowScheme>(
-      query,
-      values,
-    );
+    const queryData = await this.pool.query<SubscriptionRowScheme>(query, values);
     const firstRow = queryData.rows.shift();
     if (!firstRow) {
       return Promise.reject(new Error("Unable to get created row info"));
@@ -108,13 +90,9 @@ export class SubscriptionDb extends CoreDbClient {
     return firstRow;
   }
 
-  public async markRowAsCanceled(
-    subscriptionId: SubscriptionId,
-  ): Promise<SubscriptionRowScheme> {
+  public async markRowAsCanceled(subscriptionId: SubscriptionId): Promise<SubscriptionRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table subscriptions is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
     }
 
     const query = SubscriptionsSql.toggleCanceled;
@@ -123,10 +101,7 @@ export class SubscriptionDb extends CoreDbClient {
 
     const values = [isCanceled, updatedAt, subscriptionId];
 
-    const queryData = await this.pool.query<SubscriptionRowScheme>(
-      query,
-      values,
-    );
+    const queryData = await this.pool.query<SubscriptionRowScheme>(query, values);
     const firstRow = queryData.rows.shift();
     if (!firstRow) {
       return Promise.reject(new Error("Unable to get updated row info"));

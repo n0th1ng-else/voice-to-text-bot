@@ -3,11 +3,7 @@ import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import axios from "axios";
 import { Logger } from "../logger/index.js";
-import {
-  deleteFileIfExists,
-  readFileIntoBuffer,
-  saveStreamToFile,
-} from "../files/index.js";
+import { deleteFileIfExists, readFileIntoBuffer, saveStreamToFile } from "../files/index.js";
 import { wavSampleRate } from "../const.js";
 
 const logger = new Logger("media-to-wav");
@@ -30,12 +26,7 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
   ffmpeg()
     .setFfmpegPath(ffmpegBinPath)
     .input(inputFile)
-    .outputOptions([
-      "-analyzeduration 0",
-      "-loglevel 0",
-      `-ar ${wavSampleRate}`,
-      "-ac 1",
-    ])
+    .outputOptions(["-analyzeduration 0", "-loglevel 0", `-ar ${wavSampleRate}`, "-ac 1"])
     .saveToFile(outputFile)
     .on("end", () => {
       resolve(outputFile);
@@ -68,10 +59,7 @@ const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
   }
 };
 
-export const getWavFilePath = async (
-  fileLink: string,
-  isLocalFile: boolean,
-): Promise<string> => {
+export const getWavFilePath = async (fileLink: string, isLocalFile: boolean): Promise<string> => {
   if (isLocalFile) {
     return await getWavFilePathFromLocal(fileLink);
   }

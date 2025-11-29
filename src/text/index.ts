@@ -1,9 +1,5 @@
 import { type TranslationKey, TranslationKeys } from "./types.js";
-import {
-  DEFAULT_LANGUAGE,
-  SUPPORTED_LANGUAGES,
-  type LanguageCode,
-} from "../recognition/types.js";
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, type LanguageCode } from "../recognition/types.js";
 import {
   initializeMenuLabels,
   initializeTranslationsForLocale,
@@ -34,10 +30,7 @@ const initTranslations = (): Translator => {
 
   const getFallbackLanguage = (): LanguageCode => DEFAULT_LANGUAGE;
 
-  const getRawTranslation = (
-    key: TranslationKey,
-    locale: LanguageCode,
-  ): string => {
+  const getRawTranslation = (key: TranslationKey, locale: LanguageCode): string => {
     const currentLocaleStr = textRegistry.get(locale)?.[key];
     const defaultLocaleStr = textRegistry.get(getFallbackLanguage())?.[key];
     const str = currentLocaleStr || defaultLocaleStr || "";

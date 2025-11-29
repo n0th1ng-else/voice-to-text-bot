@@ -12,10 +12,7 @@ import { getSupportedAudioFormats } from "../../text/utils.js";
 const logger = new Logger("telegram-bot");
 
 export class VoiceFormatAction extends GenericAction {
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     return this.sendWrongFormatMessage(mdl, prefix);
   }
@@ -31,7 +28,10 @@ export class VoiceFormatAction extends GenericAction {
     const triggersAction = !isVoice && isWrongFormat;
 
     if (triggersAction) {
-      logger.warn("Wrong audio file mime-type", { ...type, ...prefix });
+      logger.warn("Wrong audio file mime-type", {
+        ...type,
+        ...prefix,
+      });
     }
 
     return Promise.resolve(triggersAction);
@@ -44,11 +44,7 @@ export class VoiceFormatAction extends GenericAction {
     if (model.isGroup) {
       logger.info(`${prefix.getPrefix()} Voice mime-type is not supported`);
       return collectAnalytics(
-        model.analytics.setCommand(
-          "/voice",
-          "Wrong voice message mime-type",
-          "Group",
-        ),
+        model.analytics.setCommand("/voice", "Wrong voice message mime-type", "Group"),
       );
     }
 
@@ -74,11 +70,7 @@ export class VoiceFormatAction extends GenericAction {
           model.forumThreadId,
         ),
       )
-      .then(() =>
-        logger.info(
-          `${prefix.getPrefix()} Mime-type is not supported message sent`,
-        ),
-      )
+      .then(() => logger.info(`${prefix.getPrefix()} Mime-type is not supported message sent`))
       .catch((err) => {
         const errorMessage = "Unable to send mime-type is not supported";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
@@ -86,11 +78,7 @@ export class VoiceFormatAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand(
-            "/voice",
-            "Wrong voice message mime-type",
-            "Private",
-          ),
+          model.analytics.setCommand("/voice", "Wrong voice message mime-type", "Private"),
         ),
       );
   }

@@ -5,10 +5,7 @@ import type { BotServerModel } from "../server/types.js";
 
 const logger = new Logger("dev-script");
 
-const startServer = async (
-  server: BotServerModel,
-  threadId: number,
-): Promise<void> => {
+const startServer = async (server: BotServerModel, threadId: number): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
   const stopListener = await prepareStopListener();
 

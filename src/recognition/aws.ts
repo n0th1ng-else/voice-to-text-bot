@@ -1,10 +1,6 @@
 import axios from "axios";
 import AWS from "aws-sdk";
-import {
-  type ConverterMeta,
-  type LanguageCode,
-  VoiceConverter,
-} from "./types.js";
+import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
 import { TimeMeasure } from "../common/timer.js";
@@ -14,8 +10,7 @@ const logger = new Logger("aws-recognition");
 
 type AWSJob = AWS.TranscribeService.Types.GetTranscriptionJobResponse;
 
-type AWSTranscriptionResponse =
-  AWS.TranscribeService.Types.StartTranscriptionJobResponse;
+type AWSTranscriptionResponse = AWS.TranscribeService.Types.StartTranscriptionJobResponse;
 
 type AWSUpload = AWS.S3.ManagedUpload.SendData;
 
@@ -88,9 +83,7 @@ export class AWSProvider extends VoiceConverter {
             },
           }),
         )
-        .then(({ data: translationData }) =>
-          this.cleanStorage(translationData, name),
-        )
+        .then(({ data: translationData }) => this.cleanStorage(translationData, name))
         .then((text) => {
           logger.info(`Job ${name} completed`);
           trackRecognitionTime("AWS", duration.getMs());
@@ -99,20 +92,14 @@ export class AWSProvider extends VoiceConverter {
     );
   }
 
-  private processFile(
-    fileLink: string,
-    name: string,
-    isLocalFile: boolean,
-  ): Promise<AWSJob> {
+  private processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
     return getWavBuffer(fileLink, isLocalFile)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));
   }
 
-  private unpackTranscription(
-    translationData: TranscriptionData,
-  ): Promise<string> {
+  private unpackTranscription(translationData: TranscriptionData): Promise<string> {
     const transcripts = translationData.results.transcripts;
     if (!transcripts?.length) {
       throw new Error("Unable to convert into text");
@@ -121,10 +108,7 @@ export class AWSProvider extends VoiceConverter {
     return Promise.resolve(transcripts[0].transcript);
   }
 
-  private cleanStorage(
-    translationData: TranscriptionData,
-    name: string,
-  ): Promise<string> {
+  private cleanStorage(translationData: TranscriptionData, name: string): Promise<string> {
     return this.deleteFromS3(name)
       .then(() => this.removeTranscriptionJob(name))
       .then(() => this.unpackTranscription(translationData));
@@ -140,17 +124,16 @@ export class AWSProvider extends VoiceConverter {
       .then(() => this.getJob(name))
       .then((info) => {
         if (!info.isExists) {
-          throw new Error("unable to get the job", { cause: info.err });
+          throw new Error("unable to get the job", {
+            cause: info.err,
+          });
         }
         return info.job;
       })
       .then((job) => this.getJobWithDelay(name, job));
   }
 
-  private uploadToS3(
-    name: string,
-    file: Buffer<ArrayBufferLike>,
-  ): Promise<AWSUpload> {
+  private uploadToS3(name: string, file: Buffer<ArrayBufferLike>): Promise<AWSUpload> {
     logger.info("Uploading to S3", name);
     return new Promise<AWSUpload>((resolve, reject) => {
       this.storage.upload(
@@ -192,10 +175,7 @@ export class AWSProvider extends VoiceConverter {
     });
   }
 
-  private convertToText(
-    name: string,
-    uri: string,
-  ): Promise<AWSTranscriptionResponse> {
+  private convertToText(name: string, uri: string): Promise<AWSTranscriptionResponse> {
     logger.info("Start converting", name, uri);
     return new Promise<AWSTranscriptionResponse>((resolve, reject) => {
       this.service.startTranscriptionJob(
@@ -264,6 +244,4 @@ export class AWSProvider extends VoiceConverter {
   }
 }
 
-type JobResponse =
-  | { isExists: true; job: AWSJob }
-  | { isExists: false; err: unknown };
+type JobResponse = { isExists: true; job: AWSJob } | { isExists: false; err: unknown };

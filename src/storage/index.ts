@@ -17,22 +17,17 @@ const safeSize = (path: string): number => {
   }
 };
 
-export const printCurrentStorageUsage = async (
-  dir: string,
-): Promise<number> => {
+export const printCurrentStorageUsage = async (dir: string): Promise<number> => {
   return Promise.resolve().then(() => {
     try {
       const folder = resolvePath(process.cwd(), dir);
-      const files = readdirSync(folder).filter(
-        (file) => !file.includes("gitkeep"),
-      );
+      const files = readdirSync(folder).filter((file) => !file.includes("gitkeep"));
       const cacheSizeBytes = files.reduce(
         (sum, file) => sum + safeSize(resolvePath(folder, file)),
         0,
       );
       const cacheSizeMBytes = Math.ceil(cacheSizeBytes / getMB(1));
-      const size =
-        cacheSizeMBytes < 1 ? "almost empty" : `[size=${cacheSizeMBytes}Mb]`;
+      const size = cacheSizeMBytes < 1 ? "almost empty" : `[size=${cacheSizeMBytes}Mb]`;
       const list = files.length ? `[files=${files.join(",")}]` : "no files";
       const message = `Current storage ${size} ${list}`;
       if (cacheSizeMBytes < 50) {
@@ -44,10 +39,7 @@ export const printCurrentStorageUsage = async (
         return cacheSizeMBytes;
       }
 
-      logger.error(
-        message,
-        new Error("The process exceeds cache storage limit"),
-      );
+      logger.error(message, new Error("The process exceeds cache storage limit"));
       return cacheSizeMBytes;
     } catch (err) {
       logger.error("Unable to read the cache folder size", err);
