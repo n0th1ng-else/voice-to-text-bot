@@ -22,21 +22,13 @@ import { parsePaymentPayload } from "../../src/telegram/helpers.js";
 import type { TgMessage, TgUpdate } from "../../src/telegram/api/types.js";
 import type { LanguageCode } from "../../src/recognition/types.js";
 import type { ChatId } from "../../src/telegram/api/core.js";
-import {
-  asChatId__test,
-  asMessageId__test,
-  asUpdateId__test,
-} from "../../src/testUtils/types.js";
+import { asChatId__test, asMessageId__test, asUpdateId__test } from "../../src/testUtils/types.js";
 
 const text = getTranslator();
 
-const makeTelegramResponse = <D>(result?: D, ok = true) =>
-  JSON.stringify({ ok, result });
+const makeTelegramResponse = <D>(result?: D, ok = true) => JSON.stringify({ ok, result });
 
-const makeSampleTelegramMessageResponse = (
-  chatId: unknown,
-  messageId?: unknown,
-): TgMessage => {
+const makeSampleTelegramMessageResponse = (chatId: unknown, messageId?: unknown): TgMessage => {
   const msgId = messageId ?? 124235;
   return {
     message_id: asMessageId__test(msgId as number),
@@ -143,9 +135,7 @@ export const mockTgReceiveRawMessage = (
       expect(answer.chat_id).toBe(chatId);
       expect(answer.text).toBe(message);
       resolve();
-      return makeTelegramResponse<TgMessage>(
-        makeSampleTelegramMessageResponse(answer.chat_id),
-      );
+      return makeTelegramResponse<TgMessage>(makeSampleTelegramMessageResponse(answer.chat_id));
     });
   });
 };
@@ -197,9 +187,7 @@ export const mockTgReceiveMessage = (
             );
 
             if (expectedItem.type === TelegramMessageMetaType.Button) {
-              const btnData = TelegramButtonModel.fromDto(
-                receivedItem.callback_data,
-              );
+              const btnData = TelegramButtonModel.fromDto(receivedItem.callback_data);
 
               expect(btnData.value).toBe(expectedItem.data);
               expect(btnData.logPrefix).toBeDefined();
@@ -216,9 +204,7 @@ export const mockTgReceiveMessage = (
         expect(answer.reply_markup).not.toBeDefined();
       }
       resolve(prefixId);
-      return makeTelegramResponse<TgMessage>(
-        makeSampleTelegramMessageResponse(answer.chat_id),
-      );
+      return makeTelegramResponse<TgMessage>(makeSampleTelegramMessageResponse(answer.chat_id));
     });
   });
 };
@@ -229,9 +215,7 @@ export const mockTgReceiveMessages = async (
   lang: LanguageCode,
   textIds: TranslationKeyFull[],
 ): Promise<void> => {
-  await Promise.all(
-    textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)),
-  );
+  await Promise.all(textIds.map((textId) => mockTgReceiveMessage(host, chatId, lang, textId)));
 };
 
 export const mockTgGetFileUrl = (host: NockScope, fileId: string): void => {
@@ -241,19 +225,18 @@ export const mockTgGetFileUrl = (host: NockScope, fileId: string): void => {
   host.post("/bottelegram-api-token/getFile").reply(200, (uri, body) => {
     const answer = typeof body === "string" ? querystring.parse(body) : body;
     expect(answer.file_id).toBe(fileId);
-    return JSON.stringify({ ok: true, result: { file_path: pathToFile } });
+    return JSON.stringify({
+      ok: true,
+      result: { file_path: pathToFile },
+    });
   });
 
   const currentDir = fileURLToPath(new URL(".", import.meta.url));
   host
     .get(fullPathToFile)
-    .replyWithFile(
-      200,
-      resolvePath(currentDir, "..", "mockData", "sample_file.oga"),
-      {
-        "Content-Type": "audio/ogg",
-      },
-    );
+    .replyWithFile(200, resolvePath(currentDir, "..", "mockData", "sample_file.oga"), {
+      "Content-Type": "audio/ogg",
+    });
 };
 
 export const mockTgReceiveCallbackMessage = (
@@ -265,68 +248,64 @@ export const mockTgReceiveCallbackMessage = (
   expectedMarkup: TelegramMessageMetaItem[][] = [],
 ): Promise<void> => {
   return new Promise((resolve) => {
-    host
-      .post("/bottelegram-api-token/editMessageText")
-      .reply(200, (uri, body) => {
-        const answer: Record<
-          string,
-          {
-            inline_keyboard: {
-              text: string;
-              url: string;
-              callback_data: string;
-            }[][];
-          }
-        > = typeof body === "string" ? querystring.parse(body) : body;
-        expect(answer.chat_id).toBe(chatId);
-        expect(answer.text).toBe(text.t(textId, langId));
-        expect(answer.message_id).toBe(messageId);
-
-        if (expectedMarkup.length) {
-          expect(answer.reply_markup).toBeDefined();
-          const receivedMarkup = answer.reply_markup.inline_keyboard;
-          expect(receivedMarkup).toBeDefined();
-
-          expect(receivedMarkup).toHaveLength(expectedMarkup.length);
-
-          receivedMarkup.forEach((receivedLine, ind) => {
-            const expectedLine = expectedMarkup[ind];
-            expect(receivedLine).toBeDefined();
-            expect(expectedLine).toBeDefined();
-            receivedLine.forEach((receivedItem, indx) => {
-              const expectedItem = expectedLine[indx];
-              expect(receivedItem).toBeDefined();
-              expect(expectedItem).toBeDefined();
-
-              expect(receivedItem.text).toBe(
-                isTranslationKey(expectedItem.title)
-                  ? text.t(expectedItem.title, langId)
-                  : expectedItem.title,
-              );
-
-              if (expectedItem.type === TelegramMessageMetaType.Button) {
-                const btnData = TelegramButtonModel.fromDto(
-                  receivedItem.callback_data,
-                );
-
-                expect(btnData.value).toBe(expectedItem.data);
-                expect(btnData.logPrefix).toBeDefined();
-                expect(btnData.id).toBe(expectedItem.btnType);
-              } else if (expectedItem.type === TelegramMessageMetaType.Link) {
-                expect(receivedItem.url).toContain(expectedItem.data); // TODO
-              } else {
-                throw new Error("type is not defined");
-              }
-            });
-          });
-        } else {
-          expect(answer.reply_markup).not.toBeDefined();
+    host.post("/bottelegram-api-token/editMessageText").reply(200, (uri, body) => {
+      const answer: Record<
+        string,
+        {
+          inline_keyboard: {
+            text: string;
+            url: string;
+            callback_data: string;
+          }[][];
         }
-        resolve();
-        return makeTelegramResponse<TgMessage>(
-          makeSampleTelegramMessageResponse(answer.chat_id, answer.message_id),
-        );
-      });
+      > = typeof body === "string" ? querystring.parse(body) : body;
+      expect(answer.chat_id).toBe(chatId);
+      expect(answer.text).toBe(text.t(textId, langId));
+      expect(answer.message_id).toBe(messageId);
+
+      if (expectedMarkup.length) {
+        expect(answer.reply_markup).toBeDefined();
+        const receivedMarkup = answer.reply_markup.inline_keyboard;
+        expect(receivedMarkup).toBeDefined();
+
+        expect(receivedMarkup).toHaveLength(expectedMarkup.length);
+
+        receivedMarkup.forEach((receivedLine, ind) => {
+          const expectedLine = expectedMarkup[ind];
+          expect(receivedLine).toBeDefined();
+          expect(expectedLine).toBeDefined();
+          receivedLine.forEach((receivedItem, indx) => {
+            const expectedItem = expectedLine[indx];
+            expect(receivedItem).toBeDefined();
+            expect(expectedItem).toBeDefined();
+
+            expect(receivedItem.text).toBe(
+              isTranslationKey(expectedItem.title)
+                ? text.t(expectedItem.title, langId)
+                : expectedItem.title,
+            );
+
+            if (expectedItem.type === TelegramMessageMetaType.Button) {
+              const btnData = TelegramButtonModel.fromDto(receivedItem.callback_data);
+
+              expect(btnData.value).toBe(expectedItem.data);
+              expect(btnData.logPrefix).toBeDefined();
+              expect(btnData.id).toBe(expectedItem.btnType);
+            } else if (expectedItem.type === TelegramMessageMetaType.Link) {
+              expect(receivedItem.url).toContain(expectedItem.data); // TODO
+            } else {
+              throw new Error("type is not defined");
+            }
+          });
+        });
+      } else {
+        expect(answer.reply_markup).not.toBeDefined();
+      }
+      resolve();
+      return makeTelegramResponse<TgMessage>(
+        makeSampleTelegramMessageResponse(answer.chat_id, answer.message_id),
+      );
+    });
   });
 };
 
@@ -352,14 +331,10 @@ export const mockTgReceiveInvoiceMessage = (
       expect(payload.prefix).toBeDefined();
 
       expect(answer.title).toBe(text.t(TranslationKeys.DonationTitle, langId));
-      expect(answer.description).toBe(
-        text.t(TranslationKeys.DonationDescription, langId),
-      );
+      expect(answer.description).toBe(text.t(TranslationKeys.DonationDescription, langId));
       expect(answer.prices).toHaveLength(1);
       expect(answer.prices[0].amount).toBe(price * 100);
-      expect(answer.prices[0].label).toBe(
-        text.t(TranslationKeys.DonationLabel, langId),
-      );
+      expect(answer.prices[0].label).toBe(text.t(TranslationKeys.DonationLabel, langId));
 
       resolve();
       return makeTelegramResponse();

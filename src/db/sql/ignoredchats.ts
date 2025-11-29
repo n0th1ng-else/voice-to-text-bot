@@ -21,18 +21,14 @@ export class IgnoredChatsDb extends CoreDbClient {
 
   public async getRow(chatId: ChatId): Promise<IgnoredChatsRowScheme | null> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table ignoredchats is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table ignoredchats is not initialized yet"));
     }
     const query = IgnoredChatsSql.getRows;
     const values = [chatId];
-    return this.pool
-      .query<IgnoredChatsRowScheme>(query, values)
-      .then((queryData) => {
-        const row = queryData.rows.shift();
-        return row ?? null;
-      });
+    return this.pool.query<IgnoredChatsRowScheme>(query, values).then((queryData) => {
+      const row = queryData.rows.shift();
+      return row ?? null;
+    });
   }
 
   public getId(row: IgnoredChatsRowScheme): IgnoredChatId {

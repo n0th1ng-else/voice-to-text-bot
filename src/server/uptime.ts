@@ -24,9 +24,7 @@ export class UptimeDaemon {
 
   constructor(version = "") {
     this.version = version;
-    this.daemon = new ScheduleDaemon("uptime", () =>
-      this.onTick(),
-    ).setStopHandler(
+    this.daemon = new ScheduleDaemon("uptime", () => this.onTick()).setStopHandler(
       () => this.shouldStop(),
       () => this.onFinish(),
     );
@@ -62,11 +60,7 @@ export class UptimeDaemon {
 
     this.lifecycleInterval = interval < minInterval ? minInterval : interval;
 
-    logger.info(
-      `Lifecycle interval is set to ${Logger.y(
-        sSuffix("day", this.lifecycleInterval),
-      )}`,
-    );
+    logger.info(`Lifecycle interval is set to ${Logger.y(sSuffix("day", this.lifecycleInterval))}`);
 
     return this;
   }
@@ -108,9 +102,7 @@ export class UptimeDaemon {
     }
     logger.info(`Ping completed with result: ${Logger.y(health.status)}`);
 
-    const isCallbackOwner = health.urls.every((url) =>
-      url.includes(this.currentUrl),
-    );
+    const isCallbackOwner = health.urls.every((url) => url.includes(this.currentUrl));
 
     if (!isCallbackOwner && this.isRunning) {
       this.stop();
@@ -133,11 +125,7 @@ export class UptimeDaemon {
       throw new Error("Buddy node status is not ok");
     }
 
-    logger.warn(
-      `Delegated callback to the ${Logger.y("next node")} ${Logger.y(
-        this.nextUrl,
-      )}`,
-    );
+    logger.warn(`Delegated callback to the ${Logger.y("next node")} ${Logger.y(this.nextUrl)}`);
 
     if (!this.stat) {
       return;
@@ -152,9 +140,7 @@ export class UptimeDaemon {
     const shouldStop = currentInterval > this.lifecycleInterval;
 
     if (shouldStop) {
-      logger.warn(
-        "Lifecycle limit reached. Delegating execution to the next node",
-      );
+      logger.warn("Lifecycle limit reached. Delegating execution to the next node");
     }
 
     return shouldStop;

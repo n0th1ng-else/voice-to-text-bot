@@ -9,7 +9,10 @@ export class StopListener {
 
   constructor() {
     onExit((code, signal) => {
-      logger.error("Exit signal received", { code, signal });
+      logger.error("Exit signal received", {
+        code,
+        signal,
+      });
       this.notifyAllListeners();
     });
   }

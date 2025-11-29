@@ -42,27 +42,19 @@ export class TgError extends Error {
 
   public setUrl(url: string, apiToken: string): this {
     this.url = apiToken
-      ? url.replace(
-          getRegExpFromString(apiToken, ["g", "i"]),
-          SANITIZE_CHARACTER,
-        )
+      ? url.replace(getRegExpFromString(apiToken, ["g", "i"]), SANITIZE_CHARACTER)
       : url;
     return this;
   }
 }
 
-const assertErrCondition = (
-  err: unknown,
-  status: number,
-  text: string,
-): boolean => {
+const assertErrCondition = (err: unknown, status: number, text: string): boolean => {
   if (!(err instanceof TgError)) {
     return false;
   }
   const isErr = !err?.response?.ok;
   const isStatusExpected = err?.code === status;
-  const isTextExpected =
-    err?.response?.description?.toLowerCase() === text.toLowerCase();
+  const isTextExpected = err?.response?.description?.toLowerCase() === text.toLowerCase();
   return isErr && isStatusExpected && isTextExpected;
 };
 
@@ -75,11 +67,7 @@ export const hasNoRightsToSendMessage = (err: unknown): boolean => {
 };
 
 export const isKickedFromSupergroup = (err: unknown): boolean => {
-  return assertErrCondition(
-    err,
-    403,
-    "Forbidden: bot was kicked from the supergroup chat",
-  );
+  return assertErrCondition(err, 403, "Forbidden: bot was kicked from the supergroup chat");
 };
 
 export const isBlockedByUser = (err: unknown): boolean => {

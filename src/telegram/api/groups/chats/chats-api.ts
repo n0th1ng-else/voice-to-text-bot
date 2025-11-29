@@ -1,9 +1,5 @@
 import { TelegramBaseApi } from "../core.js";
-import {
-  type MessageDto,
-  type TgMessage,
-  TgMessageSchema,
-} from "../../types.js";
+import { type MessageDto, type TgMessage, TgMessageSchema } from "../../types.js";
 import {
   type EditMessageDto,
   type TgMessageOptions,
@@ -47,12 +43,7 @@ export class TelegramChatsApi {
       };
     }
 
-    return this.client.requestValidate(
-      "sendMessage",
-      TgMessageSchema,
-      data,
-      chatId,
-    );
+    return this.client.requestValidate("sendMessage", TgMessageSchema, data, chatId);
   }
 
   public editMessageText(
@@ -77,12 +68,7 @@ export class TelegramChatsApi {
       };
     }
 
-    return this.client.requestValidate(
-      "editMessageText",
-      TgMessageSchema,
-      data,
-      chatId,
-    );
+    return this.client.requestValidate("editMessageText", TgMessageSchema, data, chatId);
   }
 
   public leaveChat(chatId: ChatId): Promise<boolean> {

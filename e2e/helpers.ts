@@ -3,10 +3,7 @@ import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
 import { TranslationKeys } from "../src/text/types.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
-import {
-  TelegramButtonModel,
-  type TelegramButtonType,
-} from "../src/telegram/types.js";
+import { TelegramButtonModel, type TelegramButtonType } from "../src/telegram/types.js";
 import { donationLevels } from "../src/const.js";
 import { toCurrency } from "../src/text/utils.js";
 import type { TgCallbackQuery, TgMessage } from "../src/telegram/api/types.js";
@@ -52,12 +49,7 @@ export class TelegramMessageModel {
     this.chatType = chatType;
   }
 
-  public setName(
-    messageId: MessageId,
-    options: UserNameOptions,
-    isBot = false,
-    lang = "",
-  ): this {
+  public setName(messageId: MessageId, options: UserNameOptions, isBot = false, lang = ""): this {
     this.messageId = messageId;
     this.isBot = isBot;
     this.hasFrom = true;
@@ -74,12 +66,7 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setVoice(
-    messageId: MessageId,
-    id: FileId,
-    duration: number,
-    type = "audio/ogg",
-  ): this {
+  public setVoice(messageId: MessageId, id: FileId, duration: number, type = "audio/ogg"): this {
     this.messageId = messageId;
     this.voiceId = id;
     this.voiceDuration = duration;
@@ -87,12 +74,7 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setAudio(
-    messageId: MessageId,
-    id: FileId,
-    duration: number,
-    type = "audio/opus",
-  ): this {
+  public setAudio(messageId: MessageId, id: FileId, duration: number, type = "audio/opus"): this {
     this.messageId = messageId;
     this.voiceId = id;
     this.voiceDuration = duration;
@@ -115,11 +97,7 @@ export class TelegramMessageModel {
     return this;
   }
 
-  public setLangCallback(
-    messageId: MessageId,
-    langId: LanguageCode,
-    prefixId: string,
-  ): this {
+  public setLangCallback(messageId: MessageId, langId: LanguageCode, prefixId: string): this {
     this.messageId = messageId;
     const data = new TelegramButtonModel<LanguageCode>("l", langId, prefixId);
 
@@ -134,11 +112,7 @@ export class TelegramMessageModel {
     prefixId: string,
   ): this {
     this.messageId = messageId;
-    const data = new TelegramButtonModel(
-      "d",
-      JSON.stringify([price, currency]),
-      prefixId,
-    );
+    const data = new TelegramButtonModel("d", JSON.stringify([price, currency]), prefixId);
 
     this.callbackData = data.getDtoString();
     return this;

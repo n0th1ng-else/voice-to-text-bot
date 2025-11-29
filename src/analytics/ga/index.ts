@@ -8,10 +8,7 @@ import { API_TIMEOUT_MS } from "../../const.js";
 
 const logger = new Logger("analytics:ga");
 
-export const collectEvents = async (
-  chatId: ChatId,
-  events: AnalyticsEventExt[],
-): Promise<void> => {
+export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[]): Promise<void> => {
   if (!analytics.measurementId || !analytics.apiSecret) {
     if (!isDevelopment()) {
       logger.error(

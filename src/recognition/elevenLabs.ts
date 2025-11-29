@@ -1,10 +1,6 @@
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
-import {
-  VoiceConverter,
-  type ConverterMeta,
-  type LanguageCode,
-} from "./types.js";
+import { VoiceConverter, type ConverterMeta, type LanguageCode } from "./types.js";
 import { addAttachment } from "../monitoring/sentry.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
@@ -45,10 +41,7 @@ export class ElevenLabsProvider extends VoiceConverter {
     return this.recognise(rawWav, lang);
   }
 
-  private async recognise(
-    buffer: Buffer<ArrayBufferLike>,
-    lang: LanguageCode,
-  ): Promise<string> {
+  private async recognise(buffer: Buffer<ArrayBufferLike>, lang: LanguageCode): Promise<string> {
     const duration = new TimeMeasure();
 
     const recognition = await this.client.speechToText.convert(

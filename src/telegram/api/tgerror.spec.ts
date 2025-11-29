@@ -119,9 +119,7 @@ describe("tgerror", () => {
       expect(err.response).toBe(undefined);
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
-      expect(err.url).toBe(
-        `http://google.com/${SANITIZE_CHARACTER}/sendMessage`,
-      );
+      expect(err.url).toBe(`http://google.com/${SANITIZE_CHARACTER}/sendMessage`);
     });
 
     it("should set the response", () => {
@@ -256,8 +254,7 @@ describe("tgerror", () => {
       tgErr.setErrorCode(403).setResponse({
         ok: false,
         result: undefined,
-        description:
-          "Bad Request: not enough rights to send text messages to the chat",
+        description: "Bad Request: not enough rights to send text messages to the chat",
       });
       expect(hasNoRightsToSendMessage(tgErr)).toBe(false);
     });
@@ -267,8 +264,7 @@ describe("tgerror", () => {
       tgErr.setErrorCode(400).setResponse({
         ok: true,
         result: undefined,
-        description:
-          "Bad Request: not enough rights to send text messages to the chat",
+        description: "Bad Request: not enough rights to send text messages to the chat",
       });
       expect(hasNoRightsToSendMessage(tgErr)).toBe(false);
     });
@@ -278,8 +274,7 @@ describe("tgerror", () => {
       tgErr.setErrorCode(400).setResponse({
         ok: false,
         result: undefined,
-        description:
-          "Bad Request: not enough rights to send text messages to the chat",
+        description: "Bad Request: not enough rights to send text messages to the chat",
       });
       expect(hasNoRightsToSendMessage(tgErr)).toBe(true);
     });

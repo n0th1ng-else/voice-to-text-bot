@@ -8,7 +8,11 @@ export const mockGetIgnoredChatsRow = (
   pool: MockPool,
   chatId: ChatId,
   ignore: boolean,
-): Promise<{ pool: MockPool; chatId: ChatId; ignore: boolean }> => {
+): Promise<{
+  pool: MockPool;
+  chatId: ChatId;
+  ignore: boolean;
+}> => {
   // TODO enable with caching
   return Promise.resolve({ pool, chatId, ignore });
   // return new Promise((resolve) => {

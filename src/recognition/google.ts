@@ -1,10 +1,6 @@
 import { v1 } from "@google-cloud/speech";
 import type { google } from "@google-cloud/speech/build/protos/protos.js";
-import {
-  type ConverterMeta,
-  type LanguageCode,
-  VoiceConverter,
-} from "./types.js";
+import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { TimeMeasure } from "../common/timer.js";

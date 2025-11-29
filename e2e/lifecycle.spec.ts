@@ -1,23 +1,9 @@
-import {
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  it,
-  describe,
-  beforeAll,
-} from "vitest";
+import { expect, vi, beforeEach, afterEach, it, describe, beforeAll } from "vitest";
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
-import {
-  injectTestDependencies,
-  type InjectedTestFn,
-} from "./helpers/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
+import { injectTestDependencies, type InjectedTestFn } from "./helpers/dependencies.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
@@ -33,8 +19,7 @@ const webhookDoNotWait = false;
 
 const path = "/lifecycle";
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 let server: InstanceType<InjectedFn["BotServer"]>;
 let localhostUrl: string;
@@ -121,9 +106,7 @@ describe("[lifecycle]", () => {
         expect(res.body.status).toBe(HealthStatus.InProgress);
         expect(res.body.urls).toEqual([]);
         expect(res.body.version).toBe(appVersion);
-        expect(res.body.message).toBe(
-          "App is not connected to the Telegram server",
-        );
+        expect(res.body.message).toBe("App is not connected to the Telegram server");
       });
     });
 

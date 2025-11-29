@@ -1,9 +1,6 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
-import {
-  SubscriptionDb,
-  type SubscriptionRowScheme,
-} from "./sql/subscriptions.js";
+import { SubscriptionDb, type SubscriptionRowScheme } from "./sql/subscriptions.js";
 import type { PaymentChargeId, UserId } from "../telegram/api/core.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
 import type { SubscriptionId } from "./sql/types.js";
@@ -24,10 +21,7 @@ export class SubscriptionsClient {
       await this.db.init();
       this.logInfo(`Table ${Logger.y("subscriptions")} has been initialized`);
     } catch (err) {
-      logger.error(
-        `Unable to initialize ${Logger.y("subscriptions")} table`,
-        err,
-      );
+      logger.error(`Unable to initialize ${Logger.y("subscriptions")} table`, err);
       throw err;
     }
   }
@@ -36,35 +30,22 @@ export class SubscriptionsClient {
     try {
       this.logInfo("Looking for rows with endDate in the future");
       const rows = await this.db.getRowsByDate(endData);
-      this.logInfo(
-        "Row search has been executed for rows with endDate in the future",
-      );
+      this.logInfo("Row search has been executed for rows with endDate in the future");
       return rows;
     } catch (err) {
-      logger.error(
-        "Unable provide a search for rows with endDate in the future",
-        err,
-      );
+      logger.error("Unable provide a search for rows with endDate in the future", err);
       throw err;
     }
   }
 
-  public async getRowsByUserId(
-    userId: UserId,
-    limit: number,
-  ): Promise<SubscriptionRowScheme[]> {
+  public async getRowsByUserId(userId: UserId, limit: number): Promise<SubscriptionRowScheme[]> {
     try {
       this.logInfo(`Looking for rows with userId=${userId}`);
       const rows = await this.db.getRowsByUserId(userId, limit);
-      this.logInfo(
-        `Row search has been executed for rows with userId=${userId}`,
-      );
+      this.logInfo(`Row search has been executed for rows with userId=${userId}`);
       return rows;
     } catch (err) {
-      logger.error(
-        `Unable provide a search for rows with userId=${userId}`,
-        err,
-      );
+      logger.error(`Unable provide a search for rows with userId=${userId}`, err);
       throw err;
     }
   }
@@ -79,14 +60,7 @@ export class SubscriptionsClient {
   ): Promise<SubscriptionRowScheme> {
     try {
       this.logInfo("Creating a new row");
-      const row = await this.db.createRow(
-        userId,
-        chargeId,
-        endDate,
-        amount,
-        currency,
-        isTrial,
-      );
+      const row = await this.db.createRow(userId, chargeId, endDate, amount, currency, isTrial);
       const subscriptionId = this.getRowId(row);
       this.logInfo(`The row with id=${subscriptionId} has been created`);
       return row;
@@ -96,9 +70,7 @@ export class SubscriptionsClient {
     }
   }
 
-  public async markAsCanceled(
-    subscriptionId: SubscriptionId,
-  ): Promise<SubscriptionRowScheme> {
+  public async markAsCanceled(subscriptionId: SubscriptionId): Promise<SubscriptionRowScheme> {
     this.logInfo(`Updating the row with id=${subscriptionId}`);
     try {
       const row = await this.db.markRowAsCanceled(subscriptionId);

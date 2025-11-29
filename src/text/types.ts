@@ -16,8 +16,7 @@ export const TranslationKeys = {
   DonateCommandMessage: "donate.description",
   AudioNotSupportedMessage: "recognition.voice.notSupported",
   SupportedFormatsMessage: "recognition.voice.supportedFormats",
-  SupportedFormatsMessageExplanation:
-    "recognition.voice.supportedFormats.description",
+  SupportedFormatsMessageExplanation: "recognition.voice.supportedFormats.description",
   DonateMessage: "donate.commandMessage",
   OfficialChannel: "contact.newsChannel",
   PaymentDescription: "donate.payment.description",
@@ -31,9 +30,6 @@ export const TranslationKeys = {
   BtnRussian: "language.button.russian",
 } as const;
 
-export type TranslationKey =
-  (typeof TranslationKeys)[keyof typeof TranslationKeys];
+export type TranslationKey = (typeof TranslationKeys)[keyof typeof TranslationKeys];
 
-export type TranslationKeyFull =
-  | TranslationKey
-  | [TranslationKey, Record<string, string>];
+export type TranslationKeyFull = TranslationKey | [TranslationKey, Record<string, string>];

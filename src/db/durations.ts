@@ -17,14 +17,9 @@ export class DurationsClient {
     this.logInfo("Initializing the table");
     return this.db
       .init()
-      .then(() =>
-        this.logInfo(`Table ${Logger.y("durations")} has been initialized`),
-      )
+      .then(() => this.logInfo(`Table ${Logger.y("durations")} has been initialized`))
       .catch((err) => {
-        logger.error(
-          `Unable to initialize ${Logger.y("durations")} table`,
-          err,
-        );
+        logger.error(`Unable to initialize ${Logger.y("durations")} table`, err);
         throw err;
       });
   }
@@ -33,10 +28,7 @@ export class DurationsClient {
     this.secondary = true;
   }
 
-  public createRow(
-    chatId: ChatId,
-    duration: number,
-  ): Promise<DurationRowScheme> {
+  public createRow(chatId: ChatId, duration: number): Promise<DurationRowScheme> {
     this.logInfo("Creating a new row");
     return this.db
       .createRow(chatId, duration)

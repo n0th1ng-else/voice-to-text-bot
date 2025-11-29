@@ -45,9 +45,7 @@ export class Logger {
   public output(...message: unknown[]): void {
     const prefix = `[${this.id}]`;
 
-    const additionalPrefix = this.additionalPrefix
-      ? `[${this.additionalPrefix}]`
-      : "";
+    const additionalPrefix = this.additionalPrefix ? `[${this.additionalPrefix}]` : "";
 
     const showLogs = process.env.ENABLE_LOGGER === "true";
     if (showLogs) {

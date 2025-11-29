@@ -1,9 +1,6 @@
 import type { Pool } from "pg";
 import { Logger } from "../logger/index.js";
-import {
-  IgnoredChatsDb,
-  type IgnoredChatsRowScheme,
-} from "./sql/ignoredchats.js";
+import { IgnoredChatsDb, type IgnoredChatsRowScheme } from "./sql/ignoredchats.js";
 import type { ChatId } from "../telegram/api/core.js";
 
 const logger = new Logger("postgres-ignored-chats");
@@ -20,14 +17,9 @@ export class IgnoredChatsClient {
     this.logInfo("Initializing the table");
     return this.db
       .init()
-      .then(() =>
-        this.logInfo(`Table ${Logger.y("ignoredchats")} has been initialized`),
-      )
+      .then(() => this.logInfo(`Table ${Logger.y("ignoredchats")} has been initialized`))
       .catch((err) => {
-        logger.error(
-          `Unable to initialize ${Logger.y("ignoredchats")} table`,
-          err,
-        );
+        logger.error(`Unable to initialize ${Logger.y("ignoredchats")} table`, err);
         throw err;
       });
   }

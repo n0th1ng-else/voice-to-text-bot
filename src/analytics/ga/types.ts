@@ -124,11 +124,7 @@ export class AnalyticsData {
     return this;
   }
 
-  public setCommand(
-    command: AnalyticsAction,
-    commandTitle: string,
-    commandMeta = "",
-  ): this {
+  public setCommand(command: AnalyticsAction, commandTitle: string, commandMeta = ""): this {
     this.command = command;
     this.commandTitle = commandTitle;
     this.commandMeta = commandMeta;

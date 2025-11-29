@@ -1,18 +1,11 @@
 import { arch } from "node:os";
-import {
-  type ConverterMeta,
-  type LanguageCode,
-  VoiceConverter,
-} from "./types.js";
+import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
 import { addAttachment } from "../monitoring/sentry.js";
 import { getWavFilePath } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 import { runWhisper } from "../whisper/whisper-engine.js";
-import {
-  lookupModel,
-  type WhisperAddonArchitecture,
-} from "../whisper/utils.js";
+import { lookupModel, type WhisperAddonArchitecture } from "../whisper/utils.js";
 import { whisperEnableGpu, whisperModelFile } from "../env.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";

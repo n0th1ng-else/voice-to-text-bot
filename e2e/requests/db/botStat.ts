@@ -24,10 +24,7 @@ export const mockGetBotStatItem = (
   return item;
 };
 
-export const mockUpdateBotStatUsage = (
-  pool: MockPool,
-  item: BotStatRecordModel,
-): Promise<void> => {
+export const mockUpdateBotStatUsage = (pool: MockPool, item: BotStatRecordModel): Promise<void> => {
   mockBotStatFind(pool, item.chatId, [item]);
   return mockBotStatUpdateUsage(pool, item);
 };
@@ -50,7 +47,9 @@ const mockBotStatFind = (
     expect(values).toHaveLength(1);
     const [rChatId] = values;
     expect(rChatId).toBe(chatId);
-    return Promise.resolve({ rows: items.map((stat) => getDbDto(stat)) });
+    return Promise.resolve({
+      rows: items.map((stat) => getDbDto(stat)),
+    });
   });
 };
 
@@ -66,8 +65,7 @@ const mockBotStatCreate = (
 
   pool.mockQuery(UsagesSql.insertRow, (values) => {
     expect(values).toHaveLength(7);
-    const [rId, rChatId, rUser, rUsageCount, rLangId, rCreated, rUpdated] =
-      values;
+    const [rId, rChatId, rUser, rUsageCount, rLangId, rCreated, rUpdated] = values;
     expect(typeof rId).toBe("string");
     expect(rChatId).toBe(stat.chatId);
     expect(rUser).toBe(stat.user);
@@ -81,10 +79,7 @@ const mockBotStatCreate = (
   return stat;
 };
 
-const mockBotStatUpdateUsage = (
-  pool: MockPool,
-  item: BotStatRecordModel,
-): Promise<void> => {
+const mockBotStatUpdateUsage = (pool: MockPool, item: BotStatRecordModel): Promise<void> => {
   return new Promise((resolve) => {
     pool.mockQuery(UsagesSql.updateRow, (values) => {
       expect(values).toHaveLength(5);

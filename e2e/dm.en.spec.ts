@@ -1,34 +1,15 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
-import {
-  type InjectedTestFn,
-  injectTestDependencies,
-} from "./helpers/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
+import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { setCurrentMockFileId } from "../src/telegram/api/__mocks__/tgMTProtoApi.js";
 import { getSupportedAudioFormats } from "../src/text/utils.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
 import type { VoidPromise } from "../src/common/types.js";
-import {
-  asChatId__test,
-  asMessageId__test,
-  asFileId__test,
-} from "../src/testUtils/types.js";
+import { asChatId__test, asMessageId__test, asFileId__test } from "../src/testUtils/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
@@ -41,8 +22,7 @@ const appPort = 3100;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 let chatType: TgChatType;
 let testMessageId = asMessageId__test(0);
@@ -244,17 +224,12 @@ describe("[default language - english]", () => {
       return Promise.all([
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          [
-            TranslationKeys.WelcomeMessage,
-            TranslationKeys.WelcomeMessageGroup,
-            TranslationKeys.WelcomeMessageMore,
-            TranslationKeys.DonateMessage,
-          ],
-        ),
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
+          TranslationKeys.WelcomeMessage,
+          TranslationKeys.WelcomeMessageGroup,
+          TranslationKeys.WelcomeMessageMore,
+          TranslationKeys.DonateMessage,
+        ]),
       ]);
     });
 
@@ -365,11 +340,7 @@ describe("[default language - english]", () => {
       ]).then(([prefixId]) => {
         const cbMessage = new TelegramMessageModel(testChatId, chatType);
         const newLangId: LanguageCode = "ru-RU";
-        cbMessage.setLangCallback(
-          asMessageId__test(tgMessage.messageId + 1),
-          newLangId,
-          prefixId,
-        );
+        cbMessage.setLangCallback(asMessageId__test(tgMessage.messageId + 1), newLangId, prefixId);
         return Promise.all([
           sendTelegramCallbackMessage(host, bot, cbMessage),
           mockTgReceiveCallbackMessage(
@@ -446,19 +417,14 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
           [
-            [
-              TranslationKeys.LongVoiceMessage,
-              {
-                duration: "1 min 30 sec",
-              },
-            ],
+            TranslationKeys.LongVoiceMessage,
+            {
+              duration: "1 min 30 sec",
+            },
           ],
-        ),
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -467,28 +433,15 @@ describe("[default language - english]", () => {
     it("responds on a voice message with wrong mime type", () => {
       const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
-      tgMessage.setVoice(
-        testMessageId,
-        voiceFileId,
-        voiceFileDuration,
-        "broken/type",
-      );
+      tgMessage.setVoice(testMessageId, voiceFileId, voiceFileDuration, "broken/type");
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          [
-            TranslationKeys.AudioNotSupportedMessage,
-            [
-              TranslationKeys.SupportedFormatsMessage,
-              { formats: getSupportedAudioFormats() },
-            ],
-            TranslationKeys.SupportedFormatsMessageExplanation,
-          ],
-        ),
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
+          TranslationKeys.AudioNotSupportedMessage,
+          [TranslationKeys.SupportedFormatsMessage, { formats: getSupportedAudioFormats() }],
+          TranslationKeys.SupportedFormatsMessageExplanation,
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -550,19 +503,14 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
           [
-            [
-              TranslationKeys.LongVoiceMessage,
-              {
-                duration: "1 min 30 sec",
-              },
-            ],
+            TranslationKeys.LongVoiceMessage,
+            {
+              duration: "1 min 30 sec",
+            },
           ],
-        ),
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -571,28 +519,15 @@ describe("[default language - english]", () => {
     it("responds on an audio message with wrong mime type", () => {
       const voiceFileId = asFileId__test("some-file-id");
       const voiceFileDuration = 20;
-      tgMessage.setAudio(
-        testMessageId,
-        voiceFileId,
-        voiceFileDuration,
-        "broken/test",
-      );
+      tgMessage.setAudio(testMessageId, voiceFileId, voiceFileDuration, "broken/test");
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
-          [
-            TranslationKeys.AudioNotSupportedMessage,
-            [
-              TranslationKeys.SupportedFormatsMessage,
-              { formats: getSupportedAudioFormats() },
-            ],
-            TranslationKeys.SupportedFormatsMessageExplanation,
-          ],
-        ),
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
+          TranslationKeys.AudioNotSupportedMessage,
+          [TranslationKeys.SupportedFormatsMessage, { formats: getSupportedAudioFormats() }],
+          TranslationKeys.SupportedFormatsMessageExplanation,
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);
@@ -654,19 +589,14 @@ describe("[default language - english]", () => {
       const statModel = mockGetBotStatItem(testPool, tgMessage.chatId, "en-US");
 
       return Promise.all([
-        mockTgReceiveMessages(
-          telegramServer,
-          tgMessage.chatId,
-          statModel.langId,
+        mockTgReceiveMessages(telegramServer, tgMessage.chatId, statModel.langId, [
           [
-            [
-              TranslationKeys.LongVoiceMessage,
-              {
-                duration: "1 min 30 sec",
-              },
-            ],
+            TranslationKeys.LongVoiceMessage,
+            {
+              duration: "1 min 30 sec",
+            },
           ],
-        ),
+        ]),
         sendTelegramMessage(host, bot, tgMessage),
         mockGetIgnoredChatsRow(testPool, tgMessage.chatId, false),
       ]);

@@ -20,9 +20,7 @@ export class UsagesClient {
     this.logInfo("Initializing the table");
     return this.db
       .init()
-      .then(() =>
-        this.logInfo(`Table ${Logger.y("usages")} has been initialized`),
-      )
+      .then(() => this.logInfo(`Table ${Logger.y("usages")} has been initialized`))
       .catch((err) => {
         logger.error(`Unable to initialize ${Logger.y("usages")} table`, err);
         throw err;
@@ -33,11 +31,7 @@ export class UsagesClient {
     this.secondary = true;
   }
 
-  public getLangId(
-    chatId: ChatId,
-    username: string,
-    langId: LanguageCode,
-  ): Promise<LanguageCode> {
+  public getLangId(chatId: ChatId, username: string, langId: LanguageCode): Promise<LanguageCode> {
     return this.getRows(chatId)
       .then((rows) => {
         const row = rows.shift();
@@ -50,19 +44,11 @@ export class UsagesClient {
       .then((row) => getLanguageByText(row.lang_id));
   }
 
-  public updateLangId(
-    chatId: ChatId,
-    langId: LanguageCode,
-  ): Promise<UsageRowScheme> {
+  public updateLangId(chatId: ChatId, langId: LanguageCode): Promise<UsageRowScheme> {
     return this.getRows(chatId).then((rows) => {
       const row = rows.shift();
       if (row) {
-        return this.updateRow(
-          row.usage_id,
-          langId,
-          row.usage_count,
-          row.user_name,
-        );
+        return this.updateRow(row.usage_id, langId, row.usage_count, row.user_name);
       }
 
       return this.createRow(chatId, langId);
@@ -102,9 +88,7 @@ export class UsagesClient {
   ): Promise<UsageRowScheme> {
     const rows = await this.getRows(chatId);
     const existingRow = rows.shift();
-    const row =
-      existingRow ??
-      (await this.db.createRow(chatId, langId, username, usageCount));
+    const row = existingRow ?? (await this.db.createRow(chatId, langId, username, usageCount));
     return await this.db.updateRowWithDate(
       row.usage_id,
       langId,
@@ -118,11 +102,7 @@ export class UsagesClient {
   /**
    * @deprecated Use it only for chart
    */
-  public statRows(
-    from: Date,
-    to: Date,
-    usageCountFrom: number,
-  ): Promise<UsageRowScheme[]> {
+  public statRows(from: Date, to: Date, usageCountFrom: number): Promise<UsageRowScheme[]> {
     this.logInfo("Looking for rows");
     return this.db
       .statRows(from, to, usageCountFrom)
@@ -147,9 +127,7 @@ export class UsagesClient {
       .updateRow(usageId, langId, usageCount, username)
       .then((row) => {
         const id = this.db.getId(row);
-        this.logInfo(
-          `The row with id=${usageId} has been updated ${id === usageId}`,
-        );
+        this.logInfo(`The row with id=${usageId} has been updated ${id === usageId}`);
         return row;
       })
       .catch((err) => {

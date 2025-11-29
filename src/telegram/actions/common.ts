@@ -1,10 +1,7 @@
 import { Logger } from "../../logger/index.js";
 import { getTranslator } from "../../text/index.js";
 import { splitTextIntoParts } from "../../common/helpers.js";
-import {
-  TELEGRAM_API_MAX_MESSAGE_SIZE,
-  type TelegramApi,
-} from "../api/tgapi.js";
+import { TELEGRAM_API_MAX_MESSAGE_SIZE, type TelegramApi } from "../api/tgapi.js";
 import type { TgMessage } from "../api/types.js";
 import type { MessageOptions } from "../types.js";
 import type { BotMessageModel } from "../models/botMessage.js";
@@ -28,10 +25,7 @@ export abstract class GenericAction {
     this.bot = bot;
   }
 
-  public abstract runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void>;
+  public abstract runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void>;
 
   public abstract runCondition(
     msg: TgMessage,
@@ -49,14 +43,12 @@ export abstract class GenericAction {
     }
 
     logger.info(`${prefix.getPrefix()} Fetching language`);
-    return this.stat
-      .getLanguage(model.chatId, model.name, model.userLanguage)
-      .catch((err) => {
-        const errorMessage = "Unable to get the lang";
-        logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
-        model.analytics.addError(errorMessage);
-        return this.text.getFallbackLanguage();
-      });
+    return this.stat.getLanguage(model.chatId, model.name, model.userLanguage).catch((err) => {
+      const errorMessage = "Unable to get the lang";
+      logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
+      model.analytics.addError(errorMessage);
+      return this.text.getFallbackLanguage();
+    });
   }
 
   public async sendMessage(
@@ -100,12 +92,7 @@ export abstract class GenericAction {
   ): Promise<void> {
     const [partKey, partParams] = Array.isArray(id) ? id : [id];
     return this.bot.chats
-      .editMessageText(
-        chatId,
-        messageId,
-        this.text.t(partKey, meta.lang, partParams),
-        meta.options,
-      )
+      .editMessageText(chatId, messageId, this.text.t(partKey, meta.lang, partParams), meta.options)
       .then(() => logger.info(`${prefix.getPrefix()} Updated message`));
   }
 
@@ -116,17 +103,8 @@ export abstract class GenericAction {
     options: TgMessageOptions = {},
     forumThreadId?: MessageThreadId,
   ): Promise<void> {
-    const messageParts = splitTextIntoParts(
-      message,
-      lang,
-      TELEGRAM_API_MAX_MESSAGE_SIZE,
-    );
-    return this.sendRawMessageParts(
-      chatId,
-      messageParts,
-      options,
-      forumThreadId,
-    );
+    const messageParts = splitTextIntoParts(message, lang, TELEGRAM_API_MAX_MESSAGE_SIZE);
+    return this.sendRawMessageParts(chatId, messageParts, options, forumThreadId);
   }
 
   private async sendRawMessageParts(
@@ -142,9 +120,7 @@ export abstract class GenericAction {
 
     return this.bot.chats
       .sendMessage(chatId, message, options, forumThreadId)
-      .then(() =>
-        this.sendRawMessageParts(chatId, messageParts, options, forumThreadId),
-      );
+      .then(() => this.sendRawMessageParts(chatId, messageParts, options, forumThreadId));
   }
 }
 

@@ -7,12 +7,7 @@ import { logLevel } from "../env.js";
 import { trackApplicationErrors } from "../monitoring/newrelic.js";
 
 const LogLevelSchema = z
-  .union([
-    z.literal("DEBUG"),
-    z.literal("INFO"),
-    z.literal("WARN"),
-    z.literal("ERROR"),
-  ])
+  .union([z.literal("DEBUG"), z.literal("INFO"), z.literal("WARN"), z.literal("ERROR")])
   .catch("INFO")
   .describe("Validation schema for the logging level");
 
@@ -77,10 +72,7 @@ export class Logger {
     const localDate = new Date(dateOffset);
     const timeLineStart = 0;
     const timeLineSize = 23;
-    return localDate
-      .toISOString()
-      .slice(timeLineStart, timeLineSize)
-      .replace("T", " ");
+    return localDate.toISOString().slice(timeLineStart, timeLineSize).replace("T", " ");
   }
 
   private readonly additionalPrefix: string;
@@ -113,11 +105,7 @@ export class Logger {
     sendLogs("info", this.getFullPrefix(false), msg, data);
   }
 
-  public warn(
-    msg: string,
-    data?: Record<string, unknown>,
-    shouldReport = false,
-  ): void {
+  public warn(msg: string, data?: Record<string, unknown>, shouldReport = false): void {
     if (LOG_LEVEL_PRIORITY.WARN < this.level) {
       return;
     }

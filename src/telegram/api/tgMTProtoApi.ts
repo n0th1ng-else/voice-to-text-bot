@@ -11,11 +11,7 @@ export type TgProto = {
 };
 
 // https://my.telegram.org/apps
-export const getMTProtoApi = (
-  appId: number,
-  appHash: string,
-  apiToken: string,
-): TgProto => {
+export const getMTProtoApi = (appId: number, appHash: string, apiToken: string): TgProto => {
   let isInitialized = false;
   const client = new TelegramClient({
     apiId: appId,
@@ -36,10 +32,7 @@ export const getMTProtoApi = (
       await client.destroy();
       isInitialized = false;
     },
-    downloadFile: async (
-      toFilename: string,
-      fileId: FileId,
-    ): Promise<string> => {
+    downloadFile: async (toFilename: string, fileId: FileId): Promise<string> => {
       if (!isInitialized) {
         throw new Error("EMTPROTO not initialized");
       }

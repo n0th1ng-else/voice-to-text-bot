@@ -22,11 +22,7 @@ export class ScheduleDaemon<TickData> {
     return !!this.handler;
   }
 
-  constructor(
-    id: string,
-    onTick: () => Promise<TickData>,
-    options: Options = {},
-  ) {
+  constructor(id: string, onTick: () => Promise<TickData>, options: Options = {}) {
     this.id = id;
     this.onTick = onTick;
     this.printId = `[${this.id}]`;
@@ -34,10 +30,7 @@ export class ScheduleDaemon<TickData> {
     this.skipInitialTick = options.skipInitialTick ?? false;
   }
 
-  public setStopHandler(
-    shouldStop: (data: TickData) => boolean,
-    onFinish: VoidPromise,
-  ): this {
+  public setStopHandler(shouldStop: (data: TickData) => boolean, onFinish: VoidPromise): this {
     this.shouldStop = shouldStop;
     this.onFinish = onFinish;
     return this;
@@ -45,11 +38,7 @@ export class ScheduleDaemon<TickData> {
 
   public start(): this {
     if (this.isRunning) {
-      logger.warn(
-        `${Logger.y(this.printId)} Daemon is already running`,
-        {},
-        true,
-      );
+      logger.warn(`${Logger.y(this.printId)} Daemon is already running`, {}, true);
       return this;
     }
 
@@ -65,11 +54,7 @@ export class ScheduleDaemon<TickData> {
 
   public stop(): void {
     if (!this.isRunning) {
-      logger.warn(
-        `${Logger.y(this.printId)} Daemon has already stopped`,
-        {},
-        true,
-      );
+      logger.warn(`${Logger.y(this.printId)} Daemon has already stopped`, {}, true);
       return;
     }
 
@@ -87,16 +72,11 @@ export class ScheduleDaemon<TickData> {
     logger.info(`${Logger.g(this.printId)} Running daemon tick`);
     this.onTick()
       .then((data) => {
-        logger.info(
-          `${Logger.g(this.printId)} Daemon tick executed successfully`,
-        );
+        logger.info(`${Logger.g(this.printId)} Daemon tick executed successfully`);
         return this.stopIfNeeded(data);
       })
       .catch((err) =>
-        logger.error(
-          `${Logger.r(this.printId)} Error occurred during the tick execution`,
-          err,
-        ),
+        logger.error(`${Logger.r(this.printId)} Error occurred during the tick execution`, err),
       );
   }
 
@@ -107,11 +87,7 @@ export class ScheduleDaemon<TickData> {
 
     logger.info(`${Logger.g(this.printId)} Evaluating if daemon needs to stop`);
     if (!this.shouldStop(data)) {
-      logger.info(
-        `${Logger.g(
-          this.printId,
-        )} Daemon is live and waiting for the next tick`,
-      );
+      logger.info(`${Logger.g(this.printId)} Daemon is live and waiting for the next tick`);
       return Promise.resolve();
     }
 

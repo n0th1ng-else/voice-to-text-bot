@@ -15,9 +15,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       logger.info(
         `Cache size is ${Logger.y(
           sSuffix("item", cacheSize),
-        )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(
-          String(idKey),
-        )} stat`,
+        )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(String(idKey))} stat`,
       );
     } else {
       logger.info(
@@ -43,13 +41,9 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return;
     }
 
-    logger.info(
-      `Adding cache item with ${String(this.idKey)}=${item[this.idKey]}`,
-    );
+    logger.info(`Adding cache item with ${String(this.idKey)}=${item[this.idKey]}`);
 
-    const existingItem = this.cache.find(
-      (cItem) => cItem[this.idKey] === item[this.idKey],
-    );
+    const existingItem = this.cache.find((cItem) => cItem[this.idKey] === item[this.idKey]);
     if (existingItem) {
       logger.warn(
         "The item already exists. Removing old data from the cache",
@@ -77,9 +71,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       );
     }
 
-    this.cache = newCacheData.slice(
-      Math.max(newCacheData.length - this.cacheSize, 0),
-    );
+    this.cache = newCacheData.slice(Math.max(newCacheData.length - this.cacheSize, 0));
 
     logger.info(
       `Added cache item with ${String(this.idKey)}=${
@@ -93,24 +85,16 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
       return null;
     }
 
-    logger.info(
-      `Looking for item with ${String(this.idKey)}=${idValue} in cache`,
-    );
+    logger.info(`Looking for item with ${String(this.idKey)}=${idValue} in cache`);
 
-    const cachedItem = this.cache.find(
-      (cItem) => cItem[this.idKey] === idValue,
-    );
+    const cachedItem = this.cache.find((cItem) => cItem[this.idKey] === idValue);
 
     if (!cachedItem) {
-      logger.info(
-        `Did not find the item with ${String(this.idKey)}=${idValue} in cache`,
-      );
+      logger.info(`Did not find the item with ${String(this.idKey)}=${idValue} in cache`);
       return null;
     }
 
-    logger.info(
-      `Found the item with ${String(this.idKey)}=${idValue} in cache`,
-    );
+    logger.info(`Found the item with ${String(this.idKey)}=${idValue} in cache`);
     return cachedItem;
   }
 
@@ -124,9 +108,7 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
     this.cache = this.cache.filter((cItem) => cItem[this.idKey] !== idValue);
 
     logger.info(
-      `Removed cache item for ${String(this.idKey)}=${idValue}. Cache size=${
-        this.cache.length
-      }`,
+      `Removed cache item for ${String(this.idKey)}=${idValue}. Cache size=${this.cache.length}`,
     );
   }
 

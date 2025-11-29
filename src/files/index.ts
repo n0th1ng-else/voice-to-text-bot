@@ -90,9 +90,7 @@ export const saveStreamToFile = async (
   });
 };
 
-export const readFileIntoBuffer = async (
-  fileName: string,
-): Promise<Buffer<ArrayBufferLike>> => {
+export const readFileIntoBuffer = async (fileName: string): Promise<Buffer<ArrayBufferLike>> => {
   const buffer = await promises.readFile(fileName);
   return buffer;
 };

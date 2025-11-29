@@ -26,9 +26,7 @@ export class NodesDb extends CoreDbClient {
     version: string,
   ): Promise<NodeRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table nodes is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table nodes is not initialized yet"));
     }
     const query = NodesSql.insertRow;
     const nodeId = nanoid(15);
@@ -50,9 +48,7 @@ export class NodesDb extends CoreDbClient {
     version: string,
   ): Promise<NodeRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table nodes is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table nodes is not initialized yet"));
     }
     const query = NodesSql.updateRow;
     const updatedAt = new Date();
@@ -68,15 +64,11 @@ export class NodesDb extends CoreDbClient {
 
   public async getRows(selfUrl: string): Promise<NodeRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table nodes is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table nodes is not initialized yet"));
     }
     const query = NodesSql.getRows;
     const values = [selfUrl];
-    return this.pool
-      .query<NodeRowScheme>(query, values)
-      .then((queryData) => queryData.rows);
+    return this.pool.query<NodeRowScheme>(query, values).then((queryData) => queryData.rows);
   }
 
   public getId(row: NodeRowScheme): NodeInstanceId {

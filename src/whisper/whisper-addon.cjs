@@ -36,10 +36,7 @@ const { promisify } = require("node:util");
  */
 module.exports = (addonArchitecture) => {
   // Addon version: 31aea563a83803c710691fed3e8d700e06ae6788
-  const addOnPath = path.join(
-    __dirname,
-    `./addons/whisper-processor.${addonArchitecture}.node`,
-  );
+  const addOnPath = path.join(__dirname, `./addons/whisper-processor.${addonArchitecture}.node`);
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { whisper } = require(addOnPath);
   return promisify(whisper);

@@ -1,20 +1,12 @@
-import {
-  durationLimitSec,
-  secondsInOneMinute,
-  supportedAudioFormats,
-} from "../const.js";
+import { durationLimitSec, secondsInOneMinute, supportedAudioFormats } from "../const.js";
 
-export const getMaxDuration = (
-  duration = durationLimitSec,
-): [number, number] => {
+export const getMaxDuration = (duration = durationLimitSec): [number, number] => {
   const mins = Math.floor(duration / secondsInOneMinute);
   const secs = duration - mins * secondsInOneMinute;
   return [mins, secs];
 };
 
-export const getSupportedAudioFormats = (
-  audioFormats = supportedAudioFormats,
-): string => {
+export const getSupportedAudioFormats = (audioFormats = supportedAudioFormats): string => {
   const formats = audioFormats.reduce(
     (union, format) => union.add(format.ext.toLowerCase()),
     new Set<string>(),

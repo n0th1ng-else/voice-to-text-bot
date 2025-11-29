@@ -8,12 +8,7 @@ import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";
 import { TgUpdateSchema } from "../telegram/api/types.js";
 import { getMB } from "../memory/index.js";
-import {
-  type BotServerModel,
-  type HealthDto,
-  type NotFoundDto,
-  HealthModel,
-} from "./types.js";
+import { type BotServerModel, type HealthDto, type NotFoundDto, HealthModel } from "./types.js";
 import type { VoidPromise } from "../common/types.js";
 import type { HttpsOptions } from "../../certs/index.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
@@ -21,10 +16,7 @@ import { generateMemorySnapshotAsBuffer } from "../profiling/memory.js";
 
 const logger = new Logger("server");
 
-export class BotServer
-  extends BotServerBase<FastifyInstance>
-  implements BotServerModel
-{
+export class BotServer extends BotServerBase<FastifyInstance> implements BotServerModel {
   constructor(
     port: number,
     version: string,
@@ -32,14 +24,7 @@ export class BotServer
     httpsOptions?: HttpsOptions,
     enableSnapshotCapture?: boolean,
   ) {
-    super(
-      "Fastify",
-      port,
-      version,
-      webhookDoNotWait,
-      httpsOptions,
-      enableSnapshotCapture,
-    );
+    super("Fastify", port, version, webhookDoNotWait, httpsOptions, enableSnapshotCapture);
 
     initSentry();
     trackAPIHandlers(this.app);
@@ -53,21 +38,18 @@ export class BotServer
       return reply.status(200).type("text/plain").send("The app is running");
     });
 
-    this.app.get<{ Params: { path: string }; Reply: Buffer }>(
-      "/static/:path",
-      async (req, reply) => {
-        const assetPath = new URL(
-          `../../assets/v2/${req.params.path}`,
-          import.meta.url,
-        );
-        const isExists = await isFileExist(assetPath);
-        if (!isExists) {
-          return reply.callNotFound();
-        }
-        const buffer = await readFile(assetPath);
-        return reply.type("image/png").send(buffer);
-      },
-    );
+    this.app.get<{
+      Params: { path: string };
+      Reply: Buffer;
+    }>("/static/:path", async (req, reply) => {
+      const assetPath = new URL(`../../assets/v2/${req.params.path}`, import.meta.url);
+      const isExists = await isFileExist(assetPath);
+      if (!isExists) {
+        return reply.callNotFound();
+      }
+      const buffer = await readFile(assetPath);
+      return reply.type("image/png").send(buffer);
+    });
 
     this.app.get<{ Reply: HealthDto }>("/health", async (_req, reply) => {
       const [status, dto] = await this.getStatusHandler();
@@ -75,38 +57,29 @@ export class BotServer
     });
 
     if (this.enableSnapshotCapture) {
-      this.app.get<{ Reply: Buffer }>(
-        "/profile-snapshot",
-        async (_req, reply) => {
-          const buffer = await generateMemorySnapshotAsBuffer();
-          return reply.type("application/octet-stream").send(buffer);
-        },
-      );
+      this.app.get<{ Reply: Buffer }>("/profile-snapshot", async (_req, reply) => {
+        const buffer = await generateMemorySnapshotAsBuffer();
+        return reply.type("application/octet-stream").send(buffer);
+      });
     }
 
-    this.app.post<{ Reply: HealthDto; Body: Record<string, unknown> }>(
-      "/lifecycle",
-      async (req, reply) => {
-        logger.warn("Received app:restart hook from the buddy node", req.body);
-        const [status, dto] = await this.getStatusHandler();
-        return reply.status(status).send(dto);
-      },
-    );
+    this.app.post<{
+      Reply: HealthDto;
+      Body: Record<string, unknown>;
+    }>("/lifecycle", async (req, reply) => {
+      logger.warn("Received app:restart hook from the buddy node", req.body);
+      const [status, dto] = await this.getStatusHandler();
+      return reply.status(status).send(dto);
+    });
 
     this.app.setNotFoundHandler<{ Reply: NotFoundDto }>(async (req, reply) => {
       const err = new Error("Unknown route", {
         cause: { path: req.originalUrl },
       });
       logger.error(`Unknown route ${Logger.y(req.originalUrl)}`, err);
-      const analytics = new AnalyticsData(
-        this.version,
-        this.selfUrl,
-        this.threadId,
-      );
+      const analytics = new AnalyticsData(this.version, this.selfUrl, this.threadId);
 
-      analytics
-        .addError("Unknown route for the host")
-        .setCommand("/app", "Server route not found");
+      analytics.addError("Unknown route for the host").setCommand("/app", "Server route not found");
 
       await collectAnalytics(analytics);
       return reply.status(404).send({
@@ -118,11 +91,7 @@ export class BotServer
 
     this.app.setErrorHandler(async (error, _req, reply) => {
       logger.error("Router error", error);
-      const analytics = new AnalyticsData(
-        this.version,
-        this.selfUrl,
-        this.threadId,
-      );
+      const analytics = new AnalyticsData(this.version, this.selfUrl, this.threadId);
 
       analytics.addError("Router error").setCommand("/app", "Server error");
 
@@ -133,12 +102,12 @@ export class BotServer
 
   public async applyHostLocation(timeoutMs = 0): Promise<void> {
     logger.info("Setting up bot hooks");
-    return Promise.all(
-      this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs)),
-    ).then(() => {
-      this.isIdle = false;
-      logger.info("Instance is successfully set as a hook receiver");
-    });
+    return Promise.all(this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs))).then(
+      () => {
+        this.isIdle = false;
+        logger.info("Instance is successfully set as a hook receiver");
+      },
+    );
   }
 
   public setBots(bots: TelegramBotModel[] = []): this {
@@ -146,94 +115,79 @@ export class BotServer
 
     bots.forEach((bot) => {
       logger.warn(`Setting up a handler for ${Logger.y(bot.getPath())}`);
-      this.app.post<{ Params: { id: string }; Body: unknown; Reply: "" }>(
-        bot.getPath(":id"),
-        async (req, reply) => {
-          const routeId = req.params.id;
-          const botId = bot.getId();
-          if (routeId !== botId) {
-            logger.warn(
-              "Wrong route id! Perhaps because of the cache on Telegram side.",
-              {
-                routeId,
-                botId,
-                method: req.method,
-                url: req.originalUrl,
-              },
-            );
-          }
+      this.app.post<{
+        Params: { id: string };
+        Body: unknown;
+        Reply: "";
+      }>(bot.getPath(":id"), async (req, reply) => {
+        const routeId = req.params.id;
+        const botId = bot.getId();
+        if (routeId !== botId) {
+          logger.warn("Wrong route id! Perhaps because of the cache on Telegram side.", {
+            routeId,
+            botId,
+            method: req.method,
+            url: req.originalUrl,
+          });
+        }
 
-          const analytics = new AnalyticsData(
-            this.version,
-            this.selfUrl,
-            this.threadId,
-          );
+        const analytics = new AnalyticsData(this.version, this.selfUrl, this.threadId);
 
-          try {
-            const payload = TgUpdateSchema.parse(req.body);
-            logger.debug("Incoming message validated");
+        try {
+          const payload = TgUpdateSchema.parse(req.body);
+          logger.debug("Incoming message validated");
 
-            if (this.webhookDoNotWait) {
-              logger.debug("Webhook response sent");
-              return reply.status(200).send("");
-            }
-
-            return bot
-              .handleApiMessage(payload, analytics)
-              .catch((err) => {
-                logger.error("Incoming message failed to handle", err);
-              })
-              .then(() => {
-                if (this.webhookDoNotWait) {
-                  return;
-                }
-                logger.debug("Webhook response sent");
-                return reply.status(200).send("");
-              });
-          } catch (err) {
-            logger.error("Incoming message failed validation", err);
+          if (this.webhookDoNotWait) {
+            logger.debug("Webhook response sent");
             return reply.status(200).send("");
           }
-        },
-      );
 
-      this.app.get<{ Params: { id: string }; Reply: string }>(
-        bot.getPath(":id"),
-        async (req, reply) => {
-          const routeId = req.params.id;
-          const botId = bot.getId();
-          const isLatestRouteId = routeId === botId;
-          if (!isLatestRouteId) {
-            logger.warn(
-              "Wrong route id! Perhaps because of the cache on Telegram side.",
-              {
-                routeId,
-                botId,
-                method: req.method,
-                url: req.originalUrl,
-              },
-            );
-          }
+          return bot
+            .handleApiMessage(payload, analytics)
+            .catch((err) => {
+              logger.error("Incoming message failed to handle", err);
+            })
+            .then(() => {
+              if (this.webhookDoNotWait) {
+                return;
+              }
+              logger.debug("Webhook response sent");
+              return reply.status(200).send("");
+            });
+        } catch (err) {
+          logger.error("Incoming message failed validation", err);
+          return reply.status(200).send("");
+        }
+      });
 
-          return reply
-            .status(200)
-            .type("text/plain")
-            .send(
-              isLatestRouteId
-                ? "Route is enabled"
-                : "Route is enabled under new routeId",
-            );
-        },
-      );
+      this.app.get<{
+        Params: { id: string };
+        Reply: string;
+      }>(bot.getPath(":id"), async (req, reply) => {
+        const routeId = req.params.id;
+        const botId = bot.getId();
+        const isLatestRouteId = routeId === botId;
+        if (!isLatestRouteId) {
+          logger.warn("Wrong route id! Perhaps because of the cache on Telegram side.", {
+            routeId,
+            botId,
+            method: req.method,
+            url: req.originalUrl,
+          });
+        }
+
+        return reply
+          .status(200)
+          .type("text/plain")
+          .send(isLatestRouteId ? "Route is enabled" : "Route is enabled under new routeId");
+      });
     });
 
     return this;
   }
 
   public start(): Promise<VoidPromise> {
-    logger.info(
-      `Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`,
-    );
+    logger.info(`Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`);
 
     const { promise, resolve } = Promise.withResolvers<VoidPromise>();
 
@@ -268,23 +222,17 @@ export class BotServer
   ): Promise<void> {
     if (!this.selfUrl) {
       return Promise.reject(
-        new Error(
-          "Self url is not set for this node. Unable to set up the daemon",
-        ),
+        new Error("Self url is not set for this node. Unable to set up the daemon"),
       );
     }
 
     if (!nextReplicaUrl) {
       return Promise.reject(
-        new Error(
-          "Next instance url is not set for this node. Unable to set up the daemon",
-        ),
+        new Error("Next instance url is not set for this node. Unable to set up the daemon"),
       );
     }
 
-    this.uptimeDaemon
-      .setUrls(this.selfUrl, nextReplicaUrl)
-      .setIntervalDays(lifecycleInterval);
+    this.uptimeDaemon.setUrls(this.selfUrl, nextReplicaUrl).setIntervalDays(lifecycleInterval);
 
     await this.applyHostLocation(timeoutMs);
     this.uptimeDaemon.start();
@@ -323,9 +271,7 @@ export class BotServer
     status.setDaysOnline(days.current, days.limit);
 
     try {
-      const urls = await Promise.all(
-        this.bots.map((bot) => bot.getHostLocation()),
-      );
+      const urls = await Promise.all(this.bots.map((bot) => bot.getHostLocation()));
       status.setOnline(urls);
       return [200, status.getDto()];
     } catch (err) {

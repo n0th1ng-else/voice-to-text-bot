@@ -1,8 +1,4 @@
-import {
-  defaultExclude,
-  coverageConfigDefaults,
-  defineConfig,
-} from "vitest/config";
+import { defaultExclude, coverageConfigDefaults, defineConfig } from "vitest/config";
 
 const isCI = process.env.GITHUB_ACTIONS === "true";
 
@@ -12,10 +8,7 @@ export default defineConfig({
       ? [
           "default",
           "github-actions",
-          [
-            "vitest-sonar-reporter",
-            { outputFile: "coverage/sonar-report.xml" },
-          ],
+          ["vitest-sonar-reporter", { outputFile: "coverage/sonar-report.xml" }],
         ]
       : ["default"],
     coverage: {

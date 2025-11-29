@@ -17,12 +17,7 @@ export class TelegramApi {
   public readonly updates: TelegramUpdatesApi;
   public readonly payments: TelegramPaymentsApi;
 
-  constructor(
-    apiToken: string,
-    appId: number,
-    appHash: string,
-    useMTProto: boolean,
-  ) {
+  constructor(apiToken: string, appId: number, appHash: string, useMTProto: boolean) {
     this.baseClient = new TelegramBaseApi(apiToken);
     this.proto = getMTProtoApi(appId, appHash, apiToken);
     this.chats = new TelegramChatsApi(this.baseClient, apiToken);

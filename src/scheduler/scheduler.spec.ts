@@ -263,10 +263,7 @@ describe("Scheduler", () => {
       scheduler.start();
       shouldFinishResult = false;
 
-      return Promise.all([
-        tickWatcher.waitForCondition(),
-        shouldFinishWatcher.waitForCondition(),
-      ])
+      return Promise.all([tickWatcher.waitForCondition(), shouldFinishWatcher.waitForCondition()])
         .then(() => {
           expect(vi.getTimerCount()).toBe(1);
           expect(scheduler.isRunning).toBe(true);

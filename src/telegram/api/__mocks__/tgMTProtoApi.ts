@@ -19,10 +19,7 @@ export const getMTProtoApi = (): TgProto => {
     stop: async (): Promise<void> => {
       return Promise.resolve();
     },
-    downloadFile: async (
-      toFilename: string,
-      fileId: FileId,
-    ): Promise<string> => {
+    downloadFile: async (toFilename: string, fileId: FileId): Promise<string> => {
       if (!currentFileId) {
         throw new Error("MTPROTO mock - no currentFileId set!");
       }

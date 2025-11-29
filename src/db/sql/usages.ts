@@ -29,24 +29,14 @@ export class UsagesDb extends CoreDbClient {
     usageCount: number,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table usages is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table usages is not initialized yet"));
     }
 
     const query = UsagesSql.insertRow;
     const usageId = nanoid(15);
     const createdAt = new Date();
     const updatedAt = createdAt;
-    const values = [
-      usageId,
-      chatId,
-      username,
-      usageCount,
-      langId,
-      createdAt,
-      updatedAt,
-    ];
+    const values = [usageId, chatId, username, usageCount, langId, createdAt, updatedAt];
     return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
       const firstRow = queryData.rows.shift();
       if (!firstRow) {
@@ -63,9 +53,7 @@ export class UsagesDb extends CoreDbClient {
     username: string,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table usages is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table usages is not initialized yet"));
     }
     const query = UsagesSql.updateRow;
     const updatedAt = new Date();
@@ -91,19 +79,10 @@ export class UsagesDb extends CoreDbClient {
     updatedAt: Date,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table usages is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table usages is not initialized yet"));
     }
     const query = UsagesSql.updateRowWithDate;
-    const values = [
-      username,
-      usageCount,
-      langId,
-      createdAt,
-      updatedAt,
-      usageId,
-    ];
+    const values = [username, usageCount, langId, createdAt, updatedAt, usageId];
     return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
       const firstRow = queryData.rows.shift();
       if (!firstRow) {
@@ -115,16 +94,12 @@ export class UsagesDb extends CoreDbClient {
 
   public async getRows(chatId: ChatId): Promise<UsageRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table usages is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table usages is not initialized yet"));
     }
 
     const query = UsagesSql.getRows;
     const values = [chatId];
-    return this.pool
-      .query<UsageRowScheme>(query, values)
-      .then((queryData) => queryData.rows);
+    return this.pool.query<UsageRowScheme>(query, values).then((queryData) => queryData.rows);
   }
 
   public getId(row: UsageRowScheme): UsageId {
@@ -134,15 +109,9 @@ export class UsagesDb extends CoreDbClient {
   /**
    * @deprecated Use it only for chart
    */
-  public async statRows(
-    from: Date,
-    to: Date,
-    usageCountFrom: number,
-  ): Promise<UsageRowScheme[]> {
+  public async statRows(from: Date, to: Date, usageCountFrom: number): Promise<UsageRowScheme[]> {
     const query = UsagesSql.statRows;
     const values = [usageCountFrom, from, to];
-    return this.pool
-      .query<UsageRowScheme>(query, values)
-      .then((queryData) => queryData.rows);
+    return this.pool.query<UsageRowScheme>(query, values).then((queryData) => queryData.rows);
   }
 }

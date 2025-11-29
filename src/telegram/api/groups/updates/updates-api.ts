@@ -29,10 +29,6 @@ export class TelegramUpdatesApi {
     const data: BotCommandListDto = {
       commands,
     };
-    return this.client.requestValidate(
-      "setMyCommands",
-      TgAnswerSetCommands,
-      data,
-    );
+    return this.client.requestValidate("setMyCommands", TgAnswerSetCommands, data);
   }
 }

@@ -28,16 +28,16 @@ describe("Nodes DB", () => {
 
   describe("not initialized", () => {
     it("can not update state", async () => {
-      await expect(
-        client.updateState("test-url", true, "new-v"),
-      ).rejects.toThrowError("The table nodes is not initialized yet");
+      await expect(client.updateState("test-url", true, "new-v")).rejects.toThrowError(
+        "The table nodes is not initialized yet",
+      );
     });
 
     it("init error makes api unavailable", async () => {
       await expect(client.init()).rejects.toThrow();
-      await expect(
-        client.updateState("test-url", true, "new-v"),
-      ).rejects.toThrowError("The table nodes is not initialized yet");
+      await expect(client.updateState("test-url", true, "new-v")).rejects.toThrowError(
+        "The table nodes is not initialized yet",
+      );
     });
   });
 
@@ -55,8 +55,7 @@ describe("Nodes DB", () => {
       testPool.mockQuery(NodesSql.getRows, () => Promise.resolve({ rows: [] }));
       testPool.mockQuery(NodesSql.insertRow, (values) => {
         expect(values).toHaveLength(6);
-        const [rNodeId, rSelfUrl, rActive, rVersion, rCreated, rUpdated] =
-          values;
+        const [rNodeId, rSelfUrl, rActive, rVersion, rCreated, rUpdated] = values;
 
         expect(typeof rNodeId).toBe("string");
         expect(rSelfUrl).toBe(selfUrl);
@@ -94,8 +93,7 @@ describe("Nodes DB", () => {
       testPool.mockQuery(NodesSql.getRows, () => Promise.resolve({ rows: [] }));
       testPool.mockQuery(NodesSql.insertRow, (values) => {
         expect(values).toHaveLength(6);
-        const [rNodeId, rSelfUrl, rActive, rVersion, rCreated, rUpdated] =
-          values;
+        const [rNodeId, rSelfUrl, rActive, rVersion, rCreated, rUpdated] = values;
 
         expect(typeof rNodeId).toBe("string");
         expect(rSelfUrl).toBe(selfUrl);
@@ -106,9 +104,9 @@ describe("Nodes DB", () => {
         return Promise.resolve({ rows: [] });
       });
 
-      await expect(
-        client.updateState(selfUrl, active, version),
-      ).rejects.toThrowError("Unable to get created row info");
+      await expect(client.updateState(selfUrl, active, version)).rejects.toThrowError(
+        "Unable to get created row info",
+      );
     });
 
     it("updates some existing row", () => {
@@ -197,9 +195,9 @@ describe("Nodes DB", () => {
         });
       });
 
-      await expect(
-        client.updateState(selfUrl, active, version),
-      ).rejects.toThrowError("Unable to get updated row info");
+      await expect(client.updateState(selfUrl, active, version)).rejects.toThrowError(
+        "Unable to get updated row info",
+      );
     });
   });
 });

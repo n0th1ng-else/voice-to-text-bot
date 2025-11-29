@@ -1,4 +1,4 @@
-FROM node:24.11.0-slim AS builder
+FROM node:24.11.1-slim AS builder
 
 ENV NODE_ENV=production
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
@@ -28,7 +28,7 @@ RUN pnpm run build
 RUN rm -rf ./node_modules
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
 
-FROM node:24.11.0-slim
+FROM node:24.11.1-slim
 
 EXPOSE 8080
 
@@ -46,7 +46,7 @@ ARG APP_DIR=/usr/src/app/
 RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
-RUN npm install -g pnpm@9 && touch "$APP_DIR/.env"
+RUN touch "$APP_DIR/.env"
 COPY --from=builder $APP_DIR/node_modules $APP_DIR/node_modules
 COPY --from=builder $APP_DIR/assets $APP_DIR/assets
 COPY --from=builder $APP_DIR/file-temp $APP_DIR/file-temp

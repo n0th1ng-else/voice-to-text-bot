@@ -1,17 +1,5 @@
-import {
-  vi,
-  expect,
-  beforeEach,
-  afterEach,
-  it,
-  describe,
-  type MockInstance,
-} from "vitest";
-import {
-  type HealthDto,
-  HealthSsl,
-  HealthStatus,
-} from "../src/server/types.js";
+import { vi, expect, beforeEach, afterEach, it, describe, type MockInstance } from "vitest";
+import { type HealthDto, HealthSsl, HealthStatus } from "../src/server/types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import * as apiUtils from "../src/server/api.js";
 import { BotServer } from "../src/server/bot-server.js";
@@ -56,8 +44,7 @@ const waiter = new WaiterForCalls();
 const hostUrl = `${localhostUrl}:${appPort}`;
 const webhookDoNotWait = false;
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 describe("[uptime daemon]", () => {
   beforeEach(() => {
@@ -90,11 +77,8 @@ describe("[uptime daemon]", () => {
     });
 
     it("Failed to trigger the daemon if selfUrl is not set", async () => {
-      const errMessage =
-        "Self url is not set for this node. Unable to set up the daemon";
-      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(
-        errMessage,
-      );
+      const errMessage = "Self url is not set for this node. Unable to set up the daemon";
+      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(errMessage);
     });
   });
 
@@ -105,20 +89,14 @@ describe("[uptime daemon]", () => {
     });
 
     it("Failed to trigger the daemon if nextUrl is not set", async () => {
-      const errMessage =
-        "Next instance url is not set for this node. Unable to set up the daemon";
-      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(
-        errMessage,
-      );
+      const errMessage = "Next instance url is not set for this node. Unable to set up the daemon";
+      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(errMessage);
     });
 
     it("Triggers the daemon with the interval and delegates to the next node after we hit the limit", async () => {
       waiter.reset(1);
       const interval = 1;
-      await Promise.all([
-        waiter.waitForCondition(),
-        server.triggerDaemon(nextUrl, interval),
-      ]);
+      await Promise.all([waiter.waitForCondition(), server.triggerDaemon(nextUrl, interval)]);
 
       expect(vi.getTimerCount()).toBe(1);
       expect(apiSpy).toHaveBeenCalledWith(hostUrl);
@@ -149,15 +127,12 @@ describe("[uptime daemon]", () => {
     it.each([
       ["negative", -2],
       ["zero", 0],
-    ])(
-      "Triggers daemon with minimal 1 day interval if the interval is %s",
-      async (_, interval) => {
-        await server.triggerDaemon(nextUrl, interval);
+    ])("Triggers daemon with minimal 1 day interval if the interval is %s", async (_, interval) => {
+      await server.triggerDaemon(nextUrl, interval);
 
-        expect(vi.getTimerCount()).toBe(1);
-        expect(apiSpy).toHaveBeenCalledWith(hostUrl);
-        expect(apiSpy).toHaveBeenCalledTimes(1);
-      },
-    );
+      expect(vi.getTimerCount()).toBe(1);
+      expect(apiSpy).toHaveBeenCalledWith(hostUrl);
+      expect(apiSpy).toHaveBeenCalledTimes(1);
+    });
   });
 });

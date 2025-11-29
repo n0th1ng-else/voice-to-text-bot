@@ -12,28 +12,19 @@ import { trackUserActivity } from "../../monitoring/newrelic.js";
 const logger = new Logger("telegram-bot");
 
 export class StartAction extends GenericAction {
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addFirstVisit();
     mdl.analytics.addPageVisit();
     trackUserActivity({ activityType: "start" }, mdl.userId);
     return this.sendHelloMessage(mdl, prefix);
   }
 
-  public async runCondition(
-    msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isStartMessage = isCommandMessage(mdl, msg, BotCommand.Start);
     return Promise.resolve(isStartMessage);
   }
 
-  private sendHelloMessage(
-    model: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  private sendHelloMessage(model: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     logger.info(`${prefix.getPrefix()} Sending hello message`);
     return this.getChatLanguage(model, prefix)
       .then((lang) =>
@@ -57,9 +48,7 @@ export class StartAction extends GenericAction {
         model.analytics.addError(errorMessage);
       })
       .then(() =>
-        collectAnalytics(
-          model.analytics.setCommand(BotCommand.Start, "Hello message", "Init"),
-        ),
+        collectAnalytics(model.analytics.setCommand(BotCommand.Start, "Hello message", "Init")),
       );
   }
 }

@@ -19,14 +19,9 @@ export class DurationsDb extends CoreDbClient {
     this.initialized = true;
   }
 
-  public async createRow(
-    chatId: ChatId,
-    duration: number,
-  ): Promise<DurationRowScheme> {
+  public async createRow(chatId: ChatId, duration: number): Promise<DurationRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(
-        new Error("The table durations is not initialized yet"),
-      );
+      return Promise.reject(new Error("The table durations is not initialized yet"));
     }
     const query = DurationsSql.insertRow;
     const durationId = nanoid(15);

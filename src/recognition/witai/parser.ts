@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { Logger } from "../../logger/index.js";
-import {
-  type LanguageTokens,
-  LanguageSchema,
-  SUPPORTED_LANGUAGES,
-} from "../types.js";
+import { type LanguageTokens, LanguageSchema, SUPPORTED_LANGUAGES } from "../types.js";
 
 const logger = new Logger("wit-ai-recognition-utils");
 
@@ -17,16 +13,9 @@ const WitAiTokenItem = z
 
 const WitAiTokenItems = z.array(WitAiTokenItem);
 
-const parseWitAILanguageTokens = (
-  tokens: LanguageTokens,
-  optionsStr?: string,
-): LanguageTokens => {
+const parseWitAILanguageTokens = (tokens: LanguageTokens, optionsStr?: string): LanguageTokens => {
   if (!optionsStr) {
-    logger.warn(
-      "Wit.ai tokens v2 not found. Falling back to the old format",
-      {},
-      true,
-    );
+    logger.warn("Wit.ai tokens v2 not found. Falling back to the old format", {}, true);
     return tokens;
   }
   try {
@@ -40,10 +29,7 @@ const parseWitAILanguageTokens = (
 
     return obj;
   } catch (err) {
-    logger.error(
-      "Failed to parse the wit.ai v2 tokens. Falling back to the old format",
-      err,
-    );
+    logger.error("Failed to parse the wit.ai v2 tokens. Falling back to the old format", err);
     return tokens;
   }
 };
@@ -51,9 +37,7 @@ const parseWitAILanguageTokens = (
 const validateWitAILanguageTokens = (tokens: LanguageTokens): void => {
   const missingTokens = SUPPORTED_LANGUAGES.filter((lang) => !tokens[lang]);
   if (missingTokens.length) {
-    throw new Error(
-      `wit.ai tokens are missing for languages: ${missingTokens.join(",")}`,
-    );
+    throw new Error(`wit.ai tokens are missing for languages: ${missingTokens.join(",")}`);
   }
 };
 

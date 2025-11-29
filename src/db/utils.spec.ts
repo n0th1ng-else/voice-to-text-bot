@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  validateConfigState,
-  isDBConfigValid,
-  type DbConnectionConfig,
-} from "./utils.js";
+import { validateConfigState, isDBConfigValid, type DbConnectionConfig } from "./utils.js";
 
 const cfg: DbConnectionConfig = {
   certificate: "some-cert",

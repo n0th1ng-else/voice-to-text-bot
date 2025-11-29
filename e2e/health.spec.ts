@@ -1,24 +1,10 @@
-import {
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  it,
-  describe,
-  beforeAll,
-} from "vitest";
+import { expect, vi, beforeEach, afterEach, it, describe, beforeAll } from "vitest";
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
-import {
-  injectDependencies,
-  type InjectedFn,
-} from "../src/testUtils/dependencies.js";
-import {
-  type InjectedTestFn,
-  injectTestDependencies,
-} from "./helpers/dependencies.js";
+import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
+import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import type { VoidPromise } from "../src/common/types.js";
 import type { TelegramBotModel } from "../src/telegram/bot.js";
 
@@ -47,8 +33,7 @@ let localhostUrl: string;
 
 const path = "/health";
 
-let stopHandler: VoidPromise = () =>
-  Promise.reject(new Error("Server did not start"));
+let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 describe("[health]", () => {
   beforeAll(async () => {
@@ -126,9 +111,7 @@ describe("[health]", () => {
       expect(res.body.status).toBe(HealthStatus.InProgress);
       expect(res.body.urls).toEqual([]);
       expect(res.body.version).toBe(appVersion);
-      expect(res.body.message).toBe(
-        "App is not connected to the Telegram server",
-      );
+      expect(res.body.message).toBe("App is not connected to the Telegram server");
     });
 
     it("starts with no bots enabled", async () => {

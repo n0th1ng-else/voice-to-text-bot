@@ -9,9 +9,7 @@ export type DbConnectionConfig = {
 
 type DbConfigState = "invalid" | "unsecure" | "valid";
 
-export const validateConfigState = (
-  config: DbConnectionConfig,
-): DbConfigState => {
+export const validateConfigState = (config: DbConnectionConfig): DbConfigState => {
   const { certificate, ...cfg } = config;
   const coreFieldsValid = Object.values(cfg).every((val) => val);
 

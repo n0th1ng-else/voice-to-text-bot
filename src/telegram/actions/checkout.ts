@@ -13,10 +13,7 @@ import type { DonationId } from "../../db/sql/types.js";
 const logger = new Logger("telegram-bot");
 
 export class CheckoutAction extends GenericAction {
-  public async runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public async runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     this.trackDonation(mdl);
     const paymentInternalId = mdl.paymentInternalId;
@@ -32,17 +29,11 @@ export class CheckoutAction extends GenericAction {
     return this.markAsSuccessful(Number(paymentInternalId), prefix, chargeId);
   }
 
-  public async runCondition(
-    _msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(_msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     return Promise.resolve(isDonation(mdl));
   }
 
-  public async confirmCheckout(
-    msg: TgCheckoutQuery,
-    analytics: AnalyticsData,
-  ): Promise<void> {
+  public async confirmCheckout(msg: TgCheckoutQuery, analytics: AnalyticsData): Promise<void> {
     analytics.addPageVisit();
     const {
       paymentInternalId,
@@ -57,9 +48,7 @@ export class CheckoutAction extends GenericAction {
         if (!paymentInternalId) {
           logger.error(
             `${prefix.getPrefix()} Unable to parse the paymentInternalId in confirmCheckout. Will not update the DB row!`,
-            new Error(
-              "Unable to parse the paymentInternalId in confirmCheckout",
-            ),
+            new Error("Unable to parse the paymentInternalId in confirmCheckout"),
           );
           return;
         }
@@ -81,10 +70,7 @@ export class CheckoutAction extends GenericAction {
         logger.info(`${prefix.getPrefix()} Donation marked as PENDING`);
       })
       .catch((err) => {
-        logger.error(
-          `${prefix.getPrefix()} Unable to update the donation`,
-          err,
-        );
+        logger.error(`${prefix.getPrefix()} Unable to update the donation`, err);
       });
   }
 
@@ -99,10 +85,7 @@ export class CheckoutAction extends GenericAction {
         logger.info(`${prefix.getPrefix()} Donation marked as SUCCESSFUL`);
       })
       .catch((err) => {
-        logger.error(
-          `${prefix.getPrefix()} Unable to update the donation`,
-          err,
-        );
+        logger.error(`${prefix.getPrefix()} Unable to update the donation`, err);
       });
   }
 

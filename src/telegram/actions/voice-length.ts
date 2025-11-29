@@ -20,23 +20,15 @@ export class VoiceLengthAction extends GenericAction {
     return model.voiceDuration >= durationLimitSec;
   }
 
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     return this.sendVoiceIsTooLongMessage(mdl, prefix);
   }
 
-  public async runCondition(
-    msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
-    return Promise.resolve(
-      isVoice && VoiceLengthAction.isVoiceMessageLong(mdl),
-    );
+    return Promise.resolve(isVoice && VoiceLengthAction.isVoiceMessageLong(mdl));
   }
 
   private async sendVoiceIsTooLongMessage(
@@ -52,11 +44,7 @@ export class VoiceLengthAction extends GenericAction {
 
     if (model.isGroup) {
       return collectAnalytics(
-        model.analytics.setCommand(
-          "/voice",
-          "Voice message is too long",
-          "Group",
-        ),
+        model.analytics.setCommand("/voice", "Voice message is too long", "Group"),
       );
     }
 
@@ -80,9 +68,7 @@ export class VoiceLengthAction extends GenericAction {
           model.forumThreadId,
         ),
       )
-      .then(() =>
-        logger.info(`${prefix.getPrefix()} Voice is too long message sent`),
-      )
+      .then(() => logger.info(`${prefix.getPrefix()} Voice is too long message sent`))
       .catch((err) => {
         const errorMessage = "Unable to send voice is too long";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
@@ -90,11 +76,7 @@ export class VoiceLengthAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand(
-            "/voice",
-            "Voice message is too long",
-            "Private",
-          ),
+          model.analytics.setCommand("/voice", "Voice message is too long", "Private"),
         ),
       );
   }

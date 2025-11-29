@@ -37,9 +37,7 @@ export const trackFullRecognitionTime = (durationMSec: number): void => {
   newrelic.recordMetric(metricName, durationMSec);
 };
 
-export const trackApplicationErrors = (
-  type: "Error" | "Warning" | "Launch",
-): void => {
+export const trackApplicationErrors = (type: "Error" | "Warning" | "Launch"): void => {
   newrelic.incrementMetric(`ApplicationHealth/${type}`);
 };
 
@@ -50,10 +48,7 @@ export const trackApplicationHealth = (type: "UP" | "DOWN"): void => {
 type UserActivityData = {
   activityType: "voice" | "lang" | "start" | "donate" | "support";
 };
-export const trackUserActivity = (
-  data: UserActivityData,
-  userId?: number,
-): void => {
+export const trackUserActivity = (data: UserActivityData, userId?: number): void => {
   newrelic.recordCustomEvent("UserActivity", {
     userId: userId ? String(userId) : "unknownId",
     ...data,
@@ -65,10 +60,7 @@ type DonationActivityData = {
   currency: Currency;
   amount: number;
 };
-export const trackDonation = (
-  data: DonationActivityData,
-  userId?: number,
-): void => {
+export const trackDonation = (data: DonationActivityData, userId?: number): void => {
   newrelic.recordCustomEvent("DonationActivity", {
     userId: userId ? String(userId) : "unknownId",
     ...data,

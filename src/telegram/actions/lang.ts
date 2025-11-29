@@ -11,10 +11,7 @@ import { Logger } from "../../logger/index.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { isMessageNotModified } from "../api/tgerror.js";
 import type { TgCallbackQuery, TgMessage } from "../api/types.js";
-import {
-  type LanguageCode,
-  SUPPORTED_LANGUAGES,
-} from "../../recognition/types.js";
+import { type LanguageCode, SUPPORTED_LANGUAGES } from "../../recognition/types.js";
 import type { AnalyticsData } from "../../analytics/ga/types.js";
 import type { ChatId, MessageId, MessageThreadId } from "../api/core.js";
 import type { TgInlineKeyboardButton } from "../api/groups/chats/chats-types.js";
@@ -22,10 +19,7 @@ import { trackUserActivity } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
-const getLanguageButton = (
-  lang: LanguageCode,
-  logPrefix: string,
-): TelegramButtonModel => {
+const getLanguageButton = (lang: LanguageCode, logPrefix: string): TelegramButtonModel => {
   return new TelegramButtonModel<LanguageCode>("l", lang, logPrefix);
 };
 
@@ -35,19 +29,13 @@ const languageButtonLabel: Record<LanguageCode, TranslationKey> = {
 };
 
 export class LangAction extends GenericAction {
-  public runAction(
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<void> {
+  public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
     mdl.analytics.addPageVisit();
     trackUserActivity({ activityType: "lang" }, mdl.userId);
     return this.showLanguageSelection(mdl, prefix);
   }
 
-  public async runCondition(
-    msg: TgMessage,
-    mdl: BotMessageModel,
-  ): Promise<boolean> {
+  public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isLangMessage = isCommandMessage(mdl, msg, BotCommand.Language);
     return Promise.resolve(isLangMessage);
   }
@@ -73,13 +61,7 @@ export class LangAction extends GenericAction {
     analytics.setId(model.chatId).setLang(getRawUserLanguage(msg));
 
     const opts = await this.getLangData(model.chatId, button);
-    await this.updateLanguage(
-      opts,
-      model.chatId,
-      model.id,
-      analytics,
-      model.forumThreadId,
-    );
+    await this.updateLanguage(opts, model.chatId, model.id, analytics, model.forumThreadId);
     await collectAnalytics(
       analytics.setCommand(BotCommand.Language, "Language message", "Callback"),
     );
@@ -103,10 +85,7 @@ export class LangAction extends GenericAction {
       })
       .catch((err) => {
         const errorMessage = "Unable to set the language in DB";
-        logger.error(
-          `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-          err,
-        );
+        logger.error(`${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`, err);
         analytics.addError(errorMessage);
         return false;
       })
@@ -125,10 +104,7 @@ export class LangAction extends GenericAction {
       })
       .catch((err) => {
         const errorMessage = "Unable to send the language update message";
-        logger.error(
-          `${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`,
-          err,
-        );
+        logger.error(`${prefix.getPrefix()} ${errorMessage} lang=${Logger.y(lang)}`, err);
         analytics.addError(errorMessage);
       });
   }
@@ -139,13 +115,7 @@ export class LangAction extends GenericAction {
     messageId: MessageId,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    return this.editMessage(
-      chatId,
-      messageId,
-      { lang },
-      TranslationKeys.ChangeLang,
-      prefix,
-    )
+    return this.editMessage(chatId, messageId, { lang }, TranslationKeys.ChangeLang, prefix)
       .catch((err) => {
         if (isMessageNotModified(err)) {
           logger.warn(
@@ -161,15 +131,10 @@ export class LangAction extends GenericAction {
       .then(() => logger.info(`${prefix.getPrefix()} Language updated`));
   }
 
-  private getLangData(
-    chatId: ChatId,
-    button: TelegramButtonModel,
-  ): Promise<BotLangData> {
+  private getLangData(chatId: ChatId, button: TelegramButtonModel): Promise<BotLangData> {
     if (!button.value) {
       return Promise.reject(
-        new Error(
-          "No language data received. Unable to handle language change",
-        ),
+        new Error("No language data received. Unable to handle language change"),
       );
     }
 
@@ -222,11 +187,7 @@ export class LangAction extends GenericAction {
       })
       .then(() =>
         collectAnalytics(
-          model.analytics.setCommand(
-            BotCommand.Language,
-            "Language message",
-            "Init",
-          ),
+          model.analytics.setCommand(BotCommand.Language, "Language message", "Init"),
         ),
       );
   }

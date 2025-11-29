@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  convertLanguageCodeToISO,
-  convertLanguageCodeFromISO,
-} from "./common.js";
+import { convertLanguageCodeToISO, convertLanguageCodeFromISO } from "./common.js";
 import { type LanguageCode } from "./types.js";
 
 describe("Language conversion", () => {
@@ -15,9 +12,9 @@ describe("Language conversion", () => {
     });
 
     it("should throw an error if the language is not supported", () => {
-      expect(() =>
-        convertLanguageCodeToISO("whatever" as LanguageCode),
-      ).toThrowError(/Language not supported/);
+      expect(() => convertLanguageCodeToISO("whatever" as LanguageCode)).toThrowError(
+        /Language not supported/,
+      );
     });
   });
 
@@ -30,9 +27,7 @@ describe("Language conversion", () => {
     });
 
     it("should throw an error if the language is not supported", () => {
-      expect(() => convertLanguageCodeFromISO("whatever")).toThrowError(
-        /Language not supported/,
-      );
+      expect(() => convertLanguageCodeFromISO("whatever")).toThrowError(/Language not supported/);
     });
   });
 });

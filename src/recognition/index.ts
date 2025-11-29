@@ -47,10 +47,7 @@ const getVoiceConverterInstance = async (
     case "WITAI":
       return import("./witai/wit.ai.js").then(({ WithAiProvider }) => {
         return new WithAiProvider(
-          getWitAILanguageTokens(
-            environment.witAiApi.tokens,
-            environment.wtiAiTokens,
-          ),
+          getWitAILanguageTokens(environment.witAiApi.tokens, environment.wtiAiTokens),
         );
       });
     case "WHISPER":
@@ -59,7 +56,9 @@ const getVoiceConverterInstance = async (
       });
     case "11LABS":
       return import("./elevenLabs.js").then(({ ElevenLabsProvider }) => {
-        return new ElevenLabsProvider({ apiToken: environment.elevenLabsKey });
+        return new ElevenLabsProvider({
+          apiToken: environment.elevenLabsKey,
+        });
       });
     default:
       throw new Error("Voice recognition provider is not specified");
