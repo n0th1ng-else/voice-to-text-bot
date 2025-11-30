@@ -56,4 +56,4 @@ COPY --from=builder $APP_DIR/dist $APP_DIR/dist
 
 USER node
 
-CMD ["pnpm", "run", "cluster:js"]
+CMD ["npm", "run", "cluster:js"]
