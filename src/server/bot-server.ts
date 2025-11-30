@@ -221,15 +221,11 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     timeoutMs = 0,
   ): Promise<void> {
     if (!this.selfUrl) {
-      return Promise.reject(
-        new Error("Self url is not set for this node. Unable to set up the daemon"),
-      );
+      throw new Error("Self url is not set for this node. Unable to set up the daemon");
     }
 
     if (!nextReplicaUrl) {
-      return Promise.reject(
-        new Error("Next instance url is not set for this node. Unable to set up the daemon"),
-      );
+      throw new Error("Next instance url is not set for this node. Unable to set up the daemon");
     }
 
     this.uptimeDaemon.setUrls(this.selfUrl, nextReplicaUrl).setIntervalDays(lifecycleInterval);

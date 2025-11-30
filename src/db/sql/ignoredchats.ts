@@ -21,7 +21,7 @@ export class IgnoredChatsDb extends CoreDbClient {
 
   public async getRow(chatId: ChatId): Promise<IgnoredChatsRowScheme | null> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table ignoredchats is not initialized yet"));
+      throw new Error("The table ignoredchats is not initialized yet");
     }
     const query = IgnoredChatsSql.getRows;
     const values = [chatId];

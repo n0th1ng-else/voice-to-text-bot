@@ -21,7 +21,7 @@ export class StartAction extends GenericAction {
 
   public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isStartMessage = isCommandMessage(mdl, msg, BotCommand.Start);
-    return Promise.resolve(isStartMessage);
+    return isStartMessage;
   }
 
   private sendHelloMessage(model: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {

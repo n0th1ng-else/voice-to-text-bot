@@ -21,7 +21,7 @@ export class DurationsDb extends CoreDbClient {
 
   public async createRow(chatId: ChatId, duration: number): Promise<DurationRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table durations is not initialized yet"));
+      throw new Error("The table durations is not initialized yet");
     }
     const query = DurationsSql.insertRow;
     const durationId = nanoid(15);
@@ -31,7 +31,7 @@ export class DurationsDb extends CoreDbClient {
     const queryData = await this.pool.query<DurationRowScheme>(query, values);
     const row = queryData.rows.shift();
     if (!row) {
-      return Promise.reject(new Error("Unable to get created row info"));
+      throw new Error("Unable to get created row info");
     }
     return row;
   }

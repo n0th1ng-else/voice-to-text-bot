@@ -16,7 +16,7 @@ export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[])
         new Error("Google analytics Token is not provided"),
       );
     }
-    return Promise.resolve();
+    return;
   }
 
   const isTooManyEvents = events.length > EVENTS_LIMIT_GA;
@@ -24,8 +24,8 @@ export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[])
     logger.warn("Too many events to send for analytics", {}, true);
   }
 
-  return axios
-    .request({
+  try {
+    await axios.request({
       method: "POST",
       url: "https://www.google-analytics.com/mp/collect",
       params: {
@@ -46,11 +46,9 @@ export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[])
         non_personalized_ads: true,
         events,
       },
-    })
-    .then(() => {
-      logger.debug("Analytic data ga has been collected");
-    })
-    .catch((err) => {
-      logger.error("Failed to collect analytic data ga", err);
     });
+    logger.debug("Analytic data ga has been collected");
+  } catch (err) {
+    logger.error("Failed to collect analytic data ga", err);
+  }
 };

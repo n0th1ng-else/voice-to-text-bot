@@ -41,10 +41,13 @@ export class Pool extends pg.Pool {
     return;
   }
 
-  public query(queryStream: AnyTypeForMock, values?: AnyTypeForMock): Promise<AnyTypeForMock> {
+  public async query(
+    queryStream: AnyTypeForMock,
+    values?: AnyTypeForMock,
+  ): Promise<AnyTypeForMock> {
     const queryRecord = this.mockQueue.find((mockItem) => mockItem.sql === queryStream);
     if (!queryRecord) {
-      return Promise.reject(new Error(`Unexpected sql ${queryStream}`));
+      throw new Error(`Unexpected sql ${queryStream}`);
     }
 
     this.mockQueue = this.mockQueue.filter((mockItem) => mockItem.id !== queryRecord.id);

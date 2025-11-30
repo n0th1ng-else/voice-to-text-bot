@@ -138,25 +138,26 @@ export class TelegramBotModel {
   }
 
   public async handleApiMessage(message: TgUpdate, analytics: AnalyticsData): Promise<void> {
-    return Promise.resolve()
-      .then(() => {
-        if (message.message) {
-          return this.handleMessage(message.message, analytics);
-        }
-        if (message.callback_query) {
-          return this.handleCallbackQuery(message.callback_query, analytics);
-        }
-        if (message.pre_checkout_query) {
-          return this.handleCheckout(message.pre_checkout_query, analytics);
-        }
+    try {
+      if (message.message) {
+        await this.handleMessage(message.message, analytics);
+        return;
+      }
+      if (message.callback_query) {
+        await this.handleCallbackQuery(message.callback_query, analytics);
+        return;
+      }
+      if (message.pre_checkout_query) {
+        await this.handleCheckout(message.pre_checkout_query, analytics);
+        return;
+      }
 
-        logger.warn("Message is not recognized", {
-          messageKeys: Object.keys(message),
-        });
-      })
-      .catch((err) => {
-        logger.error("Failed to handle api request", err);
+      logger.warn("Message is not recognized", {
+        messageKeys: Object.keys(message),
       });
+    } catch (err) {
+      logger.error("Failed to handle api request", err);
+    }
   }
 
   private async handleMessage(msg: TgMessage, analytics: AnalyticsData): Promise<void> {

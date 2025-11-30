@@ -29,7 +29,7 @@ export class UsagesDb extends CoreDbClient {
     usageCount: number,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table usages is not initialized yet"));
+      throw new Error("The table usages is not initialized yet");
     }
 
     const query = UsagesSql.insertRow;
@@ -37,13 +37,13 @@ export class UsagesDb extends CoreDbClient {
     const createdAt = new Date();
     const updatedAt = createdAt;
     const values = [usageId, chatId, username, usageCount, langId, createdAt, updatedAt];
-    return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
-      const firstRow = queryData.rows.shift();
-      if (!firstRow) {
-        return Promise.reject(new Error("Unable to get created row info"));
-      }
-      return firstRow;
-    });
+    const queryData = await this.pool.query<UsageRowScheme>(query, values);
+
+    const firstRow = queryData.rows.shift();
+    if (!firstRow) {
+      throw new Error("Unable to get created row info");
+    }
+    return firstRow;
   }
 
   public async updateRow(
@@ -53,18 +53,18 @@ export class UsagesDb extends CoreDbClient {
     username: string,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table usages is not initialized yet"));
+      throw new Error("The table usages is not initialized yet");
     }
     const query = UsagesSql.updateRow;
     const updatedAt = new Date();
     const values = [username, usageCount, langId, updatedAt, usageId];
-    return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
-      const firstRow = queryData.rows.shift();
-      if (!firstRow) {
-        return Promise.reject(new Error("Unable to get updated row info"));
-      }
-      return firstRow;
-    });
+    const queryData = await this.pool.query<UsageRowScheme>(query, values);
+
+    const firstRow = queryData.rows.shift();
+    if (!firstRow) {
+      throw new Error("Unable to get updated row info");
+    }
+    return firstRow;
   }
 
   /**
@@ -79,27 +79,27 @@ export class UsagesDb extends CoreDbClient {
     updatedAt: Date,
   ): Promise<UsageRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table usages is not initialized yet"));
+      throw new Error("The table usages is not initialized yet");
     }
     const query = UsagesSql.updateRowWithDate;
     const values = [username, usageCount, langId, createdAt, updatedAt, usageId];
-    return this.pool.query<UsageRowScheme>(query, values).then((queryData) => {
-      const firstRow = queryData.rows.shift();
-      if (!firstRow) {
-        return Promise.reject(new Error("Unable to get updated row info"));
-      }
-      return firstRow;
-    });
+    const queryData = await this.pool.query<UsageRowScheme>(query, values);
+    const firstRow = queryData.rows.shift();
+    if (!firstRow) {
+      throw new Error("Unable to get updated row info");
+    }
+    return firstRow;
   }
 
   public async getRows(chatId: ChatId): Promise<UsageRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table usages is not initialized yet"));
+      throw new Error("The table usages is not initialized yet");
     }
 
     const query = UsagesSql.getRows;
     const values = [chatId];
-    return this.pool.query<UsageRowScheme>(query, values).then((queryData) => queryData.rows);
+    const queryData = await this.pool.query<UsageRowScheme>(query, values);
+    return queryData.rows;
   }
 
   public getId(row: UsageRowScheme): UsageId {

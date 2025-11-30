@@ -39,7 +39,7 @@ export abstract class GenericAction {
     lang?: LanguageCode,
   ): Promise<LanguageCode> {
     if (lang) {
-      return Promise.resolve(lang);
+      return lang;
     }
 
     logger.info(`${prefix.getPrefix()} Fetching language`);
@@ -59,12 +59,12 @@ export abstract class GenericAction {
     forumThreadId?: MessageThreadId,
   ): Promise<void> {
     if (!ids.length) {
-      return Promise.resolve();
+      return;
     }
 
     const part = ids.shift();
     if (!part) {
-      return Promise.resolve();
+      return;
     }
 
     const [partKey, partParams] = Array.isArray(part) ? part : [part];
@@ -115,7 +115,7 @@ export abstract class GenericAction {
   ): Promise<void> {
     const message = messageParts.shift();
     if (!message) {
-      return Promise.resolve();
+      return;
     }
 
     return this.bot.chats
@@ -125,11 +125,11 @@ export abstract class GenericAction {
 }
 
 export class CoreAction extends GenericAction {
-  public runAction(): Promise<void> {
-    return Promise.resolve();
+  public async runAction(): Promise<void> {
+    return;
   }
 
   public async runCondition(): Promise<boolean> {
-    return Promise.resolve(false);
+    return false;
   }
 }

@@ -80,15 +80,15 @@ export class ScheduleDaemon<TickData> {
       );
   }
 
-  private stopIfNeeded(data: TickData): Promise<void> {
+  private async stopIfNeeded(data: TickData): Promise<void> {
     if (!this.shouldStop || !this.onFinish) {
-      return Promise.resolve();
+      return;
     }
 
     logger.info(`${Logger.g(this.printId)} Evaluating if daemon needs to stop`);
     if (!this.shouldStop(data)) {
       logger.info(`${Logger.g(this.printId)} Daemon is live and waiting for the next tick`);
-      return Promise.resolve();
+      return;
     }
 
     logger.info(`${Logger.g(this.printId)} Daemon is about to stop`);

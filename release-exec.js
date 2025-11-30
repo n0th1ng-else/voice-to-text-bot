@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { writeFileSync } from "node:fs";
 
 const verifyRelease = (_, context) => {
   const next = context.nextRelease.version;

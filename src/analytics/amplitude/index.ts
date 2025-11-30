@@ -11,7 +11,7 @@ const logger = new Logger("analytics:amplitude");
 export const collectEvents = async (
   chatId: ChatId | "system_executor",
   events: AnalyticsEventExt[],
-) => {
+): Promise<void> => {
   if (!amplitudeToken) {
     if (!isDevelopment()) {
       logger.error(
@@ -19,47 +19,43 @@ export const collectEvents = async (
         new Error("Amplitude Analytics Token is not provided"),
       );
     }
-    return Promise.resolve();
+    return;
   }
 
-  return Promise.resolve()
-    .then(() => {
-      const nanoid = customAlphabet("0123456789", 18);
-      const sessionIdStr = `1${nanoid()}`;
-      const sessionId = Number(sessionIdStr);
+  try {
+    const nanoid = customAlphabet("0123456789", 18);
+    const sessionIdStr = `1${nanoid()}`;
+    const sessionId = Number(sessionIdStr);
 
-      if (isNaN(sessionId)) {
-        logger.warn(
-          "Session id is not a number, got string",
-          {
-            sessionIdStr,
-          },
-          true,
-        );
-      }
-      /**
-       * SessionId, 19 chars max
-       */
-      const eventSession = isNaN(sessionId) ? {} : { session_id: sessionId };
-      const client = initAmplitude(amplitudeToken);
-
-      return Promise.all(
-        events.map((event) =>
-          client.logEvent({
-            event_type: event.name,
-            user_id: String(chatId),
-            language: event.params.language,
-            app_version: event.params.app_version,
-            event_properties: event,
-            ...eventSession,
-          }),
-        ),
+    if (isNaN(sessionId)) {
+      logger.warn(
+        "Session id is not a number, got string",
+        {
+          sessionIdStr,
+        },
+        true,
       );
-    })
-    .then(() => {
-      logger.debug("Analytic data Amplitude has been collected");
-    })
-    .catch((err) => {
-      logger.error("Failed to collect analytic data Amplitude", err);
-    });
+    }
+    /**
+     * SessionId, 19 chars max
+     */
+    const eventSession = isNaN(sessionId) ? {} : { session_id: sessionId };
+    const client = initAmplitude(amplitudeToken);
+
+    await Promise.all(
+      events.map((event) =>
+        client.logEvent({
+          event_type: event.name,
+          user_id: String(chatId),
+          language: event.params.language,
+          app_version: event.params.app_version,
+          event_properties: event,
+          ...eventSession,
+        }),
+      ),
+    );
+    logger.debug("Analytic data Amplitude has been collected");
+  } catch (err) {
+    logger.error("Failed to collect analytic data Amplitude", err);
+  }
 };

@@ -38,7 +38,10 @@ jobs:
     name: Print the summary
     needs: [trigger]
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_VERSION: ${{ inputs.version }}
+      DEPLOY_SERVER: ${{ inputs.server }}
     steps:
       - name: Summary
         run: |
-          echo "Deployed a new service version: ✨ ${{ inputs.version }} ✨to ${{ inputs.server }} 🚀" > $GITHUB_STEP_SUMMARY
+          echo "Deployed a new service version: ✨ $DEPLOY_VERSION ✨to $DEPLOY_SERVER 🚀" > $GITHUB_STEP_SUMMARY

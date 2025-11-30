@@ -99,13 +99,13 @@ export class AWSProvider extends VoiceConverter {
       .then((info) => this.getJobWithDelay(name, info));
   }
 
-  private unpackTranscription(translationData: TranscriptionData): Promise<string> {
+  private async unpackTranscription(translationData: TranscriptionData): Promise<string> {
     const transcripts = translationData.results.transcripts;
     if (!transcripts?.length) {
       throw new Error("Unable to convert into text");
     }
 
-    return Promise.resolve(transcripts[0].transcript);
+    return transcripts[0].transcript;
   }
 
   private cleanStorage(translationData: TranscriptionData, name: string): Promise<string> {
@@ -114,10 +114,10 @@ export class AWSProvider extends VoiceConverter {
       .then(() => this.unpackTranscription(translationData));
   }
 
-  private getJobWithDelay(name: string, job: AWSJob): Promise<AWSJob> {
+  private async getJobWithDelay(name: string, job: AWSJob): Promise<AWSJob> {
     logger.info("Scheduling job", name);
     if (job.TranscriptionJob?.TranscriptionJobStatus !== "IN_PROGRESS") {
-      return Promise.resolve(job);
+      return job;
     }
 
     return new Promise<void>((resolve) => setTimeout(() => resolve(), 1000))

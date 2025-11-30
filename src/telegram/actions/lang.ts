@@ -37,7 +37,7 @@ export class LangAction extends GenericAction {
 
   public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isLangMessage = isCommandMessage(mdl, msg, BotCommand.Language);
-    return Promise.resolve(isLangMessage);
+    return isLangMessage;
   }
 
   public async runCallback(
@@ -109,41 +109,38 @@ export class LangAction extends GenericAction {
       });
   }
 
-  private updateLangMessage(
+  private async updateLangMessage(
     chatId: ChatId,
     lang: LanguageCode,
     messageId: MessageId,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
-    return this.editMessage(chatId, messageId, { lang }, TranslationKeys.ChangeLang, prefix)
-      .catch((err) => {
-        if (isMessageNotModified(err)) {
-          logger.warn(
-            `${prefix.getPrefix()} Unable to edit language selector. Most likely it is already updated but the user clicked button multiple times`,
-            err,
-            true,
-          );
+    try {
+      await this.editMessage(chatId, messageId, { lang }, TranslationKeys.ChangeLang, prefix);
+      logger.info(`${prefix.getPrefix()} Language updated`);
+    } catch (err) {
+      if (isMessageNotModified(err)) {
+        logger.warn(
+          `${prefix.getPrefix()} Unable to edit language selector. Most likely it is already updated but the user clicked button multiple times`,
+          err,
+          true,
+        );
 
-          return;
-        }
-        throw err;
-      })
-      .then(() => logger.info(`${prefix.getPrefix()} Language updated`));
+        return;
+      }
+      throw err;
+    }
   }
 
-  private getLangData(chatId: ChatId, button: TelegramButtonModel): Promise<BotLangData> {
+  private async getLangData(chatId: ChatId, button: TelegramButtonModel): Promise<BotLangData> {
     if (!button.value) {
-      return Promise.reject(
-        new Error("No language data received. Unable to handle language change"),
-      );
+      throw new Error("No language data received. Unable to handle language change");
     }
 
-    return Promise.resolve().then(() => {
-      const prefix = new TelegramMessagePrefix(chatId, button.logPrefix);
-      const throwOnError = true;
-      const langId = getLanguageByText(button.value, throwOnError);
-      return new BotLangData(langId, prefix);
-    });
+    const prefix = new TelegramMessagePrefix(chatId, button.logPrefix);
+    const throwOnError = true;
+    const langId = getLanguageByText(button.value, throwOnError);
+    return new BotLangData(langId, prefix);
   }
 
   private showLanguageSelection(

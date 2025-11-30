@@ -98,7 +98,7 @@ export class TelegramChatsApi {
       const tgError = new TgError(err, err.message)
         .setUrl(this.client.getApiUrl("getFile"), this.apiToken)
         .setChatId(chatId);
-      return Promise.reject(tgError);
+      throw tgError;
     }
 
     return `${TelegramBaseApi.url}/file/bot${this.apiToken}/${filePath}`;

@@ -116,7 +116,7 @@ export class WithAiProvider extends VoiceConverter {
     authToken: string,
   ): Promise<z.infer<z.ZodType<Output, Input>>[]> {
     if (!authToken) {
-      return Promise.reject(new Error("The auth token is not provided"));
+      throw new Error("The auth token is not provided");
     }
 
     const url = `${WithAiProvider.url}/${path}`;

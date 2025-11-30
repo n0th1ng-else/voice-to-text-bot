@@ -3,7 +3,7 @@ FROM node:24.11.1-slim AS builder
 ENV NODE_ENV=production
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
-RUN apt-get update && apt-get --no-install-recommends install -y python3 make g++ \
+RUN apt-get update && apt-get --no-install-recommends install -y g++ make python3 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ARG APP_DIR=/usr/src/app/

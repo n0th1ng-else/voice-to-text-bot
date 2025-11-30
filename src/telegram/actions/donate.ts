@@ -56,7 +56,7 @@ export class DonateAction extends GenericAction {
 
   public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isDonateMessage = isCommandMessage(mdl, msg, BotCommand.Donate);
-    return Promise.resolve(isDonateMessage);
+    return isDonateMessage;
   }
 
   public async runCallback(
@@ -93,8 +93,7 @@ export class DonateAction extends GenericAction {
         );
 
         const buttons: TgInlineKeyboardButton[][] = [];
-        buttons.push(donationStars);
-        buttons.push(donationEuros);
+        buttons.push(donationStars, donationEuros);
 
         return this.sendMessage(
           model.chatId,

@@ -14,10 +14,10 @@ export const getMTProtoApi = (): TgProto => {
   return {
     isInitialized: () => true,
     start: async (): Promise<void> => {
-      return Promise.resolve();
+      return;
     },
     stop: async (): Promise<void> => {
-      return Promise.resolve();
+      return;
     },
     downloadFile: async (toFilename: string, fileId: FileId): Promise<string> => {
       if (!currentFileId) {
@@ -31,10 +31,10 @@ export const getMTProtoApi = (): TgProto => {
       const mockFilePath = resolvePath(currentDir, "sample_file.oga");
       copyFileSync(mockFilePath, toFilename);
       currentFileId = undefined;
-      return Promise.resolve(toFilename);
+      return toFilename;
     },
-    sendFile(): Promise<void> {
-      return Promise.resolve();
+    sendFile: async (): Promise<void> => {
+      return;
     },
   };
 };
