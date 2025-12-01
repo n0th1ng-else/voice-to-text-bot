@@ -66,7 +66,7 @@ export class GoogleProvider extends VoiceConverter {
       });
   }
 
-  private unpackTranscription(
+  private async unpackTranscription(
     translationData: google.cloud.speech.v1.IRecognizeResponse,
   ): Promise<string> {
     const res = translationData.results || [];
@@ -75,8 +75,8 @@ export class GoogleProvider extends VoiceConverter {
         const options = result.alternatives || [{ transcript: "" }];
         return options[0].transcript;
       })
-      .filter((text) => text)
+      .filter(Boolean)
       .join("\n");
-    return Promise.resolve(transcription);
+    return transcription;
   }
 }

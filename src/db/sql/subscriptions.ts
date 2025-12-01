@@ -30,7 +30,7 @@ export class SubscriptionDb extends CoreDbClient {
 
   public async getRowsByDate(endDate: Date): Promise<SubscriptionRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
+      throw new Error("The table subscriptions is not initialized yet");
     }
     const query = SubscriptionsSql.getRowsByDate;
     const values = [endDate];
@@ -40,7 +40,7 @@ export class SubscriptionDb extends CoreDbClient {
 
   public async getRowsByUserId(userId: UserId, limit: number): Promise<SubscriptionRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
+      throw new Error("The table subscriptions is not initialized yet");
     }
     const query = SubscriptionsSql.getRowsByUserId;
     const values = [userId, limit];
@@ -57,7 +57,7 @@ export class SubscriptionDb extends CoreDbClient {
     isTrial: boolean,
   ): Promise<SubscriptionRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
+      throw new Error("The table subscriptions is not initialized yet");
     }
     const query = SubscriptionsSql.insertRow;
     const subscriptionId = nanoid(15);
@@ -85,14 +85,14 @@ export class SubscriptionDb extends CoreDbClient {
     const queryData = await this.pool.query<SubscriptionRowScheme>(query, values);
     const firstRow = queryData.rows.shift();
     if (!firstRow) {
-      return Promise.reject(new Error("Unable to get created row info"));
+      throw new Error("Unable to get created row info");
     }
     return firstRow;
   }
 
   public async markRowAsCanceled(subscriptionId: SubscriptionId): Promise<SubscriptionRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table subscriptions is not initialized yet"));
+      throw new Error("The table subscriptions is not initialized yet");
     }
 
     const query = SubscriptionsSql.toggleCanceled;
@@ -104,7 +104,7 @@ export class SubscriptionDb extends CoreDbClient {
     const queryData = await this.pool.query<SubscriptionRowScheme>(query, values);
     const firstRow = queryData.rows.shift();
     if (!firstRow) {
-      return Promise.reject(new Error("Unable to get updated row info"));
+      throw new Error("Unable to get updated row info");
     }
     return firstRow;
   }

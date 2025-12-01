@@ -34,7 +34,7 @@ export class VoiceFormatAction extends GenericAction {
       });
     }
 
-    return Promise.resolve(triggersAction);
+    return triggersAction;
   }
 
   private sendWrongFormatMessage(

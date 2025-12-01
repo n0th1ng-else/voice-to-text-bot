@@ -18,7 +18,7 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
   const { promise, resolve, reject } = Promise.withResolvers<string>();
 
   if (typeof ffmpegBinPath !== "string") {
-    return Promise.reject(new Error("Ffmpeg binary was now found!"));
+    throw new TypeError("Ffmpeg binary was not found!");
   }
 
   ffmpeg.setFfmpegPath(ffmpegBinPath);

@@ -58,7 +58,7 @@ export class UptimeDaemon {
       );
     }
 
-    this.lifecycleInterval = interval < minInterval ? minInterval : interval;
+    this.lifecycleInterval = Math.max(minInterval, interval);
 
     logger.info(`Lifecycle interval is set to ${Logger.y(sSuffix("day", this.lifecycleInterval))}`);
 

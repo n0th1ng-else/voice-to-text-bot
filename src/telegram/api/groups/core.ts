@@ -48,7 +48,7 @@ export class TelegramBaseApi {
     return schema.parse(result);
   }
 
-  private request<Response, Data>(
+  private async request<Response, Data>(
     methodName: string,
     data?: Data,
     chatId?: ChatId,

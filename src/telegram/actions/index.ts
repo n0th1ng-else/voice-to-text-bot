@@ -68,27 +68,25 @@ export class BotActions {
       return collectAnalytics(analytics.setCommand("/app", "Callback query error", "No data"));
     }
 
-    return Promise.resolve()
-      .then(() => {
-        const button = TelegramButtonModel.fromDto(data);
+    try {
+      const button = TelegramButtonModel.fromDto(data);
 
-        switch (button.id) {
-          case "d":
-            return this.donate.runCallback(message, button, analytics);
-          case "l":
-            return this.lang.runCallback(message, button, analytics, msg);
-          default:
-            throw new Error(`Unknown type passed in callback query ${data}`, {
-              cause: data,
-            });
-        }
-      })
-      .catch((err) => {
-        const errorMessage = "Failed to execute callback query";
-        logger.error(errorMessage, err);
-        analytics.addError(errorMessage);
-        return collectAnalytics(analytics.setCommand("/app", "Callback query error", "Unknown"));
-      });
+      switch (button.id) {
+        case "d":
+          return await this.donate.runCallback(message, button, analytics);
+        case "l":
+          return await this.lang.runCallback(message, button, analytics, msg);
+        default:
+          throw new Error(`Unknown type passed in callback query ${data}`, {
+            cause: data,
+          });
+      }
+    } catch (err) {
+      const errorMessage = "Failed to execute callback query";
+      logger.error(errorMessage, err);
+      analytics.addError(errorMessage);
+      await collectAnalytics(analytics.setCommand("/app", "Callback query error", "Unknown"));
+    }
   }
 
   public handleCheckout(msg: TgCheckoutQuery, analytics: AnalyticsData): Promise<void> {

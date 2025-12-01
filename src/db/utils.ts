@@ -11,7 +11,7 @@ type DbConfigState = "invalid" | "unsecure" | "valid";
 
 export const validateConfigState = (config: DbConnectionConfig): DbConfigState => {
   const { certificate, ...cfg } = config;
-  const coreFieldsValid = Object.values(cfg).every((val) => val);
+  const coreFieldsValid = Object.values(cfg).every(Boolean);
 
   if (!coreFieldsValid) {
     return "invalid";

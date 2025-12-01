@@ -56,7 +56,7 @@ export class VoiceAction extends GenericAction {
       );
     }
 
-    return Promise.resolve(isVoice);
+    return isVoice;
   }
 
   public setConverters(converters: VoiceConverters): void {
@@ -73,7 +73,7 @@ export class VoiceAction extends GenericAction {
     return this.getFileLInk(model, prefix)
       .then(([fileId, fileLink, isLocalFile]) => {
         if (!this.converters) {
-          return Promise.reject(new Error("Voice converters are not set!"));
+          throw new Error("Voice converters are not set!");
         }
 
         const converter = getConverterType(model);
@@ -171,7 +171,7 @@ export class VoiceAction extends GenericAction {
     logger.info(`${prefix.getPrefix()} Fetching file link`);
 
     if (!model.voiceFileId) {
-      return Promise.reject(new Error("Unable to find a voice file in the message"));
+      throw new Error("Unable to find a voice file in the message");
     }
 
     const [fileLink, isLocalFile] = await this.bot.downloadFile(
@@ -189,13 +189,13 @@ export class VoiceAction extends GenericAction {
     return [model.voiceFileId, fileLink, isLocalFile];
   }
 
-  private sendInProgressMessage(
+  private async sendInProgressMessage(
     model: BotMessageModel,
     lang: LanguageCode,
     prefix: TelegramMessagePrefix,
   ): Promise<void> {
     if (model.isGroup) {
-      return Promise.resolve();
+      return;
     }
 
     return this.sendMessage(

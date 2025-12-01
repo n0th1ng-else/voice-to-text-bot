@@ -19,13 +19,14 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     name: Push docker image
-    timeout-minutes: 5
+    timeout-minutes: 10
     env:
       CONTAINER_NAME: voice-to-speech-app
       CONTAINER_REGISTRY: ghcr.io
+      APP_VERSION_SHA: ${{ inputs.sha }}
     steps:
       - name: App version
-        run: echo "Picked the app version ${{ inputs.sha }}"
+        run: echo "Picked the app version $APP_VERSION_SHA"
 
       - name: Checkout
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0

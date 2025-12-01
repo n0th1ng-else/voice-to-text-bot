@@ -28,7 +28,7 @@ export class VoiceLengthAction extends GenericAction {
   public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const type = isVoiceMessage(msg);
     const isVoice = type.type === VoiceContentReason.Ok;
-    return Promise.resolve(isVoice && VoiceLengthAction.isVoiceMessageLong(mdl));
+    return isVoice && VoiceLengthAction.isVoiceMessageLong(mdl);
   }
 
   private async sendVoiceIsTooLongMessage(

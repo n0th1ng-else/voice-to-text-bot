@@ -8,9 +8,9 @@ export class WaiterForCalls {
     this.reset();
   }
 
-  public waitForCondition(): Promise<void> {
+  public async waitForCondition(): Promise<void> {
     if (!this.promise) {
-      return Promise.resolve();
+      return;
     }
 
     return this.promise;

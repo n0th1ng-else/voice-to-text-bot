@@ -105,7 +105,7 @@ export class Logger {
     sendLogs("info", this.getFullPrefix(false), msg, data);
   }
 
-  public warn(msg: string, data?: Record<string, unknown>, shouldReport = false): void {
+  public warn(msg: string, data?: unknown, shouldReport = false): void {
     if (LOG_LEVEL_PRIORITY.WARN < this.level) {
       return;
     }
@@ -114,6 +114,7 @@ export class Logger {
     sendLogs("warn", this.getFullPrefix(false), msg, data);
     trackApplicationErrors("Warning");
     if (shouldReport) {
+      // @ts-expect-error There is a type mismatch. wanna keep it like this
       captureWarning(msg, data);
     }
   }

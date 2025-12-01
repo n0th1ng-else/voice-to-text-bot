@@ -4,16 +4,14 @@ import type { LanguageCode } from "../recognition/types.js";
 
 const logger = new Logger("run-retry");
 
-export const runPromiseWithRetry = <D>(
+export const runPromiseWithRetry = async <D>(
   fnName: string,
   fn: () => Promise<D>,
   timeoutMs = 0,
   tries = 5,
 ): Promise<D> => {
   if (!tries) {
-    return Promise.reject(
-      new Error(`Failed to execute function ${fnName} after 5 tries. Rejecting...`),
-    );
+    throw new Error(`Failed to execute function ${fnName} after 5 tries. Rejecting...`);
   }
   return sleepFor(timeoutMs)
     .then(() => fn())

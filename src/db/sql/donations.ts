@@ -33,51 +33,55 @@ export class DonationsDb extends CoreDbClient {
     this.initialized = true;
   }
 
-  public createRow(chatId: ChatId, price: number, currency: Currency): Promise<DonationRowScheme> {
+  public async createRow(
+    chatId: ChatId,
+    price: number,
+    currency: Currency,
+  ): Promise<DonationRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table donations is not initialized yet"));
+      throw new Error("The table donations is not initialized yet");
     }
     const query = DonationsSql.insertRow;
     const createdAt = new Date();
     const updatedAt = createdAt;
     const status: DonationStatus = "INITIALIZED";
     const values = [chatId, status, price, currency, createdAt, updatedAt];
-    return this.pool.query<DonationRowScheme>(query, values).then((queryData) => {
-      const firstRow = queryData.rows.shift();
-      if (!firstRow) {
-        return Promise.reject(new Error("Unable to get created row info"));
-      }
-      return firstRow;
-    });
+
+    const queryData = await this.pool.query<DonationRowScheme>(query, values);
+    const firstRow = queryData.rows.shift();
+    if (!firstRow) {
+      throw new Error("Unable to get created row info");
+    }
+    return firstRow;
   }
 
-  public updateRow(
+  public async updateRow(
     donationId: DonationId,
     status: DonationStatus,
     paymentChargeId?: PaymentChargeId,
   ): Promise<DonationRowScheme> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table donations is not initialized yet"));
+      throw new Error("The table donations is not initialized yet");
     }
     const query = DonationsSql.updateRow;
     const updatedAt = new Date();
     const values = [status, paymentChargeId, updatedAt, donationId];
-    return this.pool.query<DonationRowScheme>(query, values).then((queryData) => {
-      const firstRow = queryData.rows.shift();
-      if (!firstRow) {
-        return Promise.reject(new Error("Unable to get updated row info"));
-      }
-      return firstRow;
-    });
+    const queryData = await this.pool.query<DonationRowScheme>(query, values);
+    const firstRow = queryData.rows.shift();
+    if (!firstRow) {
+      throw new Error("Unable to get updated row info");
+    }
+    return firstRow;
   }
 
-  public getRows(status: DonationStatus): Promise<DonationRowScheme[]> {
+  public async getRows(status: DonationStatus): Promise<DonationRowScheme[]> {
     if (!this.initialized) {
-      return Promise.reject(new Error("The table donations is not initialized yet"));
+      throw new Error("The table donations is not initialized yet");
     }
     const query = DonationsSql.getRows;
     const values = [status];
-    return this.pool.query<DonationRowScheme>(query, values).then((queryData) => queryData.rows);
+    const queryData = await this.pool.query<DonationRowScheme>(query, values);
+    return queryData.rows;
   }
 
   public getId(row: DonationRowScheme): DonationId {

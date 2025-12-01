@@ -24,7 +24,7 @@ export class SupportAction extends GenericAction {
 
   public async runCondition(msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
     const isSupportMessage = isCommandMessage(mdl, msg, BotCommand.Support);
-    return Promise.resolve(isSupportMessage);
+    return isSupportMessage;
   }
 
   public setAuthorUrl(url: string): void {

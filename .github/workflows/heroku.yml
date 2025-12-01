@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Heroku
     environment: ${{ matrix.environment }}
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
       max-parallel: 1
       matrix:

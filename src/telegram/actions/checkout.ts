@@ -23,14 +23,14 @@ export class CheckoutAction extends GenericAction {
         `${prefix.getPrefix()} Unable to parse the paymentInternalId in runAction. Will not update the DB row!`,
         new Error("Unable to parse the paymentInternalId in runAction"),
       );
-      return Promise.resolve();
+      return;
     }
     // @ts-expect-error We unified the paymentId field, but will not change the donationId type
     return this.markAsSuccessful(Number(paymentInternalId), prefix, chargeId);
   }
 
   public async runCondition(_msg: TgMessage, mdl: BotMessageModel): Promise<boolean> {
-    return Promise.resolve(isDonation(mdl));
+    return isDonation(mdl);
   }
 
   public async confirmCheckout(msg: TgCheckoutQuery, analytics: AnalyticsData): Promise<void> {

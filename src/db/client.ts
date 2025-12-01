@@ -86,12 +86,12 @@ export class DbClient {
     this.subscriptions = new SubscriptionsClient(pool);
   }
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     if (!this.initialized) {
-      return Promise.resolve();
+      return;
     }
 
-    return Promise.all([
+    await Promise.all([
       this.usages.init(),
       this.nodes.init(),
       this.donations.init(),
@@ -99,9 +99,9 @@ export class DbClient {
       this.durations.init(),
       this.ignoredChats.init(),
       this.subscriptions.init(),
-    ]).then(() => {
-      this.ready = true;
-    });
+    ]);
+
+    this.ready = true;
   }
 
   public isReady(): boolean {

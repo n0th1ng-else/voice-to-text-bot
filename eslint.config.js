@@ -79,6 +79,8 @@ export default [
       "no-console": "error",
 
       "@typescript-eslint/prefer-promise-reject-errors": "warn",
+
+      "@typescript-eslint/require-await": "off",
     },
   },
 ];

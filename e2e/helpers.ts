@@ -268,8 +268,7 @@ export const getDonateButtons = (): TelegramMessageMetaItem[][] => {
       ),
   );
 
-  buttons.push(starsButtons);
-  buttons.push(eurosButtons);
+  buttons.push(starsButtons, eurosButtons);
 
   return buttons;
 };

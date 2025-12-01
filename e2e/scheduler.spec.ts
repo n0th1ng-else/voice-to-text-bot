@@ -115,8 +115,7 @@ describe("[uptime daemon]", () => {
 
       expect(apiSpy).toHaveBeenCalledWith(hostUrl);
       expect(apiSpy).toHaveBeenLastCalledWith(nextUrl);
-      // TODO why does the test call the nextUrl twice? (should be 2)
-      expect(apiSpy).toHaveBeenCalledTimes(3);
+      expect(apiSpy).toHaveBeenCalledTimes(2);
       apiSpy.mockClear();
       expect(clearIntervalSpy).toHaveBeenCalledWith(expect.any(Object));
       expect(vi.getTimerCount()).toBe(0);
