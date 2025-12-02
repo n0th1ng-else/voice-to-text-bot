@@ -120,7 +120,7 @@ export class DbClient {
   }
 
   private setParsers(): void {
-    pg.types.setTypeParser(pg.types.builtins.INT8, (val) => parseInt(val));
+    pg.types.setTypeParser(pg.types.builtins.INT8, Number);
   }
 
   private setDefaults(): void {

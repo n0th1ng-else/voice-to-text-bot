@@ -11,17 +11,17 @@ export class CacheProvider<Data, UniqId extends keyof Data> {
   constructor(cacheSize: number, idKey: UniqId) {
     this.cacheSize = cacheSize;
     this.idKey = idKey;
-    if (!this.hasCacheEnabled()) {
+    if (this.hasCacheEnabled()) {
       logger.info(
         `Cache size is ${Logger.y(
           sSuffix("item", cacheSize),
-        )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(String(idKey))} stat`,
+        )} initialized for ${Logger.y(String(idKey))} stat`,
       );
     } else {
       logger.info(
         `Cache size is ${Logger.y(
           sSuffix("item", cacheSize),
-        )} initialized for ${Logger.y(String(idKey))} stat`,
+        )}, so the cache is ${Logger.r("turned off")} for ${Logger.y(String(idKey))} stat`,
       );
     }
   }

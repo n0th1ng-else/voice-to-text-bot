@@ -5,5 +5,5 @@ export const isDevelopment = (): boolean => {
 };
 
 export const parseMultilineEnvVariable = (value: string): string => {
-  return value.split("\\n").join("\n");
+  return value.split(String.raw`\n`).join("\n");
 };

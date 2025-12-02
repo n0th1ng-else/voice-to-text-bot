@@ -32,7 +32,7 @@ const makeSampleTelegramMessageResponse = (chatId: unknown, messageId?: unknown)
   const msgId = messageId ?? 124235;
   return {
     message_id: asMessageId__test(msgId as number),
-    date: new Date().getTime(),
+    date: Date.now(),
     chat: {
       id: asChatId__test(chatId as number),
       type: "private",

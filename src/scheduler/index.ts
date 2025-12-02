@@ -43,10 +43,10 @@ export class ScheduleDaemon<TickData> {
     }
 
     logger.info(`${Logger.g(this.printId)} Launching the daemon`);
-    if (!this.skipInitialTick) {
-      this.runTick();
-    } else {
+    if (this.skipInitialTick) {
       logger.info(`${Logger.g(this.printId)} Skipped initial tick`);
+    } else {
+      this.runTick();
     }
     this.handler = setInterval(() => this.runTick(), this.interval);
     return this;

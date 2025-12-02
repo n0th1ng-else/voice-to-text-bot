@@ -15,7 +15,7 @@ const spawnInstance = (host: string, time: number): void => {
 };
 
 export const run = async (): Promise<void> => {
-  const launchTime = new Date().getTime();
+  const launchTime = Date.now();
 
   const host = await getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken);
 

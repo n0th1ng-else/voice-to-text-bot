@@ -197,7 +197,7 @@ describe("[telegram api client]", () => {
         const testText = "text-for-edit lalala";
         const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
-          date: new Date().getTime(),
+          date: Date.now(),
           message_id: testMessageId,
           chat: {
             id: testChatId,
@@ -276,7 +276,7 @@ describe("[telegram api client]", () => {
             token: "payment-token",
           };
           testApiResponse = getApiResponse<TgMessage>(true, {
-            date: new Date().getTime(),
+            date: Date.now(),
             message_id: asMessageId__test(32411244),
             chat: {
               id: data.chatId,
@@ -353,7 +353,7 @@ describe("[telegram api client]", () => {
         const testText = "text-for-edit lalala";
         const testChatType = "private";
         testApiResponse = getApiResponse<TgMessage>(true, {
-          date: new Date().getTime(),
+          date: Date.now(),
           message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
@@ -386,7 +386,7 @@ describe("[telegram api client]", () => {
           callback_data: "interesting data",
         };
         testApiResponse = getApiResponse<TgMessage>(true, {
-          date: new Date().getTime(),
+          date: Date.now(),
           message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
@@ -423,7 +423,7 @@ describe("[telegram api client]", () => {
         const testChatType = "private";
 
         testApiResponse = getApiResponse<TgMessage>(true, {
-          date: new Date().getTime(),
+          date: Date.now(),
           message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
@@ -461,7 +461,7 @@ describe("[telegram api client]", () => {
           callback_data: "interesting data",
         };
         testApiResponse = getApiResponse<TgMessage>(true, {
-          date: new Date().getTime(),
+          date: Date.now(),
           message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
@@ -503,7 +503,7 @@ describe("[telegram api client]", () => {
           url: "that lnk url",
         };
         testApiResponse = getApiResponse<TgMessage>(true, {
-          date: new Date().getTime(),
+          date: Date.now(),
           message_id: asMessageId__test(32411244),
           chat: {
             id: testChatId,
@@ -712,7 +712,7 @@ describe("[telegram api client]", () => {
       const testText = "text text text";
       const testChatType = "channel";
       testApiResponse = getApiResponse<TgMessage>(true, {
-        date: new Date().getTime(),
+        date: Date.now(),
         message_id: testMessageId,
         chat: {
           id: testChatId,
@@ -767,7 +767,7 @@ describe("[telegram api client]", () => {
       const testText = "op op op";
       const testChatType = "supergroup";
       testApiResponse = getApiResponse<TgMessage>(true, {
-        date: new Date().getTime(),
+        date: Date.now(),
         message_id: asMessageId__test(4353411),
         chat: {
           id: testChatId,

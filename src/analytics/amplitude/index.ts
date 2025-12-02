@@ -26,8 +26,9 @@ export const collectEvents = async (
     const nanoid = customAlphabet("0123456789", 18);
     const sessionIdStr = `1${nanoid()}`;
     const sessionId = Number(sessionIdStr);
+    const isBrokenSessionId = Number.isNaN(sessionId);
 
-    if (isNaN(sessionId)) {
+    if (isBrokenSessionId) {
       logger.warn(
         "Session id is not a number, got string",
         {
@@ -39,7 +40,7 @@ export const collectEvents = async (
     /**
      * SessionId, 19 chars max
      */
-    const eventSession = isNaN(sessionId) ? {} : { session_id: sessionId };
+    const eventSession = isBrokenSessionId ? {} : { session_id: sessionId };
     const client = initAmplitude(amplitudeToken);
 
     await Promise.all(
