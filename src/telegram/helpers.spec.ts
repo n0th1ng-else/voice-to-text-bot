@@ -7,7 +7,7 @@ import { asChatId__test, asMessageId__test, asUserId__test } from "../testUtils/
 const getMessage = (name?: string, lang?: string): TgMessage => {
   return {
     message_id: asMessageId__test(4324),
-    date: new Date().getTime(),
+    date: Date.now(),
     chat: {
       type: "private",
       id: asChatId__test(23324),

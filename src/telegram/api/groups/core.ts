@@ -1,9 +1,15 @@
-import axios, { type AxiosError, type AxiosInstance } from "axios";
+import axios, { type AxiosInstance, type AxiosResponse, isAxiosError } from "axios";
 import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
 import type { ChatId } from "../core.js";
 import { API_TIMEOUT_MS } from "../../../const.js";
+
+const hasMessage = (obj: unknown): obj is { message: string } => {
+  return (
+    typeof obj === "object" && obj !== null && "message" in obj && typeof obj.message === "string"
+  );
+};
 
 export class TelegramBaseApi {
   public static readonly url = "https://api.telegram.org";
@@ -54,35 +60,38 @@ export class TelegramBaseApi {
     chatId?: ChatId,
   ): Promise<Response> {
     const url = this.getApiUrl(methodName);
-    return this.client.request<TgCore<Response>>({ url, data }).then(
-      (response) => {
-        const answer = response.data;
-        if (!answer.ok) {
-          const tgError = new TgError(new Error(answer.description), answer.description)
-            .setUrl(url, this.apiToken)
-            .setErrorCode(answer.error_code)
-            .setRetryAfter(answer?.parameters?.retry_after)
-            .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
-            .setChatId(chatId);
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          this.errorReflector?.(tgError);
-          return Promise.reject(tgError);
-        }
+    let response: AxiosResponse<TgCore<Response>> | null = null;
 
-        return answer.result;
-      },
-      (err: AxiosError<TgCore<void>>) => {
-        const tgError = new TgError(err, err.message)
-          .setUrl(url, this.apiToken)
-          .setErrorCode(err?.response?.status)
-          .setResponse(err?.response?.data)
-          .setChatId(chatId);
+    try {
+      response = await this.client.request<TgCore<Response>>({ url, data });
+    } catch (err) {
+      const tgError = new TgError(err, hasMessage(err) ? err.message : undefined)
+        .setUrl(url, this.apiToken)
+        .setChatId(chatId);
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.errorReflector?.(tgError);
-        throw tgError;
-      },
-    );
+      if (isAxiosError(err)) {
+        tgError.setErrorCode(err.response?.status).setResponse(err.response?.data);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.errorReflector?.(tgError);
+      throw tgError;
+    }
+
+    const answer = response.data;
+    if (!answer.ok) {
+      const tgError = new TgError(new Error(answer.description), answer.description)
+        .setUrl(url, this.apiToken)
+        .setErrorCode(answer.error_code)
+        .setRetryAfter(answer?.parameters?.retry_after)
+        .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
+        .setChatId(chatId);
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.errorReflector?.(tgError);
+      throw tgError;
+    }
+
+    return answer.result;
   }
 }

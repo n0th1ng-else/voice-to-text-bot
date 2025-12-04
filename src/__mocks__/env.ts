@@ -34,7 +34,7 @@ export const memoryLimit = 0;
 
 export const clusterSize = 2;
 
-export const launchTime = new Date().getTime();
+export const launchTime = Date.now();
 
 export const dbPostgres = {
   user: "",

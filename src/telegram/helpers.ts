@@ -88,14 +88,14 @@ export const getUserName = (msg: TgMessage): string => {
 
 export const getFullUserName = (msg: TgMessage): string => {
   const fromUserFullName =
-    msg.from && [msg.from.first_name, msg.from.last_name].filter((k) => k).join(" ");
+    msg.from && [msg.from.first_name, msg.from.last_name].filter(Boolean).join(" ");
 
   return fromUserFullName || "";
 };
 
 export const getGroupName = (msg: TgMessage): string => {
   const chatName = msg.chat.title;
-  const chatFullName = [msg.chat.first_name, msg.chat.last_name].filter((k) => k).join(" ");
+  const chatFullName = [msg.chat.first_name, msg.chat.last_name].filter(Boolean).join(" ");
   return chatName || chatFullName || "";
 };
 

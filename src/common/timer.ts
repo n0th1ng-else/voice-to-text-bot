@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 
 export const randomIntFromInterval = (min: number, max: number): number => {
   const byteLimit = 256;
-  const randomNum = parseInt(randomBytes(1).toString("hex"), 16);
+  const randomNum = Number.parseInt(randomBytes(1).toString("hex"), 16);
   const normalizedNum = randomNum / byteLimit;
   return Math.floor(normalizedNum * (max - min + 1) + min);
 };

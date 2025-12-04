@@ -2,10 +2,10 @@ import type { ConverterType, LanguageCode } from "../recognition/types.js";
 import type { BotMessageModel } from "../telegram/models/botMessage.js";
 import type { UserId } from "../telegram/api/core.js";
 
-const FREE_LANGUAGES: readonly LanguageCode[] = ["en-US", "ru-RU"];
+const FREE_LANGUAGES = new Set<LanguageCode>(["en-US", "ru-RU"]);
 
 export const isPremiumLanguage = (lang: LanguageCode): boolean => {
-  return !FREE_LANGUAGES.includes(lang);
+  return !FREE_LANGUAGES.has(lang);
 };
 
 export const getConverterType = (

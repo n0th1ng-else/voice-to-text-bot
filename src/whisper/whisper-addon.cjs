@@ -34,7 +34,7 @@ const { promisify } = require("node:util");
  *
  * @return {(opts: WhisperOptions) => Promise<WhisperResultItem[]>}
  */
-module.exports = (addonArchitecture) => {
+module.exports = function getWhisperAddon(addonArchitecture) {
   // Addon version: 31aea563a83803c710691fed3e8d700e06ae6788
   const addOnPath = path.join(__dirname, `./addons/whisper-processor.${addonArchitecture}.node`);
   // eslint-disable-next-line @typescript-eslint/no-require-imports

@@ -748,7 +748,7 @@ const onConnect = () => {
 };
 
 // Attaching event handlers
-window.addEventListener("DOMContentLoaded", () => onReset());
+globalThis.addEventListener("DOMContentLoaded", () => onReset());
 document.querySelector(".draw-btn").addEventListener("click", () => onDraw());
 document.querySelector(".reset-btn").addEventListener("click", () => onReset());
 document.querySelector(".off-btn").addEventListener("click", () => onDisconnect());

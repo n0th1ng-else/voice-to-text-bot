@@ -19,7 +19,7 @@ export const sSuffix = (word: string, count: number | boolean): string => {
   const isNumber = typeof count === "number";
   const isSingleChecker = isNumber ? count === 1 : !count;
   const suffix = isSingleChecker ? "" : "s";
-  const prefix = !isNumber ? "" : `${count} `;
+  const prefix = isNumber ? `${count} ` : "";
   return `${prefix}${word}${suffix}`;
 };
 

@@ -11,7 +11,7 @@ export class TgError extends Error {
   public retryAfter = 0;
   public url = "";
 
-  constructor(cause: Error, message = "Telegram request was unsuccessful") {
+  constructor(cause: unknown, message = "Telegram request was unsuccessful") {
     super(`ETELEGRAM ${message}`, { cause });
   }
 
