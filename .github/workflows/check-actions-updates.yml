@@ -15,7 +15,7 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      - run: npm install -g actions-up
+      - run: npm install --ignore-scripts -g actions-up
 
       - run: |
           if actions-up --dry-run | grep -q "→"; then
