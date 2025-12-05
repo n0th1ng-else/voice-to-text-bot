@@ -39,7 +39,7 @@ ENV NODE_ENV=production
 ARG APP_VERSION=local
 ENV APP_VERSION=${APP_VERSION}
 
-RUN echo ${APP_VERSION}
+RUN echo "${APP_VERSION}"
 
 ARG APP_DIR=/usr/src/app/
 
