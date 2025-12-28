@@ -1,0 +1,86 @@
+import {
+  init as initSentryGlobal,
+  captureException,
+  captureMessage,
+  getCurrentScope,
+  withIsolationScope,
+  setupFastifyErrorHandler,
+} from "@sentry/bun";
+import type { FastifyInstance } from "fastify";
+import { SentryBase } from "./sentry-base.js";
+import { isDevelopment } from "../../common/environment.js";
+import type { VoidFunction } from "../../common/types.js";
+import type { HookMetadata } from "../../server/hook.js";
+
+export class SentryBunClient extends SentryBase {
+  public init(app: FastifyInstance): void {
+    if (!this.isEnabled()) {
+      return;
+    }
+
+    initSentryGlobal({
+      dsn: this.sentryDsn,
+      environment: this.nodeEnvironment,
+      release: this.appVersion,
+
+      // Set tracesSampleRate to 1.0 to capture 100%
+      // of transactions for performance monitoring.
+      // We recommend adjusting this value in production
+      tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
+      sampleRate: isDevelopment() ? 1.0 : 0.5,
+      beforeSend: (event, hint) => this.beforeSentrySend(event, hint),
+      beforeBreadcrumb: (breadcrumb) => this.beforeBreadcrumb(breadcrumb),
+    });
+
+    this.setFastifyRequestPlugin(app);
+    setupFastifyErrorHandler(app);
+  }
+
+  public captureException(error: unknown): void {
+    if (!this.isEnabled()) {
+      return;
+    }
+
+    captureException(error);
+  }
+
+  public captureMessage(
+    message: string,
+    context?: { level: "warning"; extra?: Record<string, unknown> },
+  ): void {
+    if (!this.isEnabled()) {
+      return;
+    }
+    captureMessage(message, context);
+  }
+
+  public addAttachment(filename: string, data: string | Uint8Array): void {
+    getCurrentScope().addAttachment({
+      filename,
+      data,
+      contentType: "text/plain",
+    });
+  }
+
+  public clearAttachments(): void {
+    getCurrentScope().clearAttachments();
+  }
+
+  public setMetadataAndTags(
+    meta: HookMetadata,
+    tags: Record<string, string>,
+    doneFn: VoidFunction,
+  ): void {
+    const user = meta.userId
+      ? {
+          id: meta.userId,
+          userId: meta.userId,
+          chatId: meta.chatId,
+        }
+      : null;
+    withIsolationScope(() => {
+      getCurrentScope().setSDKProcessingMetadata(meta).setTags(tags).setUser(user);
+      doneFn();
+    });
+  }
+}
