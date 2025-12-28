@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosResponse, isAxiosError } from "axios";
+import axios, { type AxiosResponse, isAxiosError } from "axios";
 import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
@@ -12,23 +12,11 @@ export class TelegramBaseApi {
 
   private static readonly path = "bot";
 
-  private readonly client: AxiosInstance;
   private readonly apiToken: string;
   private errorReflector?: ApiErrorReflector;
 
   constructor(apiToken: string) {
     this.apiToken = apiToken;
-
-    this.client = axios.create({
-      method: "POST",
-      baseURL: TelegramBaseApi.url,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      timeout: TelegramBaseApi.timeout,
-      responseType: "json",
-    });
   }
 
   public setErrorReflector(errorReflector: ApiErrorReflector): void {
@@ -59,7 +47,18 @@ export class TelegramBaseApi {
     let response: AxiosResponse<TgCore<Response>> | null = null;
 
     try {
-      response = await this.client.request<TgCore<Response>>({ url, data });
+      response = await axios.request<TgCore<Response>>({
+        url: `${TelegramBaseApi.url}${url}`,
+        data,
+        method: "POST",
+        baseURL: TelegramBaseApi.url,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        timeout: TelegramBaseApi.timeout,
+        responseType: "json",
+      });
     } catch (err) {
       const tgError = new TgError(err, unknownHasMessage(err) ? err.message : undefined)
         .setUrl(url, this.apiToken)
@@ -88,5 +87,65 @@ export class TelegramBaseApi {
     }
 
     return answer.result;
+  }
+
+  private async request_v2<Res, Data>(
+    methodName: string,
+    data?: Data,
+    chatId?: ChatId,
+  ): Promise<Res> {
+    const url = this.getApiUrl(methodName);
+
+    let response: Response;
+    try {
+      response = await fetch(`${TelegramBaseApi.url}${url}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: data ? JSON.stringify(data) : undefined,
+        signal: AbortSignal.timeout(TelegramBaseApi.timeout),
+      });
+
+      if (!response.ok) {
+        // throw TgError
+      }
+    } catch (err) {
+      const tgError = new TgError(err, unknownHasMessage(err) ? err.message : undefined)
+        .setUrl(url, this.apiToken)
+        .setChatId(chatId);
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.errorReflector?.(tgError);
+      throw tgError;
+    }
+
+    try {
+      const answer = (await response.json()) as TgCore<Res>;
+
+      if (!answer.ok) {
+        const tgError = new TgError(new Error(answer.description), answer.description)
+          .setUrl(url, this.apiToken)
+          .setErrorCode(answer.error_code)
+          .setRetryAfter(answer?.parameters?.retry_after)
+          .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
+          .setChatId(chatId);
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        this.errorReflector?.(tgError);
+        throw tgError;
+      }
+
+      return answer.result;
+    } catch (err) {
+      const tgError = new TgError(err, "Invalid JSON response")
+        .setUrl(url, this.apiToken)
+        .setChatId(chatId);
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.errorReflector?.(tgError);
+      throw tgError;
+    }
   }
 }

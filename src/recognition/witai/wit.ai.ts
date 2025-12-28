@@ -14,6 +14,7 @@ import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 import { addAttachment } from "../../monitoring/sentry/index.js";
 import { trackRecognitionTime } from "../../monitoring/newrelic.js";
+import { unknownHasMessage } from "../../common/unknown.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -109,6 +110,58 @@ export class WithAiProvider extends VoiceConverter {
     authToken: string,
   ): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(data, "dictation", WitAiResponseSchema, authToken);
+  }
+
+  private static async runRequest_v2<Output, Input = Output>(
+    data: Buffer<ArrayBufferLike>,
+    path: "speech" | "dictation",
+    schema: z.ZodType<Output, Input>,
+    authToken: string,
+  ): Promise<z.infer<z.ZodType<Output, Input>>[]> {
+    if (!authToken) {
+      throw new Error("The auth token is not provided");
+    }
+
+    const url = new URL(`${WithAiProvider.url}/${path}`);
+    url.searchParams.set("v", WithAiProvider.apiVersion);
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+          "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
+          "Content-Length": String(data.byteLength),
+        },
+        body: data,
+        signal: AbortSignal.timeout(API_TIMEOUT_MS),
+      });
+
+      if (!response.ok || response.status !== 200) {
+        const errorMessage = "Failed to fetch voice recognition";
+        const witAiError = new WitAiError(new Error(errorMessage), errorMessage)
+          .setUrl(url.toString())
+          .setErrorCode(response.status)
+          .setBufferLength(data);
+        throw witAiError;
+      }
+
+      const responseText = await response.text();
+      const arraySchema = z.array(schema);
+      const chunks = arraySchema.parse(parseChunkedResponse(responseText));
+      return chunks;
+    } catch (err) {
+      if (err instanceof WitAiError) {
+        throw err;
+      }
+
+      const witAiError = new WitAiError(err, unknownHasMessage(err) ? err.message : undefined)
+        .setUrl(url.toString())
+        .setBufferLength(data);
+
+      throw witAiError;
+    }
   }
 
   private static async runRequest<Output, Input = Output>(

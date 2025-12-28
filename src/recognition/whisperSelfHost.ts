@@ -46,7 +46,6 @@ export class WhisperSelfHost extends APIVoiceConverter<ApiResponse> {
       const form = new FormData();
       form.append("language", language);
 
-      // @ts-expect-error Type mismatch
       const fileBlob = new Blob([file.data], { type: file.type });
       form.append("file", fileBlob, file.name);
 

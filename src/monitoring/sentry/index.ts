@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { SentryBase } from "./sentry-base.js";
-import { isNode } from "../../engines/index.js";
+import { isBun, isNode } from "../../engines/index.js";
 
 let sentry__singleton: SentryBase | undefined = undefined;
 
@@ -12,6 +12,12 @@ export const prepareSentryInstance = async (): Promise<void> => {
   if (isNode()) {
     const { SentryNodeClient } = await import("./sentry-node.js");
     sentry__singleton = new SentryNodeClient();
+    return;
+  }
+
+  if (isBun()) {
+    const { SentryBunClient } = await import("./sentry-bun.js");
+    sentry__singleton = new SentryBunClient();
     return;
   }
 
