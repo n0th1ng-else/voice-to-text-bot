@@ -1,6 +1,12 @@
-import newrelic from "newrelic";
 import stripAnsi from "strip-ansi";
 import { type LogType } from "./const.js";
+
+const newrelic = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  recordLogEvent: (..._opts: unknown[]): void => {
+    // TODO mock
+  },
+};
 
 export const sendLogs = (
   type: LogType,

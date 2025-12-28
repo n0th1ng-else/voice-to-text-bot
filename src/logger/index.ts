@@ -114,7 +114,6 @@ export class Logger {
     sendLogs("warn", this.getFullPrefix(false), msg, data);
     trackApplicationErrors("Warning");
     if (shouldReport) {
-      // @ts-expect-error There is a type mismatch. wanna keep it like this
       captureWarning(msg, data);
     }
   }
