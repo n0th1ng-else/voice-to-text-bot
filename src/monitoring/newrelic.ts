@@ -1,7 +1,21 @@
-import newrelic from "newrelic";
 import type { ChatType, VoiceType } from "../telegram/types.js";
 import type { VoiceConverterProvider } from "../recognition/types.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
+
+const newrelic = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  incrementMetric: (..._opts: unknown[]): void => {
+    // TODO mock
+  },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  recordMetric: (..._opts: unknown[]): void => {
+    // TODO mock
+  },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  recordCustomEvent: (..._opts: unknown[]): void => {
+    // TODO mock
+  },
+};
 
 const formatMetric = (metric: string): string => {
   // Snake_case to PascalCase
