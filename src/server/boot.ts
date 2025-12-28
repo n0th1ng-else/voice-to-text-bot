@@ -107,9 +107,14 @@ export const prepareStopListener = async (): Promise<StopListener> => {
   const healthDaemon = new ScheduleDaemon(
     "health",
     async () => {
-      const value = await requestHealthData(selfUrl);
-      const status = value.status === HealthStatus.Online ? "UP" : "DOWN";
-      trackApplicationHealth(status);
+      try {
+        const value = await requestHealthData(selfUrl);
+        const status = value.status === HealthStatus.Online ? "UP" : "DOWN";
+        trackApplicationHealth(status);
+      } catch (err) {
+        trackApplicationHealth("DOWN");
+        throw err;
+      }
     },
     {
       skipInitialTick: true,

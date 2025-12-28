@@ -77,8 +77,8 @@ describe("[uptime daemon]", () => {
     });
 
     it("Failed to trigger the daemon if selfUrl is not set", async () => {
-      const errMessage = "Self url is not set for this node. Unable to set up the daemon";
-      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(errMessage);
+      const errorMessage = "Self url is not set for this node. Unable to set up the daemon";
+      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(errorMessage);
     });
   });
 
@@ -89,8 +89,9 @@ describe("[uptime daemon]", () => {
     });
 
     it("Failed to trigger the daemon if nextUrl is not set", async () => {
-      const errMessage = "Next instance url is not set for this node. Unable to set up the daemon";
-      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(errMessage);
+      const errorMessage =
+        "Next instance url is not set for this node. Unable to set up the daemon";
+      await expect(server.triggerDaemon("", 1)).rejects.toThrowError(errorMessage);
     });
 
     it("Triggers the daemon with the interval and delegates to the next node after we hit the limit", async () => {

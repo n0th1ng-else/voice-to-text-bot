@@ -1,6 +1,6 @@
 import { Logger } from "../logger/index.js";
 import { hasNoRightsToSendMessage, TgError } from "./api/tgerror.js";
-import { type ApiErrorReflector } from "./api/types.js";
+import type { ApiErrorReflector } from "./api/types.js";
 import type { ChatId } from "./api/core.js";
 
 const logger = new Logger("telegram:reflector");
@@ -19,31 +19,31 @@ class ReflectorError extends Error {
 }
 
 export const initTgReflector = (api: ApiErrorReflectorHandlers): ApiErrorReflector => {
-  const reflect = async (err: unknown): Promise<void> => {
-    if (!(err instanceof TgError)) {
+  const reflect = async (tgErr: unknown): Promise<void> => {
+    if (!(tgErr instanceof TgError)) {
       return;
     }
 
-    if (hasNoRightsToSendMessage(err)) {
-      if (!err.chatId) {
-        logger.error("No chatId provided", err);
+    if (hasNoRightsToSendMessage(tgErr)) {
+      if (!tgErr.chatId) {
+        logger.error("No chatId provided", tgErr);
         return;
       }
 
       try {
-        const isChatLeft = await api.leaveChat(err.chatId);
+        const isChatLeft = await api.leaveChat(tgErr.chatId);
         if (isChatLeft) {
-          logger.warn("Left the chat", { chatId: err.chatId }, true);
+          logger.warn("Left the chat", { chatId: tgErr.chatId }, true);
           return;
         }
 
         const rfErr = new ReflectorError("Tried to leave the chat, receive false as a result");
-        rfErr.chatId = err.chatId;
+        rfErr.chatId = tgErr.chatId;
         rfErr.isChatLeft = isChatLeft;
         logger.error(rfErr.message, rfErr);
-      } catch (error) {
-        const rfErr = new ReflectorError("Failed to leave the chat", error);
-        rfErr.chatId = err.chatId;
+      } catch (err) {
+        const rfErr = new ReflectorError("Failed to leave the chat", err);
+        rfErr.chatId = tgErr.chatId;
         logger.error(rfErr.message, rfErr);
       }
     }
