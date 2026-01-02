@@ -256,8 +256,8 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     if (!this.stat?.isReady()) {
       logger.warn("Database is not ready");
       // TODO fix behavior
-      // const errMessage = "Database is not ready";
-      // logger.error(errMessage, new Error(errMessage));
+      // const errorMessage = "Database is not ready";
+      // logger.error(errorMessage, new Error(errorMessage));
       // status.setMessage("Database is not ready");
       // res.status(400).send(status.getDto());
       // return;
@@ -271,9 +271,9 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
       status.setOnline(urls);
       return [200, status.getDto()];
     } catch (err) {
-      const errMessage = "Unable to get bot urls";
-      logger.error(errMessage, err);
-      status.setMessage(errMessage, true);
+      const errorMessage = "Unable to get bot urls";
+      logger.error(errorMessage, err);
+      status.setMessage(errorMessage, true);
       return [400, status.getDto()];
     }
   }

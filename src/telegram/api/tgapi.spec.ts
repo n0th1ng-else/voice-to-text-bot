@@ -241,7 +241,7 @@ describe("[telegram api client]", () => {
 
         it("should send proper error payload", () => {
           const queryId = "3243412";
-          const errMessage = "some error message";
+          const errorMessage = "some error message";
           testApiResponse = getApiResponse(true, true);
 
           checkApiData = (config) => {
@@ -249,11 +249,11 @@ describe("[telegram api client]", () => {
             expect(config.data).toStrictEqual({
               pre_checkout_query_id: queryId,
               ok: false,
-              error_message: errMessage,
+              error_message: errorMessage,
             });
           };
 
-          return api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId, errMessage);
+          return api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId, errorMessage);
         });
       });
 

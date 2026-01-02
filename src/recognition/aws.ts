@@ -1,4 +1,3 @@
-import axios from "axios";
 import AWS from "aws-sdk";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
@@ -62,34 +61,41 @@ export class AWSProvider extends VoiceConverter {
     logger.info(`Starting process for ${Logger.y(name)}`);
     const duration = new TimeMeasure();
 
-    return (
-      this.getJob(name)
-        .then((data) => {
-          if (data.isExists) {
-            logger.info("Job exists. skipping");
-            return this.getJobWithDelay(name, data.job);
-          }
+    return this.getJob(name)
+      .then((data) => {
+        if (data.isExists) {
+          logger.info("Job exists. skipping");
+          return this.getJobWithDelay(name, data.job);
+        }
 
-          return this.processFile(fileLink, name, isLocalFile);
-        })
-        // .then((job) => fetch(job.TranscriptionJob.Transcript.TranscriptFileUri))
-        .then((job) =>
-          axios.request({
-            method: "GET",
-            url: job.TranscriptionJob?.Transcript?.TranscriptFileUri,
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }),
-        )
-        .then(({ data: translationData }) => this.cleanStorage(translationData, name))
-        .then((text) => {
-          logger.info(`Job ${name} completed`);
-          trackRecognitionTime("AWS", duration.getMs());
-          return text;
-        })
-    );
+        return this.processFile(fileLink, name, isLocalFile);
+      })
+      .then(async (job) => {
+        const url = job.TranscriptionJob?.Transcript?.TranscriptFileUri;
+        if (!url) {
+          throw new Error("Could not find the job transcript url");
+        }
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Could not fetch the job transcript result");
+        }
+
+        const data = await res.json();
+        return data;
+      })
+      .then((translationData) => this.cleanStorage(translationData, name))
+      .then((text) => {
+        logger.info(`Job ${name} completed`);
+        trackRecognitionTime("AWS", duration.getMs());
+        return text;
+      });
   }
 
   private processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
