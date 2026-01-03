@@ -1,6 +1,7 @@
 import type { ValueOf, VoidPromise } from "../common/types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import type { getDb } from "../db/index.js";
+import type { RuntimeEngineType } from "../engines/index.js";
 
 export type ServerStatCore = ReturnType<typeof getDb>;
 
@@ -21,7 +22,7 @@ export interface BotServerModelBase {
   setThreadId(threadId: number): this;
   setStat(stat: ServerStatCore): this;
   setSelfUrl(url: string): this;
-  setNodeVersion(version: string): this;
+  setRuntimeVersion(type: RuntimeEngineType, version: string): this;
 }
 
 export type NotFoundDto = {
@@ -38,6 +39,7 @@ export type HealthDto = {
   version: string;
   threadId: number;
   serverName: string;
+  runtimeType: RuntimeEngineType;
   runtimeVersion: string;
   daysOnlineCurrent: number;
   daysOnlineLimit: number;
@@ -63,7 +65,8 @@ export class HealthModel {
   private readonly version: string;
   private readonly threadId: number;
   private readonly serverName: string;
-  private readonly coreVersion: string;
+  private readonly runtimeType: RuntimeEngineType;
+  private readonly runtimeVersion: string;
   private status: HealthStatusType = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
@@ -75,12 +78,14 @@ export class HealthModel {
     isHttps: boolean,
     threadId: number,
     serverName: string,
-    coreVersion: string,
+    runtimeType: RuntimeEngineType,
+    runtimeVersion: string,
   ) {
     this.version = version;
     this.threadId = threadId;
     this.serverName = serverName;
-    this.coreVersion = coreVersion;
+    this.runtimeType = runtimeType;
+    this.runtimeVersion = runtimeVersion;
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
 
@@ -111,7 +116,8 @@ export class HealthModel {
       message: this.message,
       threadId: this.threadId,
       serverName: this.serverName,
-      runtimeVersion: this.coreVersion,
+      runtimeType: this.runtimeType,
+      runtimeVersion: this.runtimeVersion,
       daysOnlineCurrent: this.daysOnlineCurrent,
       daysOnlineLimit: this.daysOnlineLimit,
     };

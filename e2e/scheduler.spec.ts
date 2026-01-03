@@ -22,6 +22,7 @@ apiSpy.mockImplementation(() => {
     ssl: HealthSsl.Off,
     threadId: 0,
     serverName: "MockedServer",
+    runtimeType: "node",
     runtimeVersion: "1.0.0",
     daysOnlineCurrent: 1,
     daysOnlineLimit: 1,

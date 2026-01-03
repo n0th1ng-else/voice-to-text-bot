@@ -131,7 +131,7 @@ export class AnalyticsData {
     return this;
   }
 
-  public addFlow() {
+  public addFlow(): this {
     const event: AnalyticsFlow = {
       name: "flow",
     };
@@ -152,7 +152,7 @@ export class AnalyticsData {
     return this;
   }
 
-  public addTime(name: string, ms: number) {
+  public addTime(name: string, ms: number): this {
     const event: AnalyticsTime = {
       name: "time",
       params: {

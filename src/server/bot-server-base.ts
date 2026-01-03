@@ -4,6 +4,7 @@ import { sSuffix } from "../text/utils.js";
 import type { BotServerModelBase, ServerStatCore } from "./types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import type { HttpsOptions } from "../../certs/index.js";
+import type { RuntimeEngineType } from "../engines/index.js";
 
 const logger = new Logger("server");
 
@@ -15,7 +16,8 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
   protected selfUrl = "";
   protected bots: TelegramBotModel[] = [];
   protected isIdle = true;
-  protected nodeVersion = "";
+  protected runtimeType: RuntimeEngineType = "unknown";
+  protected runtimeVersion = "";
   protected readonly isHttps: boolean;
 
   protected readonly serverName: string;
@@ -62,8 +64,9 @@ export abstract class BotServerBase<ServerType> implements BotServerModelBase {
     return this;
   }
 
-  public setNodeVersion(version: string): this {
-    this.nodeVersion = version;
+  public setRuntimeVersion(type: RuntimeEngineType, version: string): this {
+    this.runtimeType = type;
+    this.runtimeVersion = version;
     return this;
   }
 
