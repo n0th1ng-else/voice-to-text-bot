@@ -1,8 +1,8 @@
 import { vi } from "vitest";
 
 export const mocks = {
-  getIsMaster: vi.fn(() => true),
-  getWorkerId: vi.fn(() => 0),
+  getIsMaster: vi.fn((): boolean => true),
+  getWorkerId: vi.fn((): number => 0),
 };
 
 export default new Proxy(

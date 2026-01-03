@@ -17,6 +17,7 @@ import { type BotServerModel, HealthStatus } from "./types.js";
 import { VOICE_PROVIDERS } from "../const.js";
 import { trackApplicationErrors, trackApplicationHealth } from "../monitoring/newrelic.js";
 import { requestHealthData } from "./api.js";
+import { getRuntimeEngineType } from "../engines/index.js";
 
 const logger = new Logger("boot-server");
 
@@ -84,12 +85,13 @@ export const prepareInstance = async (threadId: number): Promise<BotServerModel>
       );
 
       bot.setHostLocation(host, envy.launchTime).setPayment(paymentProvider);
+      const engine = getRuntimeEngineType();
       return server
         .setSelfUrl(host)
         .setBots([bot])
         .setStat(db)
         .setThreadId(threadId)
-        .setNodeVersion(envy.nodeVersion);
+        .setRuntimeVersion(engine.engine, engine.version);
     });
 };
 

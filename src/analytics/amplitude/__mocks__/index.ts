@@ -1,1 +1,1 @@
-export const collectEvents = () => Promise.resolve();
+export const collectEvents = (): Promise<void> => Promise.resolve();

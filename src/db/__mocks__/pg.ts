@@ -90,7 +90,7 @@ class MockSql {
   }
 }
 
-export const mockTableCreation = (testPool: Pool) => {
+export const mockTableCreation = (testPool: Pool): void => {
   testPool.mockQuery(NodesSql.createTable, () => Promise.resolve());
   testPool.mockQuery(UsagesSql.createTable, () => Promise.resolve());
   testPool.mockQuery(DonationsSql.createTable, () => Promise.resolve());

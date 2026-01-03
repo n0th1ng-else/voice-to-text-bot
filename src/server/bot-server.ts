@@ -246,7 +246,8 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
       this.isHttps,
       this.threadId,
       this.serverName,
-      this.nodeVersion,
+      this.runtimeType,
+      this.runtimeVersion,
     );
     if (this.isIdle) {
       status.setMessage("App is not connected to the Telegram server");
