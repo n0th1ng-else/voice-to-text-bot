@@ -48,7 +48,7 @@ export class TelegramBaseApi {
 
     try {
       response = await axios.request<TgCore<Response>>({
-        url,
+        url: `${TelegramBaseApi.url}${url}`,
         data,
         method: "POST",
         baseURL: TelegramBaseApi.url,
@@ -98,7 +98,7 @@ export class TelegramBaseApi {
 
     let response: Response;
     try {
-      response = await fetch(url, {
+      response = await fetch(`${TelegramBaseApi.url}${url}`, {
         method: "POST",
         headers: {
           Accept: "application/json",
