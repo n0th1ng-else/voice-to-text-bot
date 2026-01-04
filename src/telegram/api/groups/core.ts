@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosResponse, isAxiosError } from "axios";
+import axios, { type AxiosResponse, isAxiosError } from "axios";
 import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
@@ -12,23 +12,11 @@ export class TelegramBaseApi {
 
   private static readonly path = "bot";
 
-  private readonly client: AxiosInstance;
   private readonly apiToken: string;
   private errorReflector?: ApiErrorReflector;
 
   constructor(apiToken: string) {
     this.apiToken = apiToken;
-
-    this.client = axios.create({
-      method: "POST",
-      baseURL: TelegramBaseApi.url,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      timeout: TelegramBaseApi.timeout,
-      responseType: "json",
-    });
   }
 
   public setErrorReflector(errorReflector: ApiErrorReflector): void {
@@ -59,7 +47,18 @@ export class TelegramBaseApi {
     let response: AxiosResponse<TgCore<Response>> | null = null;
 
     try {
-      response = await this.client.request<TgCore<Response>>({ url, data });
+      response = await axios.request<TgCore<Response>>({
+        url,
+        data,
+        method: "POST",
+        baseURL: TelegramBaseApi.url,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        timeout: TelegramBaseApi.timeout,
+        responseType: "json",
+      });
     } catch (err) {
       const tgError = new TgError(err, unknownHasMessage(err) ? err.message : undefined)
         .setUrl(url, this.apiToken)
