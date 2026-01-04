@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { getRuntimeEngineType } from "./index.js";
+import { getRuntimeEngineType, isNode } from "./index.js";
 
 describe("engines", () => {
   afterEach(() => {
@@ -14,6 +14,7 @@ describe("engines", () => {
     const { engine, version } = getRuntimeEngineType();
     expect(engine).toEqual("unknown");
     expect(version).toEqual("n/a");
+    expect(isNode()).toEqual(false);
   });
 
   it("should return the node version", () => {
@@ -24,5 +25,6 @@ describe("engines", () => {
     const { engine, version } = getRuntimeEngineType();
     expect(engine).toEqual("node");
     expect(version).toEqual("24.1.1");
+    expect(isNode()).toEqual(true);
   });
 });

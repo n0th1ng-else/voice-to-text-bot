@@ -12,7 +12,7 @@ import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
-import { addAttachment } from "../../monitoring/sentry.js";
+import { addAttachment } from "../../monitoring/sentry/index.js";
 import { trackRecognitionTime } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("wit-ai-recognition");
