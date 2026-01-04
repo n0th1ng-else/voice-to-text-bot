@@ -1,4 +1,4 @@
-import type { ValueOf, VoidPromise } from "../common/types.js";
+import type { ValueOf, VoidFunction, VoidPromise } from "../common/types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import type { getDb } from "../db/index.js";
 import type { RuntimeEngineType } from "../engines/index.js";

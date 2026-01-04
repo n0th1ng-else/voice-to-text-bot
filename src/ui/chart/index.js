@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 // TODO optimize if too many items in the array
 
 import { Chart, registerables } from "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/+esm";
