@@ -1,8 +1,10 @@
+import type { VoidFunction } from "../common/types.js";
+
 export class WaiterForCalls {
   private times = 0;
   private calledTimes = 0;
   private promise?: Promise<void>;
-  private resolve?: () => void;
+  private resolve?: VoidFunction;
 
   constructor() {
     this.reset();

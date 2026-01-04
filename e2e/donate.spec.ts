@@ -37,12 +37,19 @@ import {
 import { mockGetBotStatItem } from "./requests/db/botStat.js";
 import { mockGetIgnoredChatsRow } from "./requests/db/ignoredChatsDb.js";
 import { mockCreateDonationRow } from "./requests/db/donationStat.js";
+import { prepareSentryInstance } from "../src/monitoring/sentry/index.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/analytics/ga/index");
 vi.mock("../src/telegram/api/tgMTProtoApi");
+vi.mock("../src/monitoring/sentry/sentry-node", async () => {
+  const mod = await import("../src/monitoring/sentry/sentry-dummy.js");
+  return {
+    SentryNodeClient: mod.SentryDummyClient,
+  };
+});
 
 const appPort = 3900;
 const dbPort = appPort + 1;
@@ -77,6 +84,7 @@ describe("[default language - english] donate", () => {
   beforeAll(async () => {
     mockGoogleAuth();
 
+    await prepareSentryInstance();
     const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);

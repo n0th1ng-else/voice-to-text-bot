@@ -18,6 +18,7 @@ import { VOICE_PROVIDERS } from "../const.js";
 import { trackApplicationErrors, trackApplicationHealth } from "../monitoring/newrelic.js";
 import { requestHealthData } from "./api.js";
 import { getRuntimeEngineType } from "../engines/index.js";
+import { prepareSentryInstance } from "../monitoring/sentry/index.js";
 
 const logger = new Logger("boot-server");
 
@@ -25,6 +26,9 @@ export const prepareInstance = async (threadId: number): Promise<BotServerModel>
   const engine = getRuntimeEngineType();
   logger.info(`The ${Logger.y(engine.engine)} server is starting...`);
   trackApplicationErrors("Launch");
+
+  await prepareSentryInstance();
+
   const sslOptions = envy.enableSSL ? httpsOptions : undefined;
   const server = new BotServer(
     envy.appPort,

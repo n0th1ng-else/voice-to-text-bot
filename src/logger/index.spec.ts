@@ -24,7 +24,7 @@ vi.spyOn(global.console, "error").mockReturnValue();
 vi.spyOn(sentryUtils, "captureError").mockReturnValue();
 vi.spyOn(sentryUtils, "captureWarning").mockReturnValue();
 
-let LOG_LEVEL: string | undefined = undefined;
+let logLevel: string | undefined = undefined;
 
 const testMessage = "some message";
 
@@ -35,23 +35,23 @@ describe("Logger", () => {
 
   describe("LOG_LEVEL error", () => {
     beforeEach(() => {
-      LOG_LEVEL = "ERROR";
+      logLevel = "ERROR";
     });
 
     it("should not send debug logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
     it("should not send info logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.info(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
     it("should not send warn logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.warn(testMessage);
       expect(console.warn).not.toHaveBeenCalled();
       expect(sentryUtils.captureWarning).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe("Logger", () => {
     });
 
     it("should send error logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const err = new Error("ooops");
       log.error(testMessage, err);
       expect(console.error).toHaveBeenCalledWith(expect.any(String), testMessage, err);
@@ -70,23 +70,23 @@ describe("Logger", () => {
 
   describe("LOG_LEVEL warn", () => {
     beforeEach(() => {
-      LOG_LEVEL = "WARN";
+      logLevel = "WARN";
     });
 
     it("should not send debug logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
     it("should not send info logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.info(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
     it("should send warn logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const context = { foo: "bar" };
       log.warn(testMessage, context);
       expect(console.warn).toHaveBeenCalledWith(expect.any(String), testMessage, context);
@@ -94,7 +94,7 @@ describe("Logger", () => {
     });
 
     it("should send warn logs and report to sentry", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const context = { foo: "bar" };
       log.warn(testMessage, context, true);
       expect(console.warn).toHaveBeenCalledWith(expect.any(String), testMessage, context);
@@ -102,7 +102,7 @@ describe("Logger", () => {
     });
 
     it("should send error logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const err = new Error("ooops");
       log.error(testMessage, err);
       expect(console.error).toHaveBeenCalledWith(expect.any(String), testMessage, err);
@@ -111,23 +111,23 @@ describe("Logger", () => {
 
   describe("LOG_LEVEL info", () => {
     beforeEach(() => {
-      LOG_LEVEL = "INFO";
+      logLevel = "INFO";
     });
 
     it("should not send debug logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
     it("should send info logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.info(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
     it("should send warn logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const context = { foo: "bar" };
       log.warn(testMessage, context);
       expect(console.warn).toHaveBeenCalledWith(expect.any(String), testMessage, context);
@@ -135,7 +135,7 @@ describe("Logger", () => {
     });
 
     it("should send warn logs and report to sentry", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const context = { foo: "bar" };
       log.warn(testMessage, context, true);
       expect(console.warn).toHaveBeenCalledWith(expect.any(String), testMessage, context);
@@ -143,7 +143,7 @@ describe("Logger", () => {
     });
 
     it("should send error logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const err = new Error("ooops");
       log.error(testMessage, err);
       expect(console.error).toHaveBeenCalledWith(expect.any(String), testMessage, err);
@@ -152,29 +152,29 @@ describe("Logger", () => {
 
   describe("LOG_LEVEL debug", () => {
     beforeEach(() => {
-      LOG_LEVEL = "DEBUG";
+      logLevel = "DEBUG";
     });
 
     it("should send debug logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.debug(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
     it("should send info logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.info(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
     it("should send warn logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.warn(testMessage);
       expect(console.warn).toHaveBeenCalledWith(expect.any(String), testMessage, "");
     });
 
     it("should send error logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const err = new Error("ooops");
       log.error(testMessage, err);
       expect(console.error).toHaveBeenCalledWith(expect.any(String), testMessage, err);
@@ -183,29 +183,29 @@ describe("Logger", () => {
 
   describe("LOG_LEVEL info when it is non-level value", () => {
     beforeEach(() => {
-      LOG_LEVEL = "non-recognized";
+      logLevel = "non-recognized";
     });
 
     it("should not send debug logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.debug(testMessage);
       expect(console.log).not.toHaveBeenCalled();
     });
 
     it("should send info logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.info(testMessage);
       expect(console.log).toHaveBeenCalledWith(expect.any(String), testMessage);
     });
 
     it("should send warn logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       log.warn(testMessage);
       expect(console.warn).toHaveBeenCalledWith(expect.any(String), testMessage, "");
     });
 
     it("should send error logs", () => {
-      const log = new Logger("some-id", LOG_LEVEL);
+      const log = new Logger("some-id", logLevel);
       const err = new Error("ooops");
       log.error(testMessage, err);
       expect(console.error).toHaveBeenCalledWith(expect.any(String), testMessage, err);

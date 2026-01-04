@@ -2,7 +2,7 @@ import { fastify, type FastifyInstance } from "fastify";
 import { Logger } from "../logger/index.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import { BotServerBase } from "./bot-server-base.js";
-import { initSentry, trackAPIHandlers } from "../monitoring/sentry/index.js";
+import { initSentry } from "../monitoring/sentry/index.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";
@@ -26,8 +26,7 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
   ) {
     super("Fastify", port, version, webhookDoNotWait, httpsOptions, enableSnapshotCapture);
 
-    initSentry();
-    trackAPIHandlers(this.app);
+    initSentry(this.app);
 
     this.app.get<{ Reply: string }>("/favicon.ico", async (_req, reply) => {
       return reply.status(204).type("image/vnd.microsoft.icon").send("");
