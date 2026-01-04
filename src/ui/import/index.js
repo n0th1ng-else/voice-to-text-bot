@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 const onAction = () => {
   return fetch("/status")
     .then((response) => {

@@ -66,7 +66,8 @@ export const requestHealthData = async (domain: string): Promise<HealthDto> => {
     }
 
     const data = await response.json();
-    return data;
+    // TODO validate type
+    return data as HealthDto;
   } catch (err) {
     if (err instanceof HealthError) {
       throw err;

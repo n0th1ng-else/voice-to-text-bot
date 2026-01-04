@@ -1,6 +1,6 @@
 import { onExit } from "signal-exit";
 import { Logger } from "../logger/index.js";
-import type { VoidPromise } from "../common/types.js";
+import type { VoidFunction, VoidPromise } from "../common/types.js";
 
 const logger = new Logger("stop-listener");
 

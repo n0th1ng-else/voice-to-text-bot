@@ -1,4 +1,4 @@
-import type { IncomingMessage } from "node:http";
+import type { Readable } from "node:stream";
 import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import axios from "axios";
@@ -38,9 +38,9 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
   return promise;
 };
 
-const downloadAsStream = (url: string): Promise<IncomingMessage> =>
+const downloadAsStream = (url: string): Promise<Readable> =>
   axios
-    .request<IncomingMessage>({
+    .request<Readable>({
       method: "GET",
       url,
       responseType: "stream",

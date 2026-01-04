@@ -42,6 +42,8 @@ export default [
         console: true,
         fetch: true,
         setTimeout: true,
+        URL: true,
+        FileReader: true,
         // For whisper CommonJS scripts
         require: true,
         module: true,

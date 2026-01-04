@@ -1,5 +1,5 @@
 import { promises, createWriteStream } from "node:fs";
-import type { IncomingMessage } from "node:http";
+import type { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { nanoid } from "nanoid";
@@ -61,7 +61,7 @@ export const getFullFileName = (
 };
 
 export const saveStreamToFile = async (
-  stream: IncomingMessage,
+  stream: Readable,
   fileName?: string,
   addUniqPrefix?: boolean,
   dir?: string,

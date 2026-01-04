@@ -90,7 +90,7 @@ export class AWSProvider extends VoiceConverter {
         const data = await res.json();
         return data;
       })
-      .then((translationData) => this.cleanStorage(translationData, name))
+      .then((translationData) => this.cleanStorage(translationData as TranscriptionData, name))
       .then((text) => {
         logger.info(`Job ${name} completed`);
         trackRecognitionTime("AWS", duration.getMs());

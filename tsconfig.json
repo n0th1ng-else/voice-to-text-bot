@@ -4,6 +4,7 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
     "allowJs": true,
     "strict": true,
     "noImplicitAny": true,
