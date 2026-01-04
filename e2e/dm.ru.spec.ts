@@ -52,12 +52,19 @@ import {
   mockUpdateBotStatUsage,
 } from "./requests/db/botStat.js";
 import { mockGetIgnoredChatsRow } from "./requests/db/ignoredChatsDb.js";
+import { prepareSentryInstance } from "../src/monitoring/sentry/index.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/analytics/ga/index");
 vi.mock("../src/telegram/api/tgMTProtoApi");
+vi.mock("../src/monitoring/sentry/sentry-node", async () => {
+  const mod = await import("../src/monitoring/sentry/sentry-dummy.js");
+  return {
+    SentryNodeClient: mod.SentryDummyClient,
+  };
+});
 
 const appPort = 3200;
 const dbPort = appPort + 1;
@@ -81,6 +88,7 @@ describe("[russian language]", () => {
   beforeAll(async () => {
     mockGoogleAuth();
 
+    await prepareSentryInstance();
     const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
     const hostUrl = `${localhostUrl}:${appPort}`;
 

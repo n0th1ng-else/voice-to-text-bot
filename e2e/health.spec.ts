@@ -20,11 +20,18 @@ import {
   mockTgSetCommands,
   mockTgSetWebHook,
 } from "./requests/telegram.js";
+import { prepareSentryInstance } from "../src/monitoring/sentry/index.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/telegram/api/tgMTProtoApi");
+vi.mock("../src/monitoring/sentry/sentry-node", async () => {
+  const mod = await import("../src/monitoring/sentry/sentry-dummy.js");
+  return {
+    SentryNodeClient: mod.SentryDummyClient,
+  };
+});
 
 const appPort = 3300;
 const dbPort = appPort + 1;
@@ -45,6 +52,7 @@ describe("[health]", () => {
   beforeAll(async () => {
     mockGoogleAuth();
 
+    await prepareSentryInstance();
     const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
     hostUrl = `${localhostUrl}:${appPort}`;
 

@@ -6,10 +6,17 @@ import { BotServer } from "../src/server/bot-server.js";
 import { WaiterForCalls } from "../src/testUtils/waitFor.js";
 import { localhostUrl } from "../src/const.js";
 import { appVersion } from "../src/env.js";
+import { prepareSentryInstance } from "../src/monitoring/sentry/index.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
+vi.mock("../src/monitoring/sentry/sentry-node", async () => {
+  const mod = await import("../src/monitoring/sentry/sentry-dummy.js");
+  return {
+    SentryNodeClient: mod.SentryDummyClient,
+  };
+});
 
 const apiSpy = vi.spyOn(apiUtils, "requestHealthData");
 
@@ -48,7 +55,7 @@ const webhookDoNotWait = false;
 let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 describe("[uptime daemon]", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.useFakeTimers({
       now: new Date().setHours(23, 58, 0, 0),
       shouldAdvanceTime: true,
@@ -62,6 +69,7 @@ describe("[uptime daemon]", () => {
       waiter.tick();
     });
 
+    await prepareSentryInstance();
     server = new BotServer(appPort, appVersion, webhookDoNotWait);
   });
 

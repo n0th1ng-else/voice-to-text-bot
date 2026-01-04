@@ -14,11 +14,18 @@ import type { VoidPromise } from "../src/common/types.js";
 import { mockGoogleAuth } from "./requests/google.js";
 import { getConverterOptions } from "./helpers.js";
 import { mockTgGetWebHook, mockTgSetCommands, mockTgSetWebHook } from "./requests/telegram.js";
+import { prepareSentryInstance } from "../src/monitoring/sentry/index.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
 vi.mock("../src/analytics/amplitude/index");
 vi.mock("../src/telegram/api/tgMTProtoApi");
+vi.mock("../src/monitoring/sentry/sentry-node", async () => {
+  const mod = await import("../src/monitoring/sentry/sentry-dummy.js");
+  return {
+    SentryNodeClient: mod.SentryDummyClient,
+  };
+});
 
 const appPort = 3600;
 const dbPort = appPort + 1;
@@ -36,6 +43,7 @@ describe("error cases", () => {
     beforeAll(async () => {
       mockGoogleAuth();
 
+      await prepareSentryInstance();
       const converters = await getVoiceConverterInstances(
         "GOOGLE",
         "GOOGLE",
