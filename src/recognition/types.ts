@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { Logger } from "../logger/index.js";
+
+const logger = new Logger("voice-converter");
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const VoiceConverterProviderSchema = z
@@ -15,6 +18,10 @@ const VoiceConverterProviderSchema = z
 export type VoiceConverterProvider = z.infer<typeof VoiceConverterProviderSchema>;
 
 export abstract class VoiceConverter {
+  protected constructor(name: string) {
+    logger.info(`Using ${Logger.y(name)}`);
+  }
+
   public abstract transformToText(
     fileLink: string,
     lang: LanguageCode,

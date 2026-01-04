@@ -19,9 +19,7 @@ export class GoogleProvider extends VoiceConverter {
   private readonly service: v1.SpeechClient;
 
   constructor(options: GoogleVoiceProviderOptions) {
-    super();
-
-    logger.info("Using Google");
+    super("Google");
 
     this.service = new v1.SpeechClient({
       fallback: options.isTestEnv,

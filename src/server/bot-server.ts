@@ -187,7 +187,9 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
   }
 
   public start(): Promise<VoidPromise> {
-    logger.info(`Starting ${Logger.y(sSuffix("http", this.isHttps))} ${this.selfUrl} server`);
+    logger.info(
+      `Starting ${Logger.y(sSuffix("http", this.isHttps))} server: ${Logger.y(this.selfUrl)}`,
+    );
 
     const { promise, resolve } = Promise.withResolvers<VoidPromise>();
 

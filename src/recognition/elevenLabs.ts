@@ -18,9 +18,8 @@ export class ElevenLabsProvider extends VoiceConverter {
   private readonly client: ElevenLabsClient;
 
   constructor(options: ElevenLabsProviderOptions) {
-    super();
+    super("Eleven.labs");
 
-    logger.info("Using Eleven.labs");
     this.client = new ElevenLabsClient({
       apiKey: options.apiToken,
     });

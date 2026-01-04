@@ -22,7 +22,8 @@ import { getRuntimeEngineType } from "../engines/index.js";
 const logger = new Logger("boot-server");
 
 export const prepareInstance = async (threadId: number): Promise<BotServerModel> => {
-  logger.info("The server is starting...");
+  const engine = getRuntimeEngineType();
+  logger.info(`The ${Logger.y(engine.engine)} server is starting...`);
   trackApplicationErrors("Launch");
   const sslOptions = envy.enableSSL ? httpsOptions : undefined;
   const server = new BotServer(
@@ -85,7 +86,7 @@ export const prepareInstance = async (threadId: number): Promise<BotServerModel>
       );
 
       bot.setHostLocation(host, envy.launchTime).setPayment(paymentProvider);
-      const engine = getRuntimeEngineType();
+
       return server
         .setSelfUrl(host)
         .setBots([bot])
