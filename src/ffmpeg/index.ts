@@ -1,7 +1,6 @@
-import type { Readable } from "node:stream";
+import { Readable } from "node:stream";
 import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import axios from "axios";
 import { Logger } from "../logger/index.js";
 import { deleteFileIfExists, readFileIntoBuffer, saveStreamToFile } from "../files/index.js";
 import { wavSampleRate } from "../const.js";
@@ -38,14 +37,20 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
   return promise;
 };
 
-const downloadAsStream = (url: string): Promise<Readable> =>
-  axios
-    .request<Readable>({
-      method: "GET",
-      url,
-      responseType: "stream",
-    })
-    .then(({ data: stream }) => stream);
+const downloadAsStream = async (url: string): Promise<Readable> => {
+  // TODO make it fancy
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.status}`);
+  }
+
+  if (!response.body) {
+    throw new Error("Response has no body");
+  }
+
+  return Readable.fromWeb(response.body);
+};
 
 const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
   try {

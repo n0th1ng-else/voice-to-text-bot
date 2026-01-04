@@ -33,3 +33,8 @@ export const isBun = (): boolean => {
   const { engine } = getRuntimeEngineType();
   return engine === "bun";
 };
+
+export const isNode = (): boolean => {
+  const { engine } = getRuntimeEngineType();
+  return engine === "node";
+};
