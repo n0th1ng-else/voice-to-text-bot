@@ -14,6 +14,7 @@ import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 import { addAttachment } from "../../monitoring/sentry.js";
 import { trackRecognitionTime } from "../../monitoring/newrelic.js";
+import { unknownHasMessage } from "../../server/error.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -153,8 +154,7 @@ export class WithAiProvider extends VoiceConverter {
         throw err;
       }
 
-      // @ts-expect-error the error is most likely Error type, no unknown here but whatever
-      const witAiError = new WitAiError(err, err.message)
+      const witAiError = new WitAiError(err, unknownHasMessage(err) ? err.message : undefined)
         .setUrl(url.toString())
         .setBufferLength(data);
 

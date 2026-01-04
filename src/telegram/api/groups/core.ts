@@ -88,4 +88,64 @@ export class TelegramBaseApi {
 
     return answer.result;
   }
+
+  private async request_v2<Res, Data>(
+    methodName: string,
+    data?: Data,
+    chatId?: ChatId,
+  ): Promise<Res> {
+    const url = this.getApiUrl(methodName);
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: data ? JSON.stringify(data) : undefined,
+        signal: AbortSignal.timeout(TelegramBaseApi.timeout),
+      });
+
+      if (!response.ok) {
+        // throw TgError
+      }
+    } catch (err) {
+      const tgError = new TgError(err, unknownHasMessage(err) ? err.message : undefined)
+        .setUrl(url, this.apiToken)
+        .setChatId(chatId);
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.errorReflector?.(tgError);
+      throw tgError;
+    }
+
+    try {
+      const answer = (await response.json()) as TgCore<Res>;
+
+      if (!answer.ok) {
+        const tgError = new TgError(new Error(answer.description), answer.description)
+          .setUrl(url, this.apiToken)
+          .setErrorCode(answer.error_code)
+          .setRetryAfter(answer?.parameters?.retry_after)
+          .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
+          .setChatId(chatId);
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        this.errorReflector?.(tgError);
+        throw tgError;
+      }
+
+      return answer.result;
+    } catch (err) {
+      const tgError = new TgError(err, "Invalid JSON response")
+        .setUrl(url, this.apiToken)
+        .setChatId(chatId);
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.errorReflector?.(tgError);
+      throw tgError;
+    }
+  }
 }
