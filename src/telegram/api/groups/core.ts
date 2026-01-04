@@ -4,12 +4,7 @@ import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
 import type { ChatId } from "../core.js";
 import { API_TIMEOUT_MS } from "../../../const.js";
-
-const hasMessage = (obj: unknown): obj is { message: string } => {
-  return (
-    typeof obj === "object" && obj !== null && "message" in obj && typeof obj.message === "string"
-  );
-};
+import { unknownHasMessage } from "../../../server/error.js";
 
 export class TelegramBaseApi {
   public static readonly url = "https://api.telegram.org";
@@ -66,7 +61,7 @@ export class TelegramBaseApi {
     try {
       response = await this.client.request<TgCore<Response>>({ url, data });
     } catch (err) {
-      const tgError = new TgError(err, hasMessage(err) ? err.message : undefined)
+      const tgError = new TgError(err, unknownHasMessage(err) ? err.message : undefined)
         .setUrl(url, this.apiToken)
         .setChatId(chatId);
 

@@ -35,9 +35,7 @@ export class AWSProvider extends VoiceConverter {
   private readonly service: AWS.TranscribeService;
 
   constructor(options: AWSVoiceProviderOptions) {
-    super();
-
-    logger.info("Using AWS");
+    super("AWS");
 
     AWS.config.update({
       region: options.bucketRegion,

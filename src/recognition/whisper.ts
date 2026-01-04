@@ -17,9 +17,10 @@ export class WhisperProvider extends VoiceConverter {
   private readonly architecture: WhisperAddonArchitecture;
 
   private constructor() {
-    super();
-    this.architecture = arch().includes("x64") ? "x64" : "arm";
-    logger.info(`Using [${this.architecture}] Whisper`);
+    const architecture: WhisperAddonArchitecture = arch().includes("x64") ? "x64" : "arm";
+    const name = `[${architecture}] Whisper`;
+    super(name);
+    this.architecture = architecture;
   }
 
   private async init(): Promise<void> {
