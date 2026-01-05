@@ -55,6 +55,13 @@ export const trackUserActivity = (data: UserActivityData, userId?: number): void
   });
 };
 
+export const trackMimeType = (type: string, isSupported: boolean): void => {
+  newrelic.recordCustomEvent("FileMimeType", {
+    type,
+    isSupported,
+  });
+};
+
 type DonationActivityData = {
   activityType: "start" | "success";
   currency: Currency;
