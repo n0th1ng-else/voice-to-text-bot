@@ -8,6 +8,7 @@ import type { TelegramMessagePrefix } from "../models/messagePrefix.js";
 import type { BotMessageModel } from "../models/botMessage.js";
 import type { TgMessage } from "../api/types.js";
 import { getSupportedAudioFormats } from "../../text/utils.js";
+import { trackMimeType } from "../../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -28,14 +29,14 @@ export class VoiceFormatAction extends GenericAction {
     const triggersAction = !isVoice && isWrongFormat;
 
     if (triggersAction) {
-      logger.warn(
-        "Wrong audio file mime-type",
-        {
-          ...type,
-          ...prefix,
-        },
-        true,
-      );
+      logger.warn("Wrong audio file mime-type", {
+        ...type,
+        ...prefix,
+      });
+    }
+
+    if (typeof type.info === "string") {
+      trackMimeType(type.info, !triggersAction);
     }
 
     return triggersAction;

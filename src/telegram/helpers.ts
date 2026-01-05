@@ -60,7 +60,7 @@ export const isVoiceMessage = (msg: TgMessage): VoiceContentReasonModel => {
   const isAudioSupported = formats.has(mimeType.toLowerCase());
 
   return isAudioSupported || isVideo
-    ? new VoiceContentReasonModel(VoiceContentReason.Ok)
+    ? new VoiceContentReasonModel(VoiceContentReason.Ok, data.mime_type)
     : new VoiceContentReasonModel(VoiceContentReason.WrongMimeType, data.mime_type);
 };
 
