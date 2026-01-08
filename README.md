@@ -96,3 +96,5 @@ flowchart BT
   <sup>1</sup> Unlimited for asynchronous upload via Google Drive
   <br/>
   <sup>2</sup> Takes a while for asynchronous upload via Google Drive
+
+// API SERVER AVAILABILITY //

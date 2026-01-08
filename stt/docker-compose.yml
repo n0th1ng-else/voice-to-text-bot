@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  stt_worker1:
+    build: .
+    volumes:
+      - ./access_token.txt:/access_token.txt:ro
+    container_name: stt_worker1
+    environment:
+      ACCESS_TOKEN: supersecret
+      WHISPER_MODEL: small
+      DEVICE: cpu
+      RECOGNITION_TIMEOUT: 10
+    restart: always
+
+  stt_worker2:
+    build: .
+    volumes:
+      - ./access_token.txt:/access_token.txt:ro
+    container_name: stt_worker2
+    environment:
+      ACCESS_TOKEN: supersecret
+      WHISPER_MODEL: small
+      DEVICE: cpu
+      RECOGNITION_TIMEOUT: 10
+    restart: always
+
+  nginx:
+    image: nginx:latest
+    container_name: stt_nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - stt_worker1
+      - stt_worker2
