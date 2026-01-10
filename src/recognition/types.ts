@@ -11,6 +11,7 @@ const VoiceConverterProviderSchema = z
     z.literal("GOOGLE"),
     z.literal("WHISPER"),
     z.literal("11LABS"),
+    z.literal("WHISPER_SELF"),
   ])
   .catch("WITAI")
   .describe("Validation schema for the Voice converter providers we support");

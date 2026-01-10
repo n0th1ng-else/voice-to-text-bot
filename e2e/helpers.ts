@@ -319,5 +319,9 @@ export const getConverterOptions = (): SupportedEnvironment => {
       clientEmail: "some-email",
       isTestEnv: true,
     },
+    whisperApi: {
+      apiToken: "whisper-auth-token",
+      baseUrl: "https://api.whisper-self.com",
+    },
   };
 };
