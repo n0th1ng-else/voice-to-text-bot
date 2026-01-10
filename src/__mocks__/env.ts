@@ -66,6 +66,11 @@ export const witAiApi = {
   },
 };
 
+export const whisperApi = {
+  apiToken: "",
+  baseUrl: "",
+};
+
 export const wtiAiTokens = "";
 
 export const stripeToken = "";
