@@ -1,19 +1,13 @@
+import * as fsUtils from "node:fs";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { injectDependencies, type InjectedFn } from "../../testUtils/dependencies.js";
+import { BotCommand } from "../../telegram/commands.js";
+import {
+  createTranslationsFileForLocale,
+  initializeMenuLabels,
+  initializeTranslationsForLocale,
+} from "./loader.js";
 
-const existsSyncMock = vi.fn();
-const readFileSyncMock = vi.fn();
-const writeFileSyncMock = vi.fn();
-
-vi.mock("node:fs", async () => {
-  const originalModule = await vi.importActual("node:fs");
-  return {
-    ...originalModule,
-    existsSync: existsSyncMock,
-    readFileSync: readFileSyncMock,
-    writeFileSync: writeFileSyncMock,
-  };
-});
+vi.mock("node:fs");
 
 vi.mock("../types", async () => {
   const originalModule = await vi.importActual("../types.js");
@@ -26,20 +20,7 @@ vi.mock("../types", async () => {
   };
 });
 
-let initializeMenuLabels: InjectedFn["initializeMenuLabels"];
-let initializeTranslationsForLocale: InjectedFn["initializeTranslationsForLocale"];
-let createTranslationsFileForLocale: InjectedFn["createTranslationsFileForLocale"];
-let BotCommand: InjectedFn["BotCommand"];
-
 describe("text.loader", () => {
-  beforeEach(async () => {
-    const init = await injectDependencies();
-    initializeMenuLabels = init.initializeMenuLabels;
-    initializeTranslationsForLocale = init.initializeTranslationsForLocale;
-    createTranslationsFileForLocale = init.createTranslationsFileForLocale;
-    BotCommand = init.BotCommand;
-  });
-
   describe("initializeMenuLabels", () => {
     it("should return menu labels", () => {
       const labels = initializeMenuLabels();
@@ -54,24 +35,24 @@ describe("text.loader", () => {
 
   describe("initializeTranslationsForLocale", () => {
     it("should throw an error if translation file is not found", () => {
-      existsSyncMock.mockReturnValue(false);
+      vi.spyOn(fsUtils, "existsSync").mockReturnValue(false);
       expect(() => initializeTranslationsForLocale("en-US")).toThrowError();
     });
 
     describe("the file exists", () => {
       beforeEach(() => {
-        existsSyncMock.mockReturnValue(true);
+        vi.spyOn(fsUtils, "existsSync").mockReturnValue(true);
       });
 
       it("should throw an error if the file is not json", () => {
-        readFileSyncMock.mockReturnValue("{");
+        vi.spyOn(fsUtils, "readFileSync").mockReturnValue("{");
         expect(() => initializeTranslationsForLocale("en-US")).toThrowError(
           expect.objectContaining({ name: "SyntaxError" }),
         );
       });
 
       it("should throw an error if it is not complete with the translations", () => {
-        readFileSyncMock.mockReturnValue("{}");
+        vi.spyOn(fsUtils, "readFileSync").mockReturnValue("{}");
 
         expect(() => initializeTranslationsForLocale("en-US")).toThrowError(
           expect.objectContaining({
@@ -90,7 +71,7 @@ describe("text.loader", () => {
           "start.groupSupport": "support",
           "start.welcomeMessage": "welcome",
         };
-        readFileSyncMock.mockReturnValue(JSON.stringify(file));
+        vi.spyOn(fsUtils, "readFileSync").mockReturnValue(JSON.stringify(file));
         expect(initializeTranslationsForLocale("en-US")).toEqual(file);
       });
     });
@@ -106,9 +87,9 @@ describe("text.loader", () => {
         null,
         2,
       );
-      existsSyncMock.mockReturnValue(false);
+      vi.spyOn(fsUtils, "existsSync").mockReturnValue(false);
       createTranslationsFileForLocale("en-US");
-      expect(writeFileSyncMock).toHaveBeenCalledWith(
+      expect(fsUtils.writeFileSync).toHaveBeenCalledWith(
         expect.stringContaining("translations.en-US.json"),
         `${fileContent}\n`,
       );
@@ -126,10 +107,10 @@ describe("text.loader", () => {
         null,
         2,
       );
-      existsSyncMock.mockReturnValue(true);
-      readFileSyncMock.mockReturnValue(JSON.stringify(file));
+      vi.spyOn(fsUtils, "existsSync").mockReturnValue(true);
+      vi.spyOn(fsUtils, "readFileSync").mockReturnValue(JSON.stringify(file));
       createTranslationsFileForLocale("en-US");
-      expect(writeFileSyncMock).toHaveBeenCalledWith(
+      expect(fsUtils.writeFileSync).toHaveBeenCalledWith(
         expect.stringContaining("translations.en-US.json"),
         `${fileContent}\n`,
       );

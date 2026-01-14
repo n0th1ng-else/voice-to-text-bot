@@ -1,11 +1,17 @@
 import { vi, expect, afterEach, it, describe, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies } from "../src/testUtils/dependencies.js";
 import { injectTestDependencies } from "./helpers/dependencies.js";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import { getVoiceConverterInstances } from "../src/recognition/index.js";
+import { localhostUrl } from "../src/const.js";
+import { DbClient } from "../src/db/client.js";
+import { getDb } from "../src/db/index.js";
+import { appVersion, launchTime } from "../src/env.js";
+import { TelegramBaseApi } from "../src/telegram/api/groups/core.js";
+import { BotServer } from "../src/server/bot-server.js";
 import type { VoidPromise } from "../src/common/types.js";
-import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -26,22 +32,12 @@ let bot: TelegramBotModel;
 describe("error cases", () => {
   describe("server routes", () => {
     beforeAll(async () => {
-      const init = await injectDependencies();
       const initTest = await injectTestDependencies();
 
       const mockGoogleAuth = initTest.mockGoogleAuth;
-      const getVoiceConverterInstances = init.getVoiceConverterInstances;
-      const DbClient = init.DbClient;
-      const getDb = init.getDb;
-      const localhostUrl = init.localhostUrl;
-      const TelegramBotModel = init.TelegramBotModel;
-      const TelegramBaseApi = init.TelegramBaseApi;
       const mockTgGetWebHook = initTest.mockTgGetWebHook;
       const mockTgSetWebHook = initTest.mockTgSetWebHook;
       const mockTgSetCommands = initTest.mockTgSetCommands;
-      const BotServer = init.BotServer;
-      const appVersion = init.appVersion;
-      const launchTime = init.launchTime;
 
       mockGoogleAuth();
 

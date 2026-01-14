@@ -1,7 +1,6 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
 import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { setCurrentMockFileId } from "../src/telegram/api/__mocks__/tgMTProtoApi.js";
@@ -15,7 +14,17 @@ import {
   asFileId__test,
   asUsageId__test,
 } from "../src/testUtils/types.js";
-import type { TelegramBotModel } from "../src/telegram/bot.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import { getVoiceConverterInstances } from "../src/recognition/index.js";
+import { githubUrl, localhostUrl, officialChannelAccount } from "../src/const.js";
+import { DbClient } from "../src/db/client.js";
+import { getDb } from "../src/db/index.js";
+import { appVersion, launchTime } from "../src/env.js";
+import { TelegramBaseApi } from "../src/telegram/api/groups/core.js";
+import { BotServer } from "../src/server/bot-server.js";
+import { randomIntFromInterval } from "../src/common/timer.js";
+import { TranslationKeys } from "../src/text/types.js";
+import { BotCommand } from "../src/telegram/commands.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -38,21 +47,16 @@ let botStat: InstanceType<InjectedTestFn["BotStatRecordModel"]>;
 let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
 let testPool: MockPool;
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
 let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
 let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
-let TranslationKeys: InjectedFn["TranslationKeys"];
-let BotCommand: InjectedFn["BotCommand"];
 let mockTgReceiveMessages: InjectedTestFn["mockTgReceiveMessages"];
 let TelegramMessageMetaItem: InjectedTestFn["TelegramMessageMetaItem"];
 let TelegramMessageMetaType: InjectedTestFn["TelegramMessageMetaType"];
 let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
-let officialChannelAccount: InjectedFn["officialChannelAccount"];
-let githubUrl: InjectedFn["githubUrl"];
 let getLangButtons: InjectedTestFn["getLangButtons"];
 let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"];
 let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
@@ -65,25 +69,18 @@ let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
 
 describe("[russian language]", () => {
   beforeAll(async () => {
-    const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    randomIntFromInterval = init.randomIntFromInterval;
     TelegramMessageModel = initTest.TelegramMessageModel;
-    BotCommand = init.BotCommand;
     mockGetBotStatItem = initTest.mockGetBotStatItem;
     sendTelegramMessage = initTest.sendTelegramMessage;
     mockTgReceiveMessage = initTest.mockTgReceiveMessage;
-    TranslationKeys = init.TranslationKeys;
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
     BotStatRecordModel = initTest.BotStatRecordModel;
-    randomIntFromInterval = init.randomIntFromInterval;
     mockTgReceiveMessages = initTest.mockTgReceiveMessages;
     TelegramMessageMetaItem = initTest.TelegramMessageMetaItem;
     TelegramMessageMetaType = initTest.TelegramMessageMetaType;
     sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
-    officialChannelAccount = init.officialChannelAccount;
-    githubUrl = init.githubUrl;
     getLangButtons = initTest.getLangButtons;
     mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
     mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
@@ -95,18 +92,9 @@ describe("[russian language]", () => {
 
     trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getVoiceConverterInstances = init.getVoiceConverterInstances;
-    const DbClient = init.DbClient;
-    const getDb = init.getDb;
-    const localhostUrl = init.localhostUrl;
-    const TelegramBotModel = init.TelegramBotModel;
-    const TelegramBaseApi = init.TelegramBaseApi;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
     const mockTgSetWebHook = initTest.mockTgSetWebHook;
     const mockTgSetCommands = initTest.mockTgSetCommands;
-    const BotServer = init.BotServer;
-    const appVersion = init.appVersion;
-    const launchTime = init.launchTime;
 
     mockGoogleAuth();
 

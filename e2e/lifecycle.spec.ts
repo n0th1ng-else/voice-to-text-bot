@@ -2,11 +2,17 @@ import { expect, vi, beforeEach, afterEach, it, describe, beforeAll } from "vite
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
 import { injectTestDependencies, type InjectedTestFn } from "./helpers/dependencies.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
+import { BotServer } from "../src/server/bot-server.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import { getVoiceConverterInstances } from "../src/recognition/index.js";
+import { TelegramBaseApi } from "../src/telegram/api/groups/core.js";
+import { DbClient } from "../src/db/client.js";
+import { getDb } from "../src/db/index.js";
+import { localhostUrl } from "../src/const.js";
+import { appVersion, launchTime } from "../src/env.js";
 import type { VoidPromise } from "../src/common/types.js";
-import type { TelegramBotModel } from "../src/telegram/bot.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -21,10 +27,7 @@ const path = "/lifecycle";
 
 let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
-let server: InstanceType<InjectedFn["BotServer"]>;
-let localhostUrl: string;
-let BotServer: InjectedFn["BotServer"];
-let appVersion: InjectedFn["appVersion"];
+let server: BotServer;
 let telegramServer: nock.Scope;
 let testPool: MockPool;
 let host: request.Agent;
@@ -35,22 +38,12 @@ let mockTgGetWebHookError: InjectedTestFn["mockTgGetWebHookError"];
 
 describe("[lifecycle]", () => {
   beforeAll(async () => {
-    const init = await injectDependencies();
     const initTest = await injectTestDependencies();
 
-    BotServer = init.BotServer;
-    appVersion = init.appVersion;
     mockTgGetWebHook = initTest.mockTgGetWebHook;
     mockTgGetWebHookError = initTest.mockTgGetWebHookError;
-    localhostUrl = init.localhostUrl;
 
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getVoiceConverterInstances = init.getVoiceConverterInstances;
-    const DbClient = init.DbClient;
-    const getDb = init.getDb;
-    const TelegramBotModel = init.TelegramBotModel;
-    const launchTime = init.launchTime;
-    const TelegramBaseApi = init.TelegramBaseApi;
 
     mockGoogleAuth();
 
