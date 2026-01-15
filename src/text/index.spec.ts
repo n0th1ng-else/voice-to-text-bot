@@ -1,27 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { TranslationKeys } from "./types.js";
-import { injectDependencies, type InjectedFn } from "../testUtils/dependencies.js";
+import { getTranslator, isTranslationKey } from "./index.js";
+import { BotCommand } from "../telegram/commands.js";
+import { initializeMenuLabels, initializeTranslationsForLocale } from "./translations/loader.js";
 
 vi.mock("./translations/loader");
 
-let isTranslationKey: InjectedFn["isTranslationKey"];
-let getTranslator: InjectedFn["getTranslator"];
-let BotCommand: InjectedFn["BotCommand"];
-let initializeMenuLabels: InjectedFn["initializeMenuLabels"];
-let initializeTranslationsForLocale: InjectedFn["initializeTranslationsForLocale"];
-
-let TEST_TRANSLATOR: ReturnType<InjectedFn["getTranslator"]>;
+let TEST_TRANSLATOR: ReturnType<typeof getTranslator>;
 
 describe("text.index", () => {
-  beforeEach(async () => {
-    const init = await injectDependencies();
-    isTranslationKey = init.isTranslationKey;
-    getTranslator = init.getTranslator;
-    BotCommand = init.BotCommand;
-    initializeMenuLabels = init.initializeMenuLabels;
-    initializeTranslationsForLocale = init.initializeTranslationsForLocale;
-  });
-
   describe("isTranslationKey", () => {
     it("should return true if the value is proper translation key", () => {
       expect(isTranslationKey(TranslationKeys.AudioNotSupportedMessage)).toEqual(true);

@@ -1,13 +1,21 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import { injectDependencies, type InjectedFn } from "../src/testUtils/dependencies.js";
 import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { VoidPromise } from "../src/common/types.js";
 import { asChatId__test, asMessageId__test, asFileId__test } from "../src/testUtils/types.js";
-import type { TelegramBotModel } from "../src/telegram/bot.js";
+import { TelegramBotModel } from "../src/telegram/bot.js";
+import { getVoiceConverterInstances } from "../src/recognition/index.js";
+import { localhostUrl } from "../src/const.js";
+import { DbClient } from "../src/db/client.js";
+import { getDb } from "../src/db/index.js";
+import { appVersion, launchTime } from "../src/env.js";
+import { TelegramBaseApi } from "../src/telegram/api/groups/core.js";
+import { BotServer } from "../src/server/bot-server.js";
+import { randomIntFromInterval } from "../src/common/timer.js";
+import { BotCommand } from "../src/telegram/commands.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -29,36 +37,21 @@ let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let testPool: MockPool;
-let randomIntFromInterval: InjectedFn["randomIntFromInterval"];
 let host: request.Agent;
 let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
-let BotCommand: InjectedFn["BotCommand"];
 let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];
 let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
 
 describe("ignore chats", () => {
   beforeAll(async () => {
-    const init = await injectDependencies();
     const initTest = await injectTestDependencies();
-    randomIntFromInterval = init.randomIntFromInterval;
     TelegramMessageModel = initTest.TelegramMessageModel;
-    BotCommand = init.BotCommand;
     sendTelegramMessage = initTest.sendTelegramMessage;
-    randomIntFromInterval = init.randomIntFromInterval;
     mockGetIgnoredChatsRow = initTest.mockGetIgnoredChatsRow;
 
     trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
     const mockGoogleAuth = initTest.mockGoogleAuth;
-    const getVoiceConverterInstances = init.getVoiceConverterInstances;
-    const DbClient = init.DbClient;
-    const getDb = init.getDb;
-    const localhostUrl = init.localhostUrl;
-    const TelegramBotModel = init.TelegramBotModel;
-    const TelegramBaseApi = init.TelegramBaseApi;
     const mockTgGetWebHook = initTest.mockTgGetWebHook;
-    const BotServer = init.BotServer;
-    const appVersion = init.appVersion;
-    const launchTime = init.launchTime;
 
     mockGoogleAuth();
 
