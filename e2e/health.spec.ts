@@ -3,7 +3,6 @@ import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
-import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { TelegramBotModel } from "../src/telegram/bot.js";
 import { getVoiceConverterInstances } from "../src/recognition/index.js";
 import { localhostUrl } from "../src/const.js";
@@ -13,6 +12,14 @@ import { TelegramBaseApi } from "../src/telegram/api/groups/core.js";
 import { appVersion, launchTime } from "../src/env.js";
 import { BotServer } from "../src/server/bot-server.js";
 import type { VoidPromise } from "../src/common/types.js";
+import { mockGoogleAuth } from "./requests/google.js";
+import { getConverterOptions } from "./helpers.js";
+import {
+  mockTgGetWebHook,
+  mockTgGetWebHookError,
+  mockTgSetCommands,
+  mockTgSetWebHook,
+} from "./requests/telegram.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -28,10 +35,6 @@ let server: BotServer;
 let telegramServer: nock.Scope;
 let host: request.Agent;
 let testPool: MockPool;
-let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
-let mockTgSetWebHook: InjectedTestFn["mockTgSetWebHook"];
-let mockTgSetCommands: InjectedTestFn["mockTgSetCommands"];
-let mockTgGetWebHookError: InjectedTestFn["mockTgGetWebHookError"];
 let bot: TelegramBotModel;
 
 const path = "/health";
@@ -40,22 +43,9 @@ let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not st
 
 describe("[health]", () => {
   beforeAll(async () => {
-    const initTest = await injectTestDependencies();
-
-    mockTgGetWebHook = initTest.mockTgGetWebHook;
-    mockTgSetWebHook = initTest.mockTgSetWebHook;
-    mockTgSetCommands = initTest.mockTgSetCommands;
-    mockTgGetWebHookError = initTest.mockTgGetWebHookError;
-
-    const mockGoogleAuth = initTest.mockGoogleAuth;
-
     mockGoogleAuth();
 
-    const converters = await getVoiceConverterInstances(
-      "GOOGLE",
-      "GOOGLE",
-      initTest.getConverterOptions(),
-    );
+    const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
     hostUrl = `${localhostUrl}:${appPort}`;
 
     const dbConfig = {

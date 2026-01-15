@@ -1,7 +1,6 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import { setCurrentMockFileId } from "../src/telegram/api/__mocks__/tgMTProtoApi.js";
 import { getSupportedAudioFormats } from "../src/text/utils.js";
@@ -20,6 +19,31 @@ import { BotServer } from "../src/server/bot-server.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
 import { TranslationKeys } from "../src/text/types.js";
 import { BotCommand } from "../src/telegram/commands.js";
+import { trackNotMatchedRoutes } from "./requests/common.js";
+import { mockGoogleAuth, mockSpeechRecognition } from "./requests/google.js";
+import {
+  getConverterOptions,
+  getDonateButtons,
+  getLangButtons,
+  TelegramMessageMetaItem,
+  TelegramMessageMetaType,
+  TelegramMessageModel,
+} from "./helpers.js";
+import {
+  mockTgGetWebHook,
+  mockTgReceiveCallbackMessage,
+  mockTgReceiveMessage,
+  mockTgReceiveMessages,
+  mockTgReceiveRawMessage,
+  sendTelegramCallbackMessage,
+  sendTelegramMessage,
+} from "./requests/telegram.js";
+import {
+  mockGetBotStatItem,
+  mockUpdateBotStatLang,
+  mockUpdateBotStatUsage,
+} from "./requests/db/botStat.js";
+import { mockGetIgnoredChatsRow } from "./requests/db/ignoredChatsDb.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -30,67 +54,24 @@ vi.mock("../src/telegram/api/tgMTProtoApi");
 const appPort = 3100;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
+const trackNotMatchedRoutesHandler = trackNotMatchedRoutes();
 
 let stopHandler: VoidPromise = () => Promise.reject(new Error("Server did not start"));
 
 let chatType: TgChatType;
 let testMessageId = asMessageId__test(0);
 let testChatId = asChatId__test(0);
-let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
+let tgMessage: TelegramMessageModel;
 let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
-let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
 let testPool: MockPool;
-let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
 let host: request.Agent;
-let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
-let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
-let mockTgReceiveMessages: InjectedTestFn["mockTgReceiveMessages"];
-let TelegramMessageMetaItem: InjectedTestFn["TelegramMessageMetaItem"];
-let TelegramMessageMetaType: InjectedTestFn["TelegramMessageMetaType"];
-let getLangButtons: InjectedTestFn["getLangButtons"];
-let getDonateButtons: InjectedTestFn["getDonateButtons"];
-let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
-let mockTgReceiveCallbackMessage: InjectedTestFn["mockTgReceiveCallbackMessage"];
-let mockUpdateBotStatLang: InjectedTestFn["mockUpdateBotStatLang"];
-let mockTgReceiveRawMessage: InjectedTestFn["mockTgReceiveRawMessage"];
-let mockSpeechRecognition: InjectedTestFn["mockSpeechRecognition"];
-let mockUpdateBotStatUsage: InjectedTestFn["mockUpdateBotStatUsage"];
-let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];
-let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
 
 describe("[default language - english]", () => {
   beforeAll(async () => {
-    const initTest = await injectTestDependencies();
-    TelegramMessageModel = initTest.TelegramMessageModel;
-    mockGetBotStatItem = initTest.mockGetBotStatItem;
-    sendTelegramMessage = initTest.sendTelegramMessage;
-    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
-    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
-    mockTgReceiveMessages = initTest.mockTgReceiveMessages;
-    TelegramMessageMetaItem = initTest.TelegramMessageMetaItem;
-    TelegramMessageMetaType = initTest.TelegramMessageMetaType;
-    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
-    getLangButtons = initTest.getLangButtons;
-    mockTgReceiveCallbackMessage = initTest.mockTgReceiveCallbackMessage;
-    mockUpdateBotStatLang = initTest.mockUpdateBotStatLang;
-    mockSpeechRecognition = initTest.mockSpeechRecognition;
-    getDonateButtons = initTest.getDonateButtons;
-    mockTgReceiveRawMessage = initTest.mockTgReceiveRawMessage;
-    mockUpdateBotStatUsage = initTest.mockUpdateBotStatUsage;
-    mockGetIgnoredChatsRow = initTest.mockGetIgnoredChatsRow;
-
-    trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
-    const mockGoogleAuth = initTest.mockGoogleAuth;
-    const mockTgGetWebHook = initTest.mockTgGetWebHook;
-
     mockGoogleAuth();
 
-    const converters = await getVoiceConverterInstances(
-      "GOOGLE",
-      "GOOGLE",
-      initTest.getConverterOptions(),
-    );
+    const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
 
     const hostUrl = `${localhostUrl}:${appPort}`;
 
@@ -126,13 +107,9 @@ describe("[default language - english]", () => {
 
     const server = new BotServer(appPort, appVersion, webhookDoNotWait);
 
-    return db
-      .init()
-      .then(() => server.setSelfUrl(hostUrl).setBots([bot]).setStat(db).start())
-      .then((stopFn) => {
-        stopHandler = stopFn;
-        return server.applyHostLocation();
-      });
+    await db.init();
+    stopHandler = await server.setSelfUrl(hostUrl).setBots([bot]).setStat(db).start();
+    await server.applyHostLocation();
   });
 
   afterAll(() => stopHandler());
@@ -147,7 +124,7 @@ describe("[default language - english]", () => {
   afterEach(() => {
     expect(telegramServer.isDone()).toBe(true);
     expect(testPool.isDone()).toBe(true);
-    expect(trackNotMatchedRoutes()).toBe(true);
+    expect(trackNotMatchedRoutesHandler()).toBe(true);
   });
 
   describe("private messages", () => {

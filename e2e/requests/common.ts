@@ -16,8 +16,8 @@ export const trackNotMatchedRoutes = () => {
       return true;
     }
 
-    const routes = notMatchedRoutes.join("\n");
+    const routes = notMatchedRoutes.map((r) => `- ${r}`).join("\n");
     notMatchedRoutes = [];
-    throw new Error(`some routes are not mocked!\n${routes}`);
+    throw new Error(`some routes are not mocked:\n${routes}`, { cause: ["asd"] });
   };
 };
