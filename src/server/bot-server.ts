@@ -2,7 +2,7 @@ import { fastify, type FastifyInstance } from "fastify";
 import { Logger } from "../logger/index.js";
 import { AnalyticsData } from "../analytics/ga/types.js";
 import { BotServerBase } from "./bot-server-base.js";
-import { initSentry, trackAPIHandlers } from "../monitoring/sentry.js";
+import { initSentry, trackAPIHandlers } from "../monitoring/sentry/index.js";
 import { collectAnalytics } from "../analytics/index.js";
 import { sSuffix } from "../text/utils.js";
 import { isFileExist, readFile } from "../files/index.js";

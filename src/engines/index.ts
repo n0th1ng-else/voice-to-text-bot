@@ -20,3 +20,8 @@ export const getRuntimeEngineType = (): EngineType => {
     version: "n/a",
   };
 };
+
+export const isNode = (): boolean => {
+  const { engine } = getRuntimeEngineType();
+  return engine === "node";
+};

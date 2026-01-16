@@ -53,16 +53,16 @@ const initTranslations = (): Translator => {
       locale: LanguageCode,
       params?: Record<string, string | number>,
     ): string => {
-      let str = getRawTranslation(key, locale);
+      let text = getRawTranslation(key, locale);
 
       if (params) {
-        str = Object.keys(params).reduce((acc, varKey) => {
+        text = Object.keys(params).reduce((acc, varKey) => {
           const varValue = params[varKey];
           return acc.replaceAll(`{{${varKey}}}`, String(varValue));
-        }, str);
+        }, text);
       }
 
-      const missing = str.match(TRANSLATION_VARIABLES_PATTERN);
+      const missing = text.match(TRANSLATION_VARIABLES_PATTERN);
 
       if (missing?.length) {
         throw new Error("Missing text interpolation", {
@@ -73,16 +73,16 @@ const initTranslations = (): Translator => {
         });
       }
 
-      return str;
+      return text;
     },
   };
 };
 
-let translatorSingleton: undefined | Translator = undefined;
+let translator__singleton: undefined | Translator = undefined;
 
 export const getTranslator = (): Translator => {
-  translatorSingleton ??= initTranslations();
-  return translatorSingleton;
+  translator__singleton ??= initTranslations();
+  return translator__singleton;
 };
 
 export const isTranslationKey = (value: unknown): value is TranslationKey => {

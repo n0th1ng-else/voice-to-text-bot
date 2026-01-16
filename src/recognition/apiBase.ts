@@ -1,5 +1,5 @@
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
-import { addAttachment } from "../monitoring/sentry.js";
+import { addAttachment } from "../monitoring/sentry/index.js";
 import { Logger } from "../logger/index.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 

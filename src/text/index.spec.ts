@@ -6,7 +6,7 @@ import { initializeMenuLabels, initializeTranslationsForLocale } from "./transla
 
 vi.mock("./translations/loader");
 
-let TEST_TRANSLATOR: ReturnType<typeof getTranslator>;
+let testTranslator: ReturnType<typeof getTranslator>;
 
 describe("text.index", () => {
   describe("isTranslationKey", () => {
@@ -24,23 +24,23 @@ describe("text.index", () => {
 
   describe("getTranslator", () => {
     beforeEach(() => {
-      TEST_TRANSLATOR = getTranslator();
+      testTranslator = getTranslator();
     });
 
     it("should return the getFallbackLanguage api", () => {
-      expect(TEST_TRANSLATOR.getFallbackLanguage()).toEqual("en-US");
+      expect(testTranslator.getFallbackLanguage()).toEqual("en-US");
     });
 
     it("should return menu translations api", () => {
-      expect(TEST_TRANSLATOR.menu(BotCommand.Start)).toEqual("Command text");
+      expect(testTranslator.menu(BotCommand.Start)).toEqual("Command text");
     });
 
     it("should return translation api", () => {
-      expect(TEST_TRANSLATOR.t("start.welcomeMessage", "en-US")).toEqual("translation text");
+      expect(testTranslator.t("start.welcomeMessage", "en-US")).toEqual("translation text");
     });
 
     it("should not re-initialize the instance (singleton)", () => {
-      TEST_TRANSLATOR = getTranslator();
+      testTranslator = getTranslator();
       expect(initializeMenuLabels).toHaveBeenCalledTimes(1);
       expect(initializeTranslationsForLocale).toHaveBeenCalledTimes(2); // Two languages supported
     });
@@ -48,14 +48,14 @@ describe("text.index", () => {
     describe("interpolation", () => {
       it("should interpolate the {{var}} with the params array", () => {
         const formatsInterpolation = "any kind of file";
-        const text = TEST_TRANSLATOR.t("recognition.voice.supportedFormats", "en-US", {
+        const text = testTranslator.t("recognition.voice.supportedFormats", "en-US", {
           formats: formatsInterpolation,
         });
         expect(text).toEqual(formatsInterpolation);
       });
 
       it("should interpolate all variables", () => {
-        const text = TEST_TRANSLATOR.t("recognition.voice.time.minutes", "en-US", {
+        const text = testTranslator.t("recognition.voice.time.minutes", "en-US", {
           minutes: 7,
           seconds: 21,
         });
@@ -64,7 +64,7 @@ describe("text.index", () => {
 
       it("should throw an Error is the is a variable missing", () => {
         expect(() =>
-          TEST_TRANSLATOR.t("recognition.voice.time.minutes", "en-US", {
+          testTranslator.t("recognition.voice.time.minutes", "en-US", {
             minutes: 7,
             // missing `seconds`
           }),

@@ -1,7 +1,7 @@
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter, type ConverterMeta, type LanguageCode } from "./types.js";
-import { addAttachment } from "../monitoring/sentry.js";
+import { addAttachment } from "../monitoring/sentry/index.js";
 import { getWavBuffer } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { API_TIMEOUT_MS } from "../const.js";
