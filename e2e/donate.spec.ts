@@ -1,7 +1,6 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import nock from "nock";
-import { type InjectedTestFn, injectTestDependencies } from "./helpers/dependencies.js";
 import { mockTableCreation, Pool as MockPool } from "../src/db/__mocks__/pg.js";
 import type { TgChatType } from "../src/telegram/api/groups/chats/chats-types.js";
 import type { LanguageCode } from "../src/recognition/types.js";
@@ -20,6 +19,24 @@ import { appVersion } from "../src/env.js";
 import { randomIntFromInterval } from "../src/common/timer.js";
 import { BotCommand } from "../src/telegram/commands.js";
 import { TranslationKeys } from "../src/text/types.js";
+import { trackNotMatchedRoutes } from "./requests/common.js";
+import { mockGoogleAuth } from "./requests/google.js";
+import {
+  BotStatRecordModel,
+  getConverterOptions,
+  getDonateButtons,
+  TelegramMessageModel,
+} from "./helpers.js";
+import {
+  mockTgGetWebHook,
+  mockTgReceiveInvoiceMessage,
+  mockTgReceiveMessage,
+  sendTelegramCallbackMessage,
+  sendTelegramMessage,
+} from "./requests/telegram.js";
+import { mockGetBotStatItem } from "./requests/db/botStat.js";
+import { mockGetIgnoredChatsRow } from "./requests/db/ignoredChatsDb.js";
+import { mockCreateDonationRow } from "./requests/db/donationStat.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -30,6 +47,7 @@ vi.mock("../src/telegram/api/tgMTProtoApi");
 const appPort = 3900;
 const dbPort = appPort + 1;
 const webhookDoNotWait = false;
+const trackNotMatchedRoutesHandler = trackNotMatchedRoutes();
 
 const dbConfig = {
   user: "spy-user",
@@ -49,49 +67,17 @@ let chatType: TgChatType;
 let testMessageId = asMessageId__test(0);
 let testChatId = asChatId__test(0);
 
-let tgMessage: InstanceType<InjectedTestFn["TelegramMessageModel"]>;
+let tgMessage: TelegramMessageModel;
 let testLangId: LanguageCode;
 let bot: TelegramBotModel;
 let telegramServer: nock.Scope;
 let host: request.Agent;
-let TelegramMessageModel: InjectedTestFn["TelegramMessageModel"];
-let mockGetBotStatItem: InjectedTestFn["mockGetBotStatItem"];
-let sendTelegramMessage: InjectedTestFn["sendTelegramMessage"];
-let mockTgReceiveMessage: InjectedTestFn["mockTgReceiveMessage"];
-let getDonateButtons: InjectedTestFn["getDonateButtons"];
-let sendTelegramCallbackMessage: InjectedTestFn["sendTelegramCallbackMessage"];
-let mockTgReceiveInvoiceMessage: InjectedTestFn["mockTgReceiveInvoiceMessage"];
-let mockCreateDonationRow: InjectedTestFn["mockCreateDonationRow"];
-let BotStatRecordModel: InjectedTestFn["BotStatRecordModel"];
-let mockGetIgnoredChatsRow: InjectedTestFn["mockGetIgnoredChatsRow"];
-let trackNotMatchedRoutes: ReturnType<InjectedTestFn["trackNotMatchedRoutes"]>;
 
 describe("[default language - english] donate", () => {
   beforeAll(async () => {
-    const initTest = await injectTestDependencies();
-
-    TelegramMessageModel = initTest.TelegramMessageModel;
-    mockGetBotStatItem = initTest.mockGetBotStatItem;
-    sendTelegramMessage = initTest.sendTelegramMessage;
-    mockTgReceiveMessage = initTest.mockTgReceiveMessage;
-    getDonateButtons = initTest.getDonateButtons;
-    sendTelegramCallbackMessage = initTest.sendTelegramCallbackMessage;
-    mockTgReceiveInvoiceMessage = initTest.mockTgReceiveInvoiceMessage;
-    mockCreateDonationRow = initTest.mockCreateDonationRow;
-    BotStatRecordModel = initTest.BotStatRecordModel;
-    mockGetIgnoredChatsRow = initTest.mockGetIgnoredChatsRow;
-
-    trackNotMatchedRoutes = initTest.trackNotMatchedRoutes();
-    const mockGoogleAuth = initTest.mockGoogleAuth;
-    const mockTgGetWebHook = initTest.mockTgGetWebHook;
-
     mockGoogleAuth();
 
-    const converters = await getVoiceConverterInstances(
-      "GOOGLE",
-      "GOOGLE",
-      initTest.getConverterOptions(),
-    );
+    const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
     const mainDb = new DbClient(dbConfig, 0, testPool);
     const db = getDb([dbConfig], 0, mainDb);
 
@@ -118,13 +104,9 @@ describe("[default language - english] donate", () => {
 
     const server = new BotServer(appPort, appVersion, webhookDoNotWait);
 
-    return db
-      .init()
-      .then(() => server.setSelfUrl(hostUrl).setBots([bot]).setStat(db).start())
-      .then((stopFn) => {
-        stopHandler = stopFn;
-        return server.applyHostLocation();
-      });
+    await db.init();
+    stopHandler = await server.setSelfUrl(hostUrl).setBots([bot]).setStat(db).start();
+    await server.applyHostLocation();
   });
 
   afterAll(() => stopHandler());
@@ -138,7 +120,7 @@ describe("[default language - english] donate", () => {
   afterEach(() => {
     expect(telegramServer.isDone()).toBe(true);
     expect(testPool.isDone()).toBe(true);
-    expect(trackNotMatchedRoutes()).toBe(true);
+    expect(trackNotMatchedRoutesHandler()).toBe(true);
   });
 
   describe("DIRECT", () => {

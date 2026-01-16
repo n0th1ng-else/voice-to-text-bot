@@ -2,7 +2,6 @@ import { expect, vi, beforeEach, afterEach, it, describe, beforeAll } from "vite
 import request from "supertest";
 import nock from "nock";
 import { Pool as MockPool } from "../src/db/__mocks__/pg.js";
-import { injectTestDependencies, type InjectedTestFn } from "./helpers/dependencies.js";
 import { HealthSsl, HealthStatus } from "../src/server/types.js";
 import { BotServer } from "../src/server/bot-server.js";
 import { TelegramBotModel } from "../src/telegram/bot.js";
@@ -13,6 +12,9 @@ import { getDb } from "../src/db/index.js";
 import { localhostUrl } from "../src/const.js";
 import { appVersion, launchTime } from "../src/env.js";
 import type { VoidPromise } from "../src/common/types.js";
+import { mockGoogleAuth } from "./requests/google.js";
+import { getConverterOptions } from "./helpers.js";
+import { mockTgGetWebHook, mockTgGetWebHookError } from "./requests/telegram.js";
 
 vi.mock("../src/logger/index");
 vi.mock("../src/env");
@@ -31,27 +33,14 @@ let server: BotServer;
 let telegramServer: nock.Scope;
 let testPool: MockPool;
 let host: request.Agent;
-let mockTgGetWebHook: InjectedTestFn["mockTgGetWebHook"];
 let hostUrl: string;
 let bot: TelegramBotModel;
-let mockTgGetWebHookError: InjectedTestFn["mockTgGetWebHookError"];
 
 describe("[lifecycle]", () => {
   beforeAll(async () => {
-    const initTest = await injectTestDependencies();
-
-    mockTgGetWebHook = initTest.mockTgGetWebHook;
-    mockTgGetWebHookError = initTest.mockTgGetWebHookError;
-
-    const mockGoogleAuth = initTest.mockGoogleAuth;
-
     mockGoogleAuth();
 
-    const converters = await getVoiceConverterInstances(
-      "GOOGLE",
-      "GOOGLE",
-      initTest.getConverterOptions(),
-    );
+    const converters = await getVoiceConverterInstances("GOOGLE", "GOOGLE", getConverterOptions());
 
     hostUrl = `${localhostUrl}:${appPort}`;
 
@@ -92,29 +81,24 @@ describe("[lifecycle]", () => {
       stopHandler = await server.start();
     });
 
-    it("initial api access", () => {
-      return host.post(path).then((res) => {
-        expect(res.status).toBe(400);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.InProgress);
-        expect(res.body.urls).toEqual([]);
-        expect(res.body.version).toBe(appVersion);
-        expect(res.body.message).toBe("App is not connected to the Telegram server");
-      });
+    it("initial api access", async () => {
+      const res = await host.post(path);
+      expect(res.status).toBe(400);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.InProgress);
+      expect(res.body.urls).toEqual([]);
+      expect(res.body.version).toBe(appVersion);
+      expect(res.body.message).toBe("App is not connected to the Telegram server");
     });
 
-    it("starts with no bots enabled", () => {
-      return server
-        .setBots()
-        .applyHostLocation()
-        .then(() => host.post(path))
-        .then((res) => {
-          expect(res.status).toBe(200);
-          expect(res.body.ssl).toBe(HealthSsl.Off);
-          expect(res.body.status).toBe(HealthStatus.Online);
-          expect(res.body.urls).toEqual([]);
-          expect(res.body.version).toBe(appVersion);
-        });
+    it("starts with no bots enabled", async () => {
+      await server.setBots().applyHostLocation();
+      const res = await host.post(path);
+      expect(res.status).toBe(200);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Online);
+      expect(res.body.urls).toEqual([]);
+      expect(res.body.version).toBe(appVersion);
     });
   });
 
@@ -128,38 +112,35 @@ describe("[lifecycle]", () => {
       stopHandler = await server.start();
     });
 
-    it("shows okay health check", () => {
+    it("shows okay health check", async () => {
       mockTgGetWebHook(telegramServer, `${hostUrl}${bot.getPath()}`);
-      return host.post(path).then((res) => {
-        expect(res.status).toBe(200);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Online);
-        expect(res.body.urls).toEqual([`${hostUrl}${bot.getPath()}`]);
-        expect(res.body.version).toBe(appVersion);
-      });
+      const res = await host.post(path);
+      expect(res.status).toBe(200);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Online);
+      expect(res.body.urls).toEqual([`${hostUrl}${bot.getPath()}`]);
+      expect(res.body.version).toBe(appVersion);
     });
 
-    it("shows okay health check with bot web hooks not owned by this node", () => {
+    it("shows okay health check with bot web hooks not owned by this node", async () => {
       const nextUrl = `${localhostUrl}-next`;
       mockTgGetWebHook(telegramServer, `${nextUrl}${bot.getPath()}`);
-      return host.post(path).then((res) => {
-        expect(res.status).toBe(200);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Online);
-        expect(res.body.urls).toEqual([`${nextUrl}${bot.getPath()}`]);
-        expect(res.body.version).toBe(appVersion);
-      });
+      const res = await host.post(path);
+      expect(res.status).toBe(200);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Online);
+      expect(res.body.urls).toEqual([`${nextUrl}${bot.getPath()}`]);
+      expect(res.body.version).toBe(appVersion);
     });
 
-    it("shows error health check", () => {
+    it("shows error health check", async () => {
       mockTgGetWebHookError(telegramServer);
-      return host.post(path).then((res) => {
-        expect(res.status).toBe(400);
-        expect(res.body.ssl).toBe(HealthSsl.Off);
-        expect(res.body.status).toBe(HealthStatus.Error);
-        expect(res.body.urls).toEqual([]);
-        expect(res.body.version).toBe(appVersion);
-      });
+      const res = await host.post(path);
+      expect(res.status).toBe(400);
+      expect(res.body.ssl).toBe(HealthSsl.Off);
+      expect(res.body.status).toBe(HealthStatus.Error);
+      expect(res.body.urls).toEqual([]);
+      expect(res.body.version).toBe(appVersion);
     });
   });
 });
