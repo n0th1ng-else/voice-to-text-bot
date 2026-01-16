@@ -8,8 +8,8 @@ import {
 } from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
-import { appVersion, nodeEnvironment, sentryDsn } from "../env.js";
-import { isDevelopment } from "../common/environment.js";
+import { appVersion, nodeEnvironment, sentryDsn } from "../../env.js";
+import { isDevelopment } from "../../common/environment.js";
 
 const ERROR_RATE_LIMIT = 10; // report only 10% of "EWITAI canceled" errors
 let ERROR_RATE_COUNT = 0;

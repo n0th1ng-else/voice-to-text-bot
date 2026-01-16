@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Logger } from "./index.js";
-import * as sentryUtils from "../monitoring/sentry.js";
+import * as sentryUtils from "../monitoring/sentry/index.js";
 
 vi.mock("node:cluster", () => import("../../__mocks__/cluster.js"));
 vi.mock("picocolors", () => {

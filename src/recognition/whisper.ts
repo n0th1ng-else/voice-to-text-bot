@@ -1,7 +1,7 @@
 import { arch } from "node:os";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { addAttachment } from "../monitoring/sentry.js";
+import { addAttachment } from "../monitoring/sentry/index.js";
 import { getWavFilePath } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 import { runWhisper } from "../whisper/whisper-engine.js";
