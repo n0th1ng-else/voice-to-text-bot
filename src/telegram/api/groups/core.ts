@@ -4,7 +4,7 @@ import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
 import type { ChatId } from "../core.js";
 import { API_TIMEOUT_MS } from "../../../const.js";
-import { unknownHasMessage } from "../../../server/error.js";
+import { unknownHasMessage } from "../../../common/unknown.js";
 
 export class TelegramBaseApi {
   public static readonly url = "https://api.telegram.org";

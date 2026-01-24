@@ -16,9 +16,3 @@ export const getResponseErrorData = async (response: Response): Promise<unknown>
     return data;
   }
 };
-
-export const unknownHasMessage = (obj: unknown): obj is { message: string } => {
-  return (
-    typeof obj === "object" && obj !== null && "message" in obj && typeof obj.message === "string"
-  );
-};

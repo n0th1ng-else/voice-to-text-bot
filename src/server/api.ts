@@ -1,5 +1,6 @@
 import type { HealthDto } from "./types.js";
-import { getResponseErrorData, unknownHasMessage } from "./error.js";
+import { getResponseErrorData } from "./error.js";
+import { unknownHasMessage } from "../common/unknown.js";
 
 export class HealthError extends Error {
   public code = 0;
