@@ -5,7 +5,8 @@ import { TimeMeasure } from "../common/timer.js";
 import { API_TIMEOUT_MS } from "../const.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
 import { Logger } from "../logger/index.js";
-import { getResponseErrorData, unknownHasMessage } from "../server/error.js";
+import { getResponseErrorData } from "../server/error.js";
+import { unknownHasMessage, unknownHasText } from "../common/unknown.js";
 
 const logger = new Logger("whisper-api-recognition");
 
@@ -99,11 +100,6 @@ export class WhisperSelfHost extends APIVoiceConverter<ApiResponse> {
   }
 
   protected isRecognitionResponse(response: unknown): response is ApiResponse {
-    return (
-      typeof response === "object" &&
-      response !== null &&
-      "text" in response &&
-      typeof response.text === "string"
-    );
+    return unknownHasText(response);
   }
 }

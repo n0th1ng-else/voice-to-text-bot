@@ -10,6 +10,7 @@ import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
 import { appVersion, nodeEnvironment, sentryDsn } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
+import { fetchPropFromUnknown } from "../../common/unknown.js";
 
 const ERROR_RATE_LIMIT = 10; // report only 10% of "EWITAI canceled" errors
 let ERROR_RATE_COUNT = 0;
@@ -47,11 +48,6 @@ export const addAttachment = (filename: string, data: string | Uint8Array): void
 /**
  * @see https://github.com/getsentry/sentry-javascript/pull/9138/files
  */
-const fetchPropFromUnknown = <T>(obj: unknown, prop: string, defaultVal: T): unknown => {
-  // @ts-expect-error Sometimes we need this JS spice
-  return obj && typeof obj === "object" && prop in obj ? obj[prop] : defaultVal;
-};
-
 const fastifyRequestPlugin = (app: FastifyInstance): void => {
   app.addHook("preHandler", (request, _reply, done) => {
     const { routeOptions, body } = request;
