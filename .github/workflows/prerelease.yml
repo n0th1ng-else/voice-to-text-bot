@@ -31,7 +31,12 @@ jobs:
 
       - name: Read version into output
         id: reader
-        run: echo "version=$(cat .VERSION)" >> $GITHUB_OUTPUT
+        run: |
+          if [ ! -f .VERSION ]; then
+            echo "::error::.VERSION file is missing! Failed to create a new version?!" >&2
+            exit 1
+          fi
+          echo "version=$(cat .VERSION)" >> "$GITHUB_OUTPUT"
 
   sentry:
     runs-on: ubuntu-latest
