@@ -257,7 +257,7 @@ export class TelegramBotModel {
   }
 
   private trackUserLanguage(msg: TgMessage | TgCallbackQuery): void {
-    const rawLanguage = getRawUserLanguage(msg);
+    const rawLanguage = getRawUserLanguage(msg) || "unknown";
     trackRawUserLanguage(rawLanguage);
   }
 }
