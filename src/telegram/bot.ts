@@ -9,7 +9,7 @@ import { type VoiceConverters } from "../recognition/types.js";
 import { TranslationKeys } from "../text/types.js";
 import { TelegramMessagePrefix } from "./models/messagePrefix.js";
 import { BotMessageModel } from "./models/botMessage.js";
-import { isMessageSupported } from "./helpers.js";
+import { getRawUserLanguage, isMessageSupported } from "./helpers.js";
 import { runPromiseWithRetry } from "../common/helpers.js";
 import { getMd5Hash } from "../common/hash.js";
 import { BotActions } from "./actions/index.js";
@@ -20,6 +20,7 @@ import { type AnalyticsData } from "../analytics/ga/types.js";
 import { type PaymentService } from "../donate/types.js";
 import { initTgReflector } from "./reflector.js";
 import type { getDb } from "../db/index.js";
+import { trackRawUserLanguage } from "../monitoring/newrelic.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -161,6 +162,7 @@ export class TelegramBotModel {
     const prefix = new TelegramMessagePrefix(model.chatId);
 
     logger.debug(`${prefix.getPrefix()} Incoming message`);
+    this.trackUserLanguage(msg);
 
     // TODO enable with caching
     // if (await this.actions.ignore.runCondition(msg, model)) {
@@ -246,10 +248,16 @@ export class TelegramBotModel {
   }
 
   private handleCallbackQuery(msg: TgCallbackQuery, analytics: AnalyticsData): Promise<void> {
+    this.trackUserLanguage(msg);
     return this.actions.handleCallback(msg, analytics);
   }
 
   private handleCheckout(msg: TgCheckoutQuery, analytics: AnalyticsData): Promise<void> {
     return this.actions.handleCheckout(msg, analytics);
+  }
+
+  private trackUserLanguage(msg: TgMessage | TgCallbackQuery): void {
+    const rawLanguage = getRawUserLanguage(msg);
+    trackRawUserLanguage(rawLanguage);
   }
 }

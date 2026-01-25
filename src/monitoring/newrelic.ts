@@ -62,6 +62,12 @@ export const trackMimeType = (type: string, isSupported: boolean): void => {
   });
 };
 
+export const trackRawUserLanguage = (rawLanguage: string): void => {
+  newrelic.recordCustomEvent("UserMessageLanguage", {
+    rawLanguage,
+  });
+};
+
 type DonationActivityData = {
   activityType: "start" | "success";
   currency: Currency;

@@ -66,6 +66,11 @@ export abstract class SentryBase {
         "id",
         "",
       );
+      const requestUserLanguage = fetchPropFromUnknown<string>(
+        fetchPropFromUnknown(requestMessage, "from", {}),
+        "language_code",
+        "",
+      );
       const requestChatId = fetchPropFromUnknown<string>(
         fetchPropFromUnknown(requestMessage, "chat", {}),
         "id",
@@ -82,8 +87,9 @@ export abstract class SentryBase {
           chatId: requestChatId,
         },
         {
-          "tg.userId": requestUserId,
           "tg.chatId": requestChatId,
+          "tg.userId": requestUserId,
+          "ts.userLanguage": requestUserLanguage,
         },
         done,
       );
