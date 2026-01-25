@@ -5,7 +5,6 @@ import {
   getCurrentScope,
   withIsolationScope,
   setupFastifyErrorHandler,
-  consoleLoggingIntegration,
 } from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
@@ -23,11 +22,9 @@ export class SentryNodeClient extends SentryBase {
       dsn: this.sentryDsn,
       environment: this.nodeEnvironment,
       release: this.appVersion,
-      enableLogs: true,
       integrations: [
         // Add profiling
         nodeProfilingIntegration(),
-        consoleLoggingIntegration(),
       ],
 
       // Set tracesSampleRate to 1.0 to capture 100%
