@@ -3,6 +3,7 @@ import * as envy from "../env.js";
 import { Logger } from "../logger/index.js";
 import { run as runServer } from "./start.js";
 import { getHostName } from "../server/tunnel.js";
+import { prepareSentryInstance } from "../monitoring/sentry/index.js";
 
 const logger = new Logger("cluster");
 
@@ -16,7 +17,7 @@ const spawnInstance = (host: string, time: number): void => {
 
 export const run = async (): Promise<void> => {
   const launchTime = Date.now();
-
+  await prepareSentryInstance();
   const host = await getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken);
 
   let clusterSize = envy.clusterSize;
