@@ -86,7 +86,9 @@ export class WithAiProvider extends VoiceConverter {
         if (timeTotalMs > timeLimit) {
           logger.error(
             `${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`,
-            new Error("Voice recognition api took too long"),
+            new Error("Voice recognition api took too long", {
+              cause: { durationMs: timeTotalMs },
+            }),
           );
           return;
         }
