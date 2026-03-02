@@ -189,6 +189,7 @@ export class DonateAction extends GenericAction {
     return {
       text: isStars(currency) ? `${price} ${emoji}` : toCurrency(price, emoji),
       callback_data: btn.getDtoString(),
+      style: "danger",
     };
   }
 

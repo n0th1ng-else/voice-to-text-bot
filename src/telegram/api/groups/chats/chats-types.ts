@@ -17,6 +17,7 @@ const TgInlineKeyboardButtonSchema = z
     text: z.string(),
     callback_data: z.optional(z.string()),
     url: z.optional(z.string()),
+    style: z.optional(z.union([z.literal("primary"), z.literal("success"), z.literal("danger")])),
   })
   .describe("Telegram inline keyboard button schema");
 
