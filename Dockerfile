@@ -9,19 +9,19 @@ RUN apt-get update && apt-get --no-install-recommends install -y g++ make python
 ARG APP_DIR=/usr/src/app/
 
 RUN mkdir -p "$APP_DIR"
-WORKDIR $APP_DIR
+WORKDIR "$APP_DIR"
 
 RUN npm install -g pnpm@9
 COPY package.json pnpm-lock.yaml tsconfig.json $APP_DIR
 RUN npm pkg delete scripts.prepare
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false
 
-COPY ./assets $APP_DIR/assets
-COPY ./certs $APP_DIR/certs
-COPY ./file-temp $APP_DIR/file-temp
-COPY ./model-cache $APP_DIR/model-cache
-COPY ./src $APP_DIR/src
-COPY ./copy-files.ts $APP_DIR
+COPY ./assets "$APP_DIR/assets"
+COPY ./certs "$APP_DIR/certs"
+COPY ./file-temp "$APP_DIR/file-temp"
+COPY ./model-cache "$APP_DIR/model-cache"
+COPY ./src "$APP_DIR/src"
+COPY ./copy-files.ts "$APP_DIR"
 
 RUN pnpm run build
 
@@ -47,12 +47,14 @@ RUN mkdir -p "$APP_DIR"
 WORKDIR $APP_DIR
 
 RUN touch "$APP_DIR/.env"
-COPY --from=builder $APP_DIR/node_modules $APP_DIR/node_modules
-COPY --from=builder $APP_DIR/assets $APP_DIR/assets
-COPY --from=builder $APP_DIR/file-temp $APP_DIR/file-temp
-COPY --from=builder $APP_DIR/model-cache $APP_DIR/model-cache
-COPY --from=builder $APP_DIR/package.json $APP_DIR
-COPY --from=builder $APP_DIR/dist $APP_DIR/dist
+COPY --from=builder "$APP_DIR/node_modules" "$APP_DIR/node_modules"
+COPY --from=builder "$APP_DIR/assets" "$APP_DIR/assets"
+COPY --from=builder "$APP_DIR/file-temp" "$APP_DIR/file-temp"
+COPY --from=builder "$APP_DIR/model-cache" "$APP_DIR/model-cache"
+COPY --from=builder "$APP_DIR/package.json" "$APP_DIR"
+COPY --from=builder "$APP_DIR/dist" "$APP_DIR/dist"
+
+RUN chown -R node:node "$APP_DIR/file-temp" && chmod -R 775 "$APP_DIR/file-temp"
 
 USER node
 

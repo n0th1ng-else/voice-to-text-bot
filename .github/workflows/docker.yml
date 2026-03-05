@@ -42,8 +42,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Download AI model
-        run: pip install gdown && gdown ${{ secrets.WHISPER_MODEL_URL }} -O ./model-cache
+      #      Probably dont need anymore
+      #      - name: Download AI model
+      #        run: pip install gdown && gdown ${{ secrets.WHISPER_MODEL_URL }} -O ./model-cache
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0

@@ -19,7 +19,7 @@ export type SupportedEnvironment = {
     clientEmail: string;
     isTestEnv?: boolean;
   };
-  whisperApi: {
+  selfApi: {
     apiToken: string;
     baseUrl: string;
   };
@@ -64,9 +64,9 @@ const getVoiceConverterInstance = async (
           apiToken: environment.elevenLabsKey,
         });
       });
-    case "WHISPER_SELF":
-      return import("./whisperSelfHost.js").then(({ WhisperSelfHost }) => {
-        return new WhisperSelfHost(environment.whisperApi.baseUrl, environment.whisperApi.apiToken);
+    case "API_SELF":
+      return import("./APISelfHost.js").then(({ APISelfHost }) => {
+        return new APISelfHost(environment.selfApi.baseUrl, environment.selfApi.apiToken);
       });
     default:
       throw new Error("Voice recognition provider is not specified");

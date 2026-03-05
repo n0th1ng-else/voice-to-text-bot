@@ -8,18 +8,18 @@ import { Logger } from "../logger/index.js";
 import { getResponseErrorData } from "../server/error.js";
 import { unknownHasMessage, unknownHasText } from "../common/unknown.js";
 
-const logger = new Logger("whisper-api-recognition");
+const logger = new Logger("self-api-recognition");
 
 type ApiResponse = {
   text: string;
 };
 
-export class WhisperSelfHost extends APIVoiceConverter<ApiResponse> {
+export class APISelfHost extends APIVoiceConverter<ApiResponse> {
   private readonly apiToken: string;
   protected readonly url: string;
 
   constructor(baseUrl: string, token: string) {
-    super("Whisper.SelfHosted");
+    super("API.SelfHosted");
     this.apiToken = token;
     this.url = baseUrl;
   }
@@ -34,11 +34,11 @@ export class WhisperSelfHost extends APIVoiceConverter<ApiResponse> {
     logPrefix: string,
   ): Promise<string> {
     if (!this.apiToken) {
-      throw new Error("The api token is not provided");
+      logger.warn("The api token is not provided");
     }
 
     const duration = new TimeMeasure();
-    const url = `${this.url}/transcribe`;
+    const url = this.url;
 
     try {
       const language = convertLanguageCodeToISO(lang);
@@ -52,9 +52,11 @@ export class WhisperSelfHost extends APIVoiceConverter<ApiResponse> {
 
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.apiToken}`,
-        },
+        headers: this.apiToken
+          ? {
+              Authorization: `Bearer ${this.apiToken}`,
+            }
+          : {},
         body: form,
         duplex: "half",
         signal: AbortSignal.timeout(API_TIMEOUT_MS),
@@ -95,7 +97,7 @@ export class WhisperSelfHost extends APIVoiceConverter<ApiResponse> {
     } finally {
       const timeTotalMs = duration.getMs();
       logger.info(`${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`);
-      trackRecognitionTime("WHISPER_SELF", timeTotalMs);
+      trackRecognitionTime("API_SELF", timeTotalMs);
     }
   }
 
