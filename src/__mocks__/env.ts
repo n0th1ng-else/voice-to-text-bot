@@ -66,7 +66,7 @@ export const witAiApi = {
   },
 };
 
-export const whisperApi = {
+export const selfApi = {
   apiToken: "",
   baseUrl: "",
 };
