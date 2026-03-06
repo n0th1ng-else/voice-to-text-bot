@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { getRuntimeEngineType, isNode } from "./index.js";
 
-describe("engines", () => {
+describe("engines.index", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
