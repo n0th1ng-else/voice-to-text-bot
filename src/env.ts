@@ -68,8 +68,8 @@ export const witAiApi: { tokens: LanguageTokens } = {
 };
 
 export const selfApi = {
-  apiToken: process.env.WHISPER_API_TOKEN || "",
-  baseUrl: process.env.WHISPER_BASE_URL || "",
+  apiToken: process.env.STT_API_TOKEN || "",
+  baseUrl: process.env.STT_BASE_URL || "",
 };
 
 export const wtiAiTokens = process.env.WIT_AI_TOKENS || "";

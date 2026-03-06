@@ -78,6 +78,6 @@ export const donationLevels = {
 };
 
 export const VOICE_PROVIDERS: Record<ConverterType, VoiceConverterProvider> = {
-  main: "WITAI",
-  advanced: "11LABS",
+  main: "API_SELF",
+  advanced: "API_SELF",
 };

@@ -22,6 +22,8 @@ the application. Open the DNS settings and add two records:
 | A           | app.domain.name   | vps.server.ip.address | Main app endpoint |
 | A           | panel.domain.name | vps.server.ip.address | Cluster panel     |
 
+PRESS SAVE ON TOP OF THE PAGE
+
 ## SSL Connection
 
 - Go to http://vps.server.ip.address:3000 first and create a user.
@@ -32,6 +34,11 @@ the application. Open the DNS settings and add two records:
 3. Auto-https: Yes
 4. Provider: Let's encrypt
 5. Save
+
+If the panel does not open, test the new urls:
+
+- https://dnschecker.org/#A/app.domain.name
+- https://developers.google.com/speed/public-dns/cache
 
 # Project
 
@@ -54,9 +61,14 @@ Deploy from Docker
 
 ## Advanced
 
-Add replica
+Add healthcheck
 
-- Replicas: 2
+- Cluster settings -> Swarm settings
+- Test command: `["CMD-SHELL", "node -e \"fetch('http://localhost:3010/health').then(r => r.json()).then(j => process.exit(j.status === 'ONLINE' ? 0 : 1)).catch(() => process.exit(1))\""]`
+- Interval: 60000000000 (1 minute)
+- Timeout: 1000000000 (1 second)
+- Start Period: 60000000000 (1 minute)
+- Retries: 3
 
 ## VTT Service
 
