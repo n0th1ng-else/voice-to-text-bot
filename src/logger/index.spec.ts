@@ -28,7 +28,7 @@ let logLevel: string | undefined = undefined;
 
 const testMessage = "some message";
 
-describe("Logger", () => {
+describe("logger.index", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

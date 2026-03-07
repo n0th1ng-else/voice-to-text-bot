@@ -1,7 +1,7 @@
 import * as envy from "../env.js";
 import { BotServer } from "./bot-server.js";
 import { httpsOptions } from "../../certs/index.js";
-import { getVoiceConverterInstances } from "../recognition/index.js";
+import { getVoiceConverterInstances, getVoiceProviders } from "../recognition/index.js";
 import { getDb } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
 import { TelegramBotModel } from "../telegram/bot.js";
@@ -14,7 +14,6 @@ import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import { type BotServerModel, HealthStatus } from "./types.js";
-import { VOICE_PROVIDERS } from "../const.js";
 import { trackApplicationErrors, trackApplicationHealth } from "../monitoring/newrelic.js";
 import { requestHealthData } from "./api.js";
 import { getRuntimeEngineType } from "../engines/index.js";
@@ -38,11 +37,8 @@ export const prepareInstance = async (threadId: number): Promise<BotServerModel>
     envy.enableSnapshotCapture,
   );
 
-  const converters = await getVoiceConverterInstances(
-    VOICE_PROVIDERS.main,
-    VOICE_PROVIDERS.advanced,
-    envy,
-  );
+  const providers = getVoiceProviders(envy.providers);
+  const converters = await getVoiceConverterInstances(providers.main, providers.advanced, envy);
 
   const db = getDb(
     [

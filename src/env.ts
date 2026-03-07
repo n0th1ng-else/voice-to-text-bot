@@ -68,8 +68,8 @@ export const witAiApi: { tokens: LanguageTokens } = {
 };
 
 export const selfApi = {
-  apiToken: process.env.WHISPER_API_TOKEN || "",
-  baseUrl: process.env.WHISPER_BASE_URL || "",
+  apiToken: process.env.STT_API_TOKEN || "",
+  baseUrl: process.env.STT_BASE_URL || "",
 };
 
 export const wtiAiTokens = process.env.WIT_AI_TOKENS || "";
@@ -95,3 +95,8 @@ export const elevenLabsKey = process.env.ELEVENLABS_API_KEY || "";
 export const enableSnapshotCapture = process.env.ENABLE_SNAPSHOT_CAPTURE === "true";
 
 export const useMTProto = process.env.USE_MTPROTO === "true";
+
+export const providers = {
+  main: process.env.MAIN_PROVIDER || "",
+  advanced: process.env.ADVANCED_PROVIDER || "",
+};
