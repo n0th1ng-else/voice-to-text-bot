@@ -31,6 +31,7 @@ export class WithAiProvider extends VoiceConverter {
 
   public async transformToText(
     fileLink: string,
+    fileDuration: number,
     lang: LanguageCode,
     logData: ConverterMeta,
     isLocalFile: boolean,
@@ -46,12 +47,13 @@ export class WithAiProvider extends VoiceConverter {
         cause: { lang },
       });
     }
-    const result = await WithAiProvider.recognise(bufferData, token, logData.prefix);
+    const result = await WithAiProvider.recognise(bufferData, fileDuration, token, logData.prefix);
     return result;
   }
 
   private static async recognise(
     data: Buffer<ArrayBufferLike>,
+    fileDuration: number,
     authToken: string,
     logPrefix: string,
   ): Promise<string> {
@@ -92,8 +94,11 @@ export class WithAiProvider extends VoiceConverter {
           );
           return;
         }
-        logger.info(`${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`);
-        trackRecognitionTime("WITAI", timeTotalMs);
+
+        const perSec = trackRecognitionTime("WITAI", timeTotalMs, fileDuration);
+        logger.info(
+          `${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish. Recognition speed: ${perSec}ms per sec`,
+        );
       });
   }
 

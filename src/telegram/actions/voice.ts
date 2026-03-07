@@ -81,6 +81,7 @@ export class VoiceAction extends GenericAction {
         return Promise.all([
           this.converters[converter].transformToText(
             fileLink,
+            model.voiceDuration,
             lang,
             {
               fileId,

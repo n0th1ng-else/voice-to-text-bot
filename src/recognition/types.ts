@@ -23,6 +23,7 @@ export abstract class VoiceConverter {
 
   public abstract transformToText(
     fileLink: string,
+    fileDuration: number,
     lang: LanguageCode,
     logData: ConverterMeta,
     isLocalFile: boolean,

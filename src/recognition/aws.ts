@@ -51,6 +51,7 @@ export class AWSProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
+    fileDuration: number,
     _lang: LanguageCode,
     logData: ConverterMeta,
     isLocalFile: boolean,
@@ -91,7 +92,7 @@ export class AWSProvider extends VoiceConverter {
       .then((translationData) => this.cleanStorage(translationData as TranscriptionData, name))
       .then((text) => {
         logger.info(`Job ${name} completed`);
-        trackRecognitionTime("AWS", duration.getMs());
+        trackRecognitionTime("AWS", duration.getMs(), fileDuration);
         return text;
       });
   }

@@ -33,6 +33,7 @@ export class GoogleProvider extends VoiceConverter {
 
   public transformToText(
     fileLink: string,
+    fileDuration: number,
     lang: LanguageCode,
     opts: ConverterMeta,
     isLocalFile: boolean,
@@ -59,7 +60,7 @@ export class GoogleProvider extends VoiceConverter {
       .then(([translationData]) => this.unpackTranscription(translationData))
       .then((text) => {
         logger.info(`Job ${Logger.y(name)} completed`);
-        trackRecognitionTime("GOOGLE", duration.getMs());
+        trackRecognitionTime("GOOGLE", duration.getMs(), fileDuration);
         return text;
       });
   }
