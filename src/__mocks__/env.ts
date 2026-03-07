@@ -96,3 +96,8 @@ export const elevenLabsKey = "";
 export const enableSnapshotCapture = false;
 
 export const useMTProto = true;
+
+export const providers = {
+  main: "",
+  advanced: "",
+};

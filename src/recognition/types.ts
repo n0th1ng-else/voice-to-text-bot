@@ -3,8 +3,7 @@ import { Logger } from "../logger/index.js";
 
 const logger = new Logger("voice-converter");
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const VoiceConverterProviderSchema = z
+export const VoiceConverterProviderSchema = z
   .union([
     z.literal("WITAI"),
     z.literal("AWS"),
@@ -13,7 +12,6 @@ const VoiceConverterProviderSchema = z
     z.literal("11LABS"),
     z.literal("API_SELF"),
   ])
-  .catch("WITAI")
   .describe("Validation schema for the Voice converter providers we support");
 
 export type VoiceConverterProvider = z.infer<typeof VoiceConverterProviderSchema>;

@@ -2,9 +2,11 @@ import {
   type LanguageTokens,
   type VoiceConverter,
   type VoiceConverterProvider,
+  VoiceConverterProviderSchema,
   type VoiceConverters,
 } from "./types.js";
 import { getWitAILanguageTokens } from "./witai/parser.js";
+import { VOICE_PROVIDERS } from "../const.js";
 
 // Subset of the env.js file
 export type SupportedEnvironment = {
@@ -81,5 +83,27 @@ export const getVoiceConverterInstances = async (
   return {
     main: await getVoiceConverterInstance(mainProvider, environment),
     advanced: await getVoiceConverterInstance(advancedProvider, environment),
+  };
+};
+
+const parseProvider = (
+  provider: string,
+  fallback: VoiceConverterProvider,
+): VoiceConverterProvider => {
+  try {
+    const parsed = VoiceConverterProviderSchema.parse(provider);
+    return parsed;
+  } catch {
+    return fallback;
+  }
+};
+
+export const getVoiceProviders = (env: {
+  main: string;
+  advanced: string;
+}): { main: VoiceConverterProvider; advanced: VoiceConverterProvider } => {
+  return {
+    main: parseProvider(env.main, VOICE_PROVIDERS.main),
+    advanced: parseProvider(env.advanced, VOICE_PROVIDERS.advanced),
   };
 };
