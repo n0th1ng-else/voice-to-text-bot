@@ -89,3 +89,9 @@ export const trackDonation = (data: DonationActivityData, userId?: number): void
     ...data,
   });
 };
+
+export const trackUnknownRoute = (route: string): void => {
+  newrelic.recordCustomEvent("UnknownRoute", {
+    route,
+  });
+};

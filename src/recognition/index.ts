@@ -67,8 +67,8 @@ const getVoiceConverterInstance = async (
         });
       });
     case "API_SELF":
-      return import("./APISelfHost.js").then(({ APISelfHost }) => {
-        return new APISelfHost(environment.selfApi.baseUrl, environment.selfApi.apiToken);
+      return import("./apiSelfHost.js").then(({ ApiSelfHost }) => {
+        return new ApiSelfHost(environment.selfApi.baseUrl, environment.selfApi.apiToken);
       });
     default:
       throw new Error("Voice recognition provider is not specified");
