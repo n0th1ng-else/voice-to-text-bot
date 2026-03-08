@@ -27,9 +27,19 @@ export const trackVoiceDuration = (
 export const trackRecognitionTime = (
   metric: VoiceConverterProvider,
   durationMSec: number,
-): void => {
-  const metricName = `VoiceRecognitionProviders/${formatMetric(metric)}/RecognitionTimeMs`;
-  newrelic.recordMetric(metricName, durationMSec);
+  voiceLengthSec: number,
+): number => {
+  const metricNameDuration = `VoiceRecognitionProviders/${formatMetric(metric)}/RecognitionTimeMs`;
+  newrelic.recordMetric(metricNameDuration, durationMSec);
+
+  if (!voiceLengthSec) {
+    return 0;
+  }
+
+  const ratioPerSec = Math.ceil(durationMSec / voiceLengthSec);
+  const metricNameRatio = `VoiceRecognitionProviders/${formatMetric(metric)}/RecognitionTimePerSecondMs`;
+  newrelic.recordMetric(metricNameRatio, ratioPerSec);
+  return ratioPerSec;
 };
 
 export const trackFullRecognitionTime = (durationMSec: number): void => {

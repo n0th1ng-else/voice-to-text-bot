@@ -8,6 +8,7 @@ const logger = new Logger("api-base-recognition");
 export abstract class APIVoiceConverter<Res> extends VoiceConverter {
   public async transformToText(
     fileLink: string,
+    fileDuration: number,
     lang: LanguageCode,
     logData: ConverterMeta,
     isLocalFile: boolean,
@@ -22,6 +23,7 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
         data: bufferData,
         name,
         type: "audio/wav",
+        duration: fileDuration,
       },
       lang,
       logData.prefix,
@@ -34,6 +36,7 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
       data: Buffer<ArrayBufferLike>;
       name: string;
       type: "audio/wav";
+      duration: number;
     },
     lang: LanguageCode,
     logPrefix: string,

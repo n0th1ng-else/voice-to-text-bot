@@ -37,6 +37,7 @@ export class WhisperProvider extends VoiceConverter {
 
   public async transformToText(
     fileLink: string,
+    fileDuration: number,
     lang: LanguageCode,
     logData: ConverterMeta,
     isLocalFile: boolean,
@@ -60,7 +61,7 @@ export class WhisperProvider extends VoiceConverter {
       whisperEnableGpu,
     );
     await deleteFileIfExists(filePath);
-    trackRecognitionTime("WHISPER", duration.getMs());
+    trackRecognitionTime("WHISPER", duration.getMs(), fileDuration);
     return text;
   }
 }

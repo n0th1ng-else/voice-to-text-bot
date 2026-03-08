@@ -29,6 +29,7 @@ export class APISelfHost extends APIVoiceConverter<ApiResponse> {
       data: Buffer<ArrayBufferLike>;
       name: string;
       type: "audio/wav";
+      duration: number;
     },
     lang: LanguageCode,
     logPrefix: string,
@@ -83,6 +84,12 @@ export class APISelfHost extends APIVoiceConverter<ApiResponse> {
         throw requestError;
       }
 
+      const timeTotalMs = duration.getMs();
+      const perSec = trackRecognitionTime("API_SELF", timeTotalMs, file.duration);
+      logger.info(
+        `${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish. Recognition speed: ${perSec}ms per sec`,
+      );
+
       return recognition.text;
     } catch (err) {
       if (err instanceof APIVoiceConverterError) {
@@ -94,10 +101,6 @@ export class APISelfHost extends APIVoiceConverter<ApiResponse> {
         unknownHasMessage(err) ? err.message : undefined,
       ).setUrl(url);
       throw requestError;
-    } finally {
-      const timeTotalMs = duration.getMs();
-      logger.info(`${logPrefix} Voice recognition api took ${timeTotalMs}ms to finish`);
-      trackRecognitionTime("API_SELF", timeTotalMs);
     }
   }
 

@@ -27,6 +27,7 @@ export class ElevenLabsProvider extends VoiceConverter {
 
   public async transformToText(
     fileLink: string,
+    fileDuration: number,
     lang: LanguageCode,
     logData: ConverterMeta,
     isLocalFile: boolean,
@@ -37,10 +38,14 @@ export class ElevenLabsProvider extends VoiceConverter {
     const rawWav = await getWavBuffer(fileLink, isLocalFile);
 
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
-    return this.recognise(rawWav, lang);
+    return this.recognise(rawWav, fileDuration, lang);
   }
 
-  private async recognise(buffer: Buffer<ArrayBufferLike>, lang: LanguageCode): Promise<string> {
+  private async recognise(
+    buffer: Buffer<ArrayBufferLike>,
+    fileDuration: number,
+    lang: LanguageCode,
+  ): Promise<string> {
     const duration = new TimeMeasure();
 
     const recognition = await this.client.speechToText.convert(
@@ -56,7 +61,7 @@ export class ElevenLabsProvider extends VoiceConverter {
       },
     );
 
-    trackRecognitionTime("11LABS", duration.getMs());
+    trackRecognitionTime("11LABS", duration.getMs(), fileDuration);
     if ("text" in recognition) {
       return recognition.text;
     }
