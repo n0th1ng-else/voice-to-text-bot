@@ -14,7 +14,7 @@ type ApiResponse = {
   text: string;
 };
 
-export class APISelfHost extends APIVoiceConverter<ApiResponse> {
+export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
   private readonly apiToken: string;
   protected readonly url: string;
 
@@ -49,7 +49,7 @@ export class APISelfHost extends APIVoiceConverter<ApiResponse> {
 
       // @ts-expect-error Type mismatch
       const fileBlob = new Blob([file.data], { type: file.type });
-      form.append("file", fileBlob, file.name);
+      form.append("file", fileBlob, `${file.name}.wav`);
 
       const response = await fetch(url, {
         method: "POST",

@@ -61,7 +61,7 @@ Deploy from Docker
 
 ## Advanced
 
-Add healthcheck
+Add healthcheck (TO BE DECIDED)
 
 - Cluster settings -> Swarm settings
 - Test command: `["CMD-SHELL", "node -e \"fetch('http://localhost:3010/health').then(r => r.json()).then(j => process.exit(j.status === 'ONLINE' ? 0 : 1)).catch(() => process.exit(1))\""]`
@@ -78,7 +78,7 @@ Deploy from Docker
 
 - Source: Git
 - Repository: https://github.com/n0th1ng-else/parakeet-tdt-0.6b-v3-fastapi-openai.git
-- Branch: main
+- Branch: ~~main~~ **skip-wav-convertion**
 - Docker file: Dockerfile.cpu
 
 ## Advanced

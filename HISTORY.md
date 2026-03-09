@@ -280,3 +280,63 @@ the donation links in the bot's menu. I do not promote donating but I really app
 useful. VoiceToText bot is really small application, but you can only guess how difficult to maintain it and keep it
 alive (almost-)24/7. 4 years in the Business and the user base, 170000 users installed and tried at least once.
 There are people and groups who use the bot every day. Amazing achievement!
+
+### Switching to pnpm and modernizing the stack
+
+In June 2024, I decided to modernize the project's build process. I switched from npm to `pnpm` to speed up
+installations and save disk space. Around the same time, I started using the built-in NodeJS `dotenv` feature,
+reducing dependency on external packages. It's all about keeping the codebase lean and fast. Later, I also
+switched our testing framework from Jest to `Vitest`- it's much faster and better suited for our modern ESM setup.
+
+### The Whisper experiment
+
+I've been looking into ways to improve voice recognition without relying solely on external APIs.
+In September 2024, I started experimenting with `Whisper`. The challenge with Whisper is its resource consumption—
+it's quite heavy for the small instances I use. I had to implement a custom C++ addon and figure out how to
+manage the model files on the file system. It's still a work in progress, but it's a huge step towards a more
+self-hosted and robust recognition engine.
+
+### Telegram Stars and Donations
+
+Telegram introduced "Stars" as a new way to handle payments within the platform. I thought it would be a great
+fit for our donation system. In March 2025, I implemented support for Stars, allowing users to support the bot
+directly through Telegram's native currency. It's much smoother than jumping through external payment links,
+and I hope it makes it easier for people to contribute if they find the bot useful.
+
+### Bypassing the 20MB limit with MTProto
+
+One of the longest-standing issues was the 20MB file size limit imposed by the Telegram Bot API. If someone sent
+a very long voice message or a large video, the bot simply couldn't download it. To fix this, I had to implement
+a custom `MTProto` client. This allows the bot to talk directly to Telegram's servers just like a regular user
+app, bypassing the Bot API's download limits. Now, the bot can handle files much larger than before.
+
+### New Recognition Providers: ElevenLabs and beyond
+
+While Wit.ai has been our main engine for a long time, I wanted to provide more options, especially for
+"premium" recognition quality. In early 2025, I added support for `ElevenLabs`. It provides amazing accuracy,
+though it's not free. This led me to start working on a proper subscription system, so I can offer these
+high-quality providers to users who are willing to help cover the costs.
+One small but important optimization I added recently: the bot now avoids redundant WAV conversions if the
+file is already in a compatible format, which speeds up the response time slightly.
+
+### Hunting the memory leaks and Sentry floods
+
+As the bot stayed online for longer periods, I started noticing some weird memory issues. Turns out, Axios
+errors were holding onto the entire request buffer—which can be megabytes!—preventing the garbage collector
+from doing its job. I fixed this by serializing the error and explicitly deleting the config object.
+I also had to deal with Sentry being flooded by "EWITAI canceled" errors. These are mostly harmless but
+they were drowning out real issues. Now I only report 10% of them, keeping our error tracking clean and useful.
+
+### Observability with New Relic
+
+As the bot grows, it becomes harder to track what's going on just by looking at text logs. In mid-2025,
+I integrated `New Relic` to get better insights into our performance and error rates. I now track things
+like voice recognition duration and donation events in real-time. This helps me identify bottlenecks and
+ensure the bot stays healthy as more people use it.
+
+### 500+ commits and still going!
+
+We've recently passed the 500-commit mark in the repository. It's been almost 6 years since the first commit,
+and the bot is still evolving. I've spent a lot of time recently on "quality of life" improvements—fixing
+Sonar issues, removing old dependency injection code, and simplifying the architecture. It might not be
+visible to users, but it makes the bot much easier to maintain and faster to update.
