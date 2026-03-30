@@ -7,7 +7,7 @@ import {
   type LanguageCode,
   type LanguageTokens,
 } from "../types.js";
-import { getWavBuffer } from "../../ffmpeg/index.js";
+import { getAudioBuffer } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
@@ -39,7 +39,7 @@ export class WithAiProvider extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const bufferData = await getWavBuffer(fileLink, isLocalFile);
+    const bufferData = await getAudioBuffer(fileLink, isLocalFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const token = this.getApiToken(lang);
     if (!token) {

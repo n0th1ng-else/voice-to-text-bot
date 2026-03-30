@@ -1,11 +1,20 @@
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { addAttachment } from "../monitoring/sentry/index.js";
 import { Logger } from "../logger/index.js";
-import { getWavBuffer } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 
 const logger = new Logger("api-base-recognition");
 
 export abstract class APIVoiceConverter<Res> extends VoiceConverter {
+  protected readonly useRawFile: boolean;
+  protected readonly url: string;
+
+  protected constructor(name: string, baseUrl: string, useRawFile: boolean) {
+    super(name);
+    this.useRawFile = useRawFile;
+    this.url = baseUrl;
+  }
+
   public async transformToText(
     fileLink: string,
     fileDuration: number,
@@ -16,7 +25,7 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const bufferData = await getWavBuffer(fileLink, isLocalFile);
+    const bufferData = await getAudioBuffer(fileLink, isLocalFile, !this.useRawFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const result = await this.recognise(
       {

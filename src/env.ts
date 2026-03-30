@@ -70,6 +70,7 @@ export const witAiApi: { tokens: LanguageTokens } = {
 export const selfApi = {
   apiToken: process.env.STT_API_TOKEN || "",
   baseUrl: process.env.STT_BASE_URL || "",
+  useRawFile: process.env.STT_RAW_FILE === "true",
 };
 
 export const wtiAiTokens = process.env.WIT_AI_TOKENS || "";

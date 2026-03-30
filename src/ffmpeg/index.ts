@@ -49,6 +49,7 @@ const downloadAsStream = (url: string): Promise<Readable> =>
 
 const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
   try {
+    logger.debug("Converting 🎶 Voice into wav 💿");
     const file = await convertFileToWav(fsFilePath);
     logger.info(`WAV 🎶 file location: ${Logger.g(file)}`);
     await deleteFileIfExists(fsFilePath);
@@ -59,23 +60,31 @@ const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
   }
 };
 
-export const getWavFilePath = async (fileLink: string, isLocalFile: boolean): Promise<string> => {
+const getRawFilePath = async (fileLink: string, isLocalFile: boolean): Promise<string> => {
   if (isLocalFile) {
-    return await getWavFilePathFromLocal(fileLink);
+    return fileLink;
   }
-  logger.debug("Converting 🎶 Voice into wav 💿");
+  logger.debug("Saving voice file to the filesystem...");
   const originalFileName = fileLink.split("/").at(-1) ?? "file.ogg";
   const stream = await downloadAsStream(fileLink);
   const pathToFile = await saveStreamToFile(stream, originalFileName, true);
   logger.info(`Telegram file location: ${Logger.g(pathToFile)}`);
+  return pathToFile;
+};
+
+export const getWavFilePath = async (fileLink: string, isLocalFile: boolean): Promise<string> => {
+  const pathToFile = await getRawFilePath(fileLink, isLocalFile);
   return await getWavFilePathFromLocal(pathToFile);
 };
 
-export const getWavBuffer = async (
+export const getAudioBuffer = async (
   fileLink: string,
   isLocalFile: boolean,
+  shouldConvertToWav = true,
 ): Promise<Buffer<ArrayBufferLike>> => {
-  const filename = await getWavFilePath(fileLink, isLocalFile);
+  const filename = shouldConvertToWav
+    ? await getWavFilePath(fileLink, isLocalFile)
+    : await getRawFilePath(fileLink, isLocalFile);
   const buffer = await readFileIntoBuffer(filename);
   await deleteFileIfExists(filename);
   return buffer;

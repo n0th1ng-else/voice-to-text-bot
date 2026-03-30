@@ -16,12 +16,10 @@ type ApiResponse = {
 
 export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
   private readonly apiToken: string;
-  protected readonly url: string;
 
-  constructor(baseUrl: string, token: string) {
-    super("API.SelfHosted");
+  constructor(baseUrl: string, token: string, useRawFile: boolean) {
+    super("API.SelfHosted", baseUrl, useRawFile);
     this.apiToken = token;
-    this.url = baseUrl;
   }
 
   protected async recognise(
@@ -49,7 +47,9 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
 
       // @ts-expect-error Type mismatch
       const fileBlob = new Blob([file.data], { type: file.type });
-      form.append("file", fileBlob, `${file.name}.wav`);
+      const fileName =
+        !this.useRawFile && !file.name.endsWith(".wav") ? `${file.name}.wav` : file.name;
+      form.append("file", fileBlob, fileName);
 
       const response = await fetch(url, {
         method: "POST",

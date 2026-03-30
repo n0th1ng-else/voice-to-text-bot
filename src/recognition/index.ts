@@ -24,6 +24,7 @@ export type SupportedEnvironment = {
   selfApi: {
     apiToken: string;
     baseUrl: string;
+    useRawFile: boolean;
   };
 };
 
@@ -68,7 +69,11 @@ const getVoiceConverterInstance = async (
       });
     case "API_SELF":
       return import("./apiSelfHost.js").then(({ ApiSelfHost }) => {
-        return new ApiSelfHost(environment.selfApi.baseUrl, environment.selfApi.apiToken);
+        return new ApiSelfHost(
+          environment.selfApi.baseUrl,
+          environment.selfApi.apiToken,
+          environment.selfApi.useRawFile,
+        );
       });
     default:
       throw new Error("Voice recognition provider is not specified");

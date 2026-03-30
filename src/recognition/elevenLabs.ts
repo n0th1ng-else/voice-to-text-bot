@@ -2,7 +2,7 @@ import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter, type ConverterMeta, type LanguageCode } from "./types.js";
 import { addAttachment } from "../monitoring/sentry/index.js";
-import { getWavBuffer } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { API_TIMEOUT_MS } from "../const.js";
 import { TimeMeasure } from "../common/timer.js";
@@ -35,7 +35,7 @@ export class ElevenLabsProvider extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const rawWav = await getWavBuffer(fileLink, isLocalFile);
+    const rawWav = await getAudioBuffer(fileLink, isLocalFile);
 
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     return this.recognise(rawWav, fileDuration, lang);

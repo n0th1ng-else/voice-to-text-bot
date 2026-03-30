@@ -2,7 +2,7 @@ import { v1 } from "@google-cloud/speech";
 import type { google } from "@google-cloud/speech/build/protos/protos.js";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { getWavBuffer } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
 
@@ -42,7 +42,7 @@ export class GoogleProvider extends VoiceConverter {
     logger.info(`Starting process for ${Logger.y(name)}`);
     const duration = new TimeMeasure();
 
-    return getWavBuffer(fileLink, isLocalFile)
+    return getAudioBuffer(fileLink, isLocalFile)
       .then((bufferData) => {
         logger.info(`Start converting ${Logger.y(name)}`);
         return this.service.recognize({
