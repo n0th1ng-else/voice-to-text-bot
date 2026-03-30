@@ -322,6 +322,7 @@ export const getConverterOptions = (): SupportedEnvironment => {
     selfApi: {
       apiToken: "whisper-auth-token",
       baseUrl: "https://api.whisper-self.com",
+      useRawFile: false,
     },
   };
 };

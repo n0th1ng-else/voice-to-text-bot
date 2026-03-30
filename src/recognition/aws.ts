@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
-import { getWavBuffer } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
@@ -98,7 +98,7 @@ export class AWSProvider extends VoiceConverter {
   }
 
   private processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
-    return getWavBuffer(fileLink, isLocalFile)
+    return getAudioBuffer(fileLink, isLocalFile)
       .then((file) => this.uploadToS3(name, file))
       .then((info) => this.convertToText(name, info.Location))
       .then((info) => this.getJobWithDelay(name, info));
