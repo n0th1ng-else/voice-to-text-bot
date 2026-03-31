@@ -36,17 +36,10 @@ export const getMTProtoApi = (appId: number, appHash: string, apiToken: string):
       if (!isInitialized) {
         throw new Error("EMTPROTO not initialized");
       }
-      const ctrl = new AbortController();
-
-      const timeout = setTimeout(() => {
-        ctrl.abort(new Error("EMTPROTO Request timeout"));
-      }, API_TIMEOUT_MS);
 
       await client.downloadToFile(toFilename, fileId, {
-        abortSignal: ctrl.signal,
+        abortSignal: AbortSignal.timeout(API_TIMEOUT_MS),
       });
-
-      clearTimeout(timeout);
 
       return toFilename;
     },

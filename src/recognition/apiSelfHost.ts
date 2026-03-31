@@ -20,6 +20,9 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
   constructor(baseUrl: string, token: string, useRawFile: boolean) {
     super("API.SelfHosted", baseUrl, useRawFile);
     this.apiToken = token;
+    if (!this.apiToken) {
+      logger.warn("The api token is not provided");
+    }
   }
 
   protected async recognise(
@@ -32,10 +35,6 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
     lang: LanguageCode,
     logPrefix: string,
   ): Promise<string> {
-    if (!this.apiToken) {
-      logger.warn("The api token is not provided");
-    }
-
     const duration = new TimeMeasure();
     const url = this.url;
 

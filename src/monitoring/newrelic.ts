@@ -95,3 +95,7 @@ export const trackUnknownRoute = (route: string): void => {
     route,
   });
 };
+
+export const trackFileDownload = (type: "api" | "mtproto"): void => {
+  newrelic.incrementMetric(`FileDownloadType/${formatMetric(type)}`);
+};
