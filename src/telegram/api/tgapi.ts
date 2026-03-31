@@ -4,6 +4,7 @@ import { TelegramPaymentsApi } from "./groups/payments/payments-api.js";
 import { TelegramUpdatesApi } from "./groups/updates/updates-api.js";
 import { TelegramChatsApi } from "./groups/chats/chats-api.js";
 import { getMTProtoApi, type TgProto } from "./tgMTProtoApi.js";
+import { trackFileDownload } from "../../monitoring/newrelic.js";
 import type { ChatId, FileId } from "./core.js";
 
 export const TELEGRAM_API_MAX_MESSAGE_SIZE = 4096;
@@ -44,13 +45,21 @@ export class TelegramApi {
     toFilename: string,
     fileId: FileId,
     chatId: ChatId,
-  ): Promise<[string, boolean]> {
+  ): Promise<[string, boolean] | [string, boolean, unknown]> {
     if (this.useMTProto && this.proto.isInitialized()) {
-      await this.proto.downloadFile(toFilename, fileId);
-      return [toFilename, true];
+      try {
+        await this.proto.downloadFile(toFilename, fileId);
+        trackFileDownload("mtproto");
+        return [toFilename, true];
+      } catch (err) {
+        const fileUrl = await this.chats.getFile(fileId, chatId);
+        trackFileDownload("api");
+        return [fileUrl, false, err];
+      }
     }
 
     const fileUrl = await this.chats.getFile(fileId, chatId);
+    trackFileDownload("api");
     return [fileUrl, false];
   }
 

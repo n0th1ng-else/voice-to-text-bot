@@ -18,8 +18,8 @@ importers:
         specifier: 4.5.5
         version: 4.5.5(encoding@0.1.13)
       '@mtcute/node':
-        specifier: 0.27.6
-        version: 0.27.6(ws@8.18.3)
+        specifier: 0.29.4
+        version: 0.29.4(ws@8.18.3)
       '@ngrok/ngrok':
         specifier: 1.7.0
         version: 1.7.0
@@ -993,25 +993,22 @@ packages:
   '@fastify/proxy-addr@5.0.0':
     resolution: {integrity: sha512-37qVVA1qZ5sgH7KpHkkC4z9SK6StIsIcOmpjvMPXNb3vx2GQxhZocogVYbr2PbbeLCQxYIPDok307xEvRZOzGA==}
 
-  '@fuman/io@0.0.17':
-    resolution: {integrity: sha512-VmMnfHtXzBfEddEfptn/oYshUzWqW2XUkdVnwKuHWphEQTQZrOWxC7G12FI9U2EhEYt4nRdrUTYk65U8GVJWYw==}
+  '@fuman/io@0.0.19':
+    resolution: {integrity: sha512-B+2n3GVa9PCYMJ9xfsdXUlUV9yXO4gKLYfxm815PeJ+MGOw5TbEp166drRmBq1AtxVnP0efy6Oz9rYpKVODgow==}
 
-  '@fuman/net@0.0.17':
-    resolution: {integrity: sha512-x/kK3kWQ+gy5rfsoS6QVCsodh9n/XJeM3c6m1YHPUiQ0gWWQd4CC1bcQ/rh2UHh9DQyJJeWjCQXWH2xmsVCcFQ==}
+  '@fuman/net@0.0.19':
+    resolution: {integrity: sha512-yISM+JcZEWBpBYn0v2mUY/Zst4SsicTRaVTvRkVhMiZhgMzdXalfvRwRV/vsgwwL31bntwowCTDW4iilCJLbXg==}
 
-  '@fuman/node@0.0.17':
-    resolution: {integrity: sha512-XXRlJthuCnJBnIrg/tZcqCfv/cPuXuNOVUN521oJgKrW8FyFmt+lAt2MlYw3TROumGNRMtvn3ySjdQRpBT2sLw==}
+  '@fuman/node@0.0.19':
+    resolution: {integrity: sha512-1VNTBb47yrN5BzuXiP4t6An7mDPklH5N+vUtkeL3XATK+xWbtlQsSsU244T7iqGurmDpYrLM9kIUjdMFm8OhDw==}
     peerDependencies:
       ws: ^8.18.1
     peerDependenciesMeta:
       ws:
         optional: true
 
-  '@fuman/utils@0.0.15':
-    resolution: {integrity: sha512-3H3WzkfG7iLKCa/yNV4s80lYD4yr5hgiNzU13ysLY2BcDqFjM08XGYuLd5wFVp4V8+DA/fe8gIDW96To/JwDyA==}
-
-  '@fuman/utils@0.0.17':
-    resolution: {integrity: sha512-hy1Xu1146nOspVam8FC6p4yakb1FV1V3KrS85RzcHiK7AccFKR43Fgtv8exC8Ybsw6MtMU+MRNyaPqVhA+7TsA==}
+  '@fuman/utils@0.0.19':
+    resolution: {integrity: sha512-4qVrZ9AjKYztLJsNr1Tp7kL48b22dvVLN1iVW+Me8ZSQ0ILN0qknoxjsczVPReF7+GDWgknNxR2l6ggrA4SZyw==}
 
   '@google-cloud/common@3.10.0':
     resolution: {integrity: sha512-XMbJYMh/ZSaZnbnrrOFfR/oQrb0SxG4qh6hDisWCoEbFcBHV0qHQo4uXfeMCzolx2Mfkh6VDaOGg+hyJsmxrlw==}
@@ -1239,29 +1236,26 @@ packages:
     resolution: {integrity: sha512-bndDP83naYYkfayr/qhBHMhk0YGwS1iv6vaEGcr0SQbO0IZtbOPqjKjds/WcG+bJA+1T5vCx6kprKOzn5Bg+Vw==}
     engines: {node: '>=18'}
 
-  '@mtcute/core@0.27.6':
-    resolution: {integrity: sha512-OqjQ2hchF15yJAjcAgBuWx4RCnvMED0P3kiUfU3EsDMMIJlh8TgOgm0QspIda/Uz7icZ5+pi0rHyCYblw2MMKw==}
+  '@mtcute/core@0.29.4':
+    resolution: {integrity: sha512-dEbuKvJp53jy533lXICd3c93IbL5iM5gi70lqzPtnS75MpBmufmMeKJqUEWsTXUmps3U6epmczCCbVz4+uweEA==}
 
-  '@mtcute/file-id@0.27.6':
-    resolution: {integrity: sha512-ZSPxbGjS6YdcZv4xW0zHJ/iR28nEBisG3G6gDTwVS4gU51SJ4vlGcwGjF1uLyEeuGGbPFemQHLCP6CMSzqMRvA==}
+  '@mtcute/file-id@0.29.0':
+    resolution: {integrity: sha512-kfNFKjdfFoo9YIl823EJ068u0djgK6MsqfIHIcb6iwmKOxnCFTLRvBGnJUaO+SbOejg63Tz5lzQxKnt03kEV6A==}
 
-  '@mtcute/html-parser@0.27.6':
-    resolution: {integrity: sha512-zxTuT0nv0CBR4qy7KyKB9vGQ++DxeiofKJEwHFSj5oG/7qUARm21G5GZaVlel/v7oRzx6V3u9mKDzdlbv8BcxA==}
+  '@mtcute/html-parser@0.29.4':
+    resolution: {integrity: sha512-dW3vIoUqeUJuKnCLDjNnmEiXREATtduv7l03p3tddlNS+bzDRmNDKFt+tB5uFqpeg11TX83M51Rz0TURjzOf+g==}
 
-  '@mtcute/markdown-parser@0.27.6':
-    resolution: {integrity: sha512-YB4HXeDGQi+ilbOp1qDJ/iP3VfBFrsR+gEyQcaQo/PAR4NLtD+rZ5veWM/OSVjbawYl2OpFpfXzQdINAAlaEJg==}
+  '@mtcute/markdown-parser@0.29.4':
+    resolution: {integrity: sha512-jORffOdQaiFyS+HtQymlgIPP7agCSW6RPH+k2O9obvRv4zUHx68I9AYLfoMGHA54rbIWkMWuBdaV3SD8MAv5CQ==}
 
-  '@mtcute/node@0.27.6':
-    resolution: {integrity: sha512-fDnufwcRJyqMr7rpCIiSW6GIRR1j+tgM8Og1Rx38U16Ftmu3gB7Xt5K7lHJJWQHDhv59w8AiU+NksiPdTXbxxQ==}
+  '@mtcute/node@0.29.4':
+    resolution: {integrity: sha512-jCgPqfVJHG2Px0uQH7mZJWwL+OQRZ6hyK2IFh/mUyzbnk/5bL/qzebPu4oprqXCxxCK/4ngW4twD4G9LBrVv3w==}
 
-  '@mtcute/tl-runtime@0.24.3':
-    resolution: {integrity: sha512-61J3cgYgNOQT532GdIiuezRrSC7v6cc9MfvWv9GO27bRGf7JUKWVbFt4U0KzQ9Tp0J1uMOUfi1EbQKkYKacIKQ==}
+  '@mtcute/tl-runtime@0.29.0':
+    resolution: {integrity: sha512-VhDVYKYeC5TypdgzJ/6CtoZgwlR3h1xKatVTnuVcAe1sXrbIwju0EzZlPbUCjH6vgoOXyrJvkhUXdax/oSSjpg==}
 
-  '@mtcute/tl@221.0.0':
-    resolution: {integrity: sha512-Wp01L9nznTMLl2s9rbKnzQ8pij72eF4HK2XIziOQoJXiObPKZxQdxvMj+C6l0ArxMFmpT0H0/3EL5RB7O6VPwg==}
-
-  '@mtcute/wasm@0.27.0':
-    resolution: {integrity: sha512-1v4eO1N1BVRQ8L+cyUsMAeLXs5suTGXyVv/tftkbd/mGGHxc+fvOWItp3Fmq+GIwN7m4VX7kztuMMLhHxv2i2Q==}
+  '@mtcute/wasm@0.29.0':
+    resolution: {integrity: sha512-PFZ60ufUIt3BW1FFkCqcaEvEcezaTK+KyMVs3A/aXA19aFhDpu6HCSI8FJ6iOfGsIMGaNGYrwH3CZ7XxLn24XA==}
 
   '@newrelic/fn-inspect@4.4.0':
     resolution: {integrity: sha512-VgoXZp3zqP1167XvrA772EHDFUNuYGQh14whFq1d2sE6dC3ZL46tXI9JY0yZdAAeyCERi7mhq7CPx9BYiTOl/A==}
@@ -4411,6 +4405,9 @@ packages:
   long@5.2.3:
     resolution: {integrity: sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==}
 
+  long@5.3.2:
+    resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
+
   lowercase-keys@2.0.0:
     resolution: {integrity: sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==}
     engines: {node: '>=8'}
@@ -4838,6 +4835,7 @@ packages:
   prebuild-install@7.1.3:
     resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
 
   prebuildify@6.0.1:
@@ -7894,26 +7892,24 @@ snapshots:
       '@fastify/forwarded': 3.0.0
       ipaddr.js: 2.2.0
 
-  '@fuman/io@0.0.17':
+  '@fuman/io@0.0.19':
     dependencies:
-      '@fuman/utils': 0.0.17
+      '@fuman/utils': 0.0.19
 
-  '@fuman/net@0.0.17':
+  '@fuman/net@0.0.19':
     dependencies:
-      '@fuman/io': 0.0.17
-      '@fuman/utils': 0.0.17
+      '@fuman/io': 0.0.19
+      '@fuman/utils': 0.0.19
 
-  '@fuman/node@0.0.17(ws@8.18.3)':
+  '@fuman/node@0.0.19(ws@8.18.3)':
     dependencies:
-      '@fuman/io': 0.0.17
-      '@fuman/net': 0.0.17
-      '@fuman/utils': 0.0.17
+      '@fuman/io': 0.0.19
+      '@fuman/net': 0.0.19
+      '@fuman/utils': 0.0.19
     optionalDependencies:
       ws: 8.18.3
 
-  '@fuman/utils@0.0.15': {}
-
-  '@fuman/utils@0.0.17': {}
+  '@fuman/utils@0.0.19': {}
 
   '@google-cloud/common@3.10.0(encoding@0.1.13)':
     dependencies:
@@ -8149,57 +8145,52 @@ snapshots:
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
 
-  '@mtcute/core@0.27.6':
+  '@mtcute/core@0.29.4':
     dependencies:
-      '@fuman/io': 0.0.17
-      '@fuman/net': 0.0.17
-      '@fuman/utils': 0.0.17
-      '@mtcute/file-id': 0.27.6
-      '@mtcute/tl': 221.0.0
-      '@mtcute/tl-runtime': 0.24.3
+      '@fuman/io': 0.0.19
+      '@fuman/net': 0.0.19
+      '@fuman/utils': 0.0.19
+      '@mtcute/file-id': 0.29.0
+      '@mtcute/tl-runtime': 0.29.0
       '@types/events': 3.0.0
-      long: 5.2.3
+      long: 5.3.2
 
-  '@mtcute/file-id@0.27.6':
+  '@mtcute/file-id@0.29.0':
     dependencies:
-      '@fuman/utils': 0.0.17
-      '@mtcute/tl-runtime': 0.24.3
-      long: 5.2.3
+      '@fuman/utils': 0.0.19
+      '@mtcute/tl-runtime': 0.29.0
+      long: 5.3.2
 
-  '@mtcute/html-parser@0.27.6':
+  '@mtcute/html-parser@0.29.4':
     dependencies:
-      '@mtcute/core': 0.27.6
+      '@mtcute/core': 0.29.4
       htmlparser2: 10.0.0
-      long: 5.2.3
+      long: 5.3.2
 
-  '@mtcute/markdown-parser@0.27.6':
+  '@mtcute/markdown-parser@0.29.4':
     dependencies:
-      '@mtcute/core': 0.27.6
-      long: 5.2.3
+      '@mtcute/core': 0.29.4
+      long: 5.3.2
 
-  '@mtcute/node@0.27.6(ws@8.18.3)':
+  '@mtcute/node@0.29.4(ws@8.18.3)':
     dependencies:
-      '@fuman/net': 0.0.17
-      '@fuman/node': 0.0.17(ws@8.18.3)
-      '@fuman/utils': 0.0.17
-      '@mtcute/core': 0.27.6
-      '@mtcute/html-parser': 0.27.6
-      '@mtcute/markdown-parser': 0.27.6
-      '@mtcute/wasm': 0.27.0
+      '@fuman/net': 0.0.19
+      '@fuman/node': 0.0.19(ws@8.18.3)
+      '@fuman/utils': 0.0.19
+      '@mtcute/core': 0.29.4
+      '@mtcute/html-parser': 0.29.4
+      '@mtcute/markdown-parser': 0.29.4
+      '@mtcute/wasm': 0.29.0
       better-sqlite3: 12.5.0
     transitivePeerDependencies:
       - ws
 
-  '@mtcute/tl-runtime@0.24.3':
+  '@mtcute/tl-runtime@0.29.0':
     dependencies:
-      '@fuman/utils': 0.0.15
-      long: 5.2.3
+      '@fuman/utils': 0.0.19
+      long: 5.3.2
 
-  '@mtcute/tl@221.0.0':
-    dependencies:
-      long: 5.2.3
-
-  '@mtcute/wasm@0.27.0': {}
+  '@mtcute/wasm@0.29.0': {}
 
   '@newrelic/fn-inspect@4.4.0':
     dependencies:
@@ -12024,6 +12015,8 @@ snapshots:
   long@4.0.0: {}
 
   long@5.2.3: {}
+
+  long@5.3.2: {}
 
   lowercase-keys@2.0.0: {}
 

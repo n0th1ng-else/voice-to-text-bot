@@ -30,7 +30,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 FROM node:24.11.1-slim
 
-EXPOSE 8080
+EXPOSE 3000
 
 ENV NEW_RELIC_NO_CONFIG_FILE=true
 
@@ -55,6 +55,9 @@ COPY --from=builder "$APP_DIR/package.json" "$APP_DIR"
 COPY --from=builder "$APP_DIR/dist" "$APP_DIR/dist"
 
 RUN chown -R node:node "$APP_DIR/file-temp" && chmod -R 775 "$APP_DIR/file-temp"
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD node -e "fetch('http://localhost:' + (process.env.PORT || 3000) + '/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
 
 USER node
 

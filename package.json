@@ -41,7 +41,7 @@
     "@amplitude/node": "1.10.2",
     "@elevenlabs/elevenlabs-js": "2.31.0",
     "@google-cloud/speech": "4.5.5",
-    "@mtcute/node": "0.27.6",
+    "@mtcute/node": "0.29.4",
     "@ngrok/ngrok": "1.7.0",
     "@sentry/node": "10.34.0",
     "@sentry/profiling-node": "10.34.0",

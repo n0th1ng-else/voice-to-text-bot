@@ -175,16 +175,14 @@ export class VoiceAction extends GenericAction {
       throw new Error("Unable to find a voice file in the message");
     }
 
-    const [fileLink, isLocalFile] = await this.bot.downloadFile(
+    const [fileLink, isLocalFile, err] = await this.bot.downloadFile(
       getFullFileName("original_file", true),
       model.voiceFileId,
       model.chatId,
     );
 
-    if (isLocalFile) {
-      logger.info("Downloaded the file using the MTProto");
-    } else {
-      logger.info("Downloaded the file using the API");
+    if (err) {
+      logger.error("Error during file download", err);
     }
 
     return [model.voiceFileId, fileLink, isLocalFile];
