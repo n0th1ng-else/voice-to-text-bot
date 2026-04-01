@@ -37,9 +37,20 @@ export const getMTProtoApi = (appId: number, appHash: string, apiToken: string):
         throw new Error("EMTPROTO not initialized");
       }
 
-      await client.downloadToFile(toFilename, fileId, {
-        abortSignal: AbortSignal.timeout(API_TIMEOUT_MS),
-      });
+      const ctrl = new AbortController();
+
+      const timeout = setTimeout(() => {
+        ctrl.abort(new Error("EMTPROTO Request timeout"));
+      }, API_TIMEOUT_MS);
+
+      try {
+        await client.downloadToFile(toFilename, fileId, {
+          abortSignal: ctrl.signal,
+        });
+      } finally {
+        // we need to clear timeout otherwise mtcute will turn down the whole app
+        clearTimeout(timeout);
+      }
 
       return toFilename;
     },

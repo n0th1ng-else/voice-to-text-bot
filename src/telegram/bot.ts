@@ -59,6 +59,10 @@ export class TelegramBotModel {
   ) {
     this.token = apiToken;
 
+    if (useMTProto) {
+      logger.info("MTProto client enabled");
+    }
+
     this.bot = new TelegramApi(this.token, appId, appHash, useMTProto);
     const reflector = initTgReflector({
       leaveChat: (chatId) => this.bot.chats.leaveChat(chatId),

@@ -31,7 +31,8 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
     .on("end", () => {
       resolve(outputFile);
     })
-    .on("error", (error: Error) => {
+    .on("error", async (error: Error) => {
+      await deleteFileIfExists(outputFile);
       reject(error);
     });
 
@@ -77,14 +78,22 @@ export const getWavFilePath = async (fileLink: string, isLocalFile: boolean): Pr
   return await getWavFilePathFromLocal(pathToFile);
 };
 
+export const getAudioFilePath = async (
+  fileLink: string,
+  isLocalFile: boolean,
+  shouldConvertToWav = true,
+): Promise<string> => {
+  return shouldConvertToWav
+    ? await getWavFilePath(fileLink, isLocalFile)
+    : await getRawFilePath(fileLink, isLocalFile);
+};
+
 export const getAudioBuffer = async (
   fileLink: string,
   isLocalFile: boolean,
   shouldConvertToWav = true,
 ): Promise<Buffer<ArrayBufferLike>> => {
-  const filename = shouldConvertToWav
-    ? await getWavFilePath(fileLink, isLocalFile)
-    : await getRawFilePath(fileLink, isLocalFile);
+  const filename = await getAudioFilePath(fileLink, isLocalFile, shouldConvertToWav);
   const buffer = await readFileIntoBuffer(filename);
   await deleteFileIfExists(filename);
   return buffer;
