@@ -1,7 +1,9 @@
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
+import { openAsBlob } from "node:fs";
 import { addAttachment } from "../monitoring/sentry/index.js";
 import { Logger } from "../logger/index.js";
-import { getAudioBuffer } from "../ffmpeg/index.js";
+import { getAudioFilePath } from "../ffmpeg/index.js";
+import { deleteFileIfExists } from "../files/index.js";
 
 const logger = new Logger("api-base-recognition");
 
@@ -25,26 +27,30 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const bufferData = await getAudioBuffer(fileLink, isLocalFile, !this.useRawFile);
+    const filePath = await getAudioFilePath(fileLink, isLocalFile, !this.useRawFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
-    const result = await this.recognise(
-      {
-        data: bufferData,
-        name,
-        type: "audio/wav",
-        duration: fileDuration,
-      },
-      lang,
-      logData.prefix,
-    );
-    return result;
+
+    try {
+      const fileBlob = await openAsBlob(filePath);
+      const result = await this.recognise(
+        {
+          data: fileBlob,
+          name,
+          duration: fileDuration,
+        },
+        lang,
+        logData.prefix,
+      );
+      return result;
+    } finally {
+      await deleteFileIfExists(filePath);
+    }
   }
 
   protected abstract recognise(
     file: {
-      data: Buffer<ArrayBufferLike>;
+      data: Blob;
       name: string;
-      type: "audio/wav";
       duration: number;
     },
     lang: LanguageCode,

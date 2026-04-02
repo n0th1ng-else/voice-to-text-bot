@@ -27,9 +27,8 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
 
   protected async recognise(
     file: {
-      data: Buffer<ArrayBufferLike>;
+      data: Blob;
       name: string;
-      type: "audio/wav";
       duration: number;
     },
     lang: LanguageCode,
@@ -44,11 +43,9 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
       const form = new FormData();
       form.append("language", language);
 
-      // @ts-expect-error Type mismatch
-      const fileBlob = new Blob([file.data], { type: file.type });
       const fileName =
         !this.useRawFile && !file.name.endsWith(".wav") ? `${file.name}.wav` : file.name;
-      form.append("file", fileBlob, fileName);
+      form.append("file", file.data, fileName);
 
       const response = await fetch(url, {
         method: "POST",

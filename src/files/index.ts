@@ -1,5 +1,6 @@
 import { promises, createWriteStream } from "node:fs";
 import type { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { nanoid } from "nanoid";
@@ -68,26 +69,17 @@ export const saveStreamToFile = async (
 ): Promise<string> => {
   const name = getFullFileName(fileName, addUniqPrefix, dir);
   logger.info(`Saving the stream into filesystem. The file name is ${name}`);
-
-  const { promise, resolve, reject } = Promise.withResolvers<string>();
   const fileStream = createWriteStream(name);
 
-  fileStream
-    .on("error", (err: Error) => {
-      logger.error("Unable to dump the file", err);
-      reject(err);
-    })
-    .on("finish", () => {
-      logger.info("Dump complete");
-      resolve(name);
-    });
-
-  stream.pipe(fileStream);
-
-  return promise.catch(async (err) => {
+  try {
+    await pipeline(stream, fileStream);
+    logger.info("File download completed");
+    return name;
+  } catch (err) {
+    logger.error("Unable to download the file", err);
     await deleteFileIfExists(name);
     throw err;
-  });
+  }
 };
 
 export const readFileIntoBuffer = async (fileName: string): Promise<Buffer<ArrayBufferLike>> => {
