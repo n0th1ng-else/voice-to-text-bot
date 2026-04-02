@@ -16,6 +16,7 @@ export const getMTProtoApi = (appId: number, appHash: string, apiToken: string):
   const client = new TelegramClient({
     apiId: appId,
     apiHash: appHash,
+    storage: "file-temp/client.session",
   });
 
   return {
