@@ -1,10 +1,9 @@
-import type { Readable } from "node:stream";
+import { Readable } from "node:stream";
 import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import axios from "axios";
 import { Logger } from "../logger/index.js";
 import { deleteFileIfExists, readFileIntoBuffer, saveStreamToFile } from "../files/index.js";
-import { wavSampleRate } from "../const.js";
+import { API_TIMEOUT_MS, wavSampleRate } from "../const.js";
 
 const logger = new Logger("media-to-wav");
 
@@ -39,14 +38,16 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
   return promise;
 };
 
-const downloadAsStream = (url: string): Promise<Readable> =>
-  axios
-    .request<Readable>({
-      method: "GET",
-      url,
-      responseType: "stream",
-    })
-    .then(({ data: stream }) => stream);
+const downloadAsStream = async (url: string): Promise<Readable> => {
+  const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) });
+  if (!response.ok) {
+    throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);
+  }
+  if (!response.body) {
+    throw new Error("Response body is empty");
+  }
+  return Readable.fromWeb(response.body);
+};
 
 const getWavFilePathFromLocal = async (fsFilePath: string): Promise<string> => {
   try {
