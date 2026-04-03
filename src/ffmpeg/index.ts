@@ -3,7 +3,7 @@ import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import { Logger } from "../logger/index.js";
 import { deleteFileIfExists, readFileIntoBuffer, saveStreamToFile } from "../files/index.js";
-import { wavSampleRate } from "../const.js";
+import { API_TIMEOUT_MS, wavSampleRate } from "../const.js";
 
 const logger = new Logger("media-to-wav");
 
@@ -39,7 +39,7 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
 };
 
 const downloadAsStream = async (url: string): Promise<Readable> => {
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) });
   if (!response.ok) {
     throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);
   }
