@@ -213,7 +213,7 @@ export class VoiceAction extends GenericAction {
     }
 
     const [fileLink, isLocalFile, err] = await this.bot.downloadFile(
-      getFullFileName("original_file", true),
+      getFullFileName("original_file.ogg", true),
       model.voiceFileId,
       model.chatId,
     );

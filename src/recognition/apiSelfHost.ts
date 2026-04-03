@@ -45,7 +45,13 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
 
       const fileName =
         !this.useRawFile && !file.name.endsWith(".wav") ? `${file.name}.wav` : file.name;
-      form.append("file", file.data, fileName);
+
+      const expectedMimeType = fileName.endsWith(".wav") ? "audio/wav" : "audio/ogg";
+      const fileBlobWithType = file.data.type
+        ? file.data
+        : file.data.slice(0, file.data.size, expectedMimeType);
+
+      form.append("file", fileBlobWithType, fileName);
 
       const response = await fetch(url, {
         method: "POST",
