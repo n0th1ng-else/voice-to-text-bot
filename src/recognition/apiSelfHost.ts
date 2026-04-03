@@ -55,7 +55,6 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
             }
           : {},
         body: form,
-        duplex: "half",
         signal: AbortSignal.timeout(API_TIMEOUT_MS),
       });
 

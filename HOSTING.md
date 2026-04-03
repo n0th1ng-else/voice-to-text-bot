@@ -61,14 +61,14 @@ Deploy from Docker
 
 ## Advanced
 
-Add healthcheck (TO BE DECIDED)
+Add replica
 
-- Cluster settings -> Swarm settings
-- Test command: `["CMD-SHELL", "node -e \"fetch('http://localhost:3010/health').then(r => r.json()).then(j => process.exit(j.status === 'ONLINE' ? 0 : 1)).catch(() => process.exit(1))\""]`
-- Interval: 60000000000 (1 minute)
-- Timeout: 1000000000 (1 second)
-- Start Period: 60000000000 (1 minute)
-- Retries: 3
+- Replicas: 2
+
+Add resources budget
+
+- Memory Limit: 805306368 (768MB)
+- Memory Reservation: 402653184 (384MB)
 
 ## VTT Service
 
@@ -78,7 +78,7 @@ Deploy from Docker
 
 - Source: Git
 - Repository: https://github.com/n0th1ng-else/parakeet-tdt-0.6b-v3-fastapi-openai.git
-- Branch: ~~main~~ **skip-wav-convertion**
+- Branch: ~~main~~ **no-optimizations**
 - Docker file: Dockerfile.cpu
 
 ## Advanced
@@ -92,6 +92,11 @@ Add volume
 - Type: volume mount
 - Volume name: parakeet-models
 - Mount path: /app/models
+
+Add resources budget
+
+- Memory Limit: 6442450944 (6GB)
+- Memory Reservation: 1610612736 (1.5GB)
 
 ### Find API endpoint
 
