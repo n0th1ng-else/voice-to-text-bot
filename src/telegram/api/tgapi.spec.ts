@@ -1,12 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import axios, {
-  AxiosHeaders,
-  AxiosError,
-  type AxiosRequestConfig,
-  type CreateAxiosDefaults,
-} from "axios";
 import { nanoid } from "nanoid";
-import { type TgCore, type TgMessage } from "./types.js";
+import type { TgMessage } from "./types.js";
 import { TelegramApi } from "./tgapi.js";
 import { type TgError } from "./tgerror.js";
 import { SANITIZE_CHARACTER } from "../../logger/const.js";
@@ -29,9 +23,9 @@ const getApiResponse = <Response>(
   errorDescription?: string,
   retryAfter?: number,
   migrateChatId?: ChatId,
-): TgCore<Response> => {
+): string => {
   const hasMeta = migrateChatId || retryAfter;
-  return {
+  return JSON.stringify({
     ok,
     result,
     description: errorDescription,
@@ -42,11 +36,10 @@ const getApiResponse = <Response>(
         retry_after: retryAfter,
       }) ||
       undefined,
-  };
+  });
 };
-const testClient = axios.create();
 
-const getPromiseError = <R>(fn: () => Promise<R>): Promise<TgError> =>
+const getPromiseError = <Err = TgError, R = unknown>(fn: () => Promise<R>): Promise<Err> =>
   new Promise((resolve, reject) => {
     fn().then(
       (data) => reject(new Error("Should fail", { cause: data })),
@@ -60,63 +53,53 @@ let testAppHash = nanoid(10);
 
 let api = new TelegramApi(testApiToken, testAppId, testAppHash, true);
 
-let checkApiData = (config: AxiosRequestConfig): void => {
-  throw new Error(`Initialize check api data ${JSON.stringify(config)}`);
-};
-
-let testApiResponse: TgCore<unknown>;
-
-const clientSpy = vi.spyOn(axios, "create").mockImplementation((config?: CreateAxiosDefaults) => {
-  if (!config) {
-    throw new Error("config can not be empty");
-  }
-  expect(config.baseURL).toBe(TelegramBaseApi.url);
-  expect(config.timeout).toBe(TelegramBaseApi.timeout);
-  expect(config.method).toBe("POST");
-  expect(config.responseType).toBe("json");
-  // @ts-expect-error Some mess with header types
-  expect(config.headers?.Accept).toBe("application/json");
-  // @ts-expect-error Some mess with header types again
-  expect(config.headers?.["Content-Type"]).toBe("application/json");
-  return testClient;
-});
-
 describe("[telegram api client]", () => {
   beforeEach(() => {
-    clientSpy.mockClear();
     testApiToken = nanoid(10);
     testAppId = randomIntFromInterval(1, 100000);
     testAppHash = nanoid(10);
     api = new TelegramApi(testApiToken, testAppId, testAppHash, true);
+    vi.resetAllMocks();
+  });
+
+  it("check request config fields", async () => {
+    const testHook = "some-test-hook-url";
+
+    vi.spyOn(global, "fetch").mockImplementation((_, cfg) => {
+      if (!cfg) {
+        throw new Error("config can not be empty");
+      }
+      expect(cfg.method).toBe("POST");
+      // @ts-expect-error Some mess with header types
+      expect(cfg.headers?.get("Accept")).toBe("application/json");
+      // @ts-expect-error Some mess with header types
+      expect(cfg.headers?.get("Content-Type")).toBe("application/json");
+      return Promise.resolve(new Response(getApiResponse<boolean>(true, true), { status: 200 }));
+    });
+
+    const isOk = await api.updates.setWebHook(testHook);
+    expect(isOk).toBe(true);
   });
 
   describe("telegram response", () => {
-    beforeEach(() => {
-      vi.spyOn(testClient, "request").mockImplementationOnce((config) => {
-        checkApiData(config);
-        return Promise.resolve().then(() => ({
-          data: testApiResponse,
-        }));
-      });
-    });
-
     describe("good cases", () => {
-      it("setWebHook", () => {
-        testApiResponse = getApiResponse<boolean>(true, true);
+      it("setWebHook", async () => {
         const testHook = "some-test-hook-url";
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/setWebHook`);
-          expect(Object.keys(config.data)).toHaveLength(1);
-          expect(config.data.url).toBe(testHook);
-        };
 
-        return api.updates.setWebHook(testHook).then((isOk) => {
-          expect(isOk).toBe(true);
+        vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+          expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/setWebHook`);
+          const data = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "");
+          expect(data.url).toBe(testHook);
+          return Promise.resolve(
+            new Response(getApiResponse<boolean>(true, true), { status: 200 }),
+          );
         });
+
+        const isOk = await api.updates.setWebHook(testHook);
+        expect(isOk).toBe(true);
       });
 
-      it("setMyCommands", () => {
-        testApiResponse = getApiResponse<boolean>(true, true);
+      it("setMyCommands", async () => {
         const testCommands: BotCommandDto[] = [
           {
             command: "/test1",
@@ -128,137 +111,165 @@ describe("[telegram api client]", () => {
           },
         ];
 
-        checkApiData = (
-          config: AxiosRequestConfig<{
-            commands: {
-              command: string;
-              description: string;
-            }[];
-          }>,
-        ) => {
-          expect(config.url).toBe(`/bot${testApiToken}/setMyCommands`);
-          expect(config.data?.commands).toBeDefined();
-          expect(config.data?.commands).toHaveLength(2);
-          config.data?.commands.forEach((cmd, ind) => {
+        vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+          expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/setMyCommands`);
+          const data = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+            commands: BotCommandDto[];
+          };
+          expect(data.commands).toBeDefined();
+          expect(data.commands).toHaveLength(2);
+          data.commands.forEach((cmd, ind) => {
             expect(cmd.command).toBe(testCommands[ind].command);
             expect(cmd.description).toBe(testCommands[ind].description);
           });
-        };
-
-        return api.updates.setMyCommands(testCommands).then((isOk) => {
-          expect(isOk).toBe(true);
+          return Promise.resolve(
+            new Response(getApiResponse<boolean>(true, true), { status: 200 }),
+          );
         });
+
+        const isOk = await api.updates.setMyCommands(testCommands);
+        expect(isOk).toBe(true);
       });
 
-      it("getWebHookInfo", () => {
+      it("getWebHookInfo", async () => {
         const testHook = "some-test-hook-url-tttt";
 
-        testApiResponse = getApiResponse<TgWebHook>(true, {
-          url: testHook,
+        vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+          expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/getWebhookInfo`);
+          expect(cfg?.body).toBe(undefined);
+          return Promise.resolve(
+            new Response(
+              getApiResponse<TgWebHook>(true, {
+                url: testHook,
+              }),
+              { status: 200 },
+            ),
+          );
         });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/getWebhookInfo`);
-          expect(config.data).not.toBeDefined();
-        };
-
-        return api.updates.getWebHookInfo().then((data) => {
-          expect(Object.keys(data)).toHaveLength(1);
-          expect(data.url).toBe(testHook);
-        });
+        const data = await api.updates.getWebHookInfo();
+        expect(Object.keys(data)).toHaveLength(1);
+        expect(data.url).toBe(testHook);
       });
 
-      it("getFileLink", () => {
+      it("getFileLink", async () => {
         const testChatId = asChatId__test(323426);
         const testFileId = asFileId__test("debug-file-id");
         const testFilePath = "path/to/tg/data";
 
-        testApiResponse = getApiResponse<TgFile>(true, {
-          file_id: testFileId,
-          file_unique_id: "unused-identifier",
-          file_path: testFilePath,
+        vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+          expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/getFile`);
+          const data = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+            file_id: string;
+          };
+          expect(data.file_id).toBe(testFileId);
+          return Promise.resolve(
+            new Response(
+              getApiResponse<TgFile>(true, {
+                file_id: testFileId,
+                file_unique_id: "unused-identifier",
+                file_path: testFilePath,
+              }),
+              { status: 200 },
+            ),
+          );
         });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/getFile`);
-          expect(config.data).toBeDefined();
-          expect(Object.keys(config.data)).toHaveLength(1);
-          expect(config.data.file_id).toBe(testFileId);
-        };
-
-        return api.chats.getFile(testFileId, testChatId).then((fileUrl) => {
-          expect(fileUrl).toBe(`${TelegramBaseApi.url}/file/bot${testApiToken}/${testFilePath}`);
-        });
+        const fileUrl = await api.chats.getFile(testFileId, testChatId);
+        expect(fileUrl).toBe(`${TelegramBaseApi.url}/file/bot${testApiToken}/${testFilePath}`);
       });
 
-      it("editMessageText", () => {
+      it("editMessageText", async () => {
         const testChatId = asChatId__test(323426);
         const testMessageId = asMessageId__test(657887689);
         const testText = "text-for-edit lalala";
         const testChatType = "private";
-        testApiResponse = getApiResponse<TgMessage>(true, {
-          date: Date.now(),
-          message_id: testMessageId,
-          chat: {
-            id: testChatId,
-            type: testChatType,
-          },
-        });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/editMessageText`);
-          expect(Object.keys(config.data)).toHaveLength(4);
-          expect(config.data.chat_id).toBe(testChatId);
-          expect(config.data.message_id).toBe(testMessageId);
-          expect(config.data.text).toBe(testText);
-          expect(config.data.parse_mode).toBe("HTML");
-        };
-
-        return api.chats.editMessageText(testChatId, testMessageId, testText).then((data) => {
-          expect(data).toBeDefined();
+        vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+          expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/editMessageText`);
+          const data = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+            chat_id: ChatId;
+            message_id: number;
+            text: string;
+            parse_mode: string;
+          };
+          expect(data.chat_id).toBe(testChatId);
           expect(data.message_id).toBe(testMessageId);
-          expect(data.chat.id).toBe(testChatId);
-          expect(data.chat.type).toBe(testChatType);
+          expect(data.text).toBe(testText);
+          expect(data.parse_mode).toBe("HTML");
+          return Promise.resolve(
+            new Response(
+              getApiResponse<TgMessage>(true, {
+                date: Date.now(),
+                message_id: testMessageId,
+                chat: {
+                  id: testChatId,
+                  type: testChatType,
+                },
+              }),
+              { status: 200 },
+            ),
+          );
         });
+
+        const data = await api.chats.editMessageText(testChatId, testMessageId, testText);
+        expect(data).toBeDefined();
+        expect(data.message_id).toBe(testMessageId);
+        expect(data.chat.id).toBe(testChatId);
+        expect(data.chat.type).toBe(testChatType);
       });
 
       describe("answerPreCheckoutQuery", () => {
-        it("should send data with no error", () => {
+        it("should send data with no error", async () => {
           const queryId = "323426";
-          testApiResponse = getApiResponse(true, true);
 
-          checkApiData = (config) => {
-            expect(config.url).toBe(`/bot${testApiToken}/answerPreCheckoutQuery`);
-            expect(config.data).toStrictEqual({
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/answerPreCheckoutQuery`);
+            const data = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              pre_checkout_query_id: string;
+              ok: boolean;
+            };
+            expect(data).toStrictEqual({
               pre_checkout_query_id: queryId,
               ok: true,
-              error_message: undefined,
             });
-          };
+            return Promise.resolve(new Response(getApiResponse(true, true), { status: 200 }));
+          });
 
-          return api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId);
+          const isOk = await api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId);
+          expect(isOk).toBe(true);
         });
 
-        it("should send proper error payload", () => {
+        it("should send proper error payload", async () => {
           const queryId = "3243412";
           const errorMessage = "some error message";
-          testApiResponse = getApiResponse(true, true);
 
-          checkApiData = (config) => {
-            expect(config.url).toBe(`/bot${testApiToken}/answerPreCheckoutQuery`);
-            expect(config.data).toStrictEqual({
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/answerPreCheckoutQuery`);
+            const data = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              pre_checkout_query_id: string;
+              ok: boolean;
+              error_message?: string;
+            };
+            expect(data).toStrictEqual({
               pre_checkout_query_id: queryId,
               ok: false,
               error_message: errorMessage,
             });
-          };
+            return Promise.resolve(new Response(getApiResponse(true, true), { status: 200 }));
+          });
 
-          return api.payments.answerPreCheckoutQuery(asChatId__test(234211), queryId, errorMessage);
+          const isOk = await api.payments.answerPreCheckoutQuery(
+            asChatId__test(234211),
+            queryId,
+            errorMessage,
+          );
+          expect(isOk).toBe(true);
         });
       });
 
       describe("sendInvoice", () => {
-        it("should send proper payload", () => {
+        it("should send proper payload", async () => {
           const data: TgInvoice = {
             amount: 1900,
             currency: "EUR",
@@ -275,18 +286,23 @@ describe("[telegram api client]", () => {
             title: "donate",
             token: "payment-token",
           };
-          testApiResponse = getApiResponse<TgMessage>(true, {
+
+          const resp: TgMessage = {
             date: Date.now(),
             message_id: asMessageId__test(32411244),
             chat: {
               id: data.chatId,
               type: "private",
             },
-          });
+          };
 
-          checkApiData = (config) => {
-            expect(config.url).toBe(`/bot${testApiToken}/sendInvoice`);
-            expect(config.data).toStrictEqual({
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/sendInvoice`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as Record<
+              string,
+              unknown
+            >;
+            expect(body).toStrictEqual({
               chat_id: data.chatId,
               currency: "EUR",
               description: data.description,
@@ -304,249 +320,306 @@ describe("[telegram api client]", () => {
               start_parameter: data.meta,
               title: data.title,
             });
-          };
 
-          return api.payments.sendInvoice(data);
+            return Promise.resolve(
+              new Response(getApiResponse<TgMessage>(true, resp), { status: 200 }),
+            );
+          });
+
+          const res = await api.payments.sendInvoice(data);
+          expect(res).toEqual(resp);
         });
       });
 
       describe("leaveChat", () => {
-        it("should return proper result", () => {
+        it("should return proper result", async () => {
           const testChatId = asChatId__test(323426);
-          testApiResponse = getApiResponse<TgLeaveChatSchema>(true, true);
 
-          checkApiData = (config) => {
-            expect(config.url).toBe(`/bot${testApiToken}/leaveChat`);
-            expect(config.data.chat_id).toBe(testChatId);
-          };
-
-          return api.chats.leaveChat(testChatId).then((data) => {
-            expect(data).toBe(true);
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/leaveChat`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              chat_id: ChatId;
+            };
+            expect(body.chat_id).toBe(testChatId);
+            return Promise.resolve(
+              new Response(getApiResponse<TgLeaveChatSchema>(true, true), { status: 200 }),
+            );
           });
+
+          const isOk = await api.chats.leaveChat(testChatId);
+          expect(isOk).toBe(true);
         });
 
-        it("should return proper result?", () => {
+        it("should return validation error on wrong response", async () => {
           const testChatId = asChatId__test(323426);
-          testApiResponse = getApiResponse(true, "broken response");
 
-          checkApiData = (config) => {
-            expect(config.url).toBe(`/bot${testApiToken}/leaveChat`);
-            expect(config.data.chat_id).toBe(testChatId);
-          };
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/leaveChat`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              chat_id: ChatId;
+            };
+            expect(body.chat_id).toBe(testChatId);
+            return Promise.resolve(
+              new Response(getApiResponse(true, "broken response"), { status: 200 }),
+            );
+          });
 
-          return api.chats.leaveChat(testChatId).then(
-            () => {
-              throw new Error("should not resolve, should receive validation error");
-            },
-            (err) => {
-              expect(err.issues[0].code).toBe("invalid_type");
-              expect(err.issues[0].message).toBe(
-                "Invalid input: expected boolean, received string",
-              );
-            },
+          const err = await getPromiseError<{ issues: { code: string; message: string }[] }>(() =>
+            api.chats.leaveChat(testChatId),
           );
+          expect(err.issues[0].code).toBe("invalid_type");
+          expect(err.issues[0].message).toBe("Invalid input: expected boolean, received string");
         });
       });
 
-      it("sendMessage no params", () => {
-        const testChatId = asChatId__test(323426);
-        const testText = "text-for-edit lalala";
-        const testChatType = "private";
-        testApiResponse = getApiResponse<TgMessage>(true, {
-          date: Date.now(),
-          message_id: asMessageId__test(32411244),
-          chat: {
-            id: testChatId,
-            type: testChatType,
-          },
+      describe("sendMessage", () => {
+        it("no params", async () => {
+          const testChatId = asChatId__test(323426);
+          const testText = "text-for-edit lalala";
+          const testChatType = "private";
+
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/sendMessage`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              chat_id: ChatId;
+              text: string;
+              parse_mode: string;
+            };
+            expect(body.chat_id).toBe(testChatId);
+            expect(body.text).toBe(testText);
+            expect(body.parse_mode).toBe("HTML");
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgMessage>(true, {
+                  date: Date.now(),
+                  message_id: asMessageId__test(32411244),
+                  chat: {
+                    id: testChatId,
+                    type: testChatType,
+                  },
+                }),
+                { status: 200 },
+              ),
+            );
+          });
+
+          const data = await api.chats.sendMessage(testChatId, testText);
+          expect(data).toBeDefined();
+          expect(data.chat.id).toBe(testChatId);
+          expect(data.chat.type).toBe(testChatType);
         });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(3);
-          expect(config.data.chat_id).toBe(testChatId);
-          expect(config.data.text).toBe(testText);
-          expect(config.data.parse_mode).toBe("HTML");
-        };
+        it("with button", async () => {
+          const testChatId = asChatId__test(323426);
+          const testText = "text-for-edit lalala";
+          const testChatType = "private";
 
-        return api.chats.sendMessage(testChatId, testText).then((data) => {
+          const testButton: TgInlineKeyboardButton = {
+            text: "cool btn",
+            callback_data: "interesting data",
+          };
+
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/sendMessage`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              chat_id: ChatId;
+              text: string;
+              parse_mode: string;
+              reply_markup: {
+                inline_keyboard: TgInlineKeyboardButton[][];
+              };
+            };
+            expect(body.chat_id).toBe(testChatId);
+            expect(body.text).toBe(testText);
+            expect(body.parse_mode).toBe("HTML");
+            expect(body.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
+            expect(body.reply_markup.inline_keyboard[0][0].callback_data).toBe(
+              testButton.callback_data,
+            );
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgMessage>(true, {
+                  date: Date.now(),
+                  message_id: asMessageId__test(32411244),
+                  chat: {
+                    id: testChatId,
+                    type: testChatType,
+                  },
+                }),
+                { status: 200 },
+              ),
+            );
+          });
+
+          const data = await api.chats.sendMessage(testChatId, testText, {
+            buttons: [[testButton]],
+          });
+          expect(data).toBeDefined();
+          expect(data.chat.id).toBe(testChatId);
+          expect(data.chat.type).toBe(testChatType);
+        });
+
+        it("without markup", async () => {
+          const testChatId = asChatId__test(323426);
+          const testText = "<|~foo_bar~|>";
+          const testChatType = "private";
+
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/sendMessage`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as Record<
+              string,
+              unknown
+            >;
+            expect(body.chat_id).toBe(testChatId);
+            expect(body.text).toBe(testText);
+            expect(body.parse_mode).toBe(undefined);
+            expect(body.reply_markup).toBe(undefined);
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgMessage>(true, {
+                  date: Date.now(),
+                  message_id: asMessageId__test(32411244),
+                  chat: {
+                    id: testChatId,
+                    type: testChatType,
+                  },
+                }),
+                { status: 200 },
+              ),
+            );
+          });
+
+          const data = await api.chats.sendMessage(testChatId, testText, {
+            disableMarkup: true,
+          });
+          expect(data).toBeDefined();
+          expect(data.chat.id).toBe(testChatId);
+          expect(data.chat.type).toBe(testChatType);
+        });
+
+        it("with button and without markup", async () => {
+          const testChatId = asChatId__test(323426);
+          const testText = "<|~foo_bar~|>";
+          const testChatType = "private";
+
+          const testButton: TgInlineKeyboardButton = {
+            text: "cool btn",
+            callback_data: "interesting data",
+          };
+
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/sendMessage`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              chat_id: ChatId;
+              text: string;
+              parse_mode?: string;
+              reply_markup: {
+                inline_keyboard: TgInlineKeyboardButton[][];
+              };
+            };
+            expect(body.chat_id).toBe(testChatId);
+            expect(body.text).toBe(testText);
+            expect(body.parse_mode).toBe(undefined);
+            expect(body.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
+            expect(body.reply_markup.inline_keyboard[0][0].callback_data).toBe(
+              testButton.callback_data,
+            );
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgMessage>(true, {
+                  date: Date.now(),
+                  message_id: asMessageId__test(32411244),
+                  chat: {
+                    id: testChatId,
+                    type: testChatType,
+                  },
+                }),
+                { status: 200 },
+              ),
+            );
+          });
+
+          const data = await api.chats.sendMessage(testChatId, testText, {
+            buttons: [[testButton]],
+            disableMarkup: true,
+          });
+          expect(data).toBeDefined();
+          expect(data.chat.id).toBe(testChatId);
+          expect(data.chat.type).toBe(testChatType);
+        });
+
+        it("with link", async () => {
+          const testChatId = asChatId__test(323426);
+          const testText = "text-for-edit lalala";
+          const testChatType = "private";
+
+          const testButton: TgInlineKeyboardButton = {
+            text: "new link",
+            url: "that lnk url",
+          };
+
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/sendMessage`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              chat_id: ChatId;
+              text: string;
+              parse_mode: string;
+              reply_markup: {
+                inline_keyboard: TgInlineKeyboardButton[][];
+              };
+            };
+            expect(body.chat_id).toBe(testChatId);
+            expect(body.text).toBe(testText);
+            expect(body.parse_mode).toBe("HTML");
+            expect(body.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
+            expect(body.reply_markup.inline_keyboard[0][0].url).toBe(testButton.url);
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgMessage>(true, {
+                  date: Date.now(),
+                  message_id: asMessageId__test(32411244),
+                  chat: {
+                    id: testChatId,
+                    type: testChatType,
+                  },
+                }),
+                { status: 200 },
+              ),
+            );
+          });
+
+          const data = await api.chats.sendMessage(testChatId, testText, {
+            buttons: [[testButton]],
+          });
           expect(data).toBeDefined();
           expect(data.chat.id).toBe(testChatId);
           expect(data.chat.type).toBe(testChatType);
         });
       });
 
-      it("sendMessage with button", () => {
-        const testChatId = asChatId__test(323426);
-        const testText = "text-for-edit lalala";
-        const testChatType = "private";
+      describe("telegram error cases", () => {
+        it("telegram returned error code, description", async () => {
+          const testErrorCode = 984;
+          const testErrorDescription = "Nobody bat an eye";
 
-        const testButton: TgInlineKeyboardButton = {
-          text: "cool btn",
-          callback_data: "interesting data",
-        };
-        testApiResponse = getApiResponse<TgMessage>(true, {
-          date: Date.now(),
-          message_id: asMessageId__test(32411244),
-          chat: {
-            id: testChatId,
-            type: testChatType,
-          },
-        });
+          const testHook = "some-test-hook-url";
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(4);
-          expect(config.data.chat_id).toBe(testChatId);
-          expect(config.data.text).toBe(testText);
-          expect(config.data.parse_mode).toBe("HTML");
-          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
-          expect(config.data.reply_markup.inline_keyboard[0][0].callback_data).toBe(
-            testButton.callback_data,
-          );
-        };
-
-        return api.chats
-          .sendMessage(testChatId, testText, {
-            buttons: [[testButton]],
-          })
-          .then((data) => {
-            expect(data).toBeDefined();
-            expect(data.chat.id).toBe(testChatId);
-            expect(data.chat.type).toBe(testChatType);
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/setWebHook`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              url: string;
+            };
+            expect(Object.keys(body)).toHaveLength(1);
+            expect(body.url).toBe(testHook);
+            return Promise.resolve(
+              new Response(
+                getApiResponse<boolean>(false, true, testErrorCode, testErrorDescription),
+                { status: 200 },
+              ),
+            );
           });
-      });
 
-      it("sendMessage without markup", () => {
-        const testChatId = asChatId__test(323426);
-        const testText = "<|~foo_bar~|>";
-        const testChatType = "private";
-
-        testApiResponse = getApiResponse<TgMessage>(true, {
-          date: Date.now(),
-          message_id: asMessageId__test(32411244),
-          chat: {
-            id: testChatId,
-            type: testChatType,
-          },
-        });
-
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(2);
-          expect(config.data.chat_id).toBe(testChatId);
-          expect(config.data.text).toBe(testText);
-          expect(config.data.parse_mode).toBe(undefined);
-          expect(config.data.reply_markup).toBe(undefined);
-        };
-
-        return api.chats
-          .sendMessage(testChatId, testText, {
-            disableMarkup: true,
-          })
-          .then((data) => {
-            expect(data).toBeDefined();
-            expect(data.chat.id).toBe(testChatId);
-            expect(data.chat.type).toBe(testChatType);
-          });
-      });
-
-      it("sendMessage with button and without markup", () => {
-        const testChatId = asChatId__test(323426);
-        const testText = "<|~foo_bar~|>";
-        const testChatType = "private";
-
-        const testButton: TgInlineKeyboardButton = {
-          text: "cool btn",
-          callback_data: "interesting data",
-        };
-        testApiResponse = getApiResponse<TgMessage>(true, {
-          date: Date.now(),
-          message_id: asMessageId__test(32411244),
-          chat: {
-            id: testChatId,
-            type: testChatType,
-          },
-        });
-
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(3);
-          expect(config.data.chat_id).toBe(testChatId);
-          expect(config.data.text).toBe(testText);
-          expect(config.data.parse_mode).toBe(undefined);
-          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
-          expect(config.data.reply_markup.inline_keyboard[0][0].callback_data).toBe(
-            testButton.callback_data,
-          );
-        };
-
-        return api.chats
-          .sendMessage(testChatId, testText, {
-            buttons: [[testButton]],
-            disableMarkup: true,
-          })
-          .then((data) => {
-            expect(data).toBeDefined();
-            expect(data.chat.id).toBe(testChatId);
-            expect(data.chat.type).toBe(testChatType);
-          });
-      });
-
-      it("sendMessage with link", () => {
-        const testChatId = asChatId__test(323426);
-        const testText = "text-for-edit lalala";
-        const testChatType = "private";
-
-        const testButton: TgInlineKeyboardButton = {
-          text: "new link",
-          url: "that lnk url",
-        };
-        testApiResponse = getApiResponse<TgMessage>(true, {
-          date: Date.now(),
-          message_id: asMessageId__test(32411244),
-          chat: {
-            id: testChatId,
-            type: testChatType,
-          },
-        });
-
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-          expect(Object.keys(config.data)).toHaveLength(4);
-          expect(config.data.chat_id).toBe(testChatId);
-          expect(config.data.text).toBe(testText);
-          expect(config.data.parse_mode).toBe("HTML");
-          expect(config.data.reply_markup.inline_keyboard[0][0].text).toBe(testButton.text);
-          expect(config.data.reply_markup.inline_keyboard[0][0].url).toBe(testButton.url);
-        };
-
-        return api.chats
-          .sendMessage(testChatId, testText, {
-            buttons: [[testButton]],
-          })
-          .then((data) => {
-            expect(data).toBeDefined();
-            expect(data.chat.id).toBe(testChatId);
-            expect(data.chat.type).toBe(testChatType);
-          });
-      });
-    });
-
-    describe("telegram error cases", () => {
-      it("telegram returned error code, description", () => {
-        const testErrorCode = 984;
-        const testErrorDescription = "Nobody bat an eye";
-
-        testApiResponse = getApiResponse<boolean>(false, true, testErrorCode, testErrorDescription);
-        const testHook = "some-test-hook-url";
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/setWebHook`);
-          expect(Object.keys(config.data)).toHaveLength(1);
-          expect(config.data.url).toBe(testHook);
-        };
-
-        return getPromiseError(() => api.updates.setWebHook(testHook)).then((err) => {
+          const err = await getPromiseError(() => api.updates.setWebHook(testHook));
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
@@ -555,49 +628,51 @@ describe("[telegram api client]", () => {
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
         });
-      });
 
-      it("telegram returned error code, description, retryAfter", () => {
-        const testErrorCode = 620;
-        const testErrorDescription = "Nobody bat an eye";
-        const testRetryAfter = 4456;
+        it("telegram returned error code, description, retryAfter", async () => {
+          const testErrorCode = 620;
+          const testErrorDescription = "Nobody bat an eye";
+          const testRetryAfter = 4456;
 
-        testApiResponse = getApiResponse<boolean>(
-          false,
-          true,
-          testErrorCode,
-          testErrorDescription,
-          testRetryAfter,
-        );
-        const testCommands: BotCommandDto[] = [
-          {
-            command: "/test1",
-            description: "test1-description",
-          },
-          {
-            command: "/com2",
-            description: "co2-text",
-          },
-        ];
+          const testCommands: BotCommandDto[] = [
+            {
+              command: "/test1",
+              description: "test1-description",
+            },
+            {
+              command: "/com2",
+              description: "co2-text",
+            },
+          ];
 
-        checkApiData = (
-          config: AxiosRequestConfig<{
-            commands: {
-              command: string;
-              description: string;
-            }[];
-          }>,
-        ) => {
-          expect(config.url).toBe(`/bot${testApiToken}/setMyCommands`);
-          expect(config.data?.commands).toBeDefined();
-          expect(config.data?.commands).toHaveLength(2);
-          config.data?.commands.forEach((cmd, ind) => {
-            expect(cmd.command).toBe(testCommands[ind].command);
-            expect(cmd.description).toBe(testCommands[ind].description);
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/setMyCommands`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              commands: BotCommandDto[];
+            };
+            expect(Object.keys(body)).toHaveLength(1);
+            expect(body.commands).toBeDefined();
+            expect(body.commands).toHaveLength(2);
+            body.commands.forEach((cmd, ind) => {
+              expect(cmd.command).toBe(testCommands[ind].command);
+              expect(cmd.description).toBe(testCommands[ind].description);
+            });
+
+            return Promise.resolve(
+              new Response(
+                getApiResponse<boolean>(
+                  false,
+                  true,
+                  testErrorCode,
+                  testErrorDescription,
+                  testRetryAfter,
+                ),
+                { status: 200 },
+              ),
+            );
           });
-        };
 
-        return getPromiseError(() => api.updates.setMyCommands(testCommands)).then((err) => {
+          const err = await getPromiseError(() => api.updates.setMyCommands(testCommands));
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
@@ -606,21 +681,23 @@ describe("[telegram api client]", () => {
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(testRetryAfter);
         });
-      });
 
-      it("telegram returned error code", () => {
-        const testErrorCode = 253;
+        it("telegram returned error code", async () => {
+          const testErrorCode = 253;
 
-        const testHook = "new-h-url";
+          const testHook = "new-h-url";
 
-        testApiResponse = getApiResponse<TgWebHook>(false, { url: testHook }, testErrorCode);
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/getWebhookInfo`);
+            expect(cfg?.body).toBe(undefined);
+            return Promise.resolve(
+              new Response(getApiResponse<TgWebHook>(false, { url: testHook }, testErrorCode), {
+                status: 200,
+              }),
+            );
+          });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/getWebhookInfo`);
-          expect(config.data).not.toBeDefined();
-        };
-
-        return getPromiseError(() => api.updates.getWebHookInfo()).then((err) => {
+          const err = await getPromiseError(() => api.updates.getWebHookInfo());
           expect(err.stack).toBeDefined();
           expect(err.message).toBe("ETELEGRAM Telegram request was unsuccessful");
           expect(err.code).toBe(testErrorCode);
@@ -629,39 +706,43 @@ describe("[telegram api client]", () => {
           expect(err.migrateToChatId).toBe(0);
           expect(err.retryAfter).toBe(0);
         });
-      });
 
-      it("telegram returned error code, description, retryAfter, migrateChatId", () => {
-        const testErrorCode = 918;
-        const testErrorDescription = "Really a trouble";
-        const testRetryAfter = 1355;
-        const testChatId = asChatId__test(323426);
-        const testMigrateToChat = asChatId__test(88723);
+        it("telegram returned error code, description, retryAfter, migrateChatId", async () => {
+          const testErrorCode = 918;
+          const testErrorDescription = "Really a trouble";
+          const testRetryAfter = 1355;
+          const testChatId = asChatId__test(323426);
+          const testMigrateToChat = asChatId__test(88723);
 
-        const testFileId = asFileId__test("debug-file-id");
-        const testFilePath = "path/to/tg/data";
+          const testFileId = asFileId__test("debug-file-id");
+          const testFilePath = "path/to/tg/data";
 
-        testApiResponse = getApiResponse<TgFile>(
-          false,
-          {
-            file_id: testFileId,
-            file_unique_id: "unused-identifier",
-            file_path: testFilePath,
-          },
-          testErrorCode,
-          testErrorDescription,
-          testRetryAfter,
-          testMigrateToChat,
-        );
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/getFile`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              file_id: string;
+            };
+            expect(body.file_id).toBe(testFileId);
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgFile>(
+                  false,
+                  {
+                    file_id: testFileId,
+                    file_unique_id: "unused-identifier",
+                    file_path: testFilePath,
+                  },
+                  testErrorCode,
+                  testErrorDescription,
+                  testRetryAfter,
+                  testMigrateToChat,
+                ),
+                { status: 200 },
+              ),
+            );
+          });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/getFile`);
-          expect(config.data).toBeDefined();
-          expect(Object.keys(config.data)).toHaveLength(1);
-          expect(config.data.file_id).toBe(testFileId);
-        };
-
-        return getPromiseError(() => api.chats.getFile(testFileId, testChatId)).then((err) => {
+          const err = await getPromiseError(() => api.chats.getFile(testFileId, testChatId));
           expect(err.stack).toBeDefined();
           expect(err.message).toBe(`ETELEGRAM ${testErrorDescription}`);
           expect(err.code).toBe(testErrorCode);
@@ -671,126 +752,84 @@ describe("[telegram api client]", () => {
           expect(err.retryAfter).toBe(testRetryAfter);
           expect(err.chatId).toBe(testChatId);
         });
-      });
 
-      it("getFileLink no file path", () => {
-        const testFileId = asFileId__test("debug-file-id");
-        const testChatId = asChatId__test(323426);
+        it("getFileLink no file path", async () => {
+          const testFileId = asFileId__test("debug-file-id");
+          const testChatId = asChatId__test(323426);
 
-        testApiResponse = getApiResponse<TgFile>(true, {
-          file_id: testFileId,
-          file_unique_id: "unused-identifier",
-        });
+          vi.spyOn(global, "fetch").mockImplementation((url, cfg) => {
+            expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/getFile`);
+            const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
+              file_id: string;
+            };
+            expect(body.file_id).toBe(testFileId);
+            return Promise.resolve(
+              new Response(
+                getApiResponse<TgFile>(true, {
+                  file_id: testFileId,
+                  file_unique_id: "unused-identifier",
+                }),
+                { status: 200 },
+              ),
+            );
+          });
 
-        checkApiData = (config) => {
-          expect(config.url).toBe(`/bot${testApiToken}/getFile`);
-          expect(config.data).toBeDefined();
-          expect(Object.keys(config.data)).toHaveLength(1);
-          expect(config.data.file_id).toBe(testFileId);
-        };
-
-        return getPromiseError(() => api.chats.getFile(testFileId, testChatId)).then((err) => {
+          const err = await getPromiseError(() => api.chats.getFile(testFileId, testChatId));
           expect(err.stack).toBeDefined();
           expect(err.chatId).toBe(testChatId);
           expect(err.url).toContain("getFile");
           expect(err.message).toBe("ETELEGRAM Unable to get the file link");
         });
       });
-    });
-  });
 
-  describe("http error cases", () => {
-    it("simple error, not network", () => {
-      const testErrMsg = "oops, we are in trouble";
-      const testErr = new Error(testErrMsg);
-      vi.spyOn(testClient, "request").mockImplementationOnce(() => {
-        return Promise.reject(testErr);
-      });
+      describe("http error cases", () => {
+        it("simple error, not network", async () => {
+          const testErrMsg = "oops, we are in trouble";
+          const testErr = new Error(testErrMsg);
+          vi.spyOn(global, "fetch").mockImplementation(() => Promise.reject(testErr));
 
-      const testChatId = asChatId__test(3453453);
-      const testMessageId = asMessageId__test(2345566);
-      const testText = "text text text";
-      const testChatType = "channel";
-      testApiResponse = getApiResponse<TgMessage>(true, {
-        date: Date.now(),
-        message_id: testMessageId,
-        chat: {
-          id: testChatId,
-          type: testChatType,
-        },
-      });
+          const testChatId = asChatId__test(3453453);
+          const testMessageId = asMessageId__test(2345566);
+          const testText = "text text text";
 
-      checkApiData = (config) => {
-        expect(config.url).toBe(`/bot${testApiToken}/editMessageText`);
-        expect(Object.keys(config.data)).toHaveLength(4);
-        expect(config.data.chat_id).toBe(testChatId);
-        expect(config.data.message_id).toBe(testMessageId);
-        expect(config.data.text).toBe(testText);
-        expect(config.data.parse_mode).toBe("HTML");
-      };
-
-      return getPromiseError(() =>
-        api.chats.editMessageText(testChatId, testMessageId, testText),
-      ).then((err) => {
-        expect(err.stack).toBeDefined();
-        expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
-        expect(err.code).toBe(0);
-        expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/editMessageText`);
-        expect(err.response).toBe(undefined);
-        expect(err.migrateToChatId).toBe(0);
-        expect(err.retryAfter).toBe(0);
-      });
-    });
-
-    it("network error", () => {
-      const testErrMsg = "yeah... bad";
-      const errCode = 404;
-      const errData = "err data";
-      const testErr = new Error(testErrMsg);
-      vi.spyOn(testClient, "request").mockImplementationOnce(() => {
-        const networkErr = new AxiosError(testErr.message, "400", undefined, undefined, {
-          status: errCode,
-          statusText: "cool co co cool",
-          data: errData,
-          config: {
-            headers: new AxiosHeaders(),
-          },
-          headers: {},
-          request: {},
+          const err = await getPromiseError(() =>
+            api.chats.editMessageText(testChatId, testMessageId, testText),
+          );
+          expect(err.stack).toBeDefined();
+          expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
+          expect(err.code).toBe(0);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/editMessageText`);
+          expect(err.response).toBe(undefined);
+          expect(err.migrateToChatId).toBe(0);
+          expect(err.retryAfter).toBe(0);
         });
-        networkErr.stack = testErr.stack;
-        networkErr.name = testErr.name;
-        return Promise.reject(networkErr);
-      });
 
-      const testChatId = asChatId__test(32422);
-      const testText = "op op op";
-      const testChatType = "supergroup";
-      testApiResponse = getApiResponse<TgMessage>(true, {
-        date: Date.now(),
-        message_id: asMessageId__test(4353411),
-        chat: {
-          id: testChatId,
-          type: testChatType,
-        },
-      });
+        it("network error", async () => {
+          const testErrMsg = "Yeah co cool";
+          const errCode = 404;
+          const errData = { some: "err data" };
 
-      checkApiData = (config) => {
-        expect(config.url).toBe(`/bot${testApiToken}/sendMessage`);
-        expect(Object.keys(config.data)).toHaveLength(3);
-        expect(config.data.chat_id).toBe(testChatId);
-        expect(config.data.text).toBe(testText);
-        expect(config.data.parse_mode).toBe("HTML");
-      };
+          vi.spyOn(global, "fetch").mockImplementationOnce(() => {
+            return Promise.resolve(
+              new Response(JSON.stringify(errData), {
+                status: errCode,
+                statusText: testErrMsg,
+              }),
+            );
+          });
 
-      return getPromiseError(() => api.chats.sendMessage(testChatId, testText)).then((err) => {
-        expect(err.stack).toBeDefined();
-        expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
-        expect(err.code).toBe(errCode);
-        expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/sendMessage`);
-        expect(err.response).toBe(errData);
-        expect(err.migrateToChatId).toBe(0);
-        expect(err.retryAfter).toBe(0);
+          const testChatId = asChatId__test(32422);
+          const testText = "op op op";
+
+          const err = await getPromiseError(() => api.chats.sendMessage(testChatId, testText));
+          expect(err.stack).toBeDefined();
+          expect(err.message).toBe(`ETELEGRAM ${testErrMsg}`);
+          expect(err.code).toBe(errCode);
+          expect(err.url).toBe(`/bot${SANITIZE_CHARACTER}/sendMessage`);
+          expect(err.response).toStrictEqual(errData);
+          expect(err.migrateToChatId).toBe(0);
+          expect(err.retryAfter).toBe(0);
+        });
       });
     });
   });

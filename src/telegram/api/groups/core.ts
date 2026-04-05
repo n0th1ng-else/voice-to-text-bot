@@ -1,4 +1,3 @@
-import axios, { type AxiosInstance, type AxiosResponse, isAxiosError } from "axios";
 import type { z } from "zod";
 import type { ApiErrorReflector, TgCore } from "../types.js";
 import { TgError } from "../tgerror.js";
@@ -12,23 +11,11 @@ export class TelegramBaseApi {
 
   private static readonly path = "bot";
 
-  private readonly client: AxiosInstance;
   private readonly apiToken: string;
   private errorReflector?: ApiErrorReflector;
 
   constructor(apiToken: string) {
     this.apiToken = apiToken;
-
-    this.client = axios.create({
-      method: "POST",
-      baseURL: TelegramBaseApi.url,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      timeout: TelegramBaseApi.timeout,
-      responseType: "json",
-    });
   }
 
   public setErrorReflector(errorReflector: ApiErrorReflector): void {
@@ -49,44 +36,73 @@ export class TelegramBaseApi {
     return schema.parse(result);
   }
 
+  private async parseErrorResponse(response: Response): Promise<TgCore<void>> {
+    try {
+      const answer = (await response.json()) as TgCore<void>;
+      return answer;
+    } catch {
+      return {
+        ok: false,
+        result: undefined,
+      };
+    }
+  }
+
   private async request<Response, Data>(
     methodName: string,
     data?: Data,
     chatId?: ChatId,
   ): Promise<Response> {
     const url = this.getApiUrl(methodName);
-
-    let response: AxiosResponse<TgCore<Response>> | null = null;
+    const fullUrl = `${TelegramBaseApi.url}${url}`;
 
     try {
-      response = await this.client.request<TgCore<Response>>({ url, data });
-    } catch (err) {
-      const tgError = new TgError(err, unknownHasMessage(err) ? err.message : undefined)
-        .setUrl(url, this.apiToken)
-        .setChatId(chatId);
+      const headers = new Headers();
+      headers.set("Accept", "application/json");
+      headers.set("Content-Type", "application/json");
+      const response = await fetch(fullUrl, {
+        method: "POST",
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+        signal: AbortSignal.timeout(TelegramBaseApi.timeout),
+      });
 
-      if (isAxiosError(err)) {
-        tgError.setErrorCode(err.response?.status).setResponse(err.response?.data);
+      if (!response.ok) {
+        const answer = await this.parseErrorResponse(response);
+
+        const tgError = new TgError(new Error(response.statusText), response.statusText)
+          .setUrl(url, this.apiToken)
+          .setChatId(chatId)
+          .setErrorCode(response.status)
+          .setResponse(answer);
+
+        throw tgError;
       }
+
+      const answer = (await response.json()) as TgCore<Response>;
+      if (!answer.ok) {
+        const tgError = new TgError(new Error(answer.description), answer.description)
+          .setUrl(url, this.apiToken)
+          .setErrorCode(answer.error_code)
+          .setRetryAfter(answer?.parameters?.retry_after)
+          .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
+          .setChatId(chatId);
+
+        throw tgError;
+      }
+
+      return answer.result;
+    } catch (err) {
+      const wrappedErr =
+        err instanceof TgError
+          ? err
+          : new TgError(err, unknownHasMessage(err) ? err.message : undefined)
+              .setUrl(url, this.apiToken)
+              .setChatId(chatId);
+
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.errorReflector?.(tgError);
-      throw tgError;
+      this.errorReflector?.(wrappedErr);
+      throw wrappedErr;
     }
-
-    const answer = response.data;
-    if (!answer.ok) {
-      const tgError = new TgError(new Error(answer.description), answer.description)
-        .setUrl(url, this.apiToken)
-        .setErrorCode(answer.error_code)
-        .setRetryAfter(answer?.parameters?.retry_after)
-        .setMigrateToChatId(answer?.parameters?.migrate_to_chat_id)
-        .setChatId(chatId);
-
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.errorReflector?.(tgError);
-      throw tgError;
-    }
-
-    return answer.result;
   }
 }
