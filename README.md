@@ -51,8 +51,9 @@ and the results you can see below in the table.
 
 - [Typescript](https://www.typescriptlang.org/)
 - [Fastify](https://fastify.dev/)
-- [Axios](https://axios-http.com/)
 - [PostgreSQL](https://node-postgres.com/)
+- [NewRelic](https://newrelic.com/)
+- [Sentry](https://sentry.io/)
 - Google Analytics
 - [Amplitude](https://amplitude.com/)
 

@@ -1,8 +1,7 @@
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
-import { openAsBlob } from "node:fs";
 import { addAttachment } from "../monitoring/sentry/index.js";
 import { Logger } from "../logger/index.js";
-import { getAudioFilePath } from "../ffmpeg/index.js";
+import { getAudioBlob } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 
 const logger = new Logger("api-base-recognition");
@@ -27,11 +26,10 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const filePath = await getAudioFilePath(fileLink, isLocalFile, !this.useRawFile);
+    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile, !this.useRawFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
 
     try {
-      const fileBlob = await openAsBlob(filePath);
       const result = await this.recognise(
         {
           data: fileBlob,

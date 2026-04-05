@@ -1,9 +1,10 @@
 import AWS from "aws-sdk";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
-import { getAudioBuffer } from "../ffmpeg/index.js";
+import { getAudioBlob } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
+import { deleteFileIfExists } from "../files/index.js";
 
 const logger = new Logger("aws-recognition");
 
@@ -97,11 +98,16 @@ export class AWSProvider extends VoiceConverter {
       });
   }
 
-  private processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
-    return getAudioBuffer(fileLink, isLocalFile)
-      .then((file) => this.uploadToS3(name, file))
-      .then((info) => this.convertToText(name, info.Location))
-      .then((info) => this.getJobWithDelay(name, info));
+  private async processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
+    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    try {
+      const info1 = await this.uploadToS3(name, fileBlob);
+      const info2 = await this.convertToText(name, info1.Location);
+      const text = await this.getJobWithDelay(name, info2);
+      return text;
+    } finally {
+      await deleteFileIfExists(filePath);
+    }
   }
 
   private async unpackTranscription(translationData: TranscriptionData): Promise<string> {
@@ -138,7 +144,7 @@ export class AWSProvider extends VoiceConverter {
       .then((job) => this.getJobWithDelay(name, job));
   }
 
-  private uploadToS3(name: string, file: Buffer<ArrayBufferLike>): Promise<AWSUpload> {
+  private uploadToS3(name: string, file: Blob): Promise<AWSUpload> {
     logger.info("Uploading to S3", name);
     return new Promise<AWSUpload>((resolve, reject) => {
       this.storage.upload(

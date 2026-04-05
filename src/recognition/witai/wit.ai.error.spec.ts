@@ -47,7 +47,7 @@ describe("WitAi errors", () => {
       const msg = "ooops";
       const err = new WitAiError(errCause, msg);
       const bufferMessage = "hello";
-      const buff = new Buffer(bufferMessage);
+      const buff = new Blob([bufferMessage]);
       err.setBufferLength(buff);
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`EWITAI ${msg}`);

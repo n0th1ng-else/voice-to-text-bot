@@ -46,7 +46,6 @@
     "@sentry/node": "10.34.0",
     "@sentry/profiling-node": "10.34.0",
     "aws-sdk": "2.1310.0",
-    "axios": "1.14.0",
     "fastify": "5.8.4",
     "ffmpeg-static": "5.3.0",
     "fluent-ffmpeg": "2.1.3",

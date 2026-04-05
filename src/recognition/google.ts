@@ -2,9 +2,10 @@ import { v1 } from "@google-cloud/speech";
 import type { google } from "@google-cloud/speech/build/protos/protos.js";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { getAudioBuffer } from "../ffmpeg/index.js";
+import { getAudioBlob } from "../ffmpeg/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
+import { deleteFileIfExists } from "../files/index.js";
 
 const logger = new Logger("google-recognition");
 
@@ -31,7 +32,7 @@ export class GoogleProvider extends VoiceConverter {
     });
   }
 
-  public transformToText(
+  public async transformToText(
     fileLink: string,
     fileDuration: number,
     lang: LanguageCode,
@@ -42,27 +43,33 @@ export class GoogleProvider extends VoiceConverter {
     logger.info(`Starting process for ${Logger.y(name)}`);
     const duration = new TimeMeasure();
 
-    return getAudioBuffer(fileLink, isLocalFile)
-      .then((bufferData) => {
-        logger.info(`Start converting ${Logger.y(name)}`);
-        return this.service.recognize({
-          audio: {
-            content: bufferData.toString("base64"),
-          },
-          config: {
-            enableAutomaticPunctuation: true,
-            model: "phone_call",
-            useEnhanced: true,
-            languageCode: lang,
-          },
-        });
-      })
-      .then(([translationData]) => this.unpackTranscription(translationData))
-      .then((text) => {
-        logger.info(`Job ${Logger.y(name)} completed`);
-        trackRecognitionTime("GOOGLE", duration.getMs(), fileDuration);
-        return text;
+    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    logger.info(`Start converting ${Logger.y(name)}`);
+
+    try {
+      const arrayBuffer = await fileBlob.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const fileStr = buffer.toString("base64");
+
+      const [translationData] = await this.service.recognize({
+        audio: {
+          content: fileStr,
+        },
+        config: {
+          enableAutomaticPunctuation: true,
+          model: "phone_call",
+          useEnhanced: true,
+          languageCode: lang,
+        },
       });
+
+      const text = await this.unpackTranscription(translationData);
+      logger.info(`Job ${Logger.y(name)} completed`);
+      trackRecognitionTime("GOOGLE", duration.getMs(), fileDuration);
+      return text;
+    } finally {
+      await deleteFileIfExists(filePath);
+    }
   }
 
   private async unpackTranscription(
