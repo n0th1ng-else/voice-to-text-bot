@@ -3,7 +3,8 @@
  */
 export const fetchPropFromUnknown = <T>(obj: unknown, prop: string, defaultVal: T): T => {
   // @ts-expect-error Sometimes we need this JS spice
-  return obj && typeof obj === "object" && prop in obj ? obj[prop] : defaultVal;
+  const res = obj && typeof obj === "object" && prop in obj ? obj[prop] : defaultVal;
+  return res ?? defaultVal;
 };
 
 export const unknownHasMessage = (obj: unknown): obj is { message: string } => {

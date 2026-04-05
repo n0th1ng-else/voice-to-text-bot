@@ -31,4 +31,12 @@ describe("unknown", () => {
   ])("fetchPropFromUnknown %s is %s", (input, expected) => {
     expect(fetchPropFromUnknown(input, "message", "def-value")).toEqual(expected);
   });
+
+  it.each([[{ message: null }], [{ message: undefined }]])(
+    "fetchPropFromUnknown %s is %s",
+    (input) => {
+      const expectedDefault = "def-value";
+      expect(fetchPropFromUnknown(input, "message", expectedDefault)).toEqual(expectedDefault);
+    },
+  );
 });
