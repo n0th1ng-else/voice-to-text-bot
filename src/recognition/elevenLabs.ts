@@ -2,11 +2,12 @@ import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter, type ConverterMeta, type LanguageCode } from "./types.js";
 import { addAttachment } from "../monitoring/sentry/index.js";
-import { getAudioBuffer } from "../ffmpeg/index.js";
+import { getAudioBlob } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { API_TIMEOUT_MS } from "../const.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
+import { deleteFileIfExists } from "../files/index.js";
 
 const logger = new Logger("11-labs-recognition");
 
@@ -35,17 +36,18 @@ export class ElevenLabsProvider extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const rawWav = await getAudioBuffer(fileLink, isLocalFile);
+    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
 
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
-    return this.recognise(rawWav, fileDuration, lang);
+    try {
+      const text = await this.recognise(fileBlob, fileDuration, lang);
+      return text;
+    } finally {
+      await deleteFileIfExists(filePath);
+    }
   }
 
-  private async recognise(
-    buffer: Buffer<ArrayBufferLike>,
-    fileDuration: number,
-    lang: LanguageCode,
-  ): Promise<string> {
+  private async recognise(buffer: Blob, fileDuration: number, lang: LanguageCode): Promise<string> {
     const duration = new TimeMeasure();
 
     const recognition = await this.client.speechToText.convert(

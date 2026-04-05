@@ -1,5 +1,4 @@
 import { z } from "zod";
-import axios from "axios";
 import { Logger } from "../../logger/index.js";
 import {
   VoiceConverter,
@@ -7,13 +6,16 @@ import {
   type LanguageCode,
   type LanguageTokens,
 } from "../types.js";
-import { getAudioBuffer } from "../../ffmpeg/index.js";
+import { getAudioBlob } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
 import { addAttachment } from "../../monitoring/sentry/index.js";
 import { trackRecognitionTime } from "../../monitoring/newrelic.js";
+import { unknownHasMessage } from "../../common/unknown.js";
+import { getResponseErrorData } from "../../server/error.js";
+import { deleteFileIfExists } from "../../files/index.js";
 
 const logger = new Logger("wit-ai-recognition");
 
@@ -39,7 +41,7 @@ export class WithAiProvider extends VoiceConverter {
     const name = `${logData.fileId}.ogg`;
     addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const bufferData = await getAudioBuffer(fileLink, isLocalFile);
+    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const token = this.getApiToken(lang);
     if (!token) {
@@ -47,12 +49,17 @@ export class WithAiProvider extends VoiceConverter {
         cause: { lang },
       });
     }
-    const result = await WithAiProvider.recognise(bufferData, fileDuration, token, logData.prefix);
-    return result;
+
+    try {
+      const result = await WithAiProvider.recognise(fileBlob, fileDuration, token, logData.prefix);
+      return result;
+    } finally {
+      await deleteFileIfExists(filePath);
+    }
   }
 
   private static async recognise(
-    data: Buffer<ArrayBufferLike>,
+    data: Blob,
     fileDuration: number,
     authToken: string,
     logPrefix: string,
@@ -102,22 +109,16 @@ export class WithAiProvider extends VoiceConverter {
       });
   }
 
-  private static async recogniseSpeech(
-    data: Buffer<ArrayBufferLike>,
-    authToken: string,
-  ): Promise<WitAiResponse[]> {
+  private static async recogniseSpeech(data: Blob, authToken: string): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(data, "speech", WitAiResponseSchema, authToken);
   }
 
-  private static async recogniseDictation(
-    data: Buffer<ArrayBufferLike>,
-    authToken: string,
-  ): Promise<WitAiResponse[]> {
+  private static async recogniseDictation(data: Blob, authToken: string): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(data, "dictation", WitAiResponseSchema, authToken);
   }
 
   private static async runRequest<Output, Input = Output>(
-    data: Buffer<ArrayBufferLike>,
+    data: Blob,
     path: "speech" | "dictation",
     schema: z.ZodType<Output, Input>,
     authToken: string,
@@ -126,51 +127,46 @@ export class WithAiProvider extends VoiceConverter {
       throw new Error("The auth token is not provided");
     }
 
-    const url = `${WithAiProvider.url}/${path}`;
-    return axios
-      .request<string>({
+    const url = new URL(`${WithAiProvider.url}/${path}`);
+    url.searchParams.set("v", WithAiProvider.apiVersion);
+
+    try {
+      const response = await fetch(url, {
         method: "POST",
-        url,
-        params: {
-          v: WithAiProvider.apiVersion,
-        },
         headers: {
           Authorization: `Bearer ${authToken}`,
           Accept: "application/json",
           "Content-Type": `audio/raw;encoding=signed-integer;bits=16;rate=${wavSampleRate};endian=little`,
-          "Transfer-Encoding": "chunked",
         },
-        timeout: API_TIMEOUT_MS,
         signal: AbortSignal.timeout(API_TIMEOUT_MS),
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        responseType: "text",
-        data,
-        transformResponse: (d: string) => d,
-      })
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error("The api request was unsuccessful");
-        }
+        body: data,
+      });
 
-        return response.data;
-      })
-      .catch((err) => {
-        const attachedError = axios.isAxiosError(err) ? err.toJSON() : err;
-        delete attachedError?.config;
-
-        const witAiError = new WitAiError(attachedError, attachedError.message)
-          .setUrl(url)
-          .setErrorCode(attachedError?.status)
-          .setBufferLength(data);
+      if (!response.ok) {
+        const errResp = await getResponseErrorData(response);
+        const err = new Error("The api request was unsuccessful");
+        const witAiError = new WitAiError(err, err.message)
+          .setUrl(`${url}`)
+          .setErrorCode(response.status)
+          .setBufferLength(data)
+          .setResponse(errResp);
 
         throw witAiError;
-      })
-      .then((response) => {
-        const arraySchema = z.array(schema);
-        const chunks = arraySchema.parse(parseChunkedResponse(response));
-        return chunks;
-      });
+      }
+
+      const text = await response.text();
+      const arraySchema = z.array(schema);
+      const chunks = arraySchema.parse(parseChunkedResponse(text));
+      return chunks;
+    } catch (err) {
+      const wrappedErr =
+        err instanceof WitAiError
+          ? err
+          : new WitAiError(err, unknownHasMessage(err) ? err.message : undefined)
+              .setUrl(`${url}`)
+              .setBufferLength(data);
+      throw wrappedErr;
+    }
   }
 
   private getApiToken(lang: LanguageCode): string | undefined {
