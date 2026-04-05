@@ -35,7 +35,7 @@ jobs:
         uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Install Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -47,7 +47,7 @@ jobs:
       #        run: pip install gdown && gdown ${{ secrets.WHISPER_MODEL_URL }} -O ./model-cache
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.repository_owner }}
@@ -55,7 +55,7 @@ jobs:
 
       - name: Publish to Registry
         if: inputs.docker-tag == ''
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
@@ -68,7 +68,7 @@ jobs:
 
       - name: Publish to Registry and extra tag
         if: inputs.docker-tag != ''
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
