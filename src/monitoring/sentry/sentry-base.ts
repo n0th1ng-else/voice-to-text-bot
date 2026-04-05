@@ -64,17 +64,17 @@ export abstract class SentryBase {
       const requestUserId = fetchPropFromUnknown<string>(
         fetchPropFromUnknown(requestMessage, "from", {}),
         "id",
-        "",
+        "n/a",
       );
       const requestUserLanguage = fetchPropFromUnknown<string>(
         fetchPropFromUnknown(requestMessage, "from", {}),
         "language_code",
-        "",
+        "n/a",
       );
       const requestChatId = fetchPropFromUnknown<string>(
         fetchPropFromUnknown(requestMessage, "chat", {}),
         "id",
-        "",
+        "n/a",
       );
 
       this.setMetadataAndTags(
@@ -89,7 +89,7 @@ export abstract class SentryBase {
         {
           "tg.chatId": requestChatId,
           "tg.userId": requestUserId,
-          "ts.userLanguage": requestUserLanguage,
+          "tg.userLanguage": requestUserLanguage,
         },
         done,
       );
