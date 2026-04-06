@@ -5,7 +5,7 @@ import {
   type TgUpdate,
 } from "./api/types.js";
 import { Logger } from "../logger/index.js";
-import { type VoiceConverters } from "../recognition/types.js";
+import type { VoiceConverters, VoiceConvertersHealth } from "../recognition/types.js";
 import { TranslationKeys } from "../text/types.js";
 import { TelegramMessagePrefix } from "./models/messagePrefix.js";
 import { BotMessageModel } from "./models/botMessage.js";
@@ -125,8 +125,14 @@ export class TelegramBotModel {
     );
   }
 
-  public getHostLocation(): Promise<string> {
-    return this.bot.updates.getWebHookInfo().then((info) => info.url);
+  public async getHostLocation(): Promise<string> {
+    const info = await this.bot.updates.getWebHookInfo();
+    return info.url;
+  }
+
+  public async getVoiceRecognitionHealth(): Promise<VoiceConvertersHealth> {
+    const status = await this.actions.voice.getVoiceRecognizersHealth();
+    return status;
   }
 
   public setPayment(payment: PaymentService): this {

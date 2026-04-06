@@ -24,6 +24,7 @@ apiSpy.mockImplementation(() => {
   const dto: HealthDto = {
     version: "new2",
     urls: [],
+    recognitionEngineStatuses: [],
     status: HealthStatus.Online,
     message: "ok",
     ssl: HealthSsl.Off,

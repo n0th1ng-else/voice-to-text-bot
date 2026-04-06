@@ -17,7 +17,10 @@ export const VoiceConverterProviderSchema = z
 export type VoiceConverterProvider = z.infer<typeof VoiceConverterProviderSchema>;
 
 export abstract class VoiceConverter {
+  public readonly name: string;
+
   protected constructor(name: string) {
+    this.name = name;
     logger.info(`Using ${Logger.y(name)}`);
   }
 
@@ -28,6 +31,10 @@ export abstract class VoiceConverter {
     logData: ConverterMeta,
     isLocalFile: boolean,
   ): Promise<string>;
+
+  public async getStatus(): Promise<"ok" | "error"> {
+    return "ok";
+  }
 }
 
 export const LanguageSchema = z.enum(["en-US", "ru-RU"]).describe("Supported language codes");
@@ -48,3 +55,8 @@ export type ConverterMeta = {
 export type ConverterType = "main" | "advanced";
 
 export type VoiceConverters = Record<ConverterType, VoiceConverter>;
+
+export type VoiceConvertersHealth = Record<
+  ConverterType,
+  { provider: string; state: "ok" | "error" }
+>;

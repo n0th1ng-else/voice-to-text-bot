@@ -273,7 +273,10 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
 
     try {
       const urls = await Promise.all(this.bots.map((bot) => bot.getHostLocation()));
-      status.setOnline(urls);
+      const recognizers = await Promise.all(
+        this.bots.map((bot) => bot.getVoiceRecognitionHealth()),
+      );
+      status.setOnline(urls).setRecognizersStatus(recognizers);
       return [200, status.getDto()];
     } catch (err) {
       const errorMessage = "Unable to get bot urls";

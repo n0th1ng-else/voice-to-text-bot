@@ -68,7 +68,8 @@ export const witAiApi = {
 
 export const selfApi = {
   apiToken: "",
-  baseUrl: "",
+  apiUrl: "",
+  healthUrl: "",
   useRawFile: false,
 };
 

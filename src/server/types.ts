@@ -2,6 +2,7 @@ import type { ValueOf, VoidFunction, VoidPromise } from "../common/types.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import type { getDb } from "../db/index.js";
 import type { RuntimeEngineType } from "../engines/index.js";
+import type { VoiceConvertersHealth } from "../recognition/types.js";
 
 export type ServerStatCore = ReturnType<typeof getDb>;
 
@@ -36,6 +37,7 @@ export type HealthDto = {
   ssl: HealthSslType;
   message: string;
   urls: string[];
+  recognitionEngineStatuses: VoiceConvertersHealth[];
   version: string;
   threadId: number;
   serverName: string;
@@ -70,6 +72,7 @@ export class HealthModel {
   private status: HealthStatusType = HealthStatus.InProgress;
   private message = "Waiting for bots to set up";
   private urls: string[] = [];
+  private recognitionEngineStatuses: VoiceConvertersHealth[] = [];
   private daysOnlineCurrent = 0;
   private daysOnlineLimit = 0;
 
@@ -89,10 +92,16 @@ export class HealthModel {
     this.ssl = isHttps ? HealthSsl.On : HealthSsl.Off;
   }
 
-  public setOnline(urls: string[]): void {
+  public setOnline(urls: string[]): this {
     this.status = HealthStatus.Online;
     this.message = "All is good";
     this.urls = [...urls];
+    return this;
+  }
+
+  public setRecognizersStatus(statuses: VoiceConvertersHealth[]): this {
+    this.recognitionEngineStatuses = statuses;
+    return this;
   }
 
   public setMessage(message: string, isError = false): void {
@@ -113,6 +122,7 @@ export class HealthModel {
       version: this.version,
       status: this.status,
       urls: this.urls,
+      recognitionEngineStatuses: this.recognitionEngineStatuses,
       message: this.message,
       threadId: this.threadId,
       serverName: this.serverName,

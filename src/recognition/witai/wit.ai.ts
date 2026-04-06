@@ -20,7 +20,6 @@ import { deleteFileIfExists } from "../../files/index.js";
 const logger = new Logger("wit-ai-recognition");
 
 export class WithAiProvider extends VoiceConverter {
-  protected readonly name = "Wit.ai";
   public static readonly url = "https://api.wit.ai";
   private static readonly apiVersion = "20230215";
   private readonly tokens: LanguageTokens;

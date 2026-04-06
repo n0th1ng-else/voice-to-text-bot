@@ -17,8 +17,8 @@ type ApiResponse = {
 export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
   private readonly apiToken: string;
 
-  constructor(baseUrl: string, token: string, useRawFile: boolean) {
-    super("API.SelfHosted", baseUrl, useRawFile);
+  constructor(baseUrl: string, token: string, useRawFile: boolean, healthUrl: string) {
+    super("API.SelfHosted", baseUrl, useRawFile, healthUrl);
     this.apiToken = token;
     if (!this.apiToken) {
       logger.warn("The api token is not provided");
