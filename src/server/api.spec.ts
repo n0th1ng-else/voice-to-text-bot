@@ -7,6 +7,7 @@ const TEST_URL = "https://google.com";
 const TEST_RESPONSE: HealthDto = {
   version: "new2",
   urls: [],
+  recognitionEngineStatuses: [],
   status: HealthStatus.Online,
   message: "ok",
   ssl: HealthSsl.Off,

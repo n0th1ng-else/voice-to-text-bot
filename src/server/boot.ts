@@ -14,7 +14,11 @@ import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
 import { type BotServerModel, HealthStatus } from "./types.js";
-import { trackApplicationErrors, trackApplicationHealth } from "../monitoring/newrelic.js";
+import {
+  trackApplicationErrors,
+  trackApplicationHealth,
+  trackRecognitionProviderHealth,
+} from "../monitoring/newrelic.js";
 import { requestHealthData } from "./api.js";
 import { getRuntimeEngineType } from "../engines/index.js";
 import { prepareSentryInstance } from "../monitoring/sentry/index.js";
@@ -112,10 +116,21 @@ export const prepareStopListener = async (): Promise<StopListener> => {
     async () => {
       try {
         const value = await requestHealthData(selfUrl);
-        const status = value.status === HealthStatus.Online ? "UP" : "DOWN";
+        const status = value.status === HealthStatus.Online ? "ok" : "error";
+        const statuses = value.recognitionEngineStatuses.reduce<Record<string, "ok" | "error">>(
+          (acc, itm) => {
+            acc[itm.main.provider] = itm.main.state;
+            acc[itm.advanced.provider] = itm.advanced.state;
+            return acc;
+          },
+          {},
+        );
         trackApplicationHealth(status);
+        Object.entries(statuses).forEach(([key, value]) => {
+          trackRecognitionProviderHealth(key, value);
+        });
       } catch (err) {
-        trackApplicationHealth("DOWN");
+        trackApplicationHealth("error");
         throw err;
       }
     },

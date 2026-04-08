@@ -51,8 +51,17 @@ export const trackApplicationErrors = (type: "Error" | "Warning" | "Launch"): vo
   newrelic.incrementMetric(`ApplicationHealth/${type}`);
 };
 
-export const trackApplicationHealth = (type: "UP" | "DOWN"): void => {
-  newrelic.recordMetric("ApplicationHealth/Status", type === "UP" ? 2 : 1);
+export const trackApplicationHealth = (status: "ok" | "error"): void => {
+  newrelic.recordCustomEvent("ApplicationHealth", {
+    status,
+  });
+};
+
+export const trackRecognitionProviderHealth = (provider: string, status: "ok" | "error"): void => {
+  newrelic.recordCustomEvent("RecognitionProviderHealth", {
+    provider,
+    status,
+  });
 };
 
 type UserActivityData = {

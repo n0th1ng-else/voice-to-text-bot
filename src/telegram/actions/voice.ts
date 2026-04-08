@@ -2,7 +2,11 @@ import { GenericAction } from "./common.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
-import { type LanguageCode, type VoiceConverters } from "../../recognition/types.js";
+import type {
+  LanguageCode,
+  VoiceConverters,
+  VoiceConvertersHealth,
+} from "../../recognition/types.js";
 import { collectAnalytics } from "../../analytics/index.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { isBlockedByUser } from "../api/tgerror.js";
@@ -61,6 +65,34 @@ export class VoiceAction extends GenericAction {
 
   public setConverters(converters: VoiceConverters): void {
     this.converters = converters;
+  }
+
+  public async getVoiceRecognizersHealth(): Promise<VoiceConvertersHealth> {
+    if (!this.converters) {
+      const res: VoiceConvertersHealth = {
+        main: {
+          provider: "n/a",
+          state: "error",
+        },
+        advanced: {
+          provider: "n/a",
+          state: "error",
+        },
+      };
+      return res;
+    }
+
+    const res: VoiceConvertersHealth = {
+      main: {
+        provider: this.converters.main.name,
+        state: await this.converters.main.getStatus(),
+      },
+      advanced: {
+        provider: this.converters.advanced.name,
+        state: await this.converters.advanced.getStatus(),
+      },
+    };
+    return res;
   }
 
   private async recogniseVoiceMessage(

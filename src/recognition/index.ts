@@ -23,7 +23,8 @@ export type SupportedEnvironment = {
   };
   selfApi: {
     apiToken: string;
-    baseUrl: string;
+    apiUrl: string;
+    healthUrl: string;
     useRawFile: boolean;
   };
 };
@@ -70,9 +71,10 @@ const getVoiceConverterInstance = async (
     case "API_SELF":
       return import("./apiSelfHost.js").then(({ ApiSelfHost }) => {
         return new ApiSelfHost(
-          environment.selfApi.baseUrl,
+          environment.selfApi.apiUrl,
           environment.selfApi.apiToken,
           environment.selfApi.useRawFile,
+          environment.selfApi.healthUrl,
         );
       });
     default:

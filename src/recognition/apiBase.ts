@@ -9,11 +9,28 @@ const logger = new Logger("api-base-recognition");
 export abstract class APIVoiceConverter<Res> extends VoiceConverter {
   protected readonly useRawFile: boolean;
   protected readonly url: string;
+  protected readonly healthUrl: string;
 
-  protected constructor(name: string, baseUrl: string, useRawFile: boolean) {
+  protected constructor(name: string, baseUrl: string, useRawFile: boolean, healthUrl: string) {
     super(name);
     this.useRawFile = useRawFile;
     this.url = baseUrl;
+    this.healthUrl = healthUrl;
+  }
+
+  public async getStatus(): Promise<"ok" | "error"> {
+    if (!this.healthUrl) {
+      return "ok";
+    }
+
+    try {
+      const response = await fetch(this.healthUrl, {
+        signal: AbortSignal.timeout(1_000),
+      });
+      return response.ok ? "ok" : "error";
+    } catch {
+      return "error";
+    }
   }
 
   public async transformToText(
