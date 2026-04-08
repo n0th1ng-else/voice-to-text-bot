@@ -23,6 +23,7 @@ import {
   trackVoiceDuration,
 } from "../../monitoring/newrelic.js";
 import { getConverterType } from "../../subscription/utils.js";
+import { addAttachment, clearAttachments } from "../../monitoring/sentry/index.js";
 
 const logger = new Logger("telegram-bot");
 
@@ -108,6 +109,7 @@ export class VoiceAction extends GenericAction {
           throw new Error("Voice converters are not set!");
         }
 
+        addAttachment(fileId, fileLink);
         const converter = getConverterType(model);
 
         return Promise.all([
@@ -194,6 +196,9 @@ export class VoiceAction extends GenericAction {
         const errorMessage = "Unable to send a message that file is unable to recognize";
         logger.error(`${prefix.getPrefix()} ${errorMessage}`, err);
         model.analytics.addError(errorMessage);
+      })
+      .finally(() => {
+        clearAttachments();
       });
   }
 

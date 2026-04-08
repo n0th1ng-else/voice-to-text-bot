@@ -1,7 +1,6 @@
 import { arch } from "node:os";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { addAttachment } from "../monitoring/sentry/index.js";
 import { getWavFilePath } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 import { runWhisper } from "../whisper/whisper-engine.js";
@@ -48,7 +47,6 @@ export class WhisperProvider extends VoiceConverter {
 
     const duration = new TimeMeasure();
     const name = logData.fileId;
-    addAttachment(name, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
 
     const filePath = await getWavFilePath(fileLink, isLocalFile);

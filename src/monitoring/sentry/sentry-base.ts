@@ -19,12 +19,18 @@ export abstract class SentryBase {
   protected cancelledErrorRateCount = 0;
 
   public abstract init(app: FastifyInstance): void;
+
   public abstract captureException(error: unknown): void;
+
   public abstract captureMessage(
     message: string,
     captureContext?: { level: "warning"; extra?: Record<string, unknown> },
   ): void;
+
   public abstract addAttachment(filename: string, data: string | Uint8Array): void;
+
+  public abstract clearAttachments(): void;
+
   protected abstract setMetadataAndTags(
     meta: SentryMetadata,
     tags: Record<string, string>,

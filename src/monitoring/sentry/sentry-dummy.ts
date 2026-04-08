@@ -20,6 +20,10 @@ export class SentryDummyClient extends SentryBase {
     return;
   }
 
+  public clearAttachments(): void {
+    return;
+  }
+
   public setMetadataAndTags(): void {
     return;
   }
