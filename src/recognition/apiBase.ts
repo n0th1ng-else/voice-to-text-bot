@@ -1,5 +1,4 @@
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
-import { addAttachment } from "../monitoring/sentry/index.js";
 import { Logger } from "../logger/index.js";
 import { getAudioBlob } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
@@ -41,7 +40,6 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
     isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
-    addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
     const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile, !this.useRawFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);

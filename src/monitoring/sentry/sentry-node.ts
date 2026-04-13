@@ -66,6 +66,10 @@ export class SentryNodeClient extends SentryBase {
     });
   }
 
+  public clearAttachments(): void {
+    getCurrentScope().clearAttachments();
+  }
+
   public setMetadataAndTags(
     meta: SentryMetadata,
     tags: Record<string, string>,

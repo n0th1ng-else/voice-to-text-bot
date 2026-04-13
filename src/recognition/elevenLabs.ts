@@ -1,7 +1,6 @@
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter, type ConverterMeta, type LanguageCode } from "./types.js";
-import { addAttachment } from "../monitoring/sentry/index.js";
 import { getAudioBlob } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { API_TIMEOUT_MS } from "../const.js";
@@ -34,7 +33,6 @@ export class ElevenLabsProvider extends VoiceConverter {
     isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
-    addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
     const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
 

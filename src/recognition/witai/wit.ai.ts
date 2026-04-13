@@ -11,7 +11,6 @@ import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
 import { WitAiChunkError, WitAiError } from "./wit.ai.error.js";
-import { addAttachment } from "../../monitoring/sentry/index.js";
 import { trackRecognitionTime } from "../../monitoring/newrelic.js";
 import { unknownHasMessage } from "../../common/unknown.js";
 import { getResponseErrorData } from "../../server/error.js";
@@ -38,7 +37,6 @@ export class WithAiProvider extends VoiceConverter {
     isLocalFile: boolean,
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
-    addAttachment(logData.fileId, fileLink);
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
     const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);

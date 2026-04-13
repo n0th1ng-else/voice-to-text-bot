@@ -44,6 +44,14 @@ export const addAttachment = (filename: string, data: string | Uint8Array): void
   sentry__singleton.addAttachment(filename, data);
 };
 
+export const clearAttachments = (): void => {
+  if (!sentry__singleton) {
+    throw new Error("Sentry is not initialized");
+  }
+
+  sentry__singleton.clearAttachments();
+};
+
 export const initSentry = (app: FastifyInstance): void => {
   if (!sentry__singleton) {
     throw new Error("Sentry is not initialized");
