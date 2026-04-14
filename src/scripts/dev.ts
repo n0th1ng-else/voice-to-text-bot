@@ -7,11 +7,11 @@ const logger = new Logger("dev-script");
 
 const startServer = async (server: BotServerModel, threadId: number): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
-  const stopListener = await prepareStopListener();
 
+  const stopListener = await prepareStopListener(server);
   await server.applyHostLocation(launchDelay);
-  const onStop = await server.start();
-  stopListener.addTrigger(() => onStop());
+  const stopFn = await server.start();
+  stopListener.addTrigger(() => stopFn());
 };
 
 export const run = async (threadId = 0): Promise<void> => {

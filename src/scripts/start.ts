@@ -8,10 +8,12 @@ const logger = new Logger("start-script");
 
 const startServer = async (server: BotServerModel, threadId: number): Promise<void> => {
   const launchDelay = getLaunchDelay(threadId);
-  const stopListener = await prepareStopListener();
+
+  const stopListener = await prepareStopListener(server);
+  await server.applyHostLocation(launchDelay);
   const stopFn = await server.start();
-  stopListener.addTrigger(stopFn);
-  await server.triggerDaemon(envy.nextReplicaUrl, envy.replicaLifecycleInterval, launchDelay);
+  stopListener.addTrigger(() => stopFn());
+  await server.triggerDaemon(envy.nextReplicaUrl, envy.replicaLifecycleInterval);
 };
 
 export const run = async (threadId = 0): Promise<void> => {
