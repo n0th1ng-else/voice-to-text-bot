@@ -137,12 +137,12 @@ describe("[uptime daemon]", () => {
     it.each([
       ["negative", -2],
       ["zero", 0],
-    ])("Triggers daemon with minimal 1 day interval if the interval is %s", async (_, interval) => {
+    ])("Does not trigger daemon if the interval is %s", async (_, interval) => {
       await server.triggerDaemon(nextUrl, interval);
 
-      expect(vi.getTimerCount()).toBe(1);
-      expect(apiSpy).toHaveBeenCalledWith(hostUrl);
-      expect(apiSpy).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+      expect(apiSpy).not.toHaveBeenCalled();
+      expect(apiSpy).not.toHaveBeenCalled();
     });
   });
 });

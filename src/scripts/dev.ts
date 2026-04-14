@@ -15,7 +15,10 @@ const startServer = async (server: BotServerModel, threadId: number): Promise<vo
 };
 
 export const run = async (threadId = 0): Promise<void> => {
-  return prepareInstance(threadId)
-    .then((server) => startServer(server, threadId))
-    .catch((err) => logger.error("Failed to run dev instance", err));
+  try {
+    const server = await prepareInstance(threadId);
+    await startServer(server, threadId);
+  } catch (err) {
+    logger.error("Failed to run dev instance", err);
+  }
 };
