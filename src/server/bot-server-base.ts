@@ -1,4 +1,4 @@
-import { UptimeDaemon } from "./uptime.js";
+import { UptimeDaemon } from "../scheduler/uptime.js";
 import { Logger } from "../logger/index.js";
 import { sSuffix } from "../text/utils.js";
 import type { BotServerModelBase, ServerStatCore } from "./types.js";

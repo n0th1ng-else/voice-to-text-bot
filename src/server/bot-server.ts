@@ -104,12 +104,9 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
 
   public async applyHostLocation(timeoutMs = 0): Promise<void> {
     logger.info("Setting up bot hooks");
-    return Promise.all(this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs))).then(
-      () => {
-        this.isIdle = false;
-        logger.info("Instance is successfully set as a hook receiver");
-      },
-    );
+    await Promise.all(this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs)));
+    this.isIdle = false;
+    logger.info("Instance is successfully set as a hook receiver");
   }
 
   public setBots(bots: TelegramBotModel[] = []): this {
@@ -219,11 +216,7 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     return promise;
   }
 
-  public async triggerDaemon(
-    nextReplicaUrl: string,
-    lifecycleInterval: number,
-    timeoutMs = 0,
-  ): Promise<void> {
+  public async triggerDaemon(nextReplicaUrl: string, lifecycleInterval: number): Promise<void> {
     if (!this.selfUrl) {
       throw new Error("Self url is not set for this node. Unable to set up the daemon");
     }
@@ -231,8 +224,6 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     if (lifecycleInterval >= 1 && !nextReplicaUrl) {
       throw new Error("Next instance url is not set for this node. Unable to set up the daemon");
     }
-
-    await this.applyHostLocation(timeoutMs);
 
     if (this.stat) {
       await this.stat.updateNodeState(this.selfUrl, true, this.version);

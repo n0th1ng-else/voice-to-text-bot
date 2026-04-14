@@ -5,23 +5,19 @@ import { getVoiceConverterInstances, getVoiceProviders } from "../recognition/in
 import { getDb } from "../db/index.js";
 import { StripePayment } from "../donate/stripe.js";
 import { TelegramBotModel } from "../telegram/bot.js";
-import { ScheduleDaemon } from "../scheduler/index.js";
-import { printCurrentMemoryStat, sendMemoryStatAnalytics } from "../memory/index.js";
-import { printCurrentStorageUsage, sendStorageStatAnalytics } from "../storage/index.js";
 import { StopListener } from "../process/index.js";
 import { getHostName } from "./tunnel.js";
 import { Logger } from "../logger/index.js";
 import { isDBConfigValid } from "../db/utils.js";
 import { parseMultilineEnvVariable } from "../common/environment.js";
-import { type BotServerModel, HealthStatus } from "./types.js";
-import {
-  trackApplicationErrors,
-  trackApplicationHealth,
-  trackRecognitionProviderHealth,
-} from "../monitoring/newrelic.js";
-import { requestHealthData } from "./api.js";
+import type { BotServerModel } from "./types.js";
+import { trackApplicationErrors } from "../monitoring/newrelic.js";
 import { getRuntimeEngineType } from "../engines/index.js";
 import { prepareSentryInstance } from "../monitoring/sentry/index.js";
+import { initMemoryDaemon } from "../scheduler/memory.js";
+import { initStorageDaemon } from "../scheduler/storage.js";
+import { initHealthDaemon } from "../scheduler/health.js";
+import { initNodeDaemon } from "../scheduler/node.js";
 
 const logger = new Logger("boot-server");
 
@@ -100,49 +96,22 @@ export const prepareInstance = async (threadId: number): Promise<BotServerModel>
     });
 };
 
-export const prepareStopListener = async (): Promise<StopListener> => {
+export const prepareStopListener = async (server: BotServerModel): Promise<StopListener> => {
   const selfUrl = await getHostName(envy.appPort, envy.selfUrl, envy.enableSSL, envy.ngRokToken);
 
-  const memoryDaemon = new ScheduleDaemon("memory", async () => {
-    const value = await printCurrentMemoryStat(envy.memoryLimit);
-    await sendMemoryStatAnalytics(value, envy.appVersion);
-  }).start();
-  const storageDaemon = new ScheduleDaemon("storage", async () => {
-    const value = await printCurrentStorageUsage("file-temp");
-    await sendStorageStatAnalytics(value, envy.appVersion);
-  }).start();
-  const healthDaemon = new ScheduleDaemon(
-    "health",
-    async () => {
-      try {
-        const value = await requestHealthData(selfUrl);
-        const status = value.status === HealthStatus.Online ? "ok" : "error";
-        const statuses = value.recognitionEngineStatuses.reduce<Record<string, "ok" | "error">>(
-          (acc, itm) => {
-            acc[itm.main.provider] = itm.main.state;
-            acc[itm.advanced.provider] = itm.advanced.state;
-            return acc;
-          },
-          {},
-        );
-        trackApplicationHealth(status);
-        Object.entries(statuses).forEach(([key, value]) => {
-          trackRecognitionProviderHealth(key, value);
-        });
-      } catch (err) {
-        trackApplicationHealth("error");
-        throw err;
-      }
-    },
-    {
-      skipInitialTick: true,
-    },
-  ).start();
+  const memoryDaemon = initMemoryDaemon(envy.appVersion, envy.memoryLimit).start();
+
+  const storageDaemon = initStorageDaemon(envy.appVersion).start();
+
+  const healthDaemon = initHealthDaemon(selfUrl).start();
+
+  const nodeDaemon = initNodeDaemon(selfUrl, server).start();
 
   const stopListener = new StopListener().addTrigger(() => {
     memoryDaemon.stop();
     storageDaemon.stop();
     healthDaemon.stop();
+    nodeDaemon.stop();
   });
 
   return stopListener;

@@ -10,11 +10,7 @@ export type ServerStatCore = ReturnType<typeof getDb>;
 export interface BotServerModel extends BotServerModelBase {
   start(): Promise<VoidPromise | VoidFunction>;
   applyHostLocation(launchDelay?: number): Promise<void>;
-  triggerDaemon(
-    nextReplicaUrl: string,
-    lifecycleInterval: number,
-    timeoutMs: number,
-  ): Promise<void>;
+  triggerDaemon(nextReplicaUrl: string, lifecycleInterval: number): Promise<void>;
   setBots(bots: TelegramBotModel[]): this;
 }
 

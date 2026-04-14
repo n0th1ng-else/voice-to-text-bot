@@ -8,7 +8,7 @@ type Options = {
   skipInitialTick?: boolean;
 };
 
-export class ScheduleDaemon<TickData> {
+export class ScheduleDaemon<TickData = void> {
   private readonly interval: number;
   private readonly skipInitialTick: boolean;
   private readonly printId: string;
