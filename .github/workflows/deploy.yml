@@ -23,7 +23,9 @@ jobs:
     uses: ./.github/workflows/docker.yml
     secrets: inherit
     with:
-      docker-tag: latest
+      tags: |
+        type=raw,value=${{ inputs.sha }}
+        type=raw,value=latest
       version: ${{ inputs.version }}
       sha: ${{ inputs.sha }}
 

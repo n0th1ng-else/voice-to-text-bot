@@ -3,9 +3,10 @@ name: Build docker image
 on:
   workflow_call:
     inputs:
-      docker-tag:
+      tags:
+        description: "Comma or newline separated list of tags"
+        required: true
         type: string
-        description: "Extra docker tag"
       version:
         type: string
         description: "Version tag"
@@ -30,6 +31,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ inputs.sha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
@@ -37,10 +40,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
-      - name: Install Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version: "3.12"
+      #      - name: Install Python
+      #        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      #        with:
+      #          python-version: "3.12"
 
       #      Probably dont need anymore
       #      - name: Download AI model
@@ -53,43 +56,36 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Publish to Registry
-        if: inputs.docker-tag == ''
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+      - name: Calculate docker tags
+        id: meta
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         env:
           CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
         with:
-          context: .
-          platforms: linux/amd64, linux/arm64
-          push: true
-          tags: |
-            ${{ env.CONTAINER_PATH }}:${{ inputs.sha }}
-          build-args: APP_VERSION=${{ inputs.version }}
+          images: ${{ env.CONTAINER_PATH }}
+          tags: ${{ inputs.tags }}
 
-      - name: Publish to Registry and extra tag
-        if: inputs.docker-tag != ''
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
-        env:
-          CONTAINER_PATH: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.CONTAINER_NAME }}
+      - name: Publish to Registry
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
           platforms: linux/amd64, linux/arm64
           push: true
-          tags: |
-            ${{ env.CONTAINER_PATH }}:${{ inputs.docker-tag }}
-            ${{ env.CONTAINER_PATH }}:${{ inputs.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: APP_VERSION=${{ inputs.version }}
 
       - name: Add image reference
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           COMMIT_SHA: ${{ inputs.sha }}
+          PRIMARY_TAG: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
         with:
           script: |
-            const { COMMIT_SHA: sha, CONTAINER_NAME: container } = process.env
-            const { owner, repo } = context.issue;
+            const { COMMIT_SHA: sha, PRIMARY_TAG: tag, CONTAINER_NAME: container } = process.env
+            const { owner, repo } = context.repo;
             const target_url = `https://github.com/${owner}/${repo}/pkgs/container/${encodeURIComponent(`${repo}/${container}`)}`
-            const description = `${container}:${sha}`;
+            const description = `${container}:${tag.split(':').pop()}`;
             const api = `/repos/${owner}/${repo}/statuses/${sha}`;
 
             await github.request(`POST ${api}`, {
