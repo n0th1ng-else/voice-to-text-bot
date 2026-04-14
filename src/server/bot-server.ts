@@ -224,6 +224,20 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     lifecycleInterval: number,
     timeoutMs = 0,
   ): Promise<void> {
+    if (!this.selfUrl) {
+      throw new Error("Self url is not set for this node. Unable to set up the daemon");
+    }
+
+    if (lifecycleInterval >= 1 && !nextReplicaUrl) {
+      throw new Error("Next instance url is not set for this node. Unable to set up the daemon");
+    }
+
+    await this.applyHostLocation(timeoutMs);
+
+    if (this.stat) {
+      await this.stat.updateNodeState(this.selfUrl, true, this.version);
+    }
+
     if (lifecycleInterval < 1) {
       logger.warn(
         `Lifecycle interval is ${lifecycleInterval}. Not triggering uptime daemon.`,
@@ -232,24 +246,9 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
       );
       return;
     }
-    if (!this.selfUrl) {
-      throw new Error("Self url is not set for this node. Unable to set up the daemon");
-    }
-
-    if (!nextReplicaUrl) {
-      throw new Error("Next instance url is not set for this node. Unable to set up the daemon");
-    }
 
     this.uptimeDaemon.setUrls(this.selfUrl, nextReplicaUrl).setIntervalDays(lifecycleInterval);
-
-    await this.applyHostLocation(timeoutMs);
     this.uptimeDaemon.start();
-
-    if (!this.stat) {
-      return;
-    }
-
-    await this.stat.updateNodeState(this.selfUrl, true, this.version);
   }
 
   private async getStatusHandler(): Promise<[number, HealthDto]> {
