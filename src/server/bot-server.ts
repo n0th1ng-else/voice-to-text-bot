@@ -224,6 +224,14 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     lifecycleInterval: number,
     timeoutMs = 0,
   ): Promise<void> {
+    if (lifecycleInterval < 1) {
+      logger.warn(
+        `Lifecycle interval is ${lifecycleInterval}. Not triggering uptime daemon.`,
+        {},
+        true,
+      );
+      return;
+    }
     if (!this.selfUrl) {
       throw new Error("Self url is not set for this node. Unable to set up the daemon");
     }
