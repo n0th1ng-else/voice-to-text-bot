@@ -14,5 +14,7 @@ jobs:
     uses: ./.github/workflows/docker.yml
     secrets: inherit
     with:
+      tags: |
+        type=raw,value=preview-${{ github.event.pull_request.head.sha }}
       version: v0.0.0-${{ github.event.pull_request.head.sha }}
       sha: ${{ github.event.pull_request.head.sha }}
