@@ -5,6 +5,7 @@ import { Logger } from "../logger/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
 import { deleteFileIfExists } from "../files/index.js";
+import { getResponseErrorData } from "../server/error.js";
 
 const logger = new Logger("aws-recognition");
 
@@ -75,7 +76,7 @@ export class AWSProvider extends VoiceConverter {
         if (!url) {
           throw new Error("Could not find the job transcript url");
         }
-        const res = await fetch(url, {
+        const response = await fetch(url, {
           method: "GET",
           headers: {
             Accept: "application/json",
@@ -83,11 +84,12 @@ export class AWSProvider extends VoiceConverter {
           },
         });
 
-        if (!res.ok) {
-          throw new Error("Could not fetch the job transcript result");
+        if (!response.ok) {
+          const errResp = await getResponseErrorData(response);
+          throw new Error("Could not fetch the job transcript result", { cause: errResp });
         }
 
-        const data = await res.json();
+        const data = await response.json();
         return data;
       })
       .then((translationData) => this.cleanStorage(translationData as TranscriptionData, name))

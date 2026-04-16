@@ -1,18 +1,23 @@
-const getResponseErrorRawData = async (response: Response): Promise<string | undefined> => {
+const toJson = (text: string): unknown => {
   try {
-    const data = await response.text();
-    return data;
+    return JSON.parse(text);
   } catch {
-    return;
+    return text;
   }
 };
 
-export const getResponseErrorData = async (response: Response): Promise<unknown> => {
+export const getResponseErrorData = async (
+  response: Response,
+  opts?: { raw: boolean },
+): Promise<unknown> => {
   try {
-    const data = await response.json();
-    return data;
+    const text = await response.text();
+    if (opts?.raw) {
+      return text;
+    }
+
+    return toJson(text);
   } catch {
-    const data = await getResponseErrorRawData(response);
-    return data;
+    return "no response";
   }
 };
