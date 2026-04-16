@@ -4,6 +4,7 @@ import { analytics } from "../../env.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { ChatId } from "../../telegram/api/core.js";
 import { API_TIMEOUT_MS } from "../../const.js";
+import { getResponseErrorData } from "../../server/error.js";
 
 const logger = new Logger("analytics:ga");
 
@@ -28,7 +29,7 @@ export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[])
     url.searchParams.set("api_secret", analytics.apiSecret);
     url.searchParams.set("measurement_id", analytics.measurementId);
 
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -45,9 +46,10 @@ export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[])
       signal: AbortSignal.timeout(API_TIMEOUT_MS),
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`GA request failed: ${res.status} ${text}`);
+    const errResp = await getResponseErrorData(response, { raw: true });
+
+    if (!response.ok) {
+      throw new Error(`GA request failed: ${response.status} ${errResp}`);
     }
 
     logger.debug("Analytic data ga has been collected");

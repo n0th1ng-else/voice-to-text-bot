@@ -5,6 +5,7 @@ import { Logger } from "../logger/index.js";
 import { deleteFileIfExists, saveStreamToFile } from "../files/index.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../const.js";
 import { openAsBlob } from "node:fs";
+import { getResponseErrorData } from "../server/error.js";
 
 const logger = new Logger("media-to-wav");
 
@@ -42,7 +43,10 @@ const convertFileToWav = async (inputFile: string): Promise<string> => {
 const downloadAsStream = async (url: string): Promise<Readable> => {
   const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) });
   if (!response.ok) {
-    throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);
+    const errResp = await getResponseErrorData(response);
+    throw new Error(`Failed to download file: ${response.status} ${response.statusText}`, {
+      cause: errResp,
+    });
   }
   if (!response.body) {
     throw new Error("Response body is empty");

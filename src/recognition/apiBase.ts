@@ -26,7 +26,9 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
       const response = await fetch(this.healthUrl, {
         signal: AbortSignal.timeout(1_000),
       });
-      return response.ok ? "ok" : "error";
+
+      const data = (await response.json()) as { status: string };
+      return data.status === "healthy" ? "ok" : "error";
     } catch {
       return "error";
     }
