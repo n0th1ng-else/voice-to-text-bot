@@ -43,7 +43,9 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile, !this.useRawFile);
+    const file = await getAudioBlob(fileLink, isLocalFile, !this.useRawFile);
+    let fileBlob: null | Blob = file.fileBlob;
+    let filePath: null | string = file.filePath;
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
 
     try {
@@ -59,6 +61,10 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
       return result;
     } finally {
       await deleteFileIfExists(filePath);
+      // eslint-disable-next-line no-useless-assignment
+      fileBlob = null;
+      // eslint-disable-next-line no-useless-assignment
+      filePath = null;
     }
   }
 
