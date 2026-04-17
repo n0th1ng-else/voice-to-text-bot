@@ -38,7 +38,9 @@ export class WithAiProvider extends VoiceConverter {
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const file = await getAudioBlob(fileLink, isLocalFile);
+    let fileBlob: null | Blob = file.fileBlob;
+    let filePath: null | string = file.filePath;
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const token = this.getApiToken(lang);
     if (!token) {
@@ -52,6 +54,10 @@ export class WithAiProvider extends VoiceConverter {
       return result;
     } finally {
       await deleteFileIfExists(filePath);
+      // eslint-disable-next-line no-useless-assignment
+      fileBlob = null;
+      // eslint-disable-next-line no-useless-assignment
+      filePath = null;
     }
   }
 
