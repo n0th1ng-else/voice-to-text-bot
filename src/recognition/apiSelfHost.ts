@@ -37,10 +37,11 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
     const duration = new TimeMeasure();
     const url = this.url;
 
+    let form: null | FormData = new FormData();
+
     try {
       const language = convertLanguageCodeToISO(lang);
 
-      const form = new FormData();
       form.append("language", language);
 
       const fileName =
@@ -96,6 +97,9 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
         unknownHasMessage(err) ? err.message : undefined,
       ).setUrl(url);
       throw requestError;
+    } finally {
+      // eslint-disable-next-line no-useless-assignment
+      form = null;
     }
   }
 
