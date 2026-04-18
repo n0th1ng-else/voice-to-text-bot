@@ -1,64 +1,80 @@
-FROM node:24.11.1-slim AS builder
+# syntax=docker/dockerfile:1.7
 
-ENV NODE_ENV=production
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ARG NODE_VERSION=24.11.1
+ARG PNPM_VERSION=9
 
-RUN apt-get update && apt-get --no-install-recommends install -y g++ make python3 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+############################################
+# base — shared bootstrap (corepack + pnpm)
+############################################
+FROM node:${NODE_VERSION}-slim AS base
+ARG PNPM_VERSION
+ENV CI=true \
+    HUSKY=0 \
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
+    PNPM_HOME=/pnpm \
+    PATH=/pnpm:$PATH
+RUN corepack enable && corepack prepare pnpm@"${PNPM_VERSION}" --activate
+WORKDIR /app
 
-ARG APP_DIR=/usr/src/app/
+############################################
+# deps — install all deps (prod + dev)
+# cache key: pnpm-lock.yaml, then package.json
+############################################
+FROM base AS deps
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates g++ make python3
 
-RUN mkdir -p "$APP_DIR"
-WORKDIR "$APP_DIR"
+COPY pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm fetch
 
-RUN npm install -g pnpm@9
-COPY package.json pnpm-lock.yaml tsconfig.json $APP_DIR
-RUN npm pkg delete scripts.prepare
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false
+COPY package.json ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile --offline
 
-COPY ./assets "$APP_DIR/assets"
-COPY ./certs "$APP_DIR/certs"
-COPY ./file-temp "$APP_DIR/file-temp"
-COPY ./model-cache "$APP_DIR/model-cache"
-COPY ./src "$APP_DIR/src"
-COPY ./copy-files.ts "$APP_DIR"
-
+############################################
+# build — compile TS + copy runtime assets
+############################################
+FROM deps AS build
+COPY tsconfig.json copy-files.ts ./
+COPY certs ./certs
+COPY assets ./assets
+COPY src ./src
 RUN pnpm run build
 
-RUN rm -rf ./node_modules
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
+############################################
+# prod-deps — strip dev deps via prune
+# (reuses build tools + store from deps stage)
+############################################
+FROM deps AS prod-deps
 
-FROM node:24.11.1-slim
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm prune --prod --ignore-scripts
+
+############################################
+# runtime — minimal final image
+############################################
+FROM node:${NODE_VERSION}-slim AS runtime
+ARG APP_VERSION=local
+ENV NODE_ENV=production \
+    NEW_RELIC_NO_CONFIG_FILE=true \
+    APP_VERSION=${APP_VERSION}
+WORKDIR /app
+
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
+COPY --from=build     --chown=node:node /app/dist         ./dist
+COPY --from=build     --chown=node:node /app/assets       ./assets
+COPY --from=build     --chown=node:node /app/package.json ./
+COPY                  --chown=node:node ./file-temp       ./file-temp
+COPY                  --chown=node:node ./model-cache     ./model-cache
+
+RUN install -o node -g node -m 644 /dev/null /app/.env
 
 EXPOSE 3000
-
-ENV NEW_RELIC_NO_CONFIG_FILE=true
-
-ENV NODE_ENV=production
-
-ARG APP_VERSION=local
-ENV APP_VERSION=${APP_VERSION}
-
-RUN echo "${APP_VERSION}"
-
-ARG APP_DIR=/usr/src/app/
-
-RUN mkdir -p "$APP_DIR"
-WORKDIR $APP_DIR
-
-RUN touch "$APP_DIR/.env"
-COPY --from=builder "$APP_DIR/node_modules" "$APP_DIR/node_modules"
-COPY --from=builder "$APP_DIR/assets" "$APP_DIR/assets"
-COPY --from=builder "$APP_DIR/file-temp" "$APP_DIR/file-temp"
-COPY --from=builder "$APP_DIR/model-cache" "$APP_DIR/model-cache"
-COPY --from=builder "$APP_DIR/package.json" "$APP_DIR"
-COPY --from=builder "$APP_DIR/dist" "$APP_DIR/dist"
-
-RUN chown -R node:node "$APP_DIR/file-temp" && chmod -R 775 "$APP_DIR/file-temp"
-
+USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD node -e "fetch('http://localhost:' + (process.env.PORT || 3000) + '/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
-
-USER node
-
 CMD ["npm", "run", "cluster:js"]
