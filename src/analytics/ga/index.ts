@@ -46,7 +46,7 @@ export const collectEvents = async (chatId: ChatId, events: AnalyticsEventExt[])
       signal: AbortSignal.timeout(API_TIMEOUT_MS),
     });
 
-    const errResp = await getResponseErrorData(response, { raw: true });
+    const errResp = await getResponseErrorData(response);
 
     if (!response.ok) {
       throw new Error(`GA request failed: ${response.status} ${errResp}`);
