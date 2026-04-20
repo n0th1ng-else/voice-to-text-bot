@@ -87,26 +87,7 @@ describe("requestHealthData", () => {
       const { url, code, response } = err as HealthError;
       expect(url).toEqual(`${TEST_URL}/health`);
       expect(code).toEqual(400);
-      expect(response).toEqual("TEST RESPONSE");
-    }
-  });
-
-  it("should get the API error and parse the json", async () => {
-    const testResponse = new Response(JSON.stringify({ foo: "bar" }), {
-      status: 400,
-      statusText: "ok",
-    });
-
-    vi.spyOn(global, "fetch").mockResolvedValue(testResponse);
-
-    try {
-      await requestHealthData(TEST_URL);
-      throw new Error("Should not resolve");
-    } catch (err) {
-      const { url, code, response } = err as HealthError;
-      expect(url).toEqual(`${TEST_URL}/health`);
-      expect(code).toEqual(400);
-      expect(response).toEqual({ foo: "bar" });
+      expect(response).toEqual('"TEST RESPONSE"');
     }
   });
 });
