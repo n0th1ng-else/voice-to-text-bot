@@ -1,19 +1,60 @@
+# VCS / CI
 .git
 .github
+.gitignore
 .husky
-.idea
-.env.dev
-.nvmrc
 
-coverage-e2e
-coverage-unit
-coverage
-e2e
-k8s
+# Editors
+.idea
+.vscode
+
+# Env (runtime .env is created inside the image)
+.env
+.env.*
+
+# Node / pnpm
 node_modules
+npm-debug.log*
+pnpm-debug.log*
+
+# Build & coverage output
 dist
+coverage
+coverage-*
+*.tsbuildinfo
+
+# Tests / mocks / e2e
+e2e
+__mocks__
+**/__mocks__
+**/*.spec.ts
+**/*.test.ts
+
+# Dev-only config (not used at build/runtime)
+.nvmrc
+.npmrc
+.prettierignore
+.oxlintrc.json
+eslint.config.js
+vitest.config.ts
+vitest.setup.ts
+release.config.js
+release-exec.js
+sonar-project.properties
+load.yml
+Procfile
+
+# Docs
+*.md
+LICENSE
+
+# Deployment manifests
+k8s
+
+# Runtime-state dirs (created in the image)
 spmdb
 spmlogs
-HISTORY.md
-/**/*/*.spec.ts
-/**/__mocks__/*
+
+# The Dockerfile build context shouldn't include itself
+Dockerfile
+.dockerignore
