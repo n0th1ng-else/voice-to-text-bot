@@ -4,7 +4,7 @@ import { unknownHasMessage } from "../common/unknown.js";
 
 export class HealthError extends Error {
   public code = 0;
-  public response?: unknown;
+  public response?: string;
   public url = "";
 
   constructor(cause: unknown, message = "Health request was unsuccessful") {
@@ -16,7 +16,7 @@ export class HealthError extends Error {
     return this;
   }
 
-  public setResponse(response?: unknown): this {
+  public setResponse(response?: string): this {
     this.response = response;
     return this;
   }
