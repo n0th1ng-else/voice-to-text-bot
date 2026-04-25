@@ -14,7 +14,7 @@ import type { TgMessageOptions } from "../api/groups/chats/chats-types.js";
 
 const logger = new Logger("telegram-bot");
 
-export abstract class GenericAction {
+export class CoreAction {
   protected readonly text = getTranslator();
 
   protected readonly stat: ReturnType<typeof getDb>;
@@ -24,14 +24,6 @@ export abstract class GenericAction {
     this.stat = stat;
     this.bot = bot;
   }
-
-  public abstract runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void>;
-
-  public abstract runCondition(
-    msg: TgMessage,
-    mdl: BotMessageModel,
-    prefix: TelegramMessagePrefix,
-  ): Promise<boolean>;
 
   public async getChatLanguage(
     model: BotMessageModel,
@@ -124,12 +116,12 @@ export abstract class GenericAction {
   }
 }
 
-export class CoreAction extends GenericAction {
-  public async runAction(): Promise<void> {
-    return;
-  }
+export abstract class GenericAction extends CoreAction {
+  public abstract runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void>;
 
-  public async runCondition(): Promise<boolean> {
-    return false;
-  }
+  public abstract runCondition(
+    msg: TgMessage,
+    mdl: BotMessageModel,
+    prefix: TelegramMessagePrefix,
+  ): Promise<boolean>;
 }

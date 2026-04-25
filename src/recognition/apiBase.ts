@@ -74,28 +74,3 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
 
   protected abstract isRecognitionResponse(response: unknown): response is Res;
 }
-
-export class APIVoiceConverterError extends Error {
-  public code = 0;
-  public response?: unknown;
-  public url = "";
-
-  constructor(cause: unknown, message = "Request was unsuccessful") {
-    super(`EAPICONVERTER ${message}`, { cause });
-  }
-
-  public setResponseCode(code = 0): this {
-    this.code = code;
-    return this;
-  }
-
-  public setResponse(response?: unknown): this {
-    this.response = response;
-    return this;
-  }
-
-  public setUrl(url: string): this {
-    this.url = url;
-    return this;
-  }
-}
