@@ -4,6 +4,9 @@ import { fetchPropFromUnknown } from "../../common/unknown.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { VoidFunction } from "../../common/types.js";
 
+// Do not include the traces from Newrelic and Amplitude to keep the tracing clean
+const OMITTED_BREADCRUMBS = ["https://collector.eu01.nr-data.net/", "https://api2.amplitude.com/"];
+
 export type SentryMetadata = {
   url?: string;
   method?: string;
@@ -139,9 +142,11 @@ export abstract class SentryBase {
   protected beforeBreadcrumb<B extends { category?: string; data?: Record<string, unknown> }>(
     breadcrumb: B,
   ): B | null {
-    if (["fetch", "xhr", "http"].includes(breadcrumb.category || "")) {
-      const url = breadcrumb.data?.url;
-      if (typeof url === "string" && url.startsWith("https://collector.eu01.nr-data.net/")) {
+    const { category, data } = breadcrumb;
+    if (["fetch", "xhr", "http"].includes(category || "")) {
+      const url = typeof data?.url === "string" ? data?.url : "";
+      const shouldOmit = OMITTED_BREADCRUMBS.some((host) => url.startsWith(host));
+      if (shouldOmit) {
         return null;
       }
     }
