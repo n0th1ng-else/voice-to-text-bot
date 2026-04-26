@@ -112,7 +112,7 @@ export class Logger {
     // eslint-disable-next-line no-console
     console.warn(Logger.y(this.getFullPrefix()), msg, data ?? "");
     sendLogs("warn", this.getFullPrefix(false), msg, data);
-    trackApplicationErrors("Warning");
+    trackApplicationErrors("warning");
     if (shouldReport) {
       // @ts-expect-error There is a type mismatch. wanna keep it like this
       captureWarning(msg, data);
@@ -127,6 +127,6 @@ export class Logger {
     console.error(Logger.r(this.getFullPrefix()), Logger.r(msg), data ?? "");
     sendLogs("error", this.getFullPrefix(false), msg, data);
     captureError(data);
-    trackApplicationErrors("Error");
+    trackApplicationErrors("error");
   }
 }

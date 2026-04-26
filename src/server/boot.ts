@@ -28,7 +28,7 @@ const logger = new Logger("boot-server");
 export const prepareInstance = async (threadId: number): Promise<BotServerModel> => {
   const engine = getRuntimeEngineType();
   logger.info(`The ${Logger.y(engine.engine)} server is starting...`);
-  trackApplicationErrors("Launch");
+  trackApplicationErrors("launch");
 
   await prepareSentryInstance();
 
