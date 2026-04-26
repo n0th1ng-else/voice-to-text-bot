@@ -102,9 +102,12 @@ export abstract class SentryBase {
     });
   }
 
-  protected beforeSentrySend = <E extends { tags?: Record<string, unknown> }>(
+  protected beforeSentrySend = <
+    E extends { tags?: Record<string, unknown> },
+    H extends { originalException?: unknown },
+  >(
     event: E,
-    hint: { originalException?: unknown },
+    hint: H,
   ): E | null => {
     const error = hint.originalException;
 
@@ -132,4 +135,16 @@ export abstract class SentryBase {
 
     return event;
   };
+
+  protected beforeBreadcrumb<B extends { category?: string; data?: Record<string, unknown> }>(
+    breadcrumb: B,
+  ): B | null {
+    if (["fetch", "xhr", "http"].includes(breadcrumb.category || "")) {
+      const url = breadcrumb.data?.url;
+      if (typeof url === "string" && url.startsWith("https://collector.eu01.nr-data.net/")) {
+        return null;
+      }
+    }
+    return breadcrumb;
+  }
 }
