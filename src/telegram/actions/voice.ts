@@ -160,6 +160,7 @@ export class VoiceAction extends GenericAction {
       })
       .then(() => {
         logger.info(`${prefix.getPrefix()} Voice successfully converted`);
+        trackProcessFile("success");
         trackVoiceDuration(model.voiceType, model.chatType, model.voiceDuration);
         return this.updateUsageCount(model, prefix);
       })

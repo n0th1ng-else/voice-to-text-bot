@@ -11,7 +11,7 @@ const formatMetric = (metric: string): string => {
     .join("");
 };
 
-export const trackProcessFile = (metric: "progress" | "failed"): void => {
+export const trackProcessFile = (metric: "progress" | "failed" | "success"): void => {
   newrelic.incrementMetric(`FileProcessing/${formatMetric(metric)}`);
 };
 
@@ -47,8 +47,8 @@ export const trackFullRecognitionTime = (durationMSec: number): void => {
   newrelic.recordMetric(metricName, durationMSec);
 };
 
-export const trackApplicationErrors = (type: "Error" | "Warning" | "Launch"): void => {
-  newrelic.incrementMetric(`ApplicationHealth/${type}`);
+export const trackApplicationErrors = (type: "error" | "warning" | "launch"): void => {
+  newrelic.incrementMetric(`ApplicationHealth/${formatMetric(type)}`);
 };
 
 export const trackApplicationHealth = (status: "ok" | "error"): void => {
