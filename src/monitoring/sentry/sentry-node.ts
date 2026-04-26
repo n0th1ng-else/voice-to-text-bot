@@ -34,6 +34,7 @@ export class SentryNodeClient extends SentryBase {
       profilesSampleRate: isDevelopment() ? 1.0 : 0.2,
       sampleRate: isDevelopment() ? 1.0 : 0.5,
       beforeSend: (event, hint) => this.beforeSentrySend(event, hint),
+      beforeBreadcrumb: (breadcrumb) => this.beforeBreadcrumb(breadcrumb),
     });
 
     this.setFastifyRequestPlugin(app);
