@@ -1,4 +1,4 @@
-import { GenericAction } from "./common.js";
+import type { GenericAction } from "./common.js";
 import { isVoiceMessage } from "../helpers.js";
 import { Logger } from "../../logger/index.js";
 import { TranslationKeys } from "../../text/types.js";
@@ -24,10 +24,12 @@ import {
 } from "../../monitoring/newrelic.js";
 import { getConverterType } from "../../subscription/utils.js";
 import { addAttachment, clearAttachments } from "../../monitoring/sentry/index.js";
+import { getReportedDurationSec, isVoiceTooLongError } from "../../recognition/apiSelfHostError.js";
+import { VoiceBaseAction } from "./voice/voice-base.js";
 
 const logger = new Logger("telegram-bot");
 
-export class VoiceAction extends GenericAction {
+export class VoiceAction extends VoiceBaseAction implements GenericAction {
   private converters?: VoiceConverters;
 
   public runAction(mdl: BotMessageModel, prefix: TelegramMessagePrefix): Promise<void> {
@@ -165,6 +167,18 @@ export class VoiceAction extends GenericAction {
         return this.updateUsageCount(model, prefix);
       })
       .catch((err) => {
+        if (isVoiceTooLongError(err)) {
+          const actualVoiceDuration = getReportedDurationSec(err);
+          logger.warn(`${prefix.getPrefix()} Message is too long (api)`, {
+            durationSec: actualVoiceDuration,
+            ...prefix,
+          });
+          if (actualVoiceDuration) {
+            model.analytics.addTime("voice-length", actualVoiceDuration * 1_000);
+          }
+          return this.sendVoiceIsTooLongMessage(model, prefix);
+        }
+
         const isBlocked = isBlockedByUser(err);
         const errorMessage = "Unable to recognize the file";
         const duration = Logger.y(`${model.voiceDuration}sec`);

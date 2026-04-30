@@ -18,6 +18,9 @@ export default defineConfig({
     },
     globalSetup: "./vitest.setup.ts",
     environment: "node",
+    env: {
+      NEW_RELIC_ENABLED: "false",
+    },
     include: [],
     exclude: [...defaultExclude],
     projects: [

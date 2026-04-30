@@ -1,5 +1,6 @@
 import type { LanguageCode } from "./types.js";
-import { APIVoiceConverter, APIVoiceConverterError } from "./apiBase.js";
+import { APIVoiceConverter } from "./apiBase.js";
+import { APIVoiceConverterError } from "./apiSelfHostError.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { TimeMeasure } from "../common/timer.js";
 import { API_TIMEOUT_MS } from "../const.js";
@@ -74,7 +75,7 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
         const errorMessage = "Wrong api response object";
         const requestError = new APIVoiceConverterError(new Error(errorMessage), errorMessage)
           .setUrl(url)
-          .setResponse(recognition)
+          .setResponse(JSON.stringify(recognition))
           .setResponseCode(response.status);
         throw requestError;
       }
