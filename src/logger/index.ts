@@ -4,7 +4,7 @@ import { sendLogs } from "./integration.js";
 import { z } from "zod";
 import { captureError, captureWarning } from "../monitoring/sentry/index.js";
 import { logLevel } from "../env.js";
-import { trackApplicationErrors } from "../monitoring/newrelic.js";
+import { logError, trackApplicationErrors } from "../monitoring/newrelic.js";
 
 const LogLevelSchema = z
   .union([z.literal("DEBUG"), z.literal("INFO"), z.literal("WARN"), z.literal("ERROR")])
@@ -127,6 +127,9 @@ export class Logger {
     console.error(Logger.r(this.getFullPrefix()), Logger.r(msg), data ?? "");
     sendLogs("error", this.getFullPrefix(false), msg, data);
     captureError(data);
+    if (data instanceof Error) {
+      logError(data);
+    }
     trackApplicationErrors("error");
   }
 }

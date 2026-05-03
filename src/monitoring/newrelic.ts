@@ -125,3 +125,7 @@ export const initNewRelicRequestContext = (app: FastifyInstance): void => {
     done();
   });
 };
+
+export const logError = (err: Error): void => {
+  newrelic.noticeError(err);
+};
