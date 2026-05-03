@@ -70,20 +70,20 @@ export abstract class SentryBase {
        * @see https://github.com/getsentry/sentry-javascript/pull/9138/files
        */
       const requestMessage = fetchPropFromUnknown(body, "message", {});
-      const requestUserId = fetchPropFromUnknown<string>(
-        fetchPropFromUnknown(requestMessage, "from", {}),
-        "id",
-        "n/a",
-      );
       const requestUserLanguage = fetchPropFromUnknown<string>(
         fetchPropFromUnknown(requestMessage, "from", {}),
         "language_code",
         "n/a",
       );
+      const requestUserId = fetchPropFromUnknown<string>(
+        fetchPropFromUnknown(requestMessage, "from", {}),
+        "id",
+        "",
+      );
       const requestChatId = fetchPropFromUnknown<string>(
         fetchPropFromUnknown(requestMessage, "chat", {}),
         "id",
-        "n/a",
+        "",
       );
 
       this.setMetadataAndTags(
@@ -96,8 +96,8 @@ export abstract class SentryBase {
           chatId: requestChatId,
         },
         {
-          "tg.chatId": requestChatId,
-          "tg.userId": requestUserId,
+          "tg.chatId": requestChatId || "n/a",
+          "tg.userId": requestUserId || "n/a",
           "tg.userLanguage": requestUserLanguage,
         },
         done,

@@ -76,8 +76,15 @@ export class SentryNodeClient extends SentryBase {
     tags: Record<string, string>,
     doneFn: VoidFunction,
   ): void {
+    const user = meta.userId
+      ? {
+          id: meta.userId,
+          userId: meta.userId,
+          chatId: meta.chatId,
+        }
+      : null;
     withIsolationScope(() => {
-      getCurrentScope().setSDKProcessingMetadata(meta).setTags(tags);
+      getCurrentScope().setSDKProcessingMetadata(meta).setTags(tags).setUser(user);
       doneFn();
     });
   }
