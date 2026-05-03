@@ -8,9 +8,10 @@ import {
 } from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
-import { SentryBase, type SentryMetadata } from "./sentry-base.js";
+import { SentryBase } from "./sentry-base.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { VoidFunction } from "../../common/types.js";
+import type { HookMetadata } from "../../server/hook.js";
 
 export class SentryNodeClient extends SentryBase {
   public init(app: FastifyInstance): void {
@@ -72,12 +73,19 @@ export class SentryNodeClient extends SentryBase {
   }
 
   public setMetadataAndTags(
-    meta: SentryMetadata,
+    meta: HookMetadata,
     tags: Record<string, string>,
     doneFn: VoidFunction,
   ): void {
+    const user = meta.userId
+      ? {
+          id: meta.userId,
+          userId: meta.userId,
+          chatId: meta.chatId,
+        }
+      : null;
     withIsolationScope(() => {
-      getCurrentScope().setSDKProcessingMetadata(meta).setTags(tags);
+      getCurrentScope().setSDKProcessingMetadata(meta).setTags(tags).setUser(user);
       doneFn();
     });
   }
