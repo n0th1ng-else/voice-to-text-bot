@@ -8,9 +8,10 @@ import {
 } from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import type { FastifyInstance } from "fastify";
-import { SentryBase, type SentryMetadata } from "./sentry-base.js";
+import { SentryBase } from "./sentry-base.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { VoidFunction } from "../../common/types.js";
+import type { HookMetadata } from "../../server/hook.js";
 
 export class SentryNodeClient extends SentryBase {
   public init(app: FastifyInstance): void {
@@ -72,7 +73,7 @@ export class SentryNodeClient extends SentryBase {
   }
 
   public setMetadataAndTags(
-    meta: SentryMetadata,
+    meta: HookMetadata,
     tags: Record<string, string>,
     doneFn: VoidFunction,
   ): void {

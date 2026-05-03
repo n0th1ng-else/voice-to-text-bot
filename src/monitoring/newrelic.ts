@@ -1,7 +1,9 @@
 import newrelic from "newrelic";
+import type { FastifyInstance } from "fastify";
 import type { ChatType, VoiceType } from "../telegram/types.js";
 import type { VoiceConverterProvider } from "../recognition/types.js";
 import type { Currency } from "../telegram/api/groups/payments/payments-types.js";
+import { setFastifyPreHandler } from "../server/hook.js";
 
 const formatMetric = (metric: string): string => {
   // Snake_case to PascalCase
@@ -107,4 +109,19 @@ export const trackUnknownRoute = (route: string): void => {
 
 export const trackFileDownload = (type: "api" | "mtproto"): void => {
   newrelic.incrementMetric(`FileDownloadType/${formatMetric(type)}`);
+};
+
+export const initNewRelicRequestContext = (app: FastifyInstance): void => {
+  setFastifyPreHandler(app, (meta, done) => {
+    if (meta.userId) {
+      newrelic.setUserID(String(meta.userId));
+      newrelic.addCustomAttributes({
+        "tg.chatId": meta.chatId || "n/a",
+        "tg.userId": meta.userId || "n/a",
+        "tg.userLanguage": meta.lang || "n/a",
+      });
+    }
+
+    done();
+  });
 };

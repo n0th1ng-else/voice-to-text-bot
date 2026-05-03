@@ -13,7 +13,7 @@ import type { VoidPromise } from "../common/types.js";
 import type { HttpsOptions } from "../../certs/index.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import { generateMemorySnapshotAsBuffer } from "../profiling/memory.js";
-import { trackUnknownRoute } from "../monitoring/newrelic.js";
+import { initNewRelicRequestContext, trackUnknownRoute } from "../monitoring/newrelic.js";
 
 const logger = new Logger("server");
 
@@ -28,6 +28,7 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     super("Fastify", port, version, webhookDoNotWait, httpsOptions, enableSnapshotCapture);
 
     initSentry(this.app);
+    initNewRelicRequestContext(this.app);
 
     this.app.get<{ Reply: string }>("/favicon.ico", async (_req, reply) => {
       return reply.status(204).type("image/vnd.microsoft.icon").send("");

@@ -3,16 +3,10 @@ import { appVersion, nodeEnvironment, sentryDsn } from "../../env.js";
 import { fetchPropFromUnknown } from "../../common/unknown.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { VoidFunction } from "../../common/types.js";
+import { type HookMetadata, setFastifyPreHandler } from "../../server/hook.js";
 
 // Do not include the traces from Newrelic and Amplitude to keep the tracing clean
 const OMITTED_BREADCRUMBS = ["https://collector.eu01.nr-data.net/", "https://api2.amplitude.com/"];
-
-export type SentryMetadata = {
-  url?: string;
-  method?: string;
-  userId?: unknown;
-  chatId?: unknown;
-};
 
 export abstract class SentryBase {
   protected readonly appVersion = appVersion;
@@ -35,7 +29,7 @@ export abstract class SentryBase {
   public abstract clearAttachments(): void;
 
   protected abstract setMetadataAndTags(
-    meta: SentryMetadata,
+    meta: HookMetadata,
     tags: Record<string, string>,
     doneFn: VoidFunction,
   ): void;
@@ -64,41 +58,13 @@ export abstract class SentryBase {
   }
 
   protected setFastifyRequestPlugin(app: FastifyInstance): void {
-    app.addHook("preHandler", (request, _reply, done) => {
-      const { routeOptions, body } = request;
-      /**
-       * @see https://github.com/getsentry/sentry-javascript/pull/9138/files
-       */
-      const requestMessage = fetchPropFromUnknown(body, "message", {});
-      const requestUserLanguage = fetchPropFromUnknown<string>(
-        fetchPropFromUnknown(requestMessage, "from", {}),
-        "language_code",
-        "n/a",
-      );
-      const requestUserId = fetchPropFromUnknown<string>(
-        fetchPropFromUnknown(requestMessage, "from", {}),
-        "id",
-        "",
-      );
-      const requestChatId = fetchPropFromUnknown<string>(
-        fetchPropFromUnknown(requestMessage, "chat", {}),
-        "id",
-        "",
-      );
-
+    setFastifyPreHandler(app, (meta, done) => {
       this.setMetadataAndTags(
+        meta,
         {
-          url: routeOptions.url,
-          method: Array.isArray(routeOptions.method)
-            ? routeOptions.method.at(0)
-            : routeOptions.method,
-          userId: requestUserId,
-          chatId: requestChatId,
-        },
-        {
-          "tg.chatId": requestChatId || "n/a",
-          "tg.userId": requestUserId || "n/a",
-          "tg.userLanguage": requestUserLanguage,
+          "tg.chatId": meta.chatId || "n/a",
+          "tg.userId": meta.userId || "n/a",
+          "tg.userLanguage": meta.lang || "n/a",
         },
         done,
       );
