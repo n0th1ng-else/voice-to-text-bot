@@ -13,11 +13,16 @@ describe("initTgReflector", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
       const chatId = asChatId__test(1213455);
 
-      tgErr.setErrorCode(400).setChatId(chatId).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr
+        .setErrorCode(400)
+        .setChatId(chatId)
+        .setResponse(
+          JSON.stringify({
+            ok: false,
+            result: undefined,
+            description: "Bad Request: not enough rights to send text messages to the chat",
+          }),
+        );
       await reflect(tgErr);
       expect(leaveChat).toHaveBeenCalledTimes(1);
       expect(leaveChat).toHaveBeenCalledWith(chatId);
@@ -29,11 +34,13 @@ describe("initTgReflector", () => {
       const reflect = initTgReflector({ leaveChat });
       const tgErr = new TgError(new Error("ooops"), "ooops");
 
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Bad Request: not enough rights to send text messages to the chat",
+        }),
+      );
 
       await reflect(tgErr);
       expect(leaveChat).not.toHaveBeenCalled();
@@ -45,11 +52,16 @@ describe("initTgReflector", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
       const chatId = asChatId__test(21313);
 
-      tgErr.setErrorCode(400).setChatId(chatId).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: another error",
-      });
+      tgErr
+        .setErrorCode(400)
+        .setChatId(chatId)
+        .setResponse(
+          JSON.stringify({
+            ok: false,
+            result: undefined,
+            description: "Bad Request: another error",
+          }),
+        );
 
       await reflect(tgErr);
       expect(leaveChat).not.toHaveBeenCalled();
@@ -65,11 +77,16 @@ describe("initTgReflector", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
       const chatId = asChatId__test(1213455);
 
-      tgErr.setErrorCode(400).setChatId(chatId).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr
+        .setErrorCode(400)
+        .setChatId(chatId)
+        .setResponse(
+          JSON.stringify({
+            ok: false,
+            result: undefined,
+            description: "Bad Request: not enough rights to send text messages to the chat",
+          }),
+        );
 
       await reflect(tgErr);
       expect(leaveChat).toHaveBeenCalledTimes(1);
@@ -82,11 +99,16 @@ describe("initTgReflector", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
       const chatId = asChatId__test(1213455);
 
-      tgErr.setErrorCode(400).setChatId(chatId).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr
+        .setErrorCode(400)
+        .setChatId(chatId)
+        .setResponse(
+          JSON.stringify({
+            ok: false,
+            result: undefined,
+            description: "Bad Request: not enough rights to send text messages to the chat",
+          }),
+        );
 
       await reflect(tgErr);
       expect(leaveChat).toHaveBeenCalledTimes(1);

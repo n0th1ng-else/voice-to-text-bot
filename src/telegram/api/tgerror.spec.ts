@@ -20,7 +20,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe("");
@@ -35,7 +35,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(400);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe("");
@@ -51,7 +51,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(chatId);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe("");
@@ -67,7 +67,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(retry);
       expect(err.url).toBe("");
@@ -83,7 +83,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(chatId);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe("");
@@ -99,7 +99,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe(url);
@@ -116,7 +116,7 @@ describe("tgerror", () => {
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(undefined);
+      expect(err.response).toBe("{}");
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe(`http://google.com/${SANITIZE_CHARACTER}/sendMessage`);
@@ -130,12 +130,12 @@ describe("tgerror", () => {
         ok: false,
         result: undefined,
       };
-      err.setResponse(response);
+      err.setResponse(JSON.stringify(response));
       expect(err.cause).toBe(errCause);
       expect(err.message).toBe(`ETELEGRAM ${msg}`);
       expect(err.code).toBe(0);
       expect(err.chatId).toBe(undefined);
-      expect(err.response).toBe(response);
+      expect(err.response).toBe(JSON.stringify({ ok: false }));
       expect(err.migrateToChatId).toBe(0);
       expect(err.retryAfter).toBe(0);
       expect(err.url).toBe("");
@@ -149,41 +149,73 @@ describe("tgerror", () => {
 
     it("should return false if the error description is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Forbidden: another reason",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Forbidden: another reason",
+        }),
+      );
       expect(isKickedFromSupergroup(tgErr)).toBe(false);
     });
 
     it("should return false if the error code is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Forbidden: bot was kicked from the supergroup chat",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Forbidden: bot was kicked from the supergroup chat",
+        }),
+      );
       expect(isKickedFromSupergroup(tgErr)).toBe(false);
     });
 
     it("should return false if the error is ok", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: true,
-        result: undefined,
-        description: "Forbidden: bot was kicked from the supergroup chat",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: true,
+          result: undefined,
+          description: "Forbidden: bot was kicked from the supergroup chat",
+        }),
+      );
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response is invalid JSON", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse("invalid json");
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response is invalid JSON", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse("invalid json");
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response description is null", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: null,
+        }),
+      );
       expect(isKickedFromSupergroup(tgErr)).toBe(false);
     });
 
     it("should return true if bot was blocked by the user", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Forbidden: bot was kicked from the supergroup chat",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Forbidden: bot was kicked from the supergroup chat",
+        }),
+      );
       expect(isKickedFromSupergroup(tgErr)).toBe(true);
     });
   });
@@ -195,41 +227,67 @@ describe("tgerror", () => {
 
     it("should return false if the error description is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Forbidden: another reason",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Forbidden: another reason",
+        }),
+      );
       expect(isBlockedByUser(tgErr)).toBe(false);
     });
 
     it("should return false if the error code is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Forbidden: bot was blocked by the user",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Forbidden: bot was blocked by the user",
+        }),
+      );
       expect(isBlockedByUser(tgErr)).toBe(false);
     });
 
     it("should return false if the error is ok", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: true,
-        result: undefined,
-        description: "Forbidden: bot was blocked by the user",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: true,
+          result: undefined,
+          description: "Forbidden: bot was blocked by the user",
+        }),
+      );
       expect(isBlockedByUser(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response is invalid JSON", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse("invalid json");
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response description is null", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: null,
+        }),
+      );
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
     });
 
     it("should return true if bot was blocked by the user", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Forbidden: bot was blocked by the user",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Forbidden: bot was blocked by the user",
+        }),
+      );
       expect(isBlockedByUser(tgErr)).toBe(true);
     });
   });
@@ -241,41 +299,67 @@ describe("tgerror", () => {
 
     it("should return false if the error description is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: another reason",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Bad Request: another reason",
+        }),
+      );
       expect(hasNoRightsToSendMessage(tgErr)).toBe(false);
     });
 
     it("should return false if the error code is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Bad Request: not enough rights to send text messages to the chat",
+        }),
+      );
       expect(hasNoRightsToSendMessage(tgErr)).toBe(false);
     });
 
     it("should return false if the error is ok", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: true,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: true,
+          result: undefined,
+          description: "Bad Request: not enough rights to send text messages to the chat",
+        }),
+      );
       expect(hasNoRightsToSendMessage(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response is invalid JSON", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(400).setResponse("invalid json");
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response description is null", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: null,
+        }),
+      );
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
     });
 
     it("should return true if bot was blocked by the user", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: not enough rights to send text messages to the chat",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Bad Request: not enough rights to send text messages to the chat",
+        }),
+      );
       expect(hasNoRightsToSendMessage(tgErr)).toBe(true);
     });
   });
@@ -287,44 +371,70 @@ describe("tgerror", () => {
 
     it("should return false if the error description is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description: "Bad Request: another reason",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: "Bad Request: another reason",
+        }),
+      );
       expect(isMessageNotModified(tgErr)).toBe(false);
     });
 
     it("should return false if the error code is different", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(403).setResponse({
-        ok: false,
-        result: undefined,
-        description:
-          "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
-      });
+      tgErr.setErrorCode(403).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description:
+            "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
+        }),
+      );
       expect(isMessageNotModified(tgErr)).toBe(false);
     });
 
     it("should return false if the error is ok", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: true,
-        result: undefined,
-        description:
-          "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: true,
+          result: undefined,
+          description:
+            "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
+        }),
+      );
       expect(isMessageNotModified(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response is invalid JSON", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(400).setResponse("invalid json");
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
+    });
+
+    it("should return false if the response description is null", () => {
+      const tgErr = new TgError(new Error("ooops"), "ooops");
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description: null,
+        }),
+      );
+      expect(isKickedFromSupergroup(tgErr)).toBe(false);
     });
 
     it("should return true if the message is not modified", () => {
       const tgErr = new TgError(new Error("ooops"), "ooops");
-      tgErr.setErrorCode(400).setResponse({
-        ok: false,
-        result: undefined,
-        description:
-          "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
-      });
+      tgErr.setErrorCode(400).setResponse(
+        JSON.stringify({
+          ok: false,
+          result: undefined,
+          description:
+            "Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message",
+        }),
+      );
       expect(isMessageNotModified(tgErr)).toBe(true);
     });
   });
