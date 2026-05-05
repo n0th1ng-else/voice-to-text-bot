@@ -34,3 +34,16 @@ export async function getResponseErrorData<T = unknown>(
     return "no response";
   }
 }
+
+export class UnknownRouteError extends Error {
+  public route = "unknown";
+
+  constructor() {
+    super(`ESERVER Unknown route`);
+  }
+
+  public setRoute(route: string): this {
+    this.route = route;
+    return this;
+  }
+}

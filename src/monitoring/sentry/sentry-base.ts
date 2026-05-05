@@ -65,6 +65,7 @@ export abstract class SentryBase {
           "tg.chatId": meta.chatId || "n/a",
           "tg.userId": meta.userId || "n/a",
           "tg.userLanguage": meta.lang || "n/a",
+          "server.url": meta.url || "n/a",
         },
         done,
       );

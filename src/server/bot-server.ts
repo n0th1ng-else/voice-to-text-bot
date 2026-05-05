@@ -14,6 +14,7 @@ import type { HttpsOptions } from "../../certs/index.js";
 import type { TelegramBotModel } from "../telegram/bot.js";
 import { generateMemorySnapshotAsBuffer } from "../profiling/memory.js";
 import { initNewRelicRequestContext, trackUnknownRoute } from "../monitoring/newrelic.js";
+import { UnknownRouteError } from "./error.js";
 
 const logger = new Logger("server");
 
@@ -74,11 +75,9 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     });
 
     this.app.setNotFoundHandler<{ Reply: NotFoundDto }>(async (req, reply) => {
-      const err = new Error("Unknown route", {
-        cause: { path: req.originalUrl },
-      });
+      const err = new UnknownRouteError().setRoute(req.originalUrl);
 
-      logger.warn(`Unknown route ${Logger.y(req.originalUrl)}`, err, true);
+      logger.warn(`Unknown route`, err, true);
       const analytics = new AnalyticsData(this.version, this.selfUrl, this.threadId);
 
       analytics.addError("Unknown route for the host").setCommand("/app", "Server route not found");

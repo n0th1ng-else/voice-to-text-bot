@@ -36,12 +36,13 @@ export const setFastifyPreHandler = (
       "",
     );
 
+    const url = routeOptions.url || request.url;
+    const method = routeOptions.method || request.method;
+
     callback(
       {
-        url: routeOptions.url,
-        method: Array.isArray(routeOptions.method)
-          ? routeOptions.method.at(0)
-          : routeOptions.method,
+        url,
+        method: Array.isArray(method) ? method.at(0) : method,
         userId: requestUserId,
         chatId: requestChatId,
         lang: requestUserLanguage,
