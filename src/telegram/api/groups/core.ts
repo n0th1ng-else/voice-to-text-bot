@@ -4,6 +4,7 @@ import { TgError } from "../tgerror.js";
 import type { ChatId } from "../core.js";
 import { API_TIMEOUT_MS } from "../../../const.js";
 import { unknownHasMessage } from "../../../common/unknown.js";
+import { getResponseErrorData } from "../../../server/error.js";
 
 export class TelegramBaseApi {
   public static readonly url = "https://api.telegram.org";
@@ -36,18 +37,6 @@ export class TelegramBaseApi {
     return schema.parse(result);
   }
 
-  private async parseErrorResponse(response: Response): Promise<TgCore<void>> {
-    try {
-      const answer = (await response.json()) as TgCore<void>;
-      return answer;
-    } catch {
-      return {
-        ok: false,
-        result: undefined,
-      };
-    }
-  }
-
   private async request<Response, Data>(
     methodName: string,
     data?: Data,
@@ -68,7 +57,7 @@ export class TelegramBaseApi {
       });
 
       if (!response.ok) {
-        const answer = await this.parseErrorResponse(response);
+        const answer = await getResponseErrorData(response);
 
         const tgError = new TgError(new Error(response.statusText), response.statusText)
           .setUrl(url, this.apiToken)

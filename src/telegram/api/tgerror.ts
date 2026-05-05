@@ -6,7 +6,7 @@ import type { ChatId } from "./core.js";
 export class TgError extends Error {
   public code = 0;
   public chatId?: ChatId;
-  public response?: TgCore<void>;
+  public response = "{}";
   public migrateToChatId = 0;
   public retryAfter = 0;
   public url = "";
@@ -20,7 +20,7 @@ export class TgError extends Error {
     return this;
   }
 
-  public setResponse(response?: TgCore<void>): this {
+  public setResponse(response: string): this {
     this.response = response;
     return this;
   }
@@ -52,10 +52,16 @@ const assertErrCondition = (err: unknown, status: number, text: string): boolean
   if (!(err instanceof TgError)) {
     return false;
   }
-  const isErr = !err?.response?.ok;
-  const isStatusExpected = err?.code === status;
-  const isTextExpected = err?.response?.description?.toLowerCase() === text.toLowerCase();
-  return isErr && isStatusExpected && isTextExpected;
+
+  try {
+    const isStatusExpected = err.code === status;
+    const response = JSON.parse(err.response) as TgCore<void>;
+    const isErr = !response.ok;
+    const isTextExpected = response.description?.toLowerCase() === text.toLowerCase();
+    return isErr && isStatusExpected && isTextExpected;
+  } catch {
+    return false;
+  }
 };
 
 export const hasNoRightsToSendMessage = (err: unknown): boolean => {
