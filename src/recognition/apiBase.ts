@@ -2,6 +2,7 @@ import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.j
 import { Logger } from "../logger/index.js";
 import { getAudioBlob } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
+import { getResponseErrorData } from "../server/error.js";
 
 const logger = new Logger("api-base-recognition");
 
@@ -27,9 +28,20 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
         signal: AbortSignal.timeout(1_000),
       });
 
+      if (!response.ok) {
+        const errResp = await getResponseErrorData(response);
+        throw new Error(
+          `Failed to fetch the recognition service health: ${response.status} ${response.statusText}`,
+          {
+            cause: errResp,
+          },
+        );
+      }
+
       const data = (await response.json()) as { status: string };
       return data.status === "healthy" ? "ok" : "error";
-    } catch {
+    } catch (err) {
+      logger.error("Failed to fetch the recognition service health", err);
       return "error";
     }
   }
