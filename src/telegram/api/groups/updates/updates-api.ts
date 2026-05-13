@@ -3,6 +3,7 @@ import {
   type BotCommandDto,
   type BotCommandListDto,
   type TgWebHook,
+  type SetWebHookDto,
   TgWebHookSchema,
   TgSetWebHookSchema,
   TgAnswerSetCommands,
@@ -15,17 +16,20 @@ export class TelegramUpdatesApi {
     this.client = client;
   }
 
-  public getWebHookInfo(): Promise<TgWebHook> {
+  public async getWebHookInfo(): Promise<TgWebHook> {
     return this.client.requestValidate("getWebhookInfo", TgWebHookSchema);
   }
 
-  public setWebHook(hookUrl: string): Promise<boolean> {
-    return this.client.requestValidate("setWebHook", TgSetWebHookSchema, {
-      url: hookUrl,
-    });
+  public async setWebHook(hookUrl: string): Promise<boolean> {
+    const data: SetWebHookDto = {
+      url: encodeURI(hookUrl),
+      drop_pending_updates: true,
+    };
+
+    return this.client.requestValidate("setWebHook", TgSetWebHookSchema, data);
   }
 
-  public setMyCommands(commands: BotCommandDto[]): Promise<boolean> {
+  public async setMyCommands(commands: BotCommandDto[]): Promise<boolean> {
     const data: BotCommandListDto = {
       commands,
     };

@@ -608,9 +608,11 @@ describe("[telegram api client]", () => {
             expect(url).toBe(`${TelegramBaseApi.url}/bot${testApiToken}/setWebHook`);
             const body = JSON.parse(typeof cfg?.body === "string" ? cfg?.body : "") as {
               url: string;
+              drop_pending_updates: boolean;
             };
-            expect(Object.keys(body)).toHaveLength(1);
+            expect(Object.keys(body)).toHaveLength(2);
             expect(body.url).toBe(testHook);
+            expect(body.drop_pending_updates).toBe(true);
             return Promise.resolve(
               new Response(
                 getApiResponse<boolean>(false, true, testErrorCode, testErrorDescription),
