@@ -104,12 +104,9 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
 
   public async applyHostLocation(timeoutMs = 0): Promise<void> {
     logger.info("Setting up bot hooks");
-    return Promise.all(this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs))).then(
-      () => {
-        this.isIdle = false;
-        logger.info("Instance is successfully set as a hook receiver");
-      },
-    );
+    await Promise.all(this.bots.map((bot) => bot.applyHostLocationIfNeeded(timeoutMs)));
+    this.isIdle = false;
+    logger.info("Instance is successfully set as a hook receiver");
   }
 
   public setBots(bots: TelegramBotModel[] = []): this {

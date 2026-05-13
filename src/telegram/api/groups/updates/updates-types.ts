@@ -13,6 +13,16 @@ export const TgSetWebHookSchema = z
   .boolean()
   .describe("Telegram webhook api response schema validator");
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const SetWebHookSchema = z
+  .object({
+    url: z.string(),
+    drop_pending_updates: z.boolean(),
+  })
+  .describe("Telegram set webhook schema");
+
+export type SetWebHookDto = z.infer<typeof SetWebHookSchema>;
+
 const BotCommandSchema = z
   .object({
     command: z.string(),

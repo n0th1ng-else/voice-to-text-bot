@@ -96,33 +96,37 @@ export class TelegramBotModel {
     return this;
   }
 
-  public applyHostLocationIfNeeded(timeoutMs: number): Promise<boolean> {
+  public async applyHostLocationIfNeeded(timeoutMs: number): Promise<boolean> {
     const hookUrl = `${this.host}${this.getPath()}`;
     logger.info(`WebHook url is ${Logger.y(hookUrl)}`);
 
-    return runPromiseWithRetry("bot.getWebHookInfo", () => this.bot.updates.getWebHookInfo()).then(
-      (info) => {
-        if (info.url === hookUrl) {
-          return true;
-        }
-
-        return this.applyHostLocation(timeoutMs);
-      },
+    const info = await runPromiseWithRetry("bot.getWebHookInfo", async () =>
+      this.bot.updates.getWebHookInfo(),
     );
+    if (info.url === hookUrl) {
+      return true;
+    } else {
+      logger.warn(`Current WebHook is ${info.url}. Updating...`);
+    }
+
+    const isSet = await this.applyHostLocation(hookUrl, timeoutMs);
+    return isSet;
   }
 
-  private applyHostLocation(timeoutMs: number): Promise<boolean> {
-    const hookUrl = `${this.host}${this.getPath()}`;
+  private async applyHostLocation(hookUrl: string, timeoutMs: number): Promise<boolean> {
     logger.info(`Applying WebHook url is ${Logger.y(hookUrl)}`);
-    return runPromiseWithRetry(
+
+    await runPromiseWithRetry(
       "bot.applyHostLocation",
       () => this.bot.updates.setWebHook(hookUrl),
       timeoutMs,
-    ).then(() =>
-      runPromiseWithRetry("bot.setMyCommands", () =>
-        this.bot.updates.setMyCommands(getBotMenuCommands()),
-      ),
     );
+
+    const isSet = await runPromiseWithRetry("bot.setMyCommands", () =>
+      this.bot.updates.setMyCommands(getBotMenuCommands()),
+    );
+
+    return isSet;
   }
 
   public async getHostLocation(): Promise<string> {
