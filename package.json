@@ -34,7 +34,8 @@
     "test:unit:watch": "pnpm run test:runner watch --project=unit",
     "test:e2e:watch": "pnpm run test:runner watch --project=e2e",
     "test": "pnpm run test:runner run --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:merge": "node run-tests.mjs"
   },
   "dependencies": {
     "@amplitude/node": "1.10.2",

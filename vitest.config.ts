@@ -17,6 +17,7 @@ export default defineConfig({
       exclude: ["**/__mocks__/**", ...coverageConfigDefaults.exclude],
     },
     globalSetup: "./vitest.setup.ts",
+    setupFiles: "./vitest.prep.ts",
     environment: "node",
     env: {
       NEW_RELIC_ENABLED: "false",
