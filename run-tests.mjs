@@ -23,7 +23,7 @@ function runVitest(args) {
 
 const shardResults = await Promise.allSettled(
   Array.from({ length: SHARD_COUNT }, (_, i) =>
-    runVitest(["run", "--reporter=blob", `--shard=${i + 1}/${SHARD_COUNT}`]),
+    runVitest(["run", "--reporter=blob", "--reporter=default", `--shard=${i + 1}/${SHARD_COUNT}`]),
   ),
 );
 
