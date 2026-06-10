@@ -21,11 +21,15 @@ function runVitest(args) {
   });
 }
 
-const shardResults = await Promise.allSettled(
-  Array.from({ length: SHARD_COUNT }, (_, i) =>
-    runVitest(["run", "--reporter=blob", "--reporter=default", `--shard=${i + 1}/${SHARD_COUNT}`]),
-  ),
-);
+const shardResults = [];
+for (let i = 0; i < SHARD_COUNT; i++) {
+  // eslint-disable-next-line
+  console.log(`\nRunning shard ${i + 1}/${SHARD_COUNT}...`);
+  const result = await runVitest(["run", "--reporter=blob", "--reporter=default", `--shard=${i + 1}/${SHARD_COUNT}`])
+    .then(() => ({ status: "fulfilled" }))
+    .catch((err) => ({ status: "rejected", reason: err }));
+  shardResults.push(result);
+}
 
 // eslint-disable-next-line
 console.log("\nMerging blob reports...");
