@@ -43,6 +43,7 @@ jobs:
     name: Send release into sentry
     needs: [tag-release]
     timeout-minutes: 1
+    environment: production
     steps:
       - name: App version
         run: echo "Picked the app version ${GITHUB_SHA}"
@@ -65,6 +66,7 @@ jobs:
     name: Send release into newrelic
     needs: [tag-release]
     timeout-minutes: 1
+    environment: production
     steps:
       - name: New Relic release marker
         uses: newrelic/deployment-marker-action@d88a59ea8f713ad6935e60de27273157790b1e3b # v2.6.2
