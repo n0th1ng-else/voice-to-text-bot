@@ -77,7 +77,7 @@ export class BotServer extends BotServerBase<FastifyInstance> implements BotServ
     this.app.setNotFoundHandler<{ Reply: NotFoundDto }>(async (req, reply) => {
       const err = new UnknownRouteError().setRoute(req.originalUrl);
 
-      logger.warn(`Unknown route`, err, true);
+      logger.warn(`Unknown route`, err);
       const analytics = new AnalyticsData(this.version, this.selfUrl, this.threadId);
 
       analytics.addError("Unknown route for the host").setCommand("/app", "Server route not found");
