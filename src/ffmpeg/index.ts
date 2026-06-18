@@ -4,7 +4,7 @@ import ffmpeg from "fluent-ffmpeg";
 import { Logger } from "../logger/index.js";
 import { deleteFileIfExists, saveStreamToFile } from "../files/index.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../const.js";
-import { readFile } from "node:fs/promises";
+import { openAsBlob } from "node:fs";
 import { getResponseErrorData } from "../server/error.js";
 
 const logger = new Logger("media-to-wav");
@@ -100,7 +100,6 @@ export const getAudioBlob = async (
   shouldConvertToWav = true,
 ): Promise<[Blob, string]> => {
   const filePath = await getAudioFilePath(fileLink, isLocalFile, shouldConvertToWav);
-  const fileBuffer = await readFile(filePath);
-  const fileBlob = new Blob([fileBuffer]);
+  const fileBlob = await openAsBlob(filePath);
   return [fileBlob, filePath];
 };
