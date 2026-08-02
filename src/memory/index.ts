@@ -16,7 +16,7 @@ const getMemoryUsageMb = (): NodeJS.MemoryUsage => {
     heapUsed: getMb(stat.heapUsed),
     external: getMb(stat.external),
     rss: getMb(stat.rss),
-    arrayBuffers: stat.arrayBuffers,
+    arrayBuffers: getMb(stat.arrayBuffers),
   };
 };
 
@@ -27,38 +27,38 @@ export const getMB = (mb: number): number => {
 };
 
 export const printCurrentMemoryStat = async (limit?: number, offset = 15): Promise<number> => {
-  const stat = getMemoryUsageMb();
-  const line = `Current usage [rss=${stat.rss}Mb] [heapTotal=${stat.heapTotal}Mb] [heapUsed=${stat.heapUsed}Mb]`;
+  const { rss, heapTotal, heapUsed, arrayBuffers, external } = getMemoryUsageMb();
+  const line = `Current usage [rss=${rss}Mb] [heapTotal=${heapTotal}Mb] [heapUsed=${heapUsed}Mb] [external=${external}Mb] [arrayBuffers=${arrayBuffers}Mb]`;
   if (!limit) {
     logger.info(line);
-    return stat.rss;
+    return rss;
   }
 
   const fullStat = 100;
   const dangerStat = fullStat - offset;
   const warningStat = dangerStat - offset;
-  const statDiff = (stat.rss * fullStat) / limit;
+  const statDiff = (rss * fullStat) / limit;
 
   if (statDiff > fullStat) {
     logger.error(
       `The process exceeds memory limit ${limit}Mb! ${line}`,
       new Error("The process exceeds memory limit"),
     );
-    return stat.rss;
+    return rss;
   }
 
   if (statDiff > dangerStat) {
     logger.error(line, new Error(line));
-    return stat.rss;
+    return rss;
   }
 
   if (statDiff > warningStat) {
     logger.warn(line, {}, true);
-    return stat.rss;
+    return rss;
   }
 
   logger.info(line);
-  return stat.rss;
+  return rss;
 };
 
 export const sendMemoryStatAnalytics = async (
