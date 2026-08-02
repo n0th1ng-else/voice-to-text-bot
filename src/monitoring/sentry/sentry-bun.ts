@@ -5,14 +5,14 @@ import {
   getCurrentScope,
   withIsolationScope,
   setupFastifyErrorHandler,
-} from "@sentry/node";
+} from "@sentry/bun";
 import type { FastifyInstance } from "fastify";
 import { SentryBase } from "./sentry-base.js";
 import { isDevelopment } from "../../common/environment.js";
 import type { VoidFunction } from "../../common/types.js";
 import type { HookMetadata } from "../../server/hook.js";
 
-export class SentryNodeClient extends SentryBase {
+export class SentryBunClient extends SentryBase {
   public init(app: FastifyInstance): void {
     if (!this.isEnabled()) {
       return;
