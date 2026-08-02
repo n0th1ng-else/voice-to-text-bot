@@ -17,6 +17,7 @@ export const getMTProtoApi = (appId: number, appHash: string, apiToken: string):
     apiId: appId,
     apiHash: appHash,
     storage: "file-temp/client.session",
+    disableUpdates: true,
   });
 
   return {
