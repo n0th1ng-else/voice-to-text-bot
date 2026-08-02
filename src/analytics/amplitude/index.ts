@@ -1,4 +1,4 @@
-import { init as initAmplitude } from "@amplitude/node";
+import { init as initAmplitude, type NodeClient } from "@amplitude/node";
 import { customAlphabet } from "nanoid";
 import type { AnalyticsEventExt } from "../ga/types.js";
 import { Logger } from "../../logger/index.js";
@@ -7,6 +7,17 @@ import { isDevelopment } from "../../common/environment.js";
 import type { ChatId } from "../../telegram/api/core.js";
 
 const logger = new Logger("analytics:amplitude");
+
+let LOG_EVENT_HANDLER: NodeClient["logEvent"] | undefined;
+
+const getEventHandler = (token: string): NodeClient["logEvent"] => {
+  if (!LOG_EVENT_HANDLER) {
+    const client = initAmplitude(token);
+    LOG_EVENT_HANDLER = client.logEvent.bind(client);
+  }
+
+  return LOG_EVENT_HANDLER;
+};
 
 export const collectEvents = async (
   chatId: ChatId | "system_executor",
@@ -41,11 +52,11 @@ export const collectEvents = async (
      * SessionId, 19 chars max
      */
     const eventSession = isBrokenSessionId ? {} : { session_id: sessionId };
-    const client = initAmplitude(amplitudeToken);
+    const logEvent = getEventHandler(amplitudeToken);
 
     await Promise.all(
       events.map((event) =>
-        client.logEvent({
+        logEvent({
           event_type: event.name,
           user_id: String(chatId),
           language: event.params.language,
