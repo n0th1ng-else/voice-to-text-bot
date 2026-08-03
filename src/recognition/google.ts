@@ -2,7 +2,7 @@ import { v1 } from "@google-cloud/speech";
 import type { google } from "@google-cloud/speech/build/protos/protos.js";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { getAudioBlob } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
 import { deleteFileIfExists } from "../files/index.js";
@@ -43,13 +43,11 @@ export class GoogleProvider extends VoiceConverter {
     logger.info(`Starting process for ${Logger.y(name)}`);
     const duration = new TimeMeasure();
 
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const [fileBuffer, filePath] = await getAudioBuffer(fileLink, isLocalFile);
     logger.info(`Start converting ${Logger.y(name)}`);
 
     try {
-      const arrayBuffer = await fileBlob.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const fileStr = buffer.toString("base64");
+      const fileStr = fileBuffer.toString("base64");
 
       const [translationData] = await this.service.recognize({
         audio: {

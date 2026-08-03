@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
-import { getAudioBlob } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { Logger } from "../logger/index.js";
 import { TimeMeasure } from "../common/timer.js";
 import { trackRecognitionTime } from "../monitoring/newrelic.js";
@@ -101,9 +101,9 @@ export class AWSProvider extends VoiceConverter {
   }
 
   private async processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const [fileBuffer, filePath] = await getAudioBuffer(fileLink, isLocalFile);
     try {
-      const info1 = await this.uploadToS3(name, fileBlob);
+      const info1 = await this.uploadToS3(name, fileBuffer);
       const info2 = await this.convertToText(name, info1.Location);
       const text = await this.getJobWithDelay(name, info2);
       return text;
@@ -146,7 +146,7 @@ export class AWSProvider extends VoiceConverter {
       .then((job) => this.getJobWithDelay(name, job));
   }
 
-  private uploadToS3(name: string, file: Blob): Promise<AWSUpload> {
+  private uploadToS3(name: string, file: Buffer): Promise<AWSUpload> {
     logger.info("Uploading to S3", name);
     return new Promise<AWSUpload>((resolve, reject) => {
       this.storage.upload(
