@@ -98,8 +98,8 @@ export const getAudioBlob = async (
   fileLink: string,
   isLocalFile: boolean,
   shouldConvertToWav = true,
-): Promise<[Blob, string]> => {
+): Promise<{ fileBlob: Blob; filePath: string }> => {
   const filePath = await getAudioFilePath(fileLink, isLocalFile, shouldConvertToWav);
   const fileBlob = await openAsBlob(filePath);
-  return [fileBlob, filePath];
+  return { fileBlob, filePath };
 };
