@@ -34,7 +34,8 @@ export type TgMessageOptions = z.infer<typeof TgMessageOptionsSchema>;
 
 export const TgReplyMarkup = z
   .object({
-    inline_keyboard: z.array(z.array(TgInlineKeyboardButtonSchema)),
+    inline_keyboard: z.optional(z.array(z.array(TgInlineKeyboardButtonSchema))),
+    remove_keyboard: z.optional(z.boolean()),
   })
   .describe("Button layout attached to the message");
 

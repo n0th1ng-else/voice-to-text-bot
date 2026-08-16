@@ -201,7 +201,7 @@ export const mockTgReceiveMessage = (
           });
         });
       } else {
-        expect(answer.reply_markup).not.toBeDefined();
+        expect(answer.reply_markup).toEqual({ remove_keyboard: true });
       }
       resolve(prefixId);
       return makeTelegramResponse<TgMessage>(makeSampleTelegramMessageResponse(answer.chat_id));
@@ -299,7 +299,7 @@ export const mockTgReceiveCallbackMessage = (
           });
         });
       } else {
-        expect(answer.reply_markup).not.toBeDefined();
+        expect(answer.reply_markup).toEqual({ remove_keyboard: true });
       }
       resolve();
       return makeTelegramResponse<TgMessage>(
