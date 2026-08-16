@@ -473,7 +473,7 @@ describe("[telegram api client]", () => {
             expect(body.chat_id).toBe(testChatId);
             expect(body.text).toBe(testText);
             expect(body.parse_mode).toBe(undefined);
-            expect(body.reply_markup).toBe(undefined);
+            expect(body.reply_markup).toEqual({ remove_keyboard: true });
             return Promise.resolve(
               new Response(
                 getApiResponse<TgMessage>(true, {

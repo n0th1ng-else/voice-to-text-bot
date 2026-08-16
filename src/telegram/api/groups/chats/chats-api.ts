@@ -41,6 +41,10 @@ export class TelegramChatsApi {
       data.reply_markup = {
         inline_keyboard: options.buttons,
       };
+    } else {
+      data.reply_markup = {
+        remove_keyboard: true,
+      };
     }
 
     return this.client.requestValidate("sendMessage", TgMessageSchema, data, chatId);
@@ -65,6 +69,10 @@ export class TelegramChatsApi {
     if (options.buttons) {
       data.reply_markup = {
         inline_keyboard: options.buttons,
+      };
+    } else {
+      data.reply_markup = {
+        remove_keyboard: true,
       };
     }
 
