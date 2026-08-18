@@ -1,6 +1,6 @@
 import { type ConverterMeta, type LanguageCode, VoiceConverter } from "./types.js";
 import { Logger } from "../logger/index.js";
-import { getAudioBlob } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { deleteFileIfExists } from "../files/index.js";
 import { getResponseErrorData } from "../server/error.js";
 
@@ -55,13 +55,13 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile, !this.useRawFile);
+    const [fileBuffer, filePath] = await getAudioBuffer(fileLink, isLocalFile, !this.useRawFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
 
     try {
       const result = await this.recognise(
         {
-          data: fileBlob,
+          data: fileBuffer,
           name,
           duration: fileDuration,
         },
@@ -76,7 +76,7 @@ export abstract class APIVoiceConverter<Res> extends VoiceConverter {
 
   protected abstract recognise(
     file: {
-      data: Blob;
+      data: Buffer;
       name: string;
       duration: number;
     },
