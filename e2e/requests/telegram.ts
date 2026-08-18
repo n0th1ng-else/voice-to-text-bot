@@ -299,7 +299,7 @@ export const mockTgReceiveCallbackMessage = (
           });
         });
       } else {
-        expect(answer.reply_markup).toEqual({ remove_keyboard: true });
+        expect(answer.reply_markup).not.toBeDefined();
       }
       resolve();
       return makeTelegramResponse<TgMessage>(

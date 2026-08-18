@@ -70,10 +70,6 @@ export class TelegramChatsApi {
       data.reply_markup = {
         inline_keyboard: options.buttons,
       };
-    } else {
-      data.reply_markup = {
-        remove_keyboard: true,
-      };
     }
 
     return this.client.requestValidate("editMessageText", TgMessageSchema, data, chatId);
