@@ -39,7 +39,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 # build — compile TS + copy runtime assets
 ############################################
 FROM deps AS build
-COPY tsconfig.json copy-files.ts ./
+COPY tsconfig.json ./
 COPY certs ./certs
 COPY assets ./assets
 COPY src ./src
