@@ -43,7 +43,9 @@ export class GoogleProvider extends VoiceConverter {
     logger.info(`Starting process for ${Logger.y(name)}`);
     const duration = new TimeMeasure();
 
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const file = await getAudioBlob(fileLink, isLocalFile);
+    let fileBlob: null | Blob = file.fileBlob;
+    let filePath: null | string = file.filePath;
     logger.info(`Start converting ${Logger.y(name)}`);
 
     try {
@@ -69,6 +71,10 @@ export class GoogleProvider extends VoiceConverter {
       return text;
     } finally {
       await deleteFileIfExists(filePath);
+      // eslint-disable-next-line no-useless-assignment
+      fileBlob = null;
+      // eslint-disable-next-line no-useless-assignment
+      filePath = null;
     }
   }
 

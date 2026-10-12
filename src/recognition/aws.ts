@@ -101,7 +101,9 @@ export class AWSProvider extends VoiceConverter {
   }
 
   private async processFile(fileLink: string, name: string, isLocalFile: boolean): Promise<AWSJob> {
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const file = await getAudioBlob(fileLink, isLocalFile);
+    let fileBlob: null | Blob = file.fileBlob;
+    let filePath: null | string = file.filePath;
     try {
       const info1 = await this.uploadToS3(name, fileBlob);
       const info2 = await this.convertToText(name, info1.Location);
@@ -109,6 +111,10 @@ export class AWSProvider extends VoiceConverter {
       return text;
     } finally {
       await deleteFileIfExists(filePath);
+      // eslint-disable-next-line no-useless-assignment
+      fileBlob = null;
+      // eslint-disable-next-line no-useless-assignment
+      filePath = null;
     }
   }
 
