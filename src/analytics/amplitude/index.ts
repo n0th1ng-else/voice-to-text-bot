@@ -3,7 +3,6 @@ import { customAlphabet } from "nanoid";
 import type { AnalyticsEventExt } from "../ga/types.js";
 import { Logger } from "../../logger/index.js";
 import { amplitudeToken } from "../../env.js";
-import { isDevelopment } from "../../common/environment.js";
 import type { ChatId } from "../../telegram/api/core.js";
 
 const logger = new Logger("analytics:amplitude");
@@ -24,12 +23,12 @@ export const collectEvents = async (
   events: AnalyticsEventExt[],
 ): Promise<void> => {
   if (!amplitudeToken) {
-    if (!isDevelopment()) {
-      logger.error(
-        "Amplitude Analytics Token is not provided!",
-        new Error("Amplitude Analytics Token is not provided"),
-      );
-    }
+    // if (!isDevelopment()) {
+    //   logger.error(
+    //     "Amplitude Analytics Token is not provided!",
+    //     new Error("Amplitude Analytics Token is not provided"),
+    //   );
+    // }
     return;
   }
 
