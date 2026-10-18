@@ -26,7 +26,7 @@ export class SentryBunClient extends SentryBase {
       // Set tracesSampleRate to 1.0 to capture 100%
       // of transactions for performance monitoring.
       // We recommend adjusting this value in production
-      tracesSampleRate: isDevelopment() ? 1.0 : 0.05,
+      tracesSampleRate: isDevelopment() ? 1.0 : 0.25,
       sampleRate: isDevelopment() ? 1.0 : 0.5,
       beforeSend: (event, hint) => this.beforeSentrySend(event, hint),
       beforeBreadcrumb: (breadcrumb) => this.beforeBreadcrumb(breadcrumb),
