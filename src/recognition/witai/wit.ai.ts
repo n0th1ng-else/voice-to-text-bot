@@ -6,7 +6,7 @@ import {
   type LanguageCode,
   type LanguageTokens,
 } from "../types.js";
-import { getAudioBlob } from "../../ffmpeg/index.js";
+import { getAudioBuffer } from "../../ffmpeg/index.js";
 import { parseChunkedResponse } from "../../common/request.js";
 import { TimeMeasure } from "../../common/timer.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../../const.js";
@@ -38,7 +38,7 @@ export class WithAiProvider extends VoiceConverter {
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const [fileBuffer, filePath] = await getAudioBuffer(fileLink, isLocalFile);
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     const token = this.getApiToken(lang);
     if (!token) {
@@ -48,7 +48,12 @@ export class WithAiProvider extends VoiceConverter {
     }
 
     try {
-      const result = await WithAiProvider.recognise(fileBlob, fileDuration, token, logData.prefix);
+      const result = await WithAiProvider.recognise(
+        fileBuffer,
+        fileDuration,
+        token,
+        logData.prefix,
+      );
       return result;
     } finally {
       await deleteFileIfExists(filePath);
@@ -56,7 +61,7 @@ export class WithAiProvider extends VoiceConverter {
   }
 
   private static async recognise(
-    data: Blob,
+    data: Buffer,
     fileDuration: number,
     authToken: string,
     logPrefix: string,
@@ -106,16 +111,19 @@ export class WithAiProvider extends VoiceConverter {
       });
   }
 
-  private static async recogniseSpeech(data: Blob, authToken: string): Promise<WitAiResponse[]> {
+  private static async recogniseSpeech(data: Buffer, authToken: string): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(data, "speech", WitAiResponseSchema, authToken);
   }
 
-  private static async recogniseDictation(data: Blob, authToken: string): Promise<WitAiResponse[]> {
+  private static async recogniseDictation(
+    data: Buffer,
+    authToken: string,
+  ): Promise<WitAiResponse[]> {
     return await WithAiProvider.runRequest(data, "dictation", WitAiResponseSchema, authToken);
   }
 
   private static async runRequest<Output, Input = Output>(
-    data: Blob,
+    data: Buffer,
     path: "speech" | "dictation",
     schema: z.ZodType<Output, Input>,
     authToken: string,

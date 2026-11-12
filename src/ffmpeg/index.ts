@@ -2,7 +2,7 @@ import { Readable } from "node:stream";
 import ffmpegBinPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import { Logger } from "../logger/index.js";
-import { deleteFileIfExists, saveStreamToFile } from "../files/index.js";
+import { deleteFileIfExists, readFileIntoBuffer, saveStreamToFile } from "../files/index.js";
 import { API_TIMEOUT_MS, wavSampleRate } from "../const.js";
 import { openAsBlob } from "node:fs";
 import { getResponseErrorData } from "../server/error.js";
@@ -102,4 +102,21 @@ export const getAudioBlob = async (
   const filePath = await getAudioFilePath(fileLink, isLocalFile, shouldConvertToWav);
   const fileBlob = await openAsBlob(filePath);
   return [fileBlob, filePath];
+};
+
+/**
+ * Reads the audio file into a plain Buffer instead of a Blob.
+ * Blob data lives in the internal native blob store that is not visible in
+ * process.memoryUsage() and is only released on GC finalization, which leads
+ * to unbounded RSS growth. Buffers are tracked (external/arrayBuffers) and
+ * released deterministically.
+ */
+export const getAudioBuffer = async (
+  fileLink: string,
+  isLocalFile: boolean,
+  shouldConvertToWav = true,
+): Promise<[Buffer, string]> => {
+  const filePath = await getAudioFilePath(fileLink, isLocalFile, shouldConvertToWav);
+  const fileBuffer = await readFileIntoBuffer(filePath);
+  return [fileBuffer, filePath];
 };

@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import type { LanguageCode } from "./types.js";
 import { APIVoiceConverter } from "./apiBase.js";
 import { APIVoiceConverterError } from "./apiSelfHostError.js";
@@ -28,7 +29,7 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
 
   protected async recognise(
     file: {
-      data: Blob;
+      data: Buffer;
       name: string;
       duration: number;
     },
@@ -41,21 +42,32 @@ export class ApiSelfHost extends APIVoiceConverter<ApiResponse> {
     try {
       const language = convertLanguageCodeToISO(lang);
 
-      const form = new FormData();
-      form.append("language", language);
-
       const fileName =
         !this.useRawFile && !file.name.endsWith(".wav") ? `${file.name}.wav` : file.name;
-      form.append("file", file.data, fileName);
+
+      // Build the multipart body manually from Buffers instead of FormData+Blob.
+      // Blob data is held in the internal native blob store which is invisible
+      // to process.memoryUsage() and only freed on GC finalization (unbounded
+      // RSS growth), while Buffers are tracked and released deterministically.
+      const boundary = `----VoiceToTextFormBoundary${nanoid()}`;
+      const head = Buffer.from(
+        `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="language"\r\n\r\n` +
+          `${language}\r\n` +
+          `--${boundary}\r\n` +
+          `Content-Disposition: form-data; name="file"; filename="${fileName}"\r\n` +
+          `Content-Type: application/octet-stream\r\n\r\n`,
+      );
+      const tail = Buffer.from(`\r\n--${boundary}--\r\n`);
+      const body = Buffer.concat([head, file.data, tail]);
 
       const response = await fetch(url, {
         method: "POST",
-        headers: this.apiToken
-          ? {
-              Authorization: `Bearer ${this.apiToken}`,
-            }
-          : {},
-        body: form,
+        headers: {
+          "Content-Type": `multipart/form-data; boundary=${boundary}`,
+          ...(this.apiToken ? { Authorization: `Bearer ${this.apiToken}` } : {}),
+        },
+        body,
         signal: AbortSignal.timeout(API_TIMEOUT_MS),
       });
 

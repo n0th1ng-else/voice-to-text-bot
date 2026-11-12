@@ -1,7 +1,7 @@
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { Logger } from "../logger/index.js";
 import { VoiceConverter, type ConverterMeta, type LanguageCode } from "./types.js";
-import { getAudioBlob } from "../ffmpeg/index.js";
+import { getAudioBuffer } from "../ffmpeg/index.js";
 import { convertLanguageCodeToISO } from "./common.js";
 import { API_TIMEOUT_MS } from "../const.js";
 import { TimeMeasure } from "../common/timer.js";
@@ -34,18 +34,22 @@ export class ElevenLabsProvider extends VoiceConverter {
   ): Promise<string> {
     const name = `${logData.fileId}.ogg`;
     logger.info(`${logData.prefix} Starting process for ${Logger.y(name)}`);
-    const [fileBlob, filePath] = await getAudioBlob(fileLink, isLocalFile);
+    const [fileBuffer, filePath] = await getAudioBuffer(fileLink, isLocalFile);
 
     logger.info(`${logData.prefix} Start converting ${Logger.y(name)}`);
     try {
-      const text = await this.recognise(fileBlob, fileDuration, lang);
+      const text = await this.recognise(fileBuffer, fileDuration, lang);
       return text;
     } finally {
       await deleteFileIfExists(filePath);
     }
   }
 
-  private async recognise(buffer: Blob, fileDuration: number, lang: LanguageCode): Promise<string> {
+  private async recognise(
+    buffer: Buffer,
+    fileDuration: number,
+    lang: LanguageCode,
+  ): Promise<string> {
     const duration = new TimeMeasure();
 
     const recognition = await this.client.speechToText.convert(
